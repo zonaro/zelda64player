@@ -3,11 +3,11 @@
 
 # Gradle / Build
 *.iml
-.gradle
+.gradle/
 /local.properties
 /.idea
 /app/release
-/build
+**/build/
 /.externalNativeBuild
 /.cxx
 *.apk
@@ -36,7 +36,6 @@ Thumbs.db
 catalog.json
 
 # Cache directories (runtime)
-/app/build/outputs/
 /app/.cxx/
 *.so
 

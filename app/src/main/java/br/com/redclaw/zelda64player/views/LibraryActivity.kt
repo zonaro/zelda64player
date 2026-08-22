@@ -1,0 +1,139 @@
+package br.com.redclaw.zelda64player.views
+
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowInsets
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.databinding.ActivityLibraryBinding
+import br.com.redclaw.zelda64player.utils.CorePrefs
+
+/**
+ * A single installed hack shown in the library grid. Populated by the store in a
+ * later phase; for Phase 0 the list is always empty (see [items]).
+ */
+data class LibraryItem(val id: String, val title: String)
+
+class LibraryActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityLibraryBinding
+
+    /* Stateless: rebuilt from the catalog on every (re)create, so process
+       death / configuration changes need no saved instance state. */
+    private val items = emptyList<LibraryItem>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityLibraryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        window.decorView.setOnApplyWindowInsetsListener { view, windowInsets ->
+            view.post { immersive(window) }
+            windowInsets
+        }
+
+        setupGrid()
+        binding.librarySettings.setOnClickListener { showSettingsMenu() }
+    }
+
+    private fun setupGrid() {
+        val spanCount = resources.getInteger(R.integer.library_span_count)
+        binding.libraryGrid.layoutManager = GridLayoutManager(this, spanCount)
+        binding.libraryGrid.adapter = LibraryAdapter(items) { item ->
+            val intent = Intent(this, GameActivity::class.java).apply {
+                putExtra("hack_id", item.id)
+            }
+            startActivity(intent)
+        }
+        updateEmptyState()
+    }
+
+    private fun updateEmptyState() {
+        val isEmpty = items.isEmpty()
+        binding.libraryEmpty.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        binding.libraryGrid.visibility = if (isEmpty) View.GONE else View.VISIBLE
+    }
+
+    private fun showSettingsMenu() {
+        val items = arrayOf(getString(R.string.menu_core))
+        AlertDialog.Builder(this)
+            .setTitle(R.string.library_settings_title)
+            .setItems(items) { _, which ->
+                if (items[which] == getString(R.string.menu_core))
+                    showCoreDialog()
+            }
+            .show()
+    }
+
+    private fun showCoreDialog() {
+        /* Needs the real Activity context -- AlertDialog.Builder can't resolve
+           themed single-choice layouts without the activity's theme. */
+        val currentIndex = CorePrefs.getSelectedCoreIndex(this)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.menu_core)
+            .setSingleChoiceItems(CorePrefs.options, currentIndex) { dialog, which ->
+                CorePrefs.setSelectedCoreIndex(this, which)
+                dialog.dismiss()
+                android.widget.Toast.makeText(
+                    this, R.string.toast_core_updated, android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    /** Hide the system bars when the config permits it (mirrors GameActivity). */
+    @Suppress("DEPRECATION")
+    private fun immersive(window: Window) {
+        if (!resources.getBoolean(R.bool.config_fullscreen))
+            return
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.apply {
+                hide(WindowInsets.Type.systemBars())
+                systemBarsBehavior =
+                    android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            window.decorView.systemUiVisibility =
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_FULLSCREEN
+        }
+    }
+
+    private class LibraryAdapter(
+        private val items: List<LibraryItem>,
+        private val onItemClick: (LibraryItem) -> Unit
+    ) : RecyclerView.Adapter<LibraryAdapter.ViewHolder>() {
+
+        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val title: TextView = view.findViewById(R.id.tile_title)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.library_tile, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val item = items[position]
+            holder.title.text = item.title
+            holder.itemView.setOnClickListener { onItemClick(item) }
+        }
+
+        override fun getItemCount() = items.size
+    }
+}

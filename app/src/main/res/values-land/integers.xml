@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Library grid columns in landscape -->
+    <integer name="library_span_count">3</integer>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Internal preference keys (not user-facing) -->
+    <string name="pref_frame_speed">frame_speed</string>
+    <string name="pref_audio_enabled">audio_enabled</string>
+
+    <!-- In-game menu -->
+    <string name="menu_reset">Reiniciar</string>
+    <string name="menu_save_state">Salvar Estado</string>
+    <string name="menu_load_state">Carregar Estado</string>
+    <string name="menu_mute">Silenciar</string>
+    <string name="menu_fast_forward">Acelerar</string>
+    <string name="menu_core">Core</string>
+    <string name="menu_button_stick">Button Stick</string>
+    <string name="menu_auto_z">Auto-Z</string>
+    <string name="menu_sensitivity">Sensibilidade</string>
+    <string name="sensitivity_n64_stick">Analógico N64</string>
+    <string name="sensitivity_button_stick">Button Stick</string>
+
+    <!-- Library -->
+    <string name="library_settings_title">Configurações</string>
+    <string name="library_settings_description">Abrir configurações</string>
+    <string name="toast_core_updated">Core atualizado</string>
+    <string name="library_empty">Nenhum hack instalado</string>
+</resources>
