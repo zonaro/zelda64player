@@ -28,5 +28,8 @@
         <activity
             android:name=".store.ui.StoreActivity"
             android:exported="false" />
+        <activity
+            android:name=".settings.ui.SettingsActivity"
+            android:exported="false" />
     </application>
 </manifest>

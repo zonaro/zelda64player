@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowInsets
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,8 +17,8 @@ import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
 import br.com.redclaw.zelda64player.data.local.MergedCatalogRepository
 import br.com.redclaw.zelda64player.data.local.PatchRepository
 import br.com.redclaw.zelda64player.databinding.ActivityLibraryBinding
+import br.com.redclaw.zelda64player.settings.ui.SettingsActivity
 import br.com.redclaw.zelda64player.store.ui.StoreActivity
-import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.views.CatalogBackedLibrarySource
 import br.com.redclaw.zelda64player.views.HackLibraryEntry
 import java.io.File
@@ -52,7 +51,9 @@ class LibraryActivity : AppCompatActivity() {
         items = source.available()
 
         setupGrid()
-        binding.librarySettings.setOnClickListener { showSettingsMenu() }
+        binding.librarySettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
         binding.libraryStore.setOnClickListener {
             startActivity(Intent(this, StoreActivity::class.java))
         }
@@ -74,34 +75,6 @@ class LibraryActivity : AppCompatActivity() {
         val isEmpty = items.isEmpty()
         binding.libraryEmpty.visibility = if (isEmpty) View.VISIBLE else View.GONE
         binding.libraryGrid.visibility = if (isEmpty) View.GONE else View.VISIBLE
-    }
-
-    private fun showSettingsMenu() {
-        val items = arrayOf(getString(R.string.menu_core))
-        AlertDialog.Builder(this)
-            .setTitle(R.string.library_settings_title)
-            .setItems(items) { _, which ->
-                if (items[which] == getString(R.string.menu_core))
-                    showCoreDialog()
-            }
-            .show()
-    }
-
-    private fun showCoreDialog() {
-        /* Needs the real Activity context -- AlertDialog.Builder can't resolve
-           themed single-choice layouts without the activity's theme. */
-        val currentIndex = CorePrefs.getSelectedCoreIndex(this)
-        AlertDialog.Builder(this)
-            .setTitle(R.string.menu_core)
-            .setSingleChoiceItems(CorePrefs.options, currentIndex) { dialog, which ->
-                CorePrefs.setSelectedCoreIndex(this, which)
-                dialog.dismiss()
-                android.widget.Toast.makeText(
-                    this, R.string.toast_core_updated, android.widget.Toast.LENGTH_SHORT
-                ).show()
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
     }
 
     /** Hide the system bars when the config permits it (mirrors GameActivity). */

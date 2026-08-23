@@ -14,6 +14,7 @@ package br.com.redclaw.zelda64player.data.model
  * @property crc32 required CRC32 (lowercase hex) of the normalized ROM
  * @property md5 optional MD5 (lowercase hex) for extra validation
  * @property sha1 optional SHA-1 (lowercase hex) for extra validation
+ * @property sourceName original filename the ROM was imported from, if known
  */
 data class BaseRom(
     val id: String,
@@ -24,7 +25,8 @@ data class BaseRom(
     val sizeBytes: Long,
     val crc32: String,
     val md5: String?,
-    val sha1: String?
+    val sha1: String?,
+    val sourceName: String? = null
 ) {
     fun toJson(): org.json.JSONObject = org.json.JSONObject().apply {
         put("id", id)
@@ -36,6 +38,7 @@ data class BaseRom(
         put("crc32", crc32)
         put("md5", md5)
         put("sha1", sha1)
+        put("sourceName", sourceName)
     }
 
     companion object {
@@ -48,7 +51,8 @@ data class BaseRom(
             sizeBytes = o.getLong("sizeBytes"),
             crc32 = o.getString("crc32"),
             md5 = if (o.isNull("md5")) null else o.getString("md5"),
-            sha1 = if (o.isNull("sha1")) null else o.getString("sha1")
+            sha1 = if (o.isNull("sha1")) null else o.getString("sha1"),
+            sourceName = if (o.isNull("sourceName")) null else o.getString("sourceName")
         )
     }
 }

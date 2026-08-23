@@ -18,6 +18,13 @@ import java.io.File
  * The repository takes explicit directories (not an Android [android.content.Context])
  * so it is unit-testable on the JVM with temporary folders.
  */
+/** Outcome of registering a single normalized ROM file. */
+sealed class RegisterResult {
+    data class Success(val rom: BaseRom) : RegisterResult()
+    data class Duplicate(val existing: BaseRom) : RegisterResult()
+    data class Invalid(val reason: String) : RegisterResult()
+}
+
 class BaseRomRepository(
     private val importDir: File,
     private val storageDir: File,
@@ -67,7 +74,8 @@ class BaseRomRepository(
                     sizeBytes = finalFile.length(),
                     crc32 = crc32,
                     md5 = md5,
-                    sha1 = sha1
+                    sha1 = sha1,
+                    sourceName = file.nameWithoutExtension
                 )
             } catch (_: Exception) {
                 // Skip unreadable or unrecognized files silently.
@@ -86,6 +94,64 @@ class BaseRomRepository(
 
     fun getById(id: String): BaseRom? =
         loadRegistry().firstOrNull { it.id == id }
+
+    /**
+     * Register a ROM that has already been normalized to big-endian `.z64`
+     * (e.g. imported via the Storage Access Framework). Reuses the same
+     * checksum/header/dedupe/registry logic as [scanAndRegister] so both import
+     * paths stay consistent. The [normalizedFile] is consumed (moved on success,
+     * deleted otherwise) and must not be used by the caller afterwards.
+     */
+    fun registerNormalizedFile(normalizedFile: File, sourceName: String): RegisterResult {
+        return try {
+            val crc32 = ChecksumCalculator.crc32(normalizedFile)
+            val existing = loadRegistry().firstOrNull { it.crc32.equals(crc32, ignoreCase = true) }
+            if (existing != null) {
+                return RegisterResult.Duplicate(existing)
+            }
+            val header = RomHeader.fromNormalizedZ64(normalizedFile)
+            val md5 = ChecksumCalculator.md5(normalizedFile)
+            val sha1 = ChecksumCalculator.sha1(normalizedFile)
+
+            val finalFile = File(storageDir, "$crc32.z64")
+            move(normalizedFile, finalFile)
+
+            val displayName = header.title.takeIf { it.isNotBlank() } ?: sourceName
+            val rom = BaseRom(
+                id = crc32,
+                displayName = displayName,
+                path = finalFile.absolutePath,
+                gameCode = header.gameCode,
+                versionByte = header.versionByte,
+                sizeBytes = finalFile.length(),
+                crc32 = crc32,
+                md5 = md5,
+                sha1 = sha1,
+                sourceName = sourceName
+            )
+            val list = (loadRegistry() + rom).distinctBy { it.crc32 }
+            saveRegistry(list)
+            RegisterResult.Success(rom)
+        } catch (e: Exception) {
+            RegisterResult.Invalid(e.message ?: "invalid rom")
+        } finally {
+            if (normalizedFile.exists()) normalizedFile.delete()
+        }
+    }
+
+    /** Remove a registered base ROM (deletes the file and its registry entry). */
+    fun deleteById(id: String): Boolean {
+        val all = loadRegistry().toMutableList()
+        val found = all.firstOrNull { it.id == id } ?: return false
+        runCatching { File(found.path).delete() }
+        all.removeIf { it.id == id }
+        saveRegistry(all)
+        return true
+    }
+
+    /** A private, collision-safe temp file inside the storage directory for SAF imports. */
+    fun newImportTempFile(sanitizedName: String): File =
+        File(storageDir, "__import_${sanitizedName}.z64.tmp")
 
     private fun loadRegistry(): List<BaseRom> {
         if (!registryFile.exists()) return emptyList()

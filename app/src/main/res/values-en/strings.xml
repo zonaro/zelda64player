@@ -57,4 +57,47 @@
     <string name="dialog_base_rom_title">Incompatible base ROM</string>
     <string name="dialog_base_rom_none">No base ROM imported.</string>
     <string name="dialog_base_rom_message">This hack requires a base ROM with CRC32 %1$s. No imported ROM matches (found: %2$s).</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="cover_content_description">Hack cover</string>
+
+    <!-- Settings: import base ROM -->
+    <string name="settings_import_title">Import Base ROM</string>
+    <string name="settings_import_description">Select an N64 ROM file (.z64, .n64 or .v64) to import. Large files (32–64 MB) may take a few seconds.</string>
+    <string name="settings_import_button">Select ROM…</string>
+    <string name="settings_import_result_title">Import result</string>
+    <string name="settings_import_success">Imported: %1$s (Code: %2$s, Version: %3$s, CRC32: %4$s)</string>
+    <string name="settings_import_duplicate">Already imported: %1$s (CRC32: %2$s)</string>
+    <string name="settings_import_invalid">Failed: %1$s</string>
+    <string name="settings_import_summary">Imported: %1$d | Already present: %2$d | Failed: %3$d</string>
+
+    <!-- Settings: imported base ROMs -->
+    <string name="settings_baseroms_title">Imported Base ROMs</string>
+    <string name="settings_baseroms_empty">No base ROM imported. Use the section above to import one.</string>
+    <string name="settings_baserom_details">Code: %1$s | Version: %2$s | CRC32: %3$s | %4$s | File: %5$s</string>
+    <string name="settings_baserom_delete_desc">Remove base ROM</string>
+    <string name="settings_baserom_delete_confirm_title">Remove base ROM?</string>
+    <string name="settings_baserom_delete_confirm_message">Remove "%1$s" (CRC32: %2$s)? The file will be deleted and hacks that depend on it may stop working.</string>
+
+    <!-- Settings: custom catalog URLs -->
+    <string name="settings_catalog_title">Custom catalog URLs</string>
+    <string name="settings_catalog_description">Add additional hack catalogs (beyond the default). The default catalog is always included.</string>
+    <string name="settings_catalog_hint">https://example.com/catalog.json</string>
+    <string name="settings_catalog_add">Add</string>
+    <string name="settings_catalog_empty">No custom URLs. Only the default catalog will be used.</string>
+    <string name="settings_catalog_invalid">Invalid URL. Use http(s):// with a valid address.</string>
+    <string name="settings_catalog_delete_desc">Remove catalog URL</string>
+    <string name="settings_catalog_remove_confirm_title">Remove catalog URL?</string>
+
+    <!-- Settings: emulator core -->
+    <string name="settings_core_title">Emulator core</string>
+    <string name="settings_core_current">Current: %1$s</string>
+    <string name="settings_core_change">Change core</string>
+
+    <!-- Settings: about -->
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_version">Version: %1$s</string>
+    <string name="settings_about_repo">Repository</string>
+    <string name="settings_about_catalog">Catalog</string>
 </resources>

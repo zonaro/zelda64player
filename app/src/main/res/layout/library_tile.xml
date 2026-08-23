@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:background="#202020" />
+        android:background="#202020"
+        android:contentDescription="@string/cover_content_description" />
 
     <!-- Title overlays the bottom of the cover so the whole item is just the
          thumbnail; a gradient scrim keeps it legible over any artwork. -->

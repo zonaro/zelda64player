@@ -364,18 +364,18 @@ Após normalizar para z64 (BE), ler offsets:
 - [x] **Entregável**: Importa OoT 1.0 z64 → aplica patch OoT DX local → joga funcional
 
 ### Fase 2: Loja de Hacks (Semanas 4–5)
-- [ ] `data/model/HackEntry.kt`, `HackCatalog.kt`, `PatchFile.kt`
-- [ ] `CatalogFetcher.kt` (OkHttp + ETag/If-None-Match + cache JSON em `cacheDir/catalog.json`)
-- [ ] `DownloadManager.kt` (coroutines, progress notification, valida checksum patch após download)
-- [ ] `PatchRepository.kt` (arquivos `.bps` em `cacheDir/patches/<hackId>.bps`)
-- [ ] UI: `StoreActivity` (grid RecyclerView + Glide/Coil para capas), `StoreViewModel`, `HackDetailBottomSheet`
-- [ ] Integração: LibraryActivity mostra apenas hacks "instalados" (patch baixado + base ROM válida)
-- [ ] **Entregável**: Usuário abre Loja → vê catálogo → baixa patch → hack aparece na Library → joga
+- [x] `data/model/HackEntry.kt`, `HackCatalog.kt`, `PatchFile.kt`
+- [x] `CatalogFetcher.kt` (OkHttp + ETag/If-None-Match + cache JSON em `cacheDir/catalog.json`)
+- [x] `DownloadManager.kt` (coroutines, progress notification, valida checksum patch após download)
+- [x] `PatchRepository.kt` (arquivos `.bps` em `cacheDir/patches/<hackId>.bps`)
+- [x] UI: `StoreActivity` (grid RecyclerView + Glide/Coil para capas), `StoreViewModel`, `HackDetailBottomSheet`
+- [x] Integração: LibraryActivity mostra apenas hacks "instalados" (patch baixado + base ROM válida)
+- [x] **Entregável**: Usuário abre Loja → vê catálogo → baixa patch → hack aparece na Library → joga
 
 ### Fase 3: Configurações + Polish (Semana 6)
 - [ ] `SettingsActivity` com fragments: Importar ROM Base, Lista ROMs Base, URLs Catálogo Customizadas
 - [ ] File picker (Storage Access Framework) para importar ROMs → validação imediata (normaliza + checksum + header)
-- [ ] i18n: `strings.xml` (pt-BR default), `values-en/strings.xml`, `values-es/strings.xml`
+- [x] i18n: `strings.xml` (pt-BR default), `values-en/strings.xml`, `values-es/strings.xml`
 - [ ] Ícones/capas: Dolfi gera placeholders SVG + PNG para hacks sem coverImageUrl (ícone do app: manter o do Ludere por enquanto; ícone próprio tema Zelda adiado)
 - [ ] Acessibilidade: contentDescription, touch target sizes, TalkBack testado
 - [ ] **Entregável**: App completo funcional, pronto para release

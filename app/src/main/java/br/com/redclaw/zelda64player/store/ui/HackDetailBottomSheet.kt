@@ -102,12 +102,12 @@ class HackDetailBottomSheet : AppCompatDialogFragment() {
 
         if (hack.coverImageUrl != null) {
             binding.detailCover.load(hack.coverImageUrl) {
-                placeholder(R.drawable.store_cover_placeholder)
-                error(R.drawable.store_cover_placeholder)
+                placeholder(R.drawable.placeholder_cover)
+                error(R.drawable.placeholder_cover)
                 crossfade(true)
             }
         } else {
-            binding.detailCover.setImageResource(R.drawable.store_cover_placeholder)
+            binding.detailCover.setImageResource(R.drawable.placeholder_cover)
         }
 
         when (viewModel.statusFor(hack)) {

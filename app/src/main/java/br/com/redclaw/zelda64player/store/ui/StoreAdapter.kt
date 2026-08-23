@@ -72,12 +72,12 @@ class StoreAdapter(
 
             if (hack.coverImageUrl != null) {
                 binding.itemCover.load(hack.coverImageUrl) {
-                    placeholder(R.drawable.store_cover_placeholder)
-                    error(R.drawable.store_cover_placeholder)
+                    placeholder(R.drawable.placeholder_cover)
+                    error(R.drawable.placeholder_cover)
                     crossfade(true)
                 }
             } else {
-                binding.itemCover.setImageResource(R.drawable.store_cover_placeholder)
+                binding.itemCover.setImageResource(R.drawable.placeholder_cover)
             }
         }
     }

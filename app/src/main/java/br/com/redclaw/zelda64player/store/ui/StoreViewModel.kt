@@ -1,6 +1,7 @@
 package br.com.redclaw.zelda64player.store.ui
 
 import android.app.Application
+import android.content.Context
 import br.com.redclaw.zelda64player.R
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -14,6 +15,8 @@ import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.store.CatalogFetcher
 import br.com.redclaw.zelda64player.store.DownloadManager
 import br.com.redclaw.zelda64player.store.StoreException
+import br.com.redclaw.zelda64player.settings.CatalogUrlStore
+import br.com.redclaw.zelda64player.settings.SharedPreferencesStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,6 +50,16 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     private val downloadManager =
         DownloadManager(okHttpClient, patchRepository, installedRepository)
 
+    // Custom catalog URLs configured in Settings. The default catalog URL is
+    // always included first; CatalogFetcher merges all sources by id (later
+    // wins), so a custom catalog can override entries from the default.
+    private val catalogUrlStore = CatalogUrlStore(
+        SharedPreferencesStore(
+            appContext.getSharedPreferences(CatalogUrlStore.PREFS_NAME, Context.MODE_PRIVATE)
+        ),
+        CatalogUrlStore.KEY
+    )
+
     private val _catalog = MutableLiveData<CatalogUiState>(CatalogUiState.Loading)
     val catalog: LiveData<CatalogUiState> = _catalog
 
@@ -62,7 +75,8 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     fun refresh() {
         _catalog.value = CatalogUiState.Loading
         viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) { catalogFetcher.fetch() }
+            val urls = listOf(CatalogFetcher.DEFAULT_CATALOG_URL) + catalogUrlStore.getUrls()
+            val result = withContext(Dispatchers.IO) { catalogFetcher.fetch(urls) }
             result.onSuccess { fetchResult ->
                 mergedCatalogRepository.save(fetchResult.hacks)
                 _catalog.postValue(CatalogUiState.Loaded(fetchResult.hacks))
