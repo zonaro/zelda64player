@@ -381,11 +381,11 @@ Após normalizar para z64 (BE), ler offsets:
 - [x] **Entregável**: App completo funcional, pronto para release
 
 ### Fase 4: Extras / Stretch Goals (Pós-MVP)
-- [ ] Suporte a **IPS** (formato legado, simples, para hacks antigos)
-- [ ] Atualização automática de catálogo (WorkManager periodic fetch)
-- [ ] Backup/restore de saves (SRAM + states) via Google Drive / export ZIP
-- [ ] Suporte a múltiplos saves por hack (slots)
-- [ ] Telemetria opcional (opt-in, sem dados pessoais)
+- [x] Suporte a **IPS** (formato legado, simples, para hacks antigos)
+- [x] Atualização automática de catálogo (WorkManager periodic fetch)
+- [x] Backup/restore de saves via export/import ZIP local (sem nuvem)
+- [ ] Suporte a múltiplos saves por hack (slots) — *adiado pós-MVP*
+- [ ] Telemetria opcional (opt-in, sem dados pessoais) — *adiada: decisão privacy-first, sem backend no MVP*
 
 ---
 
