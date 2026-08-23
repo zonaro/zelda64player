@@ -67,6 +67,12 @@ at parse time so a single bad entry cannot break the whole catalog.
   `.bps` bytes and put them in `patch.checksums`. The app validates the
   downloaded file against these before installing. Base ROM checksums let the app
   tell the user whether they own the correct ROM version.
+  - **Important BPS quirk**: every spec-compliant `.bps` file ends with its own
+    CRC32 embedded in the last 4 bytes, which forces the full-file CRC32 to the
+    constant `2144df1c` for ALL valid BPS files (mathematical property:
+    `crc32(msg || crc32le(msg)) == 0x2144DF1C`). The CRC32 field therefore acts
+    as a format-consistency check only — **always include `patch.checksums.md5`**
+    so downloads are uniquely fingerprinted.
 - **Covers**: any image URL works; square or 10:7 landscape art is recommended.
   When omitted, the app shows a generated placeholder.
 

@@ -86,7 +86,7 @@
       "name": "The Legend of Zelda: Master of Time Revisited",
       "description": "Revision of Master of Time (Rev0) with a new pause menu, new Link model with matching icons and get-item models, texture updates and the Silver Scale crash fixed.",
       "author": "Don Camilo",
-      "version": "1.0",
+      "version": "1.4.2",
       "baseRom": {
         "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
         "gameCode": "CZLE",
@@ -98,10 +98,14 @@
         }
       },
       "patch": {
-        "url": "https://www.romhacking.net/download/hacks/7902/1dc7d4e898e9dc4d6b6beb70767749f4d064dee47727ca92629c2458ab48eb59",
-        "filename": "master_of_time_revisited.bps"
+        "url": "https://github.com/zonaro/zelda64player/releases/download/catalog-patches-v1/master_of_time_revisited_v1.4.2.bps",
+        "filename": "master_of_time_revisited_v1.4.2.bps",
+        "size": 20118663,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "0fba9af90d86a1e86ff0c0bc77ba321f"
+        }
       },
-      "status": "pending-patch-checksums",
       "tags": ["bugfix", "enhancement"],
       "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
     },
@@ -122,10 +126,14 @@
         }
       },
       "patch": {
-        "url": "https://www.romhacking.net/download/hacks/5334/1dc7d4e898e9dc4d6b6beb70767749f4d064dee47727ca92629c2458ab48eb59",
-        "filename": "the_missing_link.bps"
+        "url": "https://github.com/zonaro/zelda64player/releases/download/catalog-patches-v1/the_missing_link_v2.0_z64.bps",
+        "filename": "the_missing_link_v2.0_z64.bps",
+        "size": 4674020,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "c8edf8ceed18d88be468569adbe7d0cd"
+        }
       },
-      "status": "pending-patch-checksums",
       "tags": ["story", "new-content"],
       "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
     },
@@ -146,10 +154,14 @@
         }
       },
       "patch": {
-        "url": "https://www.romhacking.net/download/hacks/7663/1dc7d4e898e9dc4d6b6beb70767749f4d064dee47727ca92629c2458ab48eb59",
-        "filename": "sealed_palace.bps"
+        "url": "https://github.com/zonaro/zelda64player/releases/download/catalog-patches-v1/sealed_palace_v1.3.bps",
+        "filename": "sealed_palace_v1.3.bps",
+        "size": 11764110,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "dffcbfee4df85d8b842529bb407f9732"
+        }
       },
-      "status": "pending-patch-checksums",
       "tags": ["story", "new-content"],
       "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
     }
