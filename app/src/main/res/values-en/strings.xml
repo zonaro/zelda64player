@@ -100,4 +100,14 @@
     <string name="settings_about_version">Version: %1$s</string>
     <string name="settings_about_repo">Repository</string>
     <string name="settings_about_catalog">Catalog</string>
+
+    <!-- Settings: backups (local save export/import) -->
+    <string name="backup_title">Backups</string>
+    <string name="backup_description">Export or restore the saves (SRAM and states) of all installed hacks to a local ZIP file. No data is sent to the cloud.</string>
+    <string name="backup_export">Export saves</string>
+    <string name="backup_import">Restore saves</string>
+    <string name="backup_export_empty">No hacks installed to back up.</string>
+    <string name="backup_export_summary">Backup complete: %1$d hacks, %2$d files.</string>
+    <string name="backup_import_summary">Restored: %1$d hacks, %2$d files. Skipped: %3$d.</string>
+    <string name="backup_error_stream">Could not open the file.</string>
 </resources>

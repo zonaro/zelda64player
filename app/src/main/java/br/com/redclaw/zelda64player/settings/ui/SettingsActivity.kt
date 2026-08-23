@@ -9,17 +9,28 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
+import br.com.redclaw.zelda64player.data.local.SaveBackupManager
 import br.com.redclaw.zelda64player.data.model.BaseRom
 import br.com.redclaw.zelda64player.databinding.ActivitySettingsBinding
 import br.com.redclaw.zelda64player.databinding.SettingsBaseRomItemBinding
 import br.com.redclaw.zelda64player.databinding.SettingsCatalogUrlItemBinding
+import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.settings.SettingsViewModel
 import br.com.redclaw.zelda64player.store.CatalogFetcher
 import br.com.redclaw.zelda64player.utils.CorePrefs
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
@@ -41,6 +52,18 @@ class SettingsActivity : AppCompatActivity() {
         if (uris.isNotEmpty()) viewModel.importRomsFromUris(uris)
     }
 
+    private val exportBackupLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("application/zip")
+    ) { uri -> if (uri != null) runExportBackup(uri) }
+
+    private val importBackupLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri -> if (uri != null) runImportBackup(uri) }
+
+    private val installedRepository by lazy {
+        InstalledHacksRepository(File(filesDir, "installed_hacks.json"))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
@@ -57,8 +80,86 @@ class SettingsActivity : AppCompatActivity() {
         setupBaseRomList()
         setupCatalogSection()
         setupCoreSection()
+        setupBackupSection()
         setupAboutSection()
         observeImport()
+    }
+
+    private fun setupBackupSection() {
+        binding.settingsBackupExport.setOnClickListener {
+            val name = "zelda64_saves_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.zip"
+            exportBackupLauncher.launch(name)
+        }
+        binding.settingsBackupImport.setOnClickListener {
+            importBackupLauncher.launch(arrayOf("application/zip"))
+        }
+    }
+
+    private fun runExportBackup(uri: Uri) {
+        val installed = installedRepository.load().keys.toList()
+        if (installed.isEmpty()) {
+            showBackupResult(getString(R.string.backup_export_empty))
+            return
+        }
+        val storage = Storage.getInstance(this)
+        val saves = installed.associateWith { storage.saveFiles(it) }
+        val version = runCatching {
+            packageManager.getPackageInfo(packageName, 0).versionName
+        }.getOrNull() ?: "?"
+        binding.settingsBackupProgress.visibility = View.VISIBLE
+        lifecycleScope.launch(Dispatchers.IO) {
+            val summary = try {
+                contentResolver.openOutputStream(uri)?.use { out ->
+                    SaveBackupManager.export(out, saves, version)
+                } ?: SaveBackupManager.BackupSummary(0, 0, 0, listOf(getString(R.string.backup_error_stream)))
+            } catch (e: Exception) {
+                SaveBackupManager.BackupSummary(0, 0, 0, listOf(e.message ?: "error"))
+            }
+            withContext(Dispatchers.Main) {
+                binding.settingsBackupProgress.visibility = View.GONE
+                showBackupResult(getString(R.string.backup_export_summary, summary.hacks, summary.files))
+            }
+        }
+    }
+
+    private fun runImportBackup(uri: Uri) {
+        val storage = Storage.getInstance(this)
+        val resolver: (String, String) -> File? = { hackId, fileName ->
+            when {
+                fileName.startsWith("sram_") -> storage.sram(hackId)
+                fileName.startsWith("state_") -> storage.state(hackId)
+                else -> null
+            }
+        }
+        binding.settingsBackupProgress.visibility = View.VISIBLE
+        lifecycleScope.launch(Dispatchers.IO) {
+            val summary = try {
+                contentResolver.openInputStream(uri)?.use { input ->
+                    SaveBackupManager.restore(input, resolver)
+                } ?: SaveBackupManager.BackupSummary(0, 0, 0, listOf(getString(R.string.backup_error_stream)))
+            } catch (e: Exception) {
+                SaveBackupManager.BackupSummary(0, 0, 0, listOf(e.message ?: "error"))
+            }
+            withContext(Dispatchers.Main) {
+                binding.settingsBackupProgress.visibility = View.GONE
+                val message = buildString {
+                    append(getString(R.string.backup_import_summary, summary.hacks, summary.files, summary.skipped))
+                    if (summary.errors.isNotEmpty()) {
+                        append("\n\n")
+                        append(summary.errors.joinToString("\n"))
+                    }
+                }
+                showBackupResult(message)
+            }
+        }
+    }
+
+    private fun showBackupResult(message: String) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.backup_title)
+            .setMessage(message)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     private fun setupImportSection() {

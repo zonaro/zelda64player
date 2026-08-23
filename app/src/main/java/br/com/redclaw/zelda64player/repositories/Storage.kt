@@ -23,4 +23,7 @@ class Storage(context: Context) {
     fun rom(hackId: String) = File("$cachePath/rom_$hackId")
     fun sram(hackId: String) = File("$storagePath/sram_$hackId")
     fun state(hackId: String) = File("$storagePath/state_$hackId")
+
+    /** All per-hack save files (SRAM and save-state), in a stable order. */
+    fun saveFiles(hackId: String): List<File> = listOf(sram(hackId), state(hackId))
 }

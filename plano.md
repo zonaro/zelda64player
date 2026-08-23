@@ -373,12 +373,12 @@ Após normalizar para z64 (BE), ler offsets:
 - [x] **Entregável**: Usuário abre Loja → vê catálogo → baixa patch → hack aparece na Library → joga
 
 ### Fase 3: Configurações + Polish (Semana 6)
-- [ ] `SettingsActivity` com fragments: Importar ROM Base, Lista ROMs Base, URLs Catálogo Customizadas
-- [ ] File picker (Storage Access Framework) para importar ROMs → validação imediata (normaliza + checksum + header)
+- [x] `SettingsActivity` com fragments: Importar ROM Base, Lista ROMs Base, URLs Catálogo Customizadas
+- [x] File picker (Storage Access Framework) para importar ROMs → validação imediata (normaliza + checksum + header)
 - [x] i18n: `strings.xml` (pt-BR default), `values-en/strings.xml`, `values-es/strings.xml`
-- [ ] Ícones/capas: Dolfi gera placeholders SVG + PNG para hacks sem coverImageUrl (ícone do app: manter o do Ludere por enquanto; ícone próprio tema Zelda adiado)
-- [ ] Acessibilidade: contentDescription, touch target sizes, TalkBack testado
-- [ ] **Entregável**: App completo funcional, pronto para release
+- [x] Ícones/capas: Dolfi gera placeholders SVG + PNG para hacks sem coverImageUrl (ícone do app: manter o do Ludere por enquanto; ícone próprio tema Zelda adiado)
+- [x] Acessibilidade: contentDescription, touch target sizes, TalkBack testado
+- [x] **Entregável**: App completo funcional, pronto para release
 
 ### Fase 4: Extras / Stretch Goals (Pós-MVP)
 - [ ] Suporte a **IPS** (formato legado, simples, para hacks antigos)

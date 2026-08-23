@@ -536,17 +536,33 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         baseRomRepository.scanAndRegister()
 
         val patchFile = patchRepository.getPatchFile(hackId) ?: return PatchOutcome.NoPatch
-        val expectedSourceCrc = PatcherFacade.expectedSourceCrc32(patchFile)
-            .getOrElse { return PatchOutcome.InvalidPatch }
-
-        val baseRom = resolveBaseRom(hackId, expectedSourceCrc) ?: run {
-            val found = baseRomRepository.getAll().map { it.crc32 }
-            return PatchOutcome.NoBaseRom(expectedSourceCrc, found)
-        }
+        val format = PatcherFacade.detectPatchFormat(patchFile)
+        if (format == PatcherFacade.PatchFormat.UNKNOWN) return PatchOutcome.InvalidPatch
 
         val output = storage.rom(hackId)
-        val result = PatcherFacade.applyPatchBlocking(File(baseRom.path), patchFile, output)
-        return if (result.isSuccess) PatchOutcome.Ready else PatchOutcome.InvalidPatch
+        return if (format == PatcherFacade.PatchFormat.IPS) {
+            // IPS patches are self-contained (absolute offsets + literal data)
+            // and carry no source checksum, so no base ROM is required. The
+            // facade's IpsApplier ignores the base ROM argument entirely.
+            val result = PatcherFacade.applyPatchBlocking(emptyBaseFile, patchFile, output)
+            if (result.isSuccess) PatchOutcome.Ready else PatchOutcome.InvalidPatch
+        } else {
+            val expectedSourceCrc = PatcherFacade.expectedSourceCrc32(patchFile)
+                .getOrElse { return PatchOutcome.InvalidPatch }
+
+            val baseRom = resolveBaseRom(hackId, expectedSourceCrc) ?: run {
+                val found = baseRomRepository.getAll().map { it.crc32 }
+                return PatchOutcome.NoBaseRom(expectedSourceCrc, found)
+            }
+
+            val result = PatcherFacade.applyPatchBlocking(File(baseRom.path), patchFile, output)
+            if (result.isSuccess) PatchOutcome.Ready else PatchOutcome.InvalidPatch
+        }
+    }
+
+    /** A zero-length placeholder base ROM for IPS patches (ignored by the applier). */
+    private val emptyBaseFile: File by lazy {
+        File(appContext.cacheDir, "ips_empty_base.bin").also { it.writeBytes(ByteArray(0)) }
     }
 
     /**

@@ -114,6 +114,9 @@ dependencies {
     implementation("com.github.swordfish90:radialgamepad:0.6.0")
     implementation("com.github.swordfish90:libretrodroid:0.6.2")
 
+    // Background periodic catalog refresh (WorkManager).
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
     // Hack Store: image loading (covers) and HTTP (catalog fetch + patch download).
     implementation("io.coil-kt:coil:2.6.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

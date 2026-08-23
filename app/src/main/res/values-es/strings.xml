@@ -100,4 +100,14 @@
     <string name="settings_about_version">Versión: %1$s</string>
     <string name="settings_about_repo">Repositorio</string>
     <string name="settings_about_catalog">Catálogo</string>
+
+    <!-- Settings: backups (local save export/import) -->
+    <string name="backup_title">Copias de seguridad</string>
+    <string name="backup_description">Exporta o restaura las partidas (SRAM y estados) de todos los hacks instalados en un archivo ZIP local. Ningún dato se envía a la nube.</string>
+    <string name="backup_export">Exportar partidas</string>
+    <string name="backup_import">Restaurar partidas</string>
+    <string name="backup_export_empty">Ningún hack instalado para hacer copia.</string>
+    <string name="backup_export_summary">Copia completa: %1$d hacks, %2$d archivos.</string>
+    <string name="backup_import_summary">Restaurado: %1$d hacks, %2$d archivos. Omitidos: %3$d.</string>
+    <string name="backup_error_stream">No se pudo abrir el archivo.</string>
 </resources>
