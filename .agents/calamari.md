@@ -8,11 +8,14 @@ Provides **instant, sourced verification** of specific factual claims needed dur
 ### 1. ROM Checksums (Critical for Catalog)
 | Query | Source | Example |
 |-------|--------|---------|
-| "What is the CRC32 of Ocarina of Time NTSC-U 1.0 (z64)?" | No-Intro / Redump DATs | `0xEC7011B7` |
-| "What is the MD5 of Majora's Mask NTSC-U 1.0 (z64)?" | No-Intro / Redump DATs | `...` |
+| "What is the CRC32 of Ocarina of Time NTSC-U 1.0 (z64)?" | No-Intro DATs / romhacking.net hack pages | `cd16c529` (1.1 = `3fd2151e`) |
+| "What is the CRC32 of Majora's Mask NTSC-U (z64)?" | No-Intro DATs / romhacking.net hack pages | `b428d8a7` |
 | "GameCode for OoT NTSC-U 1.0?" | N64 header spec | `CZLE` |
 | "GameCode for MM NTSC-U 1.0?" | N64 header spec | `NSME` |
 | "Version byte for OoT 1.0 vs 1.1 vs 1.2?" | Redump / community wiki | `0x00` / `0x01` / `0x02` |
+
+> Verified 2026-08-23 against romhacking.net hack pages and No-Intro dumps.
+> The previously listed `EC7011B7` was an unverified placeholder and is WRONG.
 
 ### 2. Libretro Core Versions & Buildbot URLs
 | Query | Source |

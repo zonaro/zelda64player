@@ -192,32 +192,32 @@ flowchart TD
 
 ```json
 {
-  "catalogVersion": 2,
-  "lastUpdated": "2026-08-22T10:30:00Z",
+  "catalogVersion": 1,
+  "lastUpdated": "2026-08-23T00:00:00Z",
   "hacks": [
     {
       "id": "ocarina_of_time_dx",
       "name": "Ocarina of Time DX",
-      "description": "Quality-of-life improvements, restored content, and modern conveniences for OoT.",
-      "author": "Kazemaru",
-      "version": "2.5.1",
+      "description": "Quality-of-life overhaul of Ocarina of Time with widescreen support, restored content and difficulty options.",
+      "author": "Admentus & GhostlyDark",
+      "version": "0.6.0-beta",
       "baseRom": {
         "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
         "gameCode": "CZLE",
         "versionByte": 0,
         "checksums": {
-          "crc32": "0xEC7011B7",
-          "md5": "a1b2c3d4e5f678901234567890abcdef",
-          "sha1": "fedcba09876543210fedcba09876543210fedcba"
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
         }
       },
       "patch": {
-        "url": "https://github.com/user/repo/releases/download/v2.5.1/oot_dx_v2.5.1.bps",
-        "filename": "oot_dx_v2.5.1.bps",
-        "size": 1245184,
+        "url": "https://github.com/N64DX/oot-dx/releases/download/release-beta-0.6.0/Ocarina.of.Time.DX.21-9.UWS.Beta.v0.6.0.-.22.August.6.bps",
+        "filename": "Ocarina.of.Time.DX.21-9.UWS.Beta.v0.6.0.-.22.August.6.bps",
+        "size": 12544884,
         "checksums": {
-          "crc32": "0xA1B2C3D4",
-          "md5": "112233445566778899aabbccddeeff00"
+          "crc32": "2144df1c",
+          "md5": "34adae84a0d352c23846ee671205d1ac"
         }
       },
       "coverImageUrl": "https://raw.githubusercontent.com/user/repo/main/assets/covers/oot_dx.png",
@@ -227,25 +227,24 @@ flowchart TD
     {
       "id": "majoras_mask_redux",
       "name": "Majora's Mask Redux",
-      "description": "Definitive quality-of-life patch for Majora's Mask.",
-      "author": "Rozlette",
-      "version": "1.3.0",
+      "description": "Quality-of-life improvement hack built on the Majora's Mask Randomizer ASM patches.",
+      "author": "Maroc",
+      "version": "2.0",
       "baseRom": {
         "name": "The Legend of Zelda: Majora's Mask (NTSC-U 1.0)",
         "gameCode": "NSME",
         "versionByte": 0,
         "checksums": {
-          "crc32": "0x9F2C3A1E",
-          "md5": "abcdef1234567890abcdef1234567890",
-          "sha1": "0987654321fedcba0987654321fedcba09876543"
+          "crc32": "b428d8a7",
+          "sha1": "d6133ace5afaa0882cf214cf88daba39e266c078"
         }
       },
       "patch": {
-        "url": "https://github.com/user/repo/releases/download/v1.3.0/mm_redux_v1.3.0.zip",
-        "filename": "mm_redux_v1.3.0.bps",
+        "url": "https://github.com/user/repo/releases/download/v2.0/mm_redux_v2.0.zip",
+        "filename": "majoras_mask_redux.bps",
         "size": 987654,
         "checksums": {
-          "crc32": "0x5E6F7A8B",
+          "crc32": "5e6f7a8b",
           "md5": "ffeeddccbbaa99887766554433221100"
         }
       },
@@ -256,6 +255,11 @@ flowchart TD
   ]
 }
 ```
+
+> **Nota:** os valores de checksum de ROM base acima são reais e verificados
+> (OoT NTSC-U 1.0 = CRC32 `cd16c529` / MD5 `5bd1fe10...`; MM NTSC-U = CRC32
+> `b428d8a7`). Os valores de patch do segundo exemplo são ilustrativos. O
+> catálogo ao vivo fica em `catalog/catalog.json`.
 
 ### Campos Obrigatórios vs Opcionais
 
@@ -393,7 +397,7 @@ Após normalizar para z64 (BE), ler offsets:
 
 | Risco | Probabilidade | Impacto | Mitigação |
 |-------|---------------|---------|-----------|
-| **ROM versão errada** (usuário importa OoT 1.1 ou PAL) | Alta | Crash / patch falha / jogo quebrado | Validação estrita: gameCode + versionByte + CRC32. Mensagem clara: "Esta hack requer Ocarina of Time NTSC-U 1.0 (CRC32: 0xEC7011B7)" |
+| **ROM versão errada** (usuário importa OoT 1.1 ou PAL) | Alta | Crash / patch falha / jogo quebrado | Validação estrita: gameCode + versionByte + CRC32. Mensagem clara: "Esta hack requer Ocarina of Time NTSC-U 1.0 (CRC32: cd16c529)" |
 | **Patch BPS corrompido / incompleto** | Média | Falha silenciosa ou crash no core | Validação tripla: CRC32 do patch (download), CRC32 source (antes de aplicar), CRC32 target (após aplicar). Falha → delete patch + erro amigável |
 | **Memória baixa** (OoT/MM = 32–64 MB descomprimidos; patcheados similar) | Média em low-end | OOM ao carregar ROM em bytes (`config_load_bytes=true`) | **Default `config_load_bytes=false`** → usa arquivo em cache (Storage.rom). Streaming patcher evita 2x RAM. Testar em dispositivos 2GB RAM. |
 | **Licença GPL-3.0 do rom_patcher_js / UniPatcher** | — | Contaminação legal se copiar código | **Clean-room**: implementar só da spec BPS (documentos públicos: bps_spec.md, romhacking.net). Não ler código GPL. Documentar no AGENTS.md. |

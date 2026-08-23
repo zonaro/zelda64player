@@ -1,64 +1,63 @@
 {
-  "catalogVersion": 2,
-  "lastUpdated": "2026-08-22T10:30:00Z",
+  "catalogVersion": 1,
+  "lastUpdated": "2026-08-23T00:00:00Z",
   "hacks": [
     {
       "id": "ocarina_of_time_dx",
       "name": "Ocarina of Time DX",
-      "description": "Quality-of-life improvements, restored content, and modern conveniences for OoT.",
-      "author": "Kazemaru",
-      "version": "2.5.1",
+      "description": "Quality-of-life overhaul of Ocarina of Time: widescreen support, restored content, difficulty options, alternative dungeon layouts and many gameplay enhancements.",
+      "author": "Admentus & GhostlyDark",
+      "version": "0.6.0-beta",
       "baseRom": {
         "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
         "gameCode": "CZLE",
         "versionByte": 0,
         "checksums": {
-          "crc32": "0xEC7011B7",
-          "md5": "a1b2c3d4e5f678901234567890abcdef",
-          "sha1": "fedcba09876543210fedcba09876543210fedcba"
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
         }
       },
       "patch": {
-        "url": "https://github.com/user/repo/releases/download/v2.5.1/oot_dx_v2.5.1.bps",
-        "filename": "oot_dx_v2.5.1.bps",
-        "size": 1245184,
+        "url": "https://github.com/N64DX/oot-dx/releases/download/release-beta-0.6.0/Ocarina.of.Time.DX.21-9.UWS.Beta.v0.6.0.-.22.August.6.bps",
+        "filename": "Ocarina.of.Time.DX.21-9.UWS.Beta.v0.6.0.-.22.August.6.bps",
+        "size": 12544884,
         "checksums": {
-          "crc32": "0xA1B2C3D4",
-          "md5": "112233445566778899aabbccddeeff00"
+          "crc32": "2144df1c",
+          "md5": "34adae84a0d352c23846ee671205d1ac"
         }
       },
-      "coverImageUrl": "https://raw.githubusercontent.com/user/repo/main/assets/covers/oot_dx.png",
+      "coverImageUrl": "https://example.com/covers/oot_dx.png",
       "tags": ["quality-of-life", "restoration", "enhancement"],
       "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
     },
     {
-      "id": "majoras_mask_redux",
-      "name": "Majora's Mask Redux",
-      "description": "Definitive quality-of-life patch for Majora's Mask.",
-      "author": "Rozlette",
-      "version": "1.3.0",
+      "id": "ultimate_trial",
+      "name": "Ultimate Trial",
+      "description": "Extended-quest mod adding achievements, Spanish language support, widescreen HUD and optional Randologic trial randomization with three modes.",
+      "author": "RichieUltimate",
+      "version": "1.2.3",
       "baseRom": {
-        "name": "The Legend of Zelda: Majora's Mask (NTSC-U 1.0)",
-        "gameCode": "NSME",
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
         "versionByte": 0,
         "checksums": {
-          "crc32": "0x9F2C3A1E",
-          "md5": "abcdef1234567890abcdef1234567890",
-          "sha1": "0987654321fedcba0987654321fedcba09876543"
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
         }
       },
       "patch": {
-        "url": "https://github.com/user/repo/releases/download/v1.3.0/mm_redux_v1.3.0.zip",
-        "filename": "mm_redux_v1.3.0.bps",
-        "size": 987654,
+        "url": "https://github.com/RichieUltimate/ultimate-trial/releases/download/v1.2.3/ultimate_trial_v1.2.3_n64.bps",
+        "filename": "ultimate_trial_v1.2.3_n64.bps",
+        "size": 30917075,
         "checksums": {
-          "crc32": "0x5E6F7A8B",
-          "md5": "ffeeddccbbaa99887766554433221100"
+          "crc32": "2144df1c",
+          "md5": "db9a3c0d7fc56882e3bfa0a55cbf8617"
         }
       },
-      "coverImageUrl": "https://raw.githubusercontent.com/user/repo/main/assets/covers/mm_redux.png",
-      "tags": ["quality-of-life", "bugfix"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": ["new-content", "achievements"],
+      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
     }
   ]
 }
