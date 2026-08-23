@@ -14,21 +14,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.data.local.PatchRepository
 import br.com.redclaw.zelda64player.databinding.ActivityLibraryBinding
 import br.com.redclaw.zelda64player.utils.CorePrefs
-
-/**
- * A single installed hack shown in the library grid. Populated by the store in a
- * later phase; for Phase 0 the list is always empty (see [items]).
- */
-data class LibraryItem(val id: String, val title: String)
+import br.com.redclaw.zelda64player.views.HackLibraryEntry
+import br.com.redclaw.zelda64player.views.LocalPatchesSource
+import java.io.File
 
 class LibraryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLibraryBinding
 
-    /* Stateless: rebuilt from the catalog on every (re)create, so process
+    /* Stateless: rebuilt from the source on every (re)create, so process
        death / configuration changes need no saved instance state. */
-    private val items = emptyList<LibraryItem>()
+    private lateinit var items: List<HackLibraryEntry>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +37,10 @@ class LibraryActivity : AppCompatActivity() {
             view.post { immersive(window) }
             windowInsets
         }
+
+        val external = getExternalFilesDir(null) ?: filesDir
+        val source = LocalPatchesSource(PatchRepository(File(external, "patches")))
+        items = source.available()
 
         setupGrid()
         binding.librarySettings.setOnClickListener { showSettingsMenu() }
@@ -114,8 +116,8 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     private class LibraryAdapter(
-        private val items: List<LibraryItem>,
-        private val onItemClick: (LibraryItem) -> Unit
+        private val items: List<HackLibraryEntry>,
+        private val onItemClick: (HackLibraryEntry) -> Unit
     ) : RecyclerView.Adapter<LibraryAdapter.ViewHolder>() {
 
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

@@ -31,8 +31,13 @@ class GameActivity : AppCompatActivity() {
 
         val hackId = intent.getStringExtra("hack_id")
             ?: throw IllegalStateException("No hack_id provided to launch")
-        viewModel.setupRetroView(this, binding.retroviewContainer, hackId)
-        viewModel.setupGamePads(binding.gamepadOverlay)
+        viewModel.launchHack(
+            this,
+            binding.retroviewContainer,
+            binding.gamepadOverlay,
+            binding.patchingProgress,
+            hackId
+        )
     }
 
     private fun registerInputListener() {

@@ -22,4 +22,12 @@
     <string name="library_settings_description">Abrir configurações</string>
     <string name="toast_core_updated">Core atualizado</string>
     <string name="library_empty">Nenhum hack instalado</string>
+
+    <!-- Patching / launch flow -->
+    <string name="patching_message">Preparando ROM…</string>
+    <string name="error_patch_missing">Patch não encontrado para este hack.</string>
+    <string name="error_patch_invalid">O patch está corrompido ou inválido.</string>
+    <string name="dialog_base_rom_title">ROM base incompatível</string>
+    <string name="dialog_base_rom_none">Nenhuma ROM base importada.</string>
+    <string name="dialog_base_rom_message">Este hack requer uma ROM base com CRC32 %1$s. Nenhuma ROM importada corresponde (encontradas: %2$s).</string>
 </resources>

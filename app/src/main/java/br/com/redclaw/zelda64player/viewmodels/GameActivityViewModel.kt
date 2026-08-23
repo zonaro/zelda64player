@@ -14,7 +14,11 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.data.local.BaseRomRepository
+import br.com.redclaw.zelda64player.data.local.PatchRepository
+import br.com.redclaw.zelda64player.data.model.BaseRom
 import br.com.redclaw.zelda64player.gamepad.ButtonStick
 import br.com.redclaw.zelda64player.gamepad.ButtonStickMode
 import br.com.redclaw.zelda64player.gamepad.DoubleTapContainer
@@ -23,10 +27,16 @@ import br.com.redclaw.zelda64player.gamepad.GamePad
 import br.com.redclaw.zelda64player.gamepad.GamePadConfig
 import br.com.redclaw.zelda64player.input.ControllerInput
 import br.com.redclaw.zelda64player.input.InputMapper
+import br.com.redclaw.zelda64player.patcher.PatcherFacade
+import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroview.RetroView
 import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.utils.RetroViewUtils
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 
 class GameActivityViewModel(application: Application) : AndroidViewModel(application) {
     private val resources = application.resources
@@ -460,6 +470,129 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     fun dispose() {
         compositeDisposable.dispose()
         compositeDisposable = CompositeDisposable()
+    }
+
+    // ---- Phase 1: BPS patching launch flow ----
+
+    private val baseRomRepository: BaseRomRepository by lazy {
+        val external = appContext.getExternalFilesDir(null) ?: appContext.filesDir
+        val cache = appContext.externalCacheDir ?: appContext.cacheDir
+        BaseRomRepository(
+            importDir = File(external, "base_roms"),
+            storageDir = File(cache, "base_roms"),
+            registryFile = File(appContext.filesDir, "base_roms.json")
+        )
+    }
+
+    private val patchRepository: PatchRepository by lazy {
+        val external = appContext.getExternalFilesDir(null) ?: appContext.filesDir
+        PatchRepository(File(external, "patches"))
+    }
+
+    private val launchPrefs by lazy {
+        appContext.getSharedPreferences("zelda64_launch", Context.MODE_PRIVATE)
+    }
+
+    private val storage: Storage by lazy { Storage.getInstance(appContext) }
+
+    private sealed class PatchOutcome {
+        object Ready : PatchOutcome()
+        object NoPatch : PatchOutcome()
+        object InvalidPatch : PatchOutcome()
+        data class NoBaseRom(val expectedCrc: String, val foundCrcs: List<String>) : PatchOutcome()
+    }
+
+    /**
+     * Prepare the patched ROM for [hackId] (resolving and applying the BPS patch
+     * against an imported base ROM) and then create the RetroView. Shows an
+     * indeterminate progress overlay while patching; on failure shows an i18n'd
+     * dialog instead of launching.
+     */
+    fun launchHack(
+        activity: ComponentActivity,
+        container: FrameLayout,
+        overlay: FrameLayout,
+        progress: View,
+        hackId: String
+    ) {
+        progress.visibility = View.VISIBLE
+        viewModelScope.launch {
+            val outcome = withContext(Dispatchers.IO) { prepareLaunch(hackId) }
+            progress.visibility = View.GONE
+            when (outcome) {
+                PatchOutcome.Ready -> {
+                    setupRetroView(activity, container, hackId)
+                    setupGamePads(overlay)
+                }
+                PatchOutcome.NoPatch -> showError(R.string.error_patch_missing)
+                PatchOutcome.InvalidPatch -> showError(R.string.error_patch_invalid)
+                is PatchOutcome.NoBaseRom ->
+                    showBaseRomMismatch(activity, outcome.expectedCrc, outcome.foundCrcs)
+            }
+        }
+    }
+
+    private fun prepareLaunch(hackId: String): PatchOutcome {
+        baseRomRepository.scanAndRegister()
+
+        val patchFile = patchRepository.getPatchFile(hackId) ?: return PatchOutcome.NoPatch
+        val expectedSourceCrc = PatcherFacade.expectedSourceCrc32(patchFile)
+            .getOrElse { return PatchOutcome.InvalidPatch }
+
+        val baseRom = resolveBaseRom(hackId, expectedSourceCrc) ?: run {
+            val found = baseRomRepository.getAll().map { it.crc32 }
+            return PatchOutcome.NoBaseRom(expectedSourceCrc, found)
+        }
+
+        val output = storage.rom(hackId)
+        val result = PatcherFacade.applyPatchBlocking(File(baseRom.path), patchFile, output)
+        return if (result.isSuccess) PatchOutcome.Ready else PatchOutcome.InvalidPatch
+    }
+
+    /**
+     * Find the imported base ROM whose CRC32 matches the patch's expected source
+     * CRC32. A previously-resolved mapping is cached per hack id in
+     * SharedPreferences so later launches skip the linear probe.
+     */
+    private fun resolveBaseRom(hackId: String, expectedSourceCrc: String): BaseRom? {
+        val cachedId = launchPrefs.getString("base_rom:$hackId", null)
+        if (cachedId != null) {
+            val cached = baseRomRepository.getById(cachedId)
+            if (cached != null && cached.crc32.equals(expectedSourceCrc, ignoreCase = true)) {
+                return cached
+            }
+        }
+        val probed = baseRomRepository.getAll()
+            .firstOrNull { it.crc32.equals(expectedSourceCrc, ignoreCase = true) }
+        if (probed != null) {
+            launchPrefs.edit().putString("base_rom:$hackId", probed.id).apply()
+        }
+        return probed
+    }
+
+    private fun showError(messageRes: Int) {
+        val context = activityContext ?: return
+        AlertDialog.Builder(context)
+            .setMessage(messageRes)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+    }
+
+    private fun showBaseRomMismatch(
+        activity: ComponentActivity,
+        expectedCrc: String,
+        foundCrcs: List<String>
+    ) {
+        val foundText = if (foundCrcs.isEmpty()) {
+            activity.getString(R.string.dialog_base_rom_none)
+        } else {
+            foundCrcs.joinToString(", ")
+        }
+        AlertDialog.Builder(activity)
+            .setTitle(R.string.dialog_base_rom_title)
+            .setMessage(activity.getString(R.string.dialog_base_rom_message, expectedCrc, foundText))
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     /**

@@ -1,0 +1,29 @@
+package br.com.redclaw.zelda64player.views
+
+import br.com.redclaw.zelda64player.data.local.PatchRepository
+
+/** A single hack shown in the library grid. */
+data class HackLibraryEntry(val id: String, val title: String)
+
+/**
+ * Seam for the library data source. Phase 1 is backed by locally-placed patch
+ * files; Phase 2 will add a catalog-driven implementation behind the same
+ * interface without touching the UI.
+ */
+interface HackLibrarySource {
+    fun available(): List<HackLibraryEntry>
+}
+
+/**
+ * Interim [HackLibrarySource] reading locally-placed `<hackId>.bps` patches.
+ * The displayed title is derived from the hack id (filename without extension).
+ */
+class LocalPatchesSource(private val patchRepository: PatchRepository) : HackLibrarySource {
+    override fun available(): List<HackLibraryEntry> =
+        patchRepository.listHackIds().map { HackLibraryEntry(it, prettify(it)) }
+
+    private fun prettify(hackId: String): String =
+        hackId.split('_', '-', '.')
+            .filter { it.isNotBlank() }
+            .joinToString(" ") { it.replaceFirstChar(Char::titlecase) }
+}
