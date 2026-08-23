@@ -74,10 +74,14 @@
         }
       },
       "patch": {
-        "url": "https://www.romhacking.net/download/hacks/5122/1dc7d4e898e9dc4d6b6beb70767749f4d064dee47727ca92629c2458ab48eb59",
-        "filename": "majoras_mask_redux.bps"
+        "url": "https://github.com/zonaro/zelda64player/releases/download/catalog-patches-v1/majoras_mask_redux_v2.0.bps",
+        "filename": "majoras_mask_redux_v2.0.bps",
+        "size": 748141,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "6fd6497916f5de2e6c25b9033eb30a7d"
+        }
       },
-      "status": "pending-patch-checksums",
       "tags": ["quality-of-life"],
       "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
     },
