@@ -1,16 +1,15 @@
 package br.com.redclaw.zelda64player.store.ui
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatDialogFragment
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.databinding.FragmentHackDetailBinding
 import coil.load
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 /**
  * Bottom-sheet detail view for a single hack: full metadata, required base ROM
@@ -21,7 +20,7 @@ import coil.load
  * configuration changes. The hack is passed as JSON in the arguments for the
  * same reason.
  */
-class HackDetailBottomSheet : AppCompatDialogFragment() {
+class HackDetailBottomSheet : BottomSheetDialogFragment() {
     private var _binding: FragmentHackDetailBinding? = null
     private val binding get() = _binding!!
 
@@ -58,14 +57,12 @@ class HackDetailBottomSheet : AppCompatDialogFragment() {
         _binding = null
     }
 
-    override fun getTheme(): Int = R.style.StoreBottomSheet
-
     override fun onStart() {
         super.onStart()
-        dialog?.window?.apply {
-            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            setGravity(Gravity.BOTTOM)
-        }
+        dialog?.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun populate() {
@@ -110,13 +107,15 @@ class HackDetailBottomSheet : AppCompatDialogFragment() {
             binding.detailCover.setImageResource(R.drawable.placeholder_cover)
         }
 
-        when (viewModel.statusFor(hack)) {
+        when (val status = viewModel.statusFor(hack)) {
             is StoreStatus.NotInstalled -> {
                 binding.detailDownload.setText(R.string.detail_download)
                 binding.detailDownload.isEnabled = true
             }
             is StoreStatus.Installed -> {
-                binding.detailDownload.setText(R.string.store_status_installed)
+                binding.detailDownload.text = getString(
+                    R.string.store_status_installed, status.version
+                )
                 binding.detailDownload.isEnabled = false
             }
             is StoreStatus.UpdateAvailable -> {
