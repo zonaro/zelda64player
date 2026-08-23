@@ -3,7 +3,11 @@ package br.com.redclaw.zelda64player.views
 import br.com.redclaw.zelda64player.data.local.PatchRepository
 
 /** A single hack shown in the library grid. */
-data class HackLibraryEntry(val id: String, val title: String)
+data class HackLibraryEntry(
+    val id: String,
+    val title: String,
+    val coverUrl: String? = null
+)
 
 /**
  * Seam for the library data source. Phase 1 is backed by locally-placed patch

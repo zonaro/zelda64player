@@ -20,8 +20,12 @@ class CatalogBackedLibrarySource(
         val ids = (patchRepository.listHackIds() + installedRepository.load().keys)
             .distinct()
         return ids.map { id ->
-            val title = catalog[id]?.name ?: LocalPatchesSource.prettify(id)
-            HackLibraryEntry(id, title)
+            val entry = catalog[id]
+            HackLibraryEntry(
+                id = id,
+                title = entry?.name ?: LocalPatchesSource.prettify(id),
+                coverUrl = entry?.coverImageUrl
+            )
         }
     }
 }

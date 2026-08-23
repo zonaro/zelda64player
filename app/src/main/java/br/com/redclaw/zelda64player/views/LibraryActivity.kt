@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowInsets
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
@@ -21,6 +22,7 @@ import br.com.redclaw.zelda64player.settings.ui.SettingsActivity
 import br.com.redclaw.zelda64player.store.ui.StoreActivity
 import br.com.redclaw.zelda64player.views.CatalogBackedLibrarySource
 import br.com.redclaw.zelda64player.views.HackLibraryEntry
+import coil.load
 import java.io.File
 
 class LibraryActivity : AppCompatActivity() {
@@ -57,6 +59,22 @@ class LibraryActivity : AppCompatActivity() {
         binding.libraryStore.setOnClickListener {
             startActivity(Intent(this, StoreActivity::class.java))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Rebuild the list so hacks installed in the Store appear on return
+        // without needing to recreate the activity.
+        val external = getExternalFilesDir(null) ?: filesDir
+        val source = CatalogBackedLibrarySource(
+            PatchRepository(File(external, "patches")),
+            InstalledHacksRepository(File(filesDir, "installed_hacks.json")),
+            MergedCatalogRepository(File(filesDir, "merged_catalog.json")).asMap()
+        )
+        items = source.available()
+        (binding.libraryGrid.adapter as? LibraryAdapter)?.update(items)
+            ?: setupGrid()
+        updateEmptyState()
     }
 
     private fun setupGrid() {
@@ -101,12 +119,18 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     private class LibraryAdapter(
-        private val items: List<HackLibraryEntry>,
+        private var items: List<HackLibraryEntry>,
         private val onItemClick: (HackLibraryEntry) -> Unit
     ) : RecyclerView.Adapter<LibraryAdapter.ViewHolder>() {
 
+        fun update(newItems: List<HackLibraryEntry>) {
+            items = newItems
+            notifyDataSetChanged()
+        }
+
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val title: TextView = view.findViewById(R.id.tile_title)
+            val cover: ImageView = view.findViewById(R.id.tile_cover)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -118,6 +142,15 @@ class LibraryActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = items[position]
             holder.title.text = item.title
+            if (item.coverUrl != null) {
+                holder.cover.load(item.coverUrl) {
+                    placeholder(R.drawable.placeholder_cover)
+                    error(R.drawable.placeholder_cover)
+                    crossfade(true)
+                }
+            } else {
+                holder.cover.setImageResource(R.drawable.placeholder_cover)
+            }
             holder.itemView.setOnClickListener { onItemClick(item) }
         }
 
