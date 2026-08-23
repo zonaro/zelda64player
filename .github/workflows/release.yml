@@ -1,0 +1,93 @@
+# Manual release workflow for Zelda 64 Player (Android)
+#
+# Trigger: ONLY manual (workflow_dispatch). No push/tag/PR triggers.
+#
+# How to run it:
+#   1) Via CLI (requires the GitHub CLI `gh`):
+#        gh workflow run release.yml -f version=v1.0.1
+#        gh workflow run release.yml -f version=v1.0.1 -f prerelease=true
+#   2) Via the GitHub web UI:
+#        Actions tab -> "Release" -> "Run workflow" -> fill in version / prerelease.
+#
+# Keystore note:
+#   This workflow builds the DEBUG variant (assembleDebug). Debug APKs are
+#   already signed with the SDK debug key and are directly installable.
+#   The project currently has NO release keystore. To switch to assembleRelease
+#   you MUST first add signing config + repository secrets (KEYSTORE_BASE64,
+#   KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD) and wire them into the Gradle
+#   build before changing the build step below.
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag, e.g. v1.0.1'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark the release as a pre-release'
+        required: false
+        type: choice
+        default: 'false'
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle (with dependency caching)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build debug APK
+        # assembleDebug triggers the `prepareCore` task, which downloads the
+        # Libretro cores (.so files) from buildbot.libretro.com into
+        # app/src/main/jniLibs at build time. The runner's internet handles this
+        # automatically; do NOT cache jniLibs. ANDROID_HOME is preinstalled on
+        # GitHub ubuntu runners, and there is no local.properties in the repo
+        # (and none should be created).
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Rename artifact
+        run: |
+          set -euo pipefail
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             "Zelda64Player-${{ inputs.version }}-debug.apk"
+
+      - name: Create or update GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          APK: Zelda64Player-${{ inputs.version }}-debug.apk
+        run: |
+          set -euo pipefail
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            echo "Release $VERSION already exists; uploading APK (clobber)."
+            gh release upload "$VERSION" "$APK" --clobber
+          else
+            echo "Creating release $VERSION."
+            prerelease_flag=""
+            if [ "${{ inputs.prerelease }}" = "true" ]; then
+              prerelease_flag="--prerelease"
+            fi
+            # shellcheck disable=SC2086
+            gh release create "$VERSION" "$APK" \
+              --title "Zelda 64 Player $VERSION" \
+              --generate-notes \
+              $prerelease_flag
+          fi
