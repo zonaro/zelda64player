@@ -14,11 +14,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
+import br.com.redclaw.zelda64player.data.local.MergedCatalogRepository
 import br.com.redclaw.zelda64player.data.local.PatchRepository
 import br.com.redclaw.zelda64player.databinding.ActivityLibraryBinding
+import br.com.redclaw.zelda64player.store.ui.StoreActivity
 import br.com.redclaw.zelda64player.utils.CorePrefs
+import br.com.redclaw.zelda64player.views.CatalogBackedLibrarySource
 import br.com.redclaw.zelda64player.views.HackLibraryEntry
-import br.com.redclaw.zelda64player.views.LocalPatchesSource
 import java.io.File
 
 class LibraryActivity : AppCompatActivity() {
@@ -39,11 +42,20 @@ class LibraryActivity : AppCompatActivity() {
         }
 
         val external = getExternalFilesDir(null) ?: filesDir
-        val source = LocalPatchesSource(PatchRepository(File(external, "patches")))
+        val patchRepository = PatchRepository(File(external, "patches"))
+        val installedRepository =
+            InstalledHacksRepository(File(filesDir, "installed_hacks.json"))
+        val mergedCatalog = MergedCatalogRepository(File(filesDir, "merged_catalog.json"))
+        val source = CatalogBackedLibrarySource(
+            patchRepository, installedRepository, mergedCatalog.asMap()
+        )
         items = source.available()
 
         setupGrid()
         binding.librarySettings.setOnClickListener { showSettingsMenu() }
+        binding.libraryStore.setOnClickListener {
+            startActivity(Intent(this, StoreActivity::class.java))
+        }
     }
 
     private fun setupGrid() {

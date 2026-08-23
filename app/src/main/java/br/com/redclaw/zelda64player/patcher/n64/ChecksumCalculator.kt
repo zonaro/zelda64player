@@ -49,6 +49,19 @@ object ChecksumCalculator {
     /** SHA-1 of a file, returned as a 40-character lowercase hex string. */
     fun sha1(file: File): String = digest(file, "SHA-1")
 
+    /** CRC32 of an in-memory byte array, returned as an 8-digit lowercase hex string. */
+    fun crc32(bytes: ByteArray): String {
+        val crc = CRC32()
+        crc.update(bytes)
+        return toHex(crc.value)
+    }
+
+    /** MD5 of an in-memory byte array, returned as a 32-character lowercase hex string. */
+    fun md5(bytes: ByteArray): String {
+        val md = MessageDigest.getInstance("MD5")
+        return md.digest(bytes).joinToString("") { "%02x".format(it) }
+    }
+
     private fun digest(file: File, algorithm: String): String {
         val md = MessageDigest.getInstance(algorithm)
         file.inputStream().use { stream ->

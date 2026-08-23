@@ -22,8 +22,11 @@ class LocalPatchesSource(private val patchRepository: PatchRepository) : HackLib
     override fun available(): List<HackLibraryEntry> =
         patchRepository.listHackIds().map { HackLibraryEntry(it, prettify(it)) }
 
-    private fun prettify(hackId: String): String =
-        hackId.split('_', '-', '.')
-            .filter { it.isNotBlank() }
-            .joinToString(" ") { it.replaceFirstChar(Char::titlecase) }
+    companion object {
+        /** Turn a slug like `ocarina_of_time_dx` into `Ocarina Of Time Dx`. */
+        fun prettify(hackId: String): String =
+            hackId.split('_', '-', '.')
+                .filter { it.isNotBlank() }
+                .joinToString(" ") { it.replaceFirstChar(Char::titlecase) }
+    }
 }

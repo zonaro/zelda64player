@@ -25,5 +25,8 @@
         <activity
             android:name=".views.GameActivity"
             android:exported="false" />
+        <activity
+            android:name=".store.ui.StoreActivity"
+            android:exported="false" />
     </application>
 </manifest>

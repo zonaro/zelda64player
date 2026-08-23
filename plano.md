@@ -340,28 +340,28 @@ Após normalizar para z64 (BE), ler offsets:
 ## Plano de Implementação em Fases (Milestones)
 
 ### Fase 0: Fundação + Limpeza (Semana 1)
-- [ ] Criar projeto Android Studio (package `br.com.redclaw.zelda64player`, minSdk 24, targetSdk 34, compileSdk 34)
-- [ ] Migrar Gradle: Kotlin DSL, ViewBinding, Coroutines, LibretroDroid 0.6.2+, RadialGamePad 0.6.0
-- [ ] **Migração seletiva** (ver "Escopo de Migração"): copiar APENAS `retroview/`, `views/GameActivity*`, `gamepad/`, `input/`, `utils/`, `config.xml`, `Storage.kt` — adaptando package/imports
-- [ ] Copiar ícones do Ludere (`mipmap-*`, `ic_launcher_foreground.xml`, `ic_launcher_background.xml`) — reutilizados por enquanto; ícone próprio tema Zelda é tarefa futura (Dolfi)
-- [ ] **NÃO migrar**: `Games.kt`, capas embutidas, empacotamento de ROM (assets/raw/noCompress), `autogen/`, workflow autogen, keystore Ludere, splits ABI
-- [ ] Remover dependências mortas do build (RxAndroid só se ainda usado pelos controles; senão Flow)
-- [ ] Configurar `config.xml` (id/name novos; core GLES3, variáveis, landscape, gamepad — intactos)
-- [ ] **Entregável**: App compila, abre LibraryActivity vazia, GameActivity carrega core (sem ROM), layout de controles idêntico ao Ludere (validar contra referencia.png)
+- [x] Criar projeto Android Studio (package `br.com.redclaw.zelda64player`, minSdk 24, targetSdk 34, compileSdk 34)
+- [x] Migrar Gradle: Kotlin DSL, ViewBinding, Coroutines, LibretroDroid 0.6.2+, RadialGamePad 0.6.0
+- [x] **Migração seletiva** (ver "Escopo de Migração"): copiar APENAS `retroview/`, `views/GameActivity*`, `gamepad/`, `input/`, `utils/`, `config.xml`, `Storage.kt` — adaptando package/imports
+- [x] Copiar ícones do Ludere (`mipmap-*`, `ic_launcher_foreground.xml`, `ic_launcher_background.xml`) — reutilizados por enquanto; ícone próprio tema Zelda é tarefa futura (Dolfi)
+- [x] **NÃO migrar**: `Games.kt`, capas embutidas, empacotamento de ROM (assets/raw/noCompress), `autogen/`, workflow autogen, keystore Ludere, splits ABI
+- [x] Remover dependências mortas do build (RxAndroid só se ainda usado pelos controles; senão Flow)
+- [x] Configurar `config.xml` (id/name novos; core GLES3, variáveis, landscape, gamepad — intactos)
+- [x] **Entregável**: App compila, abre LibraryActivity vazia, GameActivity carrega core (sem ROM), layout de controles idêntico ao Ludere (validar contra referencia.png)
 
 ### Fase 1: ROMs Base + Patcher BPS (MVP Core) (Semanas 2–3)
-- [ ] `data/model/BaseRom.kt`, `BaseRomRepository` (JSON em `filesDir/base_roms.json` + arquivos em `cacheDir/base_roms/`)
-- [ ] `patcher/n64/RomNormalizer.kt` + `RomHeader.kt` + `ChecksumCalculator.kt` (testes unitários com fixtures)
-- [ ] `patcher/bps/` — **Clean-room implementation** baseada na spec BPS (não copiar código GPL do rom_patcher_js/UniPatcher)
+- [x] `data/model/BaseRom.kt`, `BaseRomRepository` (JSON em `filesDir/base_roms.json` + arquivos em `cacheDir/base_roms/`)
+- [x] `patcher/n64/RomNormalizer.kt` + `RomHeader.kt` + `ChecksumCalculator.kt` (testes unitários com fixtures)
+- [x] `patcher/bps/` — **Clean-room implementation** baseada na spec BPS (não copiar código GPL do rom_patcher_js/UniPatcher)
   - `VarInt.kt` (encode/decode)
   - `BpsParser.kt` (streaming, valida header "BPS1", parse commands até footer)
   - `BpsApplier.kt` (aplica SourceRead/TargetRead/SourceCopy/TargetCopy streaming)
   - `BpsValidator.kt` (CRC32 source/target/patch)
   - `PatcherFacade.kt` (API: `applyPatch(base: File, patch: File): Result<File>`)
-- [ ] `Storage.kt` adaptado: `rom(hackId)` → cache do ROM patcheado
-- [ ] `RetroView.kt` modificado: em vez de `context.assets.open(romAssetPath)`, lê `storage.rom(hackId)` (já patcheado)
-- [ ] **Testes unitários**: fixtures BPS pequenas (conhecidas), normalização z64/v64/n64, CRC32 match
-- [ ] **Entregável**: Importa OoT 1.0 z64 → aplica patch OoT DX local → joga funcional
+- [x] `Storage.kt` adaptado: `rom(hackId)` → cache do ROM patcheado
+- [x] `RetroView.kt` modificado: em vez de `context.assets.open(romAssetPath)`, lê `storage.rom(hackId)` (já patcheado)
+- [x] **Testes unitários**: fixtures BPS pequenas (conhecidas), normalização z64/v64/n64, CRC32 match
+- [x] **Entregável**: Importa OoT 1.0 z64 → aplica patch OoT DX local → joga funcional
 
 ### Fase 2: Loja de Hacks (Semanas 4–5)
 - [ ] `data/model/HackEntry.kt`, `HackCatalog.kt`, `PatchFile.kt`

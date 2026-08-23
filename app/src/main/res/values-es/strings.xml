@@ -20,8 +20,35 @@
     <!-- Library -->
     <string name="library_settings_title">Configuración</string>
     <string name="library_settings_description">Abrir configuración</string>
+    <string name="library_menu_store">Tienda de Hacks</string>
     <string name="toast_core_updated">Core actualizado</string>
     <string name="library_empty">Ningún hack instalado</string>
+
+    <!-- Hack Store -->
+    <string name="store_title">Tienda de Hacks</string>
+    <string name="store_empty">Ningún hack en el catálogo</string>
+    <string name="store_refresh">Actualizar</string>
+    <string name="store_version_format">Versión %1$s</string>
+    <string name="store_status_installed">Instalado v%1$s</string>
+    <string name="store_status_update">Actualización disponible</string>
+    <string name="store_status_not_installed">No instalado</string>
+
+    <!-- Hack detail sheet -->
+    <string name="detail_author">Autor: %1$s</string>
+    <string name="detail_version">Versión: %1$s</string>
+    <string name="detail_required_base">ROM base necesaria</string>
+    <string name="detail_base_info">%1$s (Código: %2$s, Versión: %3$s)</string>
+    <string name="detail_base_match">Tienes una ROM base compatible.</string>
+    <string name="detail_base_no_match">Ninguna ROM base compatible importada.</string>
+    <string name="detail_tags">Etiquetas: %1$s</string>
+    <string name="detail_cores">Cores compatibles: %1$s</string>
+    <string name="detail_download">Descargar</string>
+    <string name="detail_update">Actualizar</string>
+    <string name="detail_installing">Instalando… %1$d%%</string>
+    <string name="detail_error_network">Error de red. Inténtalo de nuevo.</string>
+    <string name="detail_error_checksum">Error en la verificación del parche (suma de verificación incompatible).</string>
+    <string name="detail_error_generic">Error al descargar el parche.</string>
+    <string name="detail_installed_toast">Parche instalado. Disponible en Biblioteca.</string>
 
     <!-- Patching / launch flow -->
     <string name="patching_message">Preparando ROM…</string>

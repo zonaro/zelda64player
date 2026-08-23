@@ -1,0 +1,64 @@
+{
+  "catalogVersion": 2,
+  "lastUpdated": "2026-08-22T10:30:00Z",
+  "hacks": [
+    {
+      "id": "ocarina_of_time_dx",
+      "name": "Ocarina of Time DX",
+      "description": "Quality-of-life improvements, restored content, and modern conveniences for OoT.",
+      "author": "Kazemaru",
+      "version": "2.5.1",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "0xEC7011B7",
+          "md5": "a1b2c3d4e5f678901234567890abcdef",
+          "sha1": "fedcba09876543210fedcba09876543210fedcba"
+        }
+      },
+      "patch": {
+        "url": "https://github.com/user/repo/releases/download/v2.5.1/oot_dx_v2.5.1.bps",
+        "filename": "oot_dx_v2.5.1.bps",
+        "size": 1245184,
+        "checksums": {
+          "crc32": "0xA1B2C3D4",
+          "md5": "112233445566778899aabbccddeeff00"
+        }
+      },
+      "coverImageUrl": "https://raw.githubusercontent.com/user/repo/main/assets/covers/oot_dx.png",
+      "tags": ["quality-of-life", "restoration", "enhancement"],
+      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+    },
+    {
+      "id": "majoras_mask_redux",
+      "name": "Majora's Mask Redux",
+      "description": "Definitive quality-of-life patch for Majora's Mask.",
+      "author": "Rozlette",
+      "version": "1.3.0",
+      "baseRom": {
+        "name": "The Legend of Zelda: Majora's Mask (NTSC-U 1.0)",
+        "gameCode": "NSME",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "0x9F2C3A1E",
+          "md5": "abcdef1234567890abcdef1234567890",
+          "sha1": "0987654321fedcba0987654321fedcba09876543"
+        }
+      },
+      "patch": {
+        "url": "https://github.com/user/repo/releases/download/v1.3.0/mm_redux_v1.3.0.zip",
+        "filename": "mm_redux_v1.3.0.bps",
+        "size": 987654,
+        "checksums": {
+          "crc32": "0x5E6F7A8B",
+          "md5": "ffeeddccbbaa99887766554433221100"
+        }
+      },
+      "coverImageUrl": "https://raw.githubusercontent.com/user/repo/main/assets/covers/mm_redux.png",
+      "tags": ["quality-of-life", "bugfix"],
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+    }
+  ]
+}

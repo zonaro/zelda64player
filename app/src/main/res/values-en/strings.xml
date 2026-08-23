@@ -20,8 +20,35 @@
     <!-- Library -->
     <string name="library_settings_title">Settings</string>
     <string name="library_settings_description">Open settings</string>
+    <string name="library_menu_store">Hack Store</string>
     <string name="toast_core_updated">Core updated</string>
     <string name="library_empty">No hacks installed</string>
+
+    <!-- Hack Store -->
+    <string name="store_title">Hack Store</string>
+    <string name="store_empty">No hacks in catalog</string>
+    <string name="store_refresh">Refresh</string>
+    <string name="store_version_format">Version %1$s</string>
+    <string name="store_status_installed">Installed v%1$s</string>
+    <string name="store_status_update">Update available</string>
+    <string name="store_status_not_installed">Not installed</string>
+
+    <!-- Hack detail sheet -->
+    <string name="detail_author">Author: %1$s</string>
+    <string name="detail_version">Version: %1$s</string>
+    <string name="detail_required_base">Required base ROM</string>
+    <string name="detail_base_info">%1$s (Code: %2$s, Version: %3$s)</string>
+    <string name="detail_base_match">You have a compatible base ROM.</string>
+    <string name="detail_base_no_match">No compatible base ROM imported.</string>
+    <string name="detail_tags">Tags: %1$s</string>
+    <string name="detail_cores">Compatible cores: %1$s</string>
+    <string name="detail_download">Download</string>
+    <string name="detail_update">Update</string>
+    <string name="detail_installing">Installing… %1$d%%</string>
+    <string name="detail_error_network">Network error. Try again.</string>
+    <string name="detail_error_checksum">Patch verification failed (checksum mismatch).</string>
+    <string name="detail_error_generic">Failed to download the patch.</string>
+    <string name="detail_installed_toast">Patch installed. Available in Library.</string>
 
     <!-- Patching / launch flow -->
     <string name="patching_message">Preparing ROM…</string>

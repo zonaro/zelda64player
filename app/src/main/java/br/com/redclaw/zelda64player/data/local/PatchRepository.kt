@@ -15,6 +15,9 @@ class PatchRepository(private val patchesDir: File) {
         patchesDir.mkdirs()
     }
 
+    /** The directory where patch files are stored (exposed for temp files). */
+    val directory: File get() = patchesDir
+
     /** All hack ids available locally, derived from `<hackId>.bps` filenames. */
     fun listHackIds(): List<String> =
         patchesDir.listFiles { f -> f.isFile && f.extension.equals("bps", ignoreCase = true) }

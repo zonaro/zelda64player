@@ -34,6 +34,8 @@ Thumbs.db
 *.ips
 *.ups
 catalog.json
+# The shipped default catalog is tracked; user caches are not.
+!catalog/catalog.json
 
 # Cache directories (runtime)
 /app/.cxx/

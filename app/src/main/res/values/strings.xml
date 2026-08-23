@@ -20,8 +20,35 @@
     <!-- Library -->
     <string name="library_settings_title">Configurações</string>
     <string name="library_settings_description">Abrir configurações</string>
+    <string name="library_menu_store">Loja de Hacks</string>
     <string name="toast_core_updated">Core atualizado</string>
     <string name="library_empty">Nenhum hack instalado</string>
+
+    <!-- Hack Store -->
+    <string name="store_title">Loja de Hacks</string>
+    <string name="store_empty">Nenhum hack no catálogo</string>
+    <string name="store_refresh">Atualizar</string>
+    <string name="store_version_format">Versão %1$s</string>
+    <string name="store_status_installed">Instalado v%1$s</string>
+    <string name="store_status_update">Atualização disponível</string>
+    <string name="store_status_not_installed">Não instalado</string>
+
+    <!-- Hack detail sheet -->
+    <string name="detail_author">Autor: %1$s</string>
+    <string name="detail_version">Versão: %1$s</string>
+    <string name="detail_required_base">ROM base necessária</string>
+    <string name="detail_base_info">%1$s (Código: %2$s, Versão: %3$s)</string>
+    <string name="detail_base_match">Você possui uma ROM base compatível.</string>
+    <string name="detail_base_no_match">Nenhuma ROM base compatível importada.</string>
+    <string name="detail_tags">Tags: %1$s</string>
+    <string name="detail_cores">Cores compatíveis: %1$s</string>
+    <string name="detail_download">Baixar</string>
+    <string name="detail_update">Atualizar</string>
+    <string name="detail_installing">Instalando… %1$d%%</string>
+    <string name="detail_error_network">Erro de rede. Tente novamente.</string>
+    <string name="detail_error_checksum">Falha na verificação do patch (checksum incompatível).</string>
+    <string name="detail_error_generic">Falha ao baixar o patch.</string>
+    <string name="detail_installed_toast">Patch instalado. Disponível na Biblioteca.</string>
 
     <!-- Patching / launch flow -->
     <string name="patching_message">Preparando ROM…</string>

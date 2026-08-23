@@ -3,4 +3,17 @@
     <style name="Theme.Zelda64Player" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@android:color/black</item>
     </style>
+
+    <!-- Bottom-sheet style for the hack detail dialog: anchored to the bottom,
+         full width, with a slide-up/down animation. -->
+    <style name="StoreBottomSheet" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowAnimationStyle">@style/StoreBottomSheetAnimation</item>
+    </style>
+
+    <style name="StoreBottomSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_down</item>
+    </style>
 </resources>

@@ -34,4 +34,16 @@
         android:src="@drawable/ic_settings"
         android:tint="@android:color/white" />
 
+    <ImageButton
+        android:id="@+id/library_store"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="56dp"
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/library_menu_store"
+        android:src="@drawable/ic_store"
+        android:tint="@android:color/white" />
+
 </FrameLayout>

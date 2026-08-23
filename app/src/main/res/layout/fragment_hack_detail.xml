@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/black"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/detail_cover"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:background="#202020"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/store_cover_placeholder" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/detail_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Ocarina of Time DX" />
+
+            <TextView
+                android:id="@+id/detail_author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="#cccccc"
+                android:textSize="13sp"
+                tools:text="Autor: Kazemaru" />
+
+            <TextView
+                android:id="@+id/detail_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="#cccccc"
+                android:textSize="13sp"
+                tools:text="Versão: 2.5.1" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/detail_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:maxHeight="160dp"
+        android:scrollbars="vertical"
+        android:textColor="#dddddd"
+        android:textSize="14sp"
+        tools:text="Quality-of-life improvements..." />
+
+    <TextView
+        android:id="@+id/detail_tags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="#999999"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:text="Tags: quality-of-life, restoration"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/detail_cores"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="#999999"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:text="Cores compatíveis: mupen64plus_next_gles3"
+        tools:visibility="visible" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/detail_required_base"
+        android:textColor="@android:color/white"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/detail_base_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="#cccccc"
+        android:textSize="13sp"
+        tools:text="The Legend of Zelda: OoT (Código: CZLE, Versão: 0)" />
+
+    <TextView
+        android:id="@+id/detail_base_match"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="#88ff88"
+        android:textSize="13sp"
+        tools:text="Você possui uma ROM base compatível." />
+
+    <ProgressBar
+        android:id="@+id/detail_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:max="100"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/detail_progress_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="#cccccc"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:text="Instalando… 42%" />
+
+    <TextView
+        android:id="@+id/detail_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="#ff8888"
+        android:textSize="13sp"
+        android:visibility="gone"
+        tools:text="Erro de rede."
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/detail_download"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/detail_download" />
+
+</LinearLayout>
