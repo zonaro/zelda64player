@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.os.Build
+import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.data.local.AppRepositories
 import br.com.redclaw.zelda64player.data.local.BaseRomRepository
 import br.com.redclaw.zelda64player.data.local.PatchRepository
 import br.com.redclaw.zelda64player.data.model.BaseRom
@@ -39,6 +41,10 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class GameActivityViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        private const val TAG = "GameLaunch"
+    }
+
     private val resources = application.resources
     private val appContext = application.applicationContext
 
@@ -475,18 +481,11 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     // ---- Phase 1: BPS patching launch flow ----
 
     private val baseRomRepository: BaseRomRepository by lazy {
-        val external = appContext.getExternalFilesDir(null) ?: appContext.filesDir
-        val cache = appContext.externalCacheDir ?: appContext.cacheDir
-        BaseRomRepository(
-            importDir = File(external, "base_roms"),
-            storageDir = File(cache, "base_roms"),
-            registryFile = File(appContext.filesDir, "base_roms.json")
-        )
+        AppRepositories.baseRomRepository(appContext)
     }
 
     private val patchRepository: PatchRepository by lazy {
-        val external = appContext.getExternalFilesDir(null) ?: appContext.filesDir
-        PatchRepository(File(external, "patches"))
+        AppRepositories.patchRepository(appContext)
     }
 
     private val launchPrefs by lazy {
@@ -535,9 +534,14 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     private fun prepareLaunch(hackId: String): PatchOutcome {
         baseRomRepository.scanAndRegister()
 
-        val patchFile = patchRepository.getPatchFile(hackId) ?: return PatchOutcome.NoPatch
+        val patchFile = patchRepository.getPatchFile(hackId) ?: return PatchOutcome.NoPatch.also {
+            Log.e(TAG, "prepareLaunch: patch file missing for $hackId")
+        }
         val format = PatcherFacade.detectPatchFormat(patchFile)
-        if (format == PatcherFacade.PatchFormat.UNKNOWN) return PatchOutcome.InvalidPatch
+        if (format == PatcherFacade.PatchFormat.UNKNOWN) {
+            Log.e(TAG, "prepareLaunch: unrecognized patch format for ${patchFile.absolutePath}")
+            return PatchOutcome.InvalidPatch
+        }
 
         val output = storage.rom(hackId)
         return if (format == PatcherFacade.PatchFormat.IPS) {
@@ -545,18 +549,29 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
             // and carry no source checksum, so no base ROM is required. The
             // facade's IpsApplier ignores the base ROM argument entirely.
             val result = PatcherFacade.applyPatchBlocking(emptyBaseFile, patchFile, output)
-            if (result.isSuccess) PatchOutcome.Ready else PatchOutcome.InvalidPatch
+            if (result.isSuccess) PatchOutcome.Ready else {
+                Log.e(TAG, "prepareLaunch: IPS apply failed: ${result.exceptionOrNull()?.message}")
+                PatchOutcome.InvalidPatch
+            }
         } else {
             val expectedSourceCrc = PatcherFacade.expectedSourceCrc32(patchFile)
-                .getOrElse { return PatchOutcome.InvalidPatch }
+                .getOrElse {
+                    Log.e(TAG, "prepareLaunch: cannot read BPS footer: ${it.message}")
+                    return PatchOutcome.InvalidPatch
+                }
 
             val baseRom = resolveBaseRom(hackId, expectedSourceCrc) ?: run {
                 val found = baseRomRepository.getAll().map { it.crc32 }
+                Log.e(TAG, "prepareLaunch: no base ROM matches $expectedSourceCrc (found: $found)")
                 return PatchOutcome.NoBaseRom(expectedSourceCrc, found)
             }
+            Log.i(TAG, "prepareLaunch: base ROM ${baseRom.path} (${baseRom.sizeBytes}B)")
 
             val result = PatcherFacade.applyPatchBlocking(File(baseRom.path), patchFile, output)
-            if (result.isSuccess) PatchOutcome.Ready else PatchOutcome.InvalidPatch
+            if (result.isSuccess) PatchOutcome.Ready else {
+                Log.e(TAG, "prepareLaunch: BPS apply/validate failed: ${result.exceptionOrNull()?.let { "${it::class.simpleName}: ${it.message}" }}")
+                PatchOutcome.InvalidPatch
+            }
         }
     }
 
@@ -591,6 +606,9 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         AlertDialog.Builder(context)
             .setMessage(messageRes)
             .setPositiveButton(android.R.string.ok, null)
+            /* A failed launch leaves no RetroView behind, so the game screen
+               would just sit black under the gamepad overlay -- close it. */
+            .setOnDismissListener { (context as? Activity)?.finish() }
             .show()
     }
 
@@ -608,6 +626,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
             .setTitle(R.string.dialog_base_rom_title)
             .setMessage(activity.getString(R.string.dialog_base_rom_message, expectedCrc, foundText))
             .setPositiveButton(android.R.string.ok, null)
+            /* Same as showError: without a base ROM there is nothing to play. */
+            .setOnDismissListener { activity.finish() }
             .show()
     }
 

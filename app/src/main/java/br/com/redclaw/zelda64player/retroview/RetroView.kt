@@ -34,26 +34,19 @@ class RetroView(
     val frameRendered: LiveData<Boolean> = _frameRendered
 
     /**
-     * Copy the selected core .so from nativeLibraryDir to internal storage
-     * so GLRetroView can load it by absolute path
+     * Resolve the core library path for GLRetroView.
+     *
+     * The .so is loaded directly from the read-only native library directory:
+     * since Android 10 the W^X policy forbids executing files from writable
+     * app storage, so copying the core into filesDir makes dlopen fail with
+     * "Cannot dlopen library" on modern devices.
      */
     private fun prepareCoreFile(coreLibName: String): String {
-        val coreDir = File(context.filesDir, "cores")
-        coreDir.mkdirs()
-        val destFile = File(coreDir, "libretrocore.so")
-
-        val nativeDir = File(context.applicationInfo.nativeLibraryDir)
-        val srcFile = File(nativeDir, coreLibName)
-
-        if (srcFile.exists()) {
-            srcFile.inputStream().use { input ->
-                destFile.outputStream().use { output ->
-                    input.copyTo(output)
-                }
-            }
+        val srcFile = File(context.applicationInfo.nativeLibraryDir, coreLibName)
+        if (!srcFile.exists()) {
+            Log.e("RetroView", "Core library missing from nativeLibraryDir: ${srcFile.absolutePath}")
         }
-
-        return destFile.absolutePath
+        return srcFile.absolutePath
     }
 
     private val retroViewData = GLRetroViewData(context).apply {

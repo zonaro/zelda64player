@@ -6,10 +6,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import br.com.redclaw.zelda64player.data.local.BaseRomRepository
+import br.com.redclaw.zelda64player.data.local.AppRepositories
 import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
 import br.com.redclaw.zelda64player.data.local.MergedCatalogRepository
-import br.com.redclaw.zelda64player.data.local.PatchRepository
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.store.CatalogRefresher
 import br.com.redclaw.zelda64player.store.DownloadManager
@@ -31,18 +30,13 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     private val okHttpClient = OkHttpClient.Builder().build()
 
     private val external = appContext.getExternalFilesDir(null) ?: appContext.filesDir
-    private val cache = appContext.externalCacheDir ?: appContext.cacheDir
 
-    private val patchRepository = PatchRepository(File(external, "patches"))
+    private val patchRepository = AppRepositories.patchRepository(appContext)
     private val installedRepository =
         InstalledHacksRepository(File(appContext.filesDir, "installed_hacks.json"))
     private val mergedCatalogRepository =
         MergedCatalogRepository(File(appContext.filesDir, "merged_catalog.json"))
-    private val baseRomRepository = BaseRomRepository(
-        importDir = File(external, "base_roms"),
-        storageDir = File(cache, "base_roms"),
-        registryFile = File(appContext.filesDir, "base_roms.json")
-    )
+    private val baseRomRepository = AppRepositories.baseRomRepository(appContext)
     private val downloadManager =
         DownloadManager(okHttpClient, patchRepository, installedRepository)
 

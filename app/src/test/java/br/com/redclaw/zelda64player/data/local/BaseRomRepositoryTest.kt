@@ -87,4 +87,59 @@ class BaseRomRepositoryTest {
         assertEquals(rom.crc32, env.repo.findByCrc32(rom.crc32)?.crc32)
         assertEquals(rom.id, env.repo.getById(rom.id)?.id)
     }
+
+    @Test
+    fun migratesRomFileFromLegacyCacheDir() {
+        val root = File.createTempFile("repo", "").also { it.delete() }.also { it.mkdirs() }
+        val importDir = File(root, "import").also { it.mkdirs() }
+        val legacyStorage = File(root, "legacy_cache").also { it.mkdirs() }
+        val storageDir = File(root, "storage").also { it.mkdirs() }
+        val registry = File(root, "base_roms.json")
+
+        // Register a ROM normally, then simulate the old cache-dir layout:
+        // move the stored file to the legacy dir and point the registry at it.
+        val env = BaseRomRepository(importDir, storageDir, registry)
+        File(importDir, "oot.z64").writeBytes(buildLogicalRom())
+        val rom = env.scanAndRegister().first()
+        val oldFile = File(rom.path)
+        val legacyFile = File(legacyStorage, oldFile.name)
+        oldFile.renameTo(legacyFile)
+        org.json.JSONArray(registry.readText()).let { arr ->
+            arr.getJSONObject(0).put("path", legacyFile.absolutePath)
+            registry.writeText(arr.toString())
+        }
+
+        // A fresh instance with legacyStorageDirs must relocate the file and
+        // update the registry path; the legacy copy must be gone afterwards.
+        val migrated = BaseRomRepository(importDir, storageDir, registry, listOf(legacyStorage))
+        val entries = migrated.getAll()
+        assertEquals(1, entries.size)
+        val newPath = entries.first().path
+        assertTrue(newPath.startsWith(storageDir.absolutePath))
+        assertTrue(File(newPath).exists())
+        assertTrue(!legacyFile.exists())
+    }
+
+    @Test
+    fun migrationKeepsEntriesWhenLegacyFileMissing() {
+        val root = File.createTempFile("repo", "").also { it.delete() }.also { it.mkdirs() }
+        val importDir = File(root, "import").also { it.mkdirs() }
+        val legacyStorage = File(root, "legacy_cache").also { it.mkdirs() }
+        val storageDir = File(root, "storage").also { it.mkdirs() }
+        val registry = File(root, "base_roms.json")
+
+        val env = BaseRomRepository(importDir, storageDir, registry)
+        File(importDir, "oot.z64").writeBytes(buildLogicalRom())
+        val rom = env.scanAndRegister().first()
+
+        // File already gone everywhere (cache wiped): migration must leave the
+        // entry untouched (scanAndRegister prunes it later).
+        org.json.JSONArray(registry.readText()).let { arr ->
+            arr.getJSONObject(0).put("path", File("/nonexistent/dir", File(rom.path).name).absolutePath)
+            registry.writeText(arr.toString())
+        }
+
+        val repo = BaseRomRepository(importDir, storageDir, registry, listOf(legacyStorage))
+        assertEquals(1, repo.getAll().size)
+    }
 }

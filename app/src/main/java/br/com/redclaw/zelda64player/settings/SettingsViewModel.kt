@@ -9,7 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import br.com.redclaw.zelda64player.data.local.BaseRomRepository
+import br.com.redclaw.zelda64player.data.local.AppRepositories
 import br.com.redclaw.zelda64player.data.local.RegisterResult
 import br.com.redclaw.zelda64player.data.model.BaseRom
 import br.com.redclaw.zelda64player.patcher.n64.RomNormalizer
@@ -31,14 +31,8 @@ import java.io.File
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val appContext = application.applicationContext
 
-    private val external = appContext.getExternalFilesDir(null) ?: appContext.filesDir
-    private val cache = appContext.externalCacheDir ?: appContext.cacheDir
-
-    private val baseRomRepository = BaseRomRepository(
-        importDir = File(external, "base_roms"),
-        storageDir = File(cache, "base_roms"),
-        registryFile = File(appContext.filesDir, "base_roms.json")
-    )
+    private val baseRomRepository = AppRepositories.baseRomRepository(appContext)
+    private val patchRepository = AppRepositories.patchRepository(appContext)
 
     private val launchPrefs: SharedPreferences =
         appContext.getSharedPreferences("zelda64_launch", Context.MODE_PRIVATE)

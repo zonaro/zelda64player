@@ -28,13 +28,46 @@ sealed class RegisterResult {
 class BaseRomRepository(
     private val importDir: File,
     private val storageDir: File,
-    private val registryFile: File
+    private val registryFile: File,
+    private val legacyStorageDirs: List<File> = emptyList()
 ) {
     private val supportedExtensions = setOf("z64", "n64", "v64", "rom")
 
     init {
         importDir.mkdirs()
         storageDir.mkdirs()
+        migrateLegacyEntries()
+    }
+
+    /**
+     * One-time relocation of ROM files that were previously stored under a
+     * cache directory (which the OS may wipe at any time). Any registry entry
+     * pointing inside a legacy directory is moved into [storageDir] and its
+     * stored path updated; entries whose files are already gone are left for
+     * [scanAndRegister] to prune.
+     */
+    private fun migrateLegacyEntries() {
+        if (legacyStorageDirs.isEmpty() || !registryFile.exists()) return
+        var changed = false
+        val migrated = loadRegistry().map { rom ->
+            val current = File(rom.path)
+            val parent = current.parentFile ?: return@map rom
+            val isLegacy = legacyStorageDirs.any { it.absolutePath == parent.absolutePath }
+            if (!isLegacy) return@map rom
+            val dest = File(storageDir, current.name)
+            if (!current.exists() || dest.exists()) return@map rom
+            try {
+                current.inputStream().use { input ->
+                    dest.outputStream().use { output -> input.copyTo(output) }
+                }
+                current.delete()
+                changed = true
+                rom.copy(path = dest.absolutePath)
+            } catch (_: Exception) {
+                rom
+            }
+        }
+        if (changed) saveRegistry(migrated)
     }
 
     /** Scan for new ROMs, normalize and register them, and return the full registry. */
