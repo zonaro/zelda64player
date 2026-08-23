@@ -12,11 +12,13 @@ Owns all **documentation**, **translation (i18n)**, and **code documentation (KD
   - Legal disclaimer: user must own base ROMs
   - Installation: GitHub Releases / F-Droid / sideload APK
   - Usage: Import ROMs → Browse Store → Download hack → Play
+  - **RetroAchievements integration**: login, achievements screen, in-game unlocks, leaderboards (in-game menu only)
+  - **OoT Randomizer Generator**: API key, schema-driven settings, plandomizer, seed library
   - Supported hacks (from catalog.json)
-  - Supported cores (mupen64plus_next_gles3, gles2, parallel_n64)
-  - Building from source (Gradle, core fetch at build time)
+  - Supported cores (mupen64plus_next_gles3, parallel_n64)
+  - Building from source (Gradle, core fetch at build time, rcheevos native build)
   - License: GPL-3.0 (derivative of Ludere)
-  - Credits: LibretroDroid, RadialGamePad, mupen64plus-next, parallel-n64, BPS spec authors
+  - Credits: LibretroDroid, RadialGamePad, mupen64plus-next, parallel-n64, BPS spec authors, **rcheevos (MIT)**
 - **Format**: Markdown, badges (license, minSdk, version), screenshots (from Chululu)
 
 ### 2. Strings Translation (i18n)
@@ -28,10 +30,12 @@ Owns all **documentation**, **translation (i18n)**, and **code documentation (KD
   1. Bruce completes pt-BR strings for a feature
   2. Wally translates to en/es (context-aware, not literal)
   3. Validate: no missing keys, no hardcoded strings in code
-  4. Special terms: "Base ROM" → "ROM Base" (pt-BR) / "Base ROM" (en) / "ROM Base" (es); "Patch" → "Patch" (all); "Hack" → "Hack" (pt-BR/en) / "Hack" (es)
+  4. Special terms: "Base ROM" → "ROM Base" (pt-BR) / "Base ROM" (en) / "ROM Base" (es); "Patch" → "Patch" (all); "Hack" → "Hack" (pt-BR/en) / "Hack" (es); "Achievement" → "Conquista" (pt-BR) / "Achievement" (en) / "Logro" (es); "Leaderboard" → "Ranking" (pt-BR) / "Leaderboard" (en) / "Clasificación" (es); "Hardcore" → "Hardcore" (all); "Seed" → "Seed" (all)
+- **RetroAchievements exception**: Achievement titles/descriptions come from RA API in English — **do NOT translate** (community canonical terms). Only UI chrome (tabs, buttons, errors, placeholders) translated.
+- **Randomizer exception**: ~200 setting labels/tooltips in `assets/randomizer/oot_settings_schema.json` remain in English (canonical OoTR terminology). Only UI chrome translated.
 
 ### 3. Code Documentation (KDoc)
-- **Target**: All public APIs in `patcher/`, `data/`, `store/`, `settings/`, `retroview/`
+- **Target**: All public APIs in `patcher/`, `data/`, `store/`, `settings/`, `retroview/`, `randomizer/`, `retroachievements/`
 - **Standard**:
   ```kotlin
   /**

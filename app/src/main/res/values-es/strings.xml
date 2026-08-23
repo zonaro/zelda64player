@@ -14,8 +14,51 @@
     <string name="menu_button_stick">Button Stick</string>
     <string name="menu_auto_z">Auto-Z</string>
     <string name="menu_sensitivity">Sensibilidad</string>
+    <string name="menu_exit">Salir</string>
+    <string name="msg_game_still_loading">Espera, el juego todavía se está cargando…</string>
     <string name="sensitivity_n64_stick">Analógico N64</string>
     <string name="sensitivity_button_stick">Button Stick</string>
+
+    <!-- In-game menu categories -->
+    <string name="menu_category_game">Juego</string>
+    <string name="menu_category_audio_video">Audio y Vídeo</string>
+    <string name="menu_category_controls">Controles</string>
+
+    <!-- Physical controller key badges (button names, not translated) -->
+    <string name="badge_select">SELECT</string>
+    <string name="badge_start">START</string>
+    <string name="badge_lb">LB</string>
+    <string name="badge_rb">RB</string>
+    <string name="badge_l3">L3</string>
+    <string name="badge_r3">R3</string>
+    <string name="badge_x">X</string>
+    <string name="badge_y">Y</string>
+
+    <!-- Library per-game context menu -->
+    <string name="menu_start">Iniciar</string>
+    <string name="menu_pin_shortcut">Fijar acceso</string>
+    <string name="menu_category_saves">Saves</string>
+    <string name="menu_category_management">Gestión</string>
+    <string name="menu_export_saves">Exportar Saves</string>
+    <string name="menu_import_saves">Importar Saves</string>
+    <string name="menu_uninstall">Desinstalar</string>
+    <string name="menu_uninstall_title">Desinstalar %1$s</string>
+    <string name="menu_uninstall_message">Esto eliminará permanentemente TODOS los saves (SRAM y estados) de %1$s. Recomendamos exportar una copia de seguridad antes.</string>
+    <string name="menu_uninstall_button">Desinstalar</string>
+    <string name="menu_uninstall_done">Desinstalado</string>
+    <string name="menu_export_nothing">Nada que exportar</string>
+    <string name="menu_export_success">Saves exportados</string>
+    <string name="menu_export_failure">Error al exportar saves</string>
+    <string name="menu_import_success">Saves importados</string>
+    <string name="menu_import_failure">Error al importar saves</string>
+    <string name="menu_import_not_installed">El juego no está instalado</string>
+    <string name="menu_overflow">…</string>
+    <string name="menu_overflow_content_description">Abrir menú del juego</string>
+    <string name="menu_export_filename_suffix">_saves.zip</string>
+
+    <!-- Generic dialog buttons -->
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancelar</string>
 
     <!-- Library -->
     <string name="library_settings_title">Configuración</string>
@@ -23,6 +66,7 @@
     <string name="library_menu_store">Tienda de Hacks</string>
     <string name="toast_core_updated">Core actualizado</string>
     <string name="library_empty">Ningún hack instalado</string>
+    <string name="library_subtitle">Hacks de Zelda 64 para Nintendo 64</string>
 
     <!-- Hack Store -->
     <string name="store_title">Tienda de Hacks</string>
@@ -47,13 +91,17 @@
     <string name="detail_installing">Instalando… %1$d%%</string>
     <string name="detail_error_network">Error de red. Inténtalo de nuevo.</string>
     <string name="detail_error_checksum">Error en la verificación del parche (suma de verificación incompatible).</string>
+    <string name="detail_error_patch_invalid">Parche inválido o corrupto.</string>
+    <string name="detail_error_base_rom_missing">ROM base necesaria no encontrada (CRC32 %1$s). Importa la ROM base en Configuración.</string>
     <string name="detail_error_generic">Error al descargar el parche.</string>
+    <string name="detail_patching">Aplicando parche…</string>
     <string name="detail_installed_toast">Parche instalado. Disponible en Biblioteca.</string>
 
     <!-- Patching / launch flow -->
     <string name="patching_message">Preparando ROM…</string>
     <string name="error_patch_missing">Parche no encontrado para este hack.</string>
     <string name="error_patch_invalid">El parche está corrupto o no es válido.</string>
+    <string name="error_rom_not_installed">ROM no encontrada. Instala el hack en la Tienda.</string>
     <string name="dialog_base_rom_title">ROM base incompatible</string>
     <string name="dialog_base_rom_none">Ninguna ROM base importada.</string>
     <string name="dialog_base_rom_message">Este hack requiere una ROM base con CRC32 %1$s. Ninguna ROM importada coincide (encontradas: %2$s).</string>
@@ -90,6 +138,16 @@
     <string name="settings_catalog_delete_desc">Eliminar URL de catálogo</string>
     <string name="settings_catalog_remove_confirm_title">¿Eliminar URL de catálogo?</string>
 
+    <!-- Settings: randomizer API key -->
+    <string name="settings_randomizer_title">API Key del Randomizador</string>
+    <string name="settings_randomizer_description">Pega la clave de API del OoTR (obtenida en el Discord del OoTR). La clave se almacena cifrada y nunca se muestra.</string>
+    <string name="settings_randomizer_hint">Pega la clave de API aquí</string>
+    <string name="settings_randomizer_save">Guardar</string>
+    <string name="settings_randomizer_clear">Limpiar</string>
+    <string name="settings_randomizer_status_configured">Clave configurada</string>
+    <string name="settings_randomizer_status_none">Ninguna clave configurada</string>
+    <string name="settings_randomizer_empty">Pega una clave válida antes de guardar.</string>
+
     <!-- Settings: emulator core -->
     <string name="settings_core_title">Core emulador</string>
     <string name="settings_core_current">Actual: %1$s</string>
@@ -110,4 +168,129 @@
     <string name="backup_export_summary">Copia completa: %1$d hacks, %2$d archivos.</string>
     <string name="backup_import_summary">Restaurado: %1$d hacks, %2$d archivos. Omitidos: %3$d.</string>
     <string name="backup_error_stream">No se pudo abrir el archivo.</string>
+
+    <!-- App shortcuts (installed games as launcher shortcuts) -->
+    <string name="shortcut_add_to_home">Añadir a la pantalla de inicio</string>
+    <string name="shortcut_long_label_play">Jugar %1$s</string>
+    <string name="shortcut_disabled_not_installed">Juego no instalado</string>
+    <string name="shortcut_pin_unsupported">Añadir a la pantalla de inicio no es compatible con esta versión de Android.</string>
+
+    <!-- Randomizer (OoTR) -->
+    <string name="randomizer_title">Generador de Randomizador</string>
+    <string name="randomizer_seed_name_hint">Nombre de la seed (obligatorio)</string>
+    <string name="randomizer_seed_name_required">Introduce un nombre para la seed.</string>
+    <string name="randomizer_seed_string_hint">Seed fija (opcional, para reproducir)</string>
+    <string name="randomizer_advanced">Avanzado</string>
+    <string name="randomizer_version_hint">Versión de OoTR</string>
+    <string name="randomizer_plandomizer_title">Plandomizer</string>
+    <string name="randomizer_plandomizer_button">Abrir editor de Plandomizer</string>
+    <string name="randomizer_plandomizer_configured">Plandomizer configurado</string>
+    <string name="randomizer_generate">Generar Seed</string>
+    <string name="randomizer_edit">Editar selección</string>
+    <string name="randomizer_list_none">Ninguno seleccionado</string>
+    <string name="randomizer_category_main">Reglas</string>
+    <string name="randomizer_category_open">Mundo Abierto</string>
+    <string name="randomizer_category_shuffle">Barajar</string>
+    <string name="randomizer_category_dungeons">Mazmorras</string>
+    <string name="randomizer_category_tricks">Trucos</string>
+    <string name="randomizer_category_timesavers">Ahorro de Tiempo</string>
+    <string name="randomizer_category_starting_items">Objetos Iniciales</string>
+    <string name="randomizer_category_misc">Varios</string>
+    <string name="randomizer_category_cosmetics">Cosméticos</string>
+    <string name="randomizer_queue_position">Cola: %1$d</string>
+    <string name="randomizer_polling">Generando… %1$d%%</string>
+    <string name="randomizer_success">Seed generada con éxito.</string>
+    <string name="randomizer_success_detail">La seed %1$s está lista para jugar.</string>
+    <string name="randomizer_error_prefix">Error:</string>
+    <string name="randomizer_error_missing_key">Clave de API no configurada. Añádela en Ajustes.</string>
+    <string name="randomizer_error_validation">%1$d opción(es) inválida(s). Revisa el formulario.</string>
+    <string name="randomizer_error_no_base_rom">Ninguna ROM base importada. Importa Ocarina of Time 1.0 NTSC-U (CZLE) o NTSC-J (CZLJ) para usar el randomizador.</string>
+    <string name="randomizer_error_invalid_base_rom">Ninguna ROM base compatible. El randomizador requiere Ocarina of Time 1.0 NTSC-U (CZLE) o NTSC-J (CZLJ).</string>
+    <string name="randomizer_error_network">Error de red. Comprueba tu conexión e inténtalo de nuevo.</string>
+    <string name="randomizer_error_rate_limited">Demasiadas solicitudes. Espera 10 segundos e inténtalo de nuevo.</string>
+    <string name="randomizer_error_queue_full">La cola de generación está llena. Inténtalo de nuevo en unos minutos.</string>
+    <string name="randomizer_error_timeout">Tiempo de generación agotado. Inténtalo de nuevo.</string>
+    <string name="randomizer_error_patch">Error al aplicar el parche: %1$s</string>
+    <string name="randomizer_status_creating">Creando seed…</string>
+    <string name="randomizer_status_downloading">Descargando parche…</string>
+    <string name="randomizer_status_applying">Aplicando parche a la ROM…</string>
+    <string name="randomizer_status_working">Procesando…</string>
+
+    <!-- Plandomizer editor -->
+    <string name="plandomizer_title">Editor de Plandomizer</string>
+    <string name="plandomizer_tab_text">Texto</string>
+    <string name="plandomizer_tab_builder">Constructor</string>
+    <string name="plandomizer_import">Importar archivo .json</string>
+    <string name="plandomizer_validate">Validar</string>
+    <string name="plandomizer_clear">Limpiar</string>
+    <string name="plandomizer_generate_json">Generar JSON</string>
+    <string name="plandomizer_apply">Aplicar</string>
+    <string name="plandomizer_generated">JSON generado desde el constructor.</string>
+    <string name="plandomizer_text_hint">Pega o edita aquí el JSON de placement de Plandomizer…</string>
+    <string name="plandomizer_valid">JSON válido.</string>
+    <string name="plandomizer_invalid">JSON inválido: %1$s</string>
+    <string name="plandomizer_warnings">Avisos: %1$s</string>
+    <string name="plandomizer_parse_error">Error de análisis: %1$s</string>
+    <string name="plandomizer_empty">El editor está vacío.</string>
+    <string name="plandomizer_section_locations">Lugares</string>
+    <string name="plandomizer_section_entrances">Entradas</string>
+    <string name="plandomizer_section_dungeons">Mazmorras</string>
+    <string name="plandomizer_section_trials">Pruebas</string>
+    <string name="plandomizer_section_starting_items">Objetos iniciales</string>
+    <string name="plandomizer_section_item_pool">Pool de objetos</string>
+    <string name="plandomizer_section_settings">Sobrescribir configuración</string>
+    <string name="plandomizer_section_file_hash">File hash (hasta 5 íconos)</string>
+    <string name="plandomizer_add_row">Añadir</string>
+    <string name="plandomizer_name_hint">Nombre</string>
+    <string name="plandomizer_value_hint">Valor</string>
+    <string name="plandomizer_item_hint">Objeto</string>
+    <string name="plandomizer_count_hint">Cantidad</string>
+    <string name="plandomizer_from_hint">Desde</string>
+    <string name="plandomizer_to_hint">Hasta</string>
+    <string name="plandomizer_mode_hint">Modo</string>
+    <string name="plandomizer_type_hint">Tipo</string>
+    <string name="plandomizer_file_hash_hint">Ícono (opcional)</string>
+    <string name="plandomizer_remove_row">Eliminar fila</string>
+    <string name="plandomizer_import_error">No se pudo leer el archivo: %1$s</string>
+    <string name="plandomizer_import_success">Archivo importado.</string>
+    <string name="randomizer_error_plandomizer_invalid">Plandomizer inválido: %1$s</string>
+    <string name="randomizer_success_plandomizer_rejected">Seed generada, pero el Plandomizer NO se aplicó (puede no ser compatible con la API). Usa el sitio oficial para seeds personalizadas.</string>
+
+    <!-- Randomizer: Library integration -->
+    <string name="library_menu_randomizer">Generador de Randomizador</string>
+    <string name="randomizer_badge_content_description">Seed de randomizador</string>
+    <string name="menu_delete_seed">Eliminar Seed</string>
+    <string name="randomizer_delete_title">Eliminar seed %1$s</string>
+    <string name="randomizer_delete_message">Esto eliminará permanentemente la seed y todos sus saves (SRAM y estados).</string>
+    <string name="randomizer_delete_button">Eliminar</string>
+    <string name="randomizer_delete_done">Seed eliminada</string>
+    <string name="randomizer_delete_failed">Error al eliminar la seed</string>
+
+    <!-- Auto-Ocarina -->
+    <string name="menu_category_ocarina">Ocarina</string>
+    <string name="menu_auto_ocarina">Auto-Ocarina</string>
+    <string name="ocarina_now_playing">Reproduciendo</string>
+    <!-- Ocarina of Time songs -->
+    <string name="ocarina_zeldas_lullaby">Canción de Zelda</string>
+    <string name="ocarina_eponas_song">Canción de Epona</string>
+    <string name="ocarina_sarias_song">Canción de Saria</string>
+    <string name="ocarina_suns_song">Canción del Sol</string>
+    <string name="ocarina_song_of_time">Canción del Tiempo</string>
+    <string name="ocarina_song_of_storms">Canción de la Tormenta</string>
+    <string name="ocarina_minuet_of_forest">Minueto del Bosque</string>
+    <string name="ocarina_bolero_of_fire">Bolero del Fuego</string>
+    <string name="ocarina_serenade_of_water">Serenata del Agua</string>
+    <string name="ocarina_requiem_of_spirit">Réquiem del Espíritu</string>
+    <string name="ocarina_nocturne_of_shadow">Nocturno de las Sombras</string>
+    <string name="ocarina_prelude_of_light">Preludio de la Luz</string>
+    <!-- Majora\'s Mask songs -->
+    <string name="ocarina_song_of_healing">Canción de la Curación</string>
+    <string name="ocarina_song_of_soaring">Canción del Vuelo</string>
+    <string name="ocarina_sonata_of_awakening">Sonata del Despertar</string>
+    <string name="ocarina_goron_lullaby">Canción de Cuna Goron</string>
+    <string name="ocarina_new_wave_bossa_nova">Nueva Ola Bossa Nova</string>
+    <string name="ocarina_elegy_of_emptiness">Elegía de la Vacuidad</string>
+    <string name="ocarina_oath_to_order">Juramento del Orden</string>
+    <string name="ocarina_inverted_song_of_time">Canción del Tiempo Invertida</string>
+    <string name="ocarina_song_of_double_time">Canción del Tiempo Doble</string>
 </resources>

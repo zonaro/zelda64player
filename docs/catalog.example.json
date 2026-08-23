@@ -29,7 +29,7 @@
       },
       "coverImageUrl": "https://example.com/covers/oot_dx.png",
       "tags": ["quality-of-life", "restoration", "enhancement"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     },
     {
       "id": "ultimate_trial",
@@ -57,7 +57,7 @@
         }
       },
       "tags": ["new-content", "achievements"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     }
   ]
 }

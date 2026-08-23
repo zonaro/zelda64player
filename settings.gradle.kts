@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Zelda64Player"
 include(":app")
+include(":libretrodroid")

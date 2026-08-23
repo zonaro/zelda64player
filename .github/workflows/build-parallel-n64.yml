@@ -1,0 +1,101 @@
+name: Build Parallel-N64
+
+# Self-build pipeline for the parallel_n64 Libretro core.
+#
+# The official LibRetro buildbot Android artifact for parallel_n64 is stale
+# (last built 2020-11-10). The upstream repo (libretro/parallel-n64) is active
+# and ships newer ARM/x86_64 dynarec giving ~10-15% speedup, so we build it
+# ourselves with the current NDK LTS (r27d) via ndk-build (jni/Android.mk).
+#
+# Triggers:
+#   - workflow_dispatch (manual), with a boolean input `publish_release`
+#     (default true) controlling whether a rolling release is published.
+#   - push of a tag matching `parallel-n64-v*` (always publishes a release).
+#
+# Output: a rolling release tagged `parallel-n64-latest` containing one
+# `parallel_n64_libretro_android_<abi>.so` per ABI, consumed by the app's
+# `prepareCore` Gradle task.
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: "Publish a rolling release after the build"
+        type: boolean
+        default: true
+  push:
+    tags:
+      - "parallel-n64-v*"
+
+jobs:
+  build:
+    name: Build ${{ matrix.abi }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        abi: [arm64-v8a, armeabi-v7a, x86, x86_64]
+    steps:
+      - name: Checkout parallel-n64
+        uses: actions/checkout@v4
+        with:
+          repository: libretro/parallel-n64
+          submodules: recursive
+
+      - name: Set up Android NDK
+        uses: nttld/setup-ndk@v1
+        id: ndk
+        with:
+          ndk-version: r27d
+
+      - name: Build core
+        env:
+          ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
+        run: |
+          cd jni
+          ndk-build APP_ABI=${{ matrix.abi }} -j
+
+      - name: Prepare artifact
+        run: |
+          mkdir -p dist
+          cp "libs/${{ matrix.abi }}/libretro.so" "dist/parallel_n64_libretro_android_${{ matrix.abi }}.so"
+          git rev-parse HEAD > "dist/UPSTREAM_SHA_${{ matrix.abi }}.txt"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: parallel-n64-${{ matrix.abi }}
+          path: dist/
+
+  release:
+    name: Publish rolling release
+    needs: build
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish_release)
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Publish rolling release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p dist
+          cp artifacts/*.so dist/ || true
+          UPSTREAM_SHA="$(cat artifacts/UPSTREAM_SHA_*.txt | head -n1)"
+          BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          NOTES="$(printf 'Automated build of libretro/parallel-n64 for Android.\n\nUpstream commit: %s\nBuilt on: %s' "${UPSTREAM_SHA}" "${BUILD_DATE}")"
+          gh release delete parallel-n64-latest --yes --cleanup-tag || true
+          gh release create parallel-n64-latest dist/*.so \
+            --title "Parallel-N64 updated Android build" \
+            --notes "${NOTES}"

@@ -27,6 +27,16 @@ class InstalledHacksRepository(private val file: File) {
 
     fun isInstalled(hackId: String): Boolean = load().containsKey(hackId)
 
+    /**
+     * Remove [hackId] from the installed set (e.g. after the user uninstalls a
+     * game). Safe to call when the hack was never recorded.
+     */
+    fun unmarkInstalled(hackId: String) {
+        val all = load().toMutableMap()
+        all.remove(hackId)
+        save(all)
+    }
+
     fun installedVersion(hackId: String): String? = getInstalled(hackId)?.version
 
     fun load(): Map<String, InstalledHack> {

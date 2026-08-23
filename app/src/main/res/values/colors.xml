@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Frozen gamepad colors (DO NOT retheme) -->
     <color name="gamepad_icon_color">#ff000000</color>
     <color name="gamepad_button_color">#88ffffff</color>
     <color name="gamepad_pressed_color">#66ffffff</color>
+
+    <!-- Material 3 Expressive design tokens (light) -->
+    <color name="color_background">#F9F9FF</color>
+    <color name="color_surface">#F9F9FF</color>
+    <color name="color_surface_container">#E7E0EC</color>
+    <color name="color_surface_container_high">#F3EDF7</color>
+    <color name="color_surface_variant">#E7E0EC</color>
+    <color name="color_primary">#6750A4</color>
+    <color name="color_on_primary">#FFFFFF</color>
+    <color name="color_primary_container">#EADDFF</color>
+    <color name="color_on_primary_container">#21005D</color>
+    <color name="color_on_surface">#1D1B20</color>
+    <color name="color_on_surface_variant">#49454F</color>
+    <color name="color_secondary">#625B71</color>
+    <color name="color_on_secondary">#FFFFFF</color>
+    <color name="color_error">#B3261E</color>
+    <color name="color_on_error">#FFFFFF</color>
+
+    <!-- Pill input background: surfaceVariant at ~50% alpha -->
+    <color name="color_input_background">#80E7E0EC</color>
+
+    <!-- Neutral cover backdrop (blends with the card surface) -->
+    <color name="color_cover_background">#E7E0EC</color>
 </resources>

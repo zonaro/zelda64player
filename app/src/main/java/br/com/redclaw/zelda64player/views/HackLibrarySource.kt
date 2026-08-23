@@ -6,7 +6,11 @@ import br.com.redclaw.zelda64player.data.local.PatchRepository
 data class HackLibraryEntry(
     val id: String,
     val title: String,
-    val coverUrl: String? = null
+    val coverUrl: String? = null,
+    /** Short badge text drawn over the tile (e.g. "R" for randomizer seeds). */
+    val badgeText: String? = null,
+    /** True when this tile is a generated randomizer seed (not a store hack). */
+    val isRandomizer: Boolean = false
 )
 
 /**

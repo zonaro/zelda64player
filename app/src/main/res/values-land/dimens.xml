@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Landscape compaction for the in-game grid menu: tighten cells, headers and
+         ScrollView padding so the full 3-section menu fits a ~360dp-tall landscape
+         phone without requiring an invisible scroll. Portrait keeps the comfortable
+         defaults from values/dimens.xml. -->
+    <dimen name="menu_cell_min_height">52dp</dimen>
+    <dimen name="menu_cell_padding">8dp</dimen>
+    <dimen name="menu_icon_size">22dp</dimen>
+    <dimen name="menu_icon_margin_bottom">4dp</dimen>
+    <dimen name="menu_label_text_size">11sp</dimen>
+    <dimen name="menu_cell_margin">4dp</dimen>
+    <dimen name="menu_header_top_margin">8dp</dimen>
+    <dimen name="menu_header_bottom_margin">2dp</dimen>
+    <dimen name="menu_header_text_size">11sp</dimen>
+    <dimen name="dialog_menu_padding_vertical">6dp</dimen>
+</resources>

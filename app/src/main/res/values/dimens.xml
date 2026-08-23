@@ -1,4 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="gamepad_padding_vertical">20dp</dimen>
+
+    <!-- Shared shape dimensions (Material 3 Expressive) -->
+    <dimen name="card_radius">24dp</dimen>
+    <dimen name="sheet_radius">28dp</dimen>
+    <dimen name="icon_button_size">44dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_elevation_high">8dp</dimen>
+    <dimen name="pill_horizontal_padding">24dp</dimen>
+    <dimen name="input_horizontal_padding">16dp</dimen>
+    <dimen name="input_vertical_padding">12dp</dimen>
+    <dimen name="section_spacing">16dp</dimen>
+    <dimen name="header_padding">20dp</dimen>
+
+    <!-- In-game grid menu -->
+    <dimen name="menu_cell_margin">8dp</dimen>
+    <dimen name="menu_cell_min_height">76dp</dimen>
+    <dimen name="menu_cell_padding">12dp</dimen>
+    <dimen name="menu_icon_size">28dp</dimen>
+    <dimen name="menu_icon_margin_bottom">8dp</dimen>
+    <dimen name="menu_label_text_size">13sp</dimen>
+    <dimen name="menu_header_top_margin">16dp</dimen>
+    <dimen name="menu_header_bottom_margin">8dp</dimen>
+    <dimen name="menu_header_text_size">13sp</dimen>
+    <dimen name="dialog_menu_max_width">560dp</dimen>
+    <!-- Vertical padding applied to the menu ScrollView (top + bottom). -->
+    <dimen name="dialog_menu_padding_vertical">20dp</dimen>
+    <!-- Extra vertical room added to the measured content height when sizing the
+         game-menu dialog window, to absorb the dialog background drawable's
+         padding so the window is never tighter than its content. -->
+    <dimen name="dialog_menu_vertical_inset">16dp</dimen>
+
+    <!-- Physical-controller key badge (pill at cell top-end corner) -->
+    <dimen name="menu_badge_text_size">10sp</dimen>
+    <dimen name="menu_badge_padding_horizontal">6dp</dimen>
+    <dimen name="menu_badge_padding_vertical">2dp</dimen>
+    <dimen name="menu_badge_margin">4dp</dimen>
 </resources>

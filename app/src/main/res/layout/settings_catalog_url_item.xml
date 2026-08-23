@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#161616"
+    android:background="@drawable/shape_card"
+    android:elevation="@dimen/card_elevation"
     android:orientation="horizontal"
     android:padding="8dp">
 
@@ -14,7 +15,7 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@android:color/white"
+        android:textColor="@color/color_on_surface"
         android:textSize="13sp" />
 
     <ImageButton
@@ -25,6 +26,5 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/settings_catalog_delete_desc"
         android:src="@android:drawable/ic_menu_delete"
-        android:tint="@android:color/white" />
-
+        android:tint="@color/color_on_surface" />
 </LinearLayout>

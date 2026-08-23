@@ -10,9 +10,14 @@ import br.com.redclaw.zelda64player.data.local.AppRepositories
 import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
 import br.com.redclaw.zelda64player.data.local.MergedCatalogRepository
 import br.com.redclaw.zelda64player.data.model.HackEntry
+import br.com.redclaw.zelda64player.repositories.Storage
+import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
+import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.store.CatalogRefresher
 import br.com.redclaw.zelda64player.store.DownloadManager
+import br.com.redclaw.zelda64player.store.InstallPhase
 import br.com.redclaw.zelda64player.store.StoreException
+import br.com.redclaw.zelda64player.views.HackLibraryEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,13 +43,23 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
         MergedCatalogRepository(File(appContext.filesDir, "merged_catalog.json"))
     private val baseRomRepository = AppRepositories.baseRomRepository(appContext)
     private val downloadManager =
-        DownloadManager(okHttpClient, patchRepository, installedRepository)
+        DownloadManager(
+            appContext,
+            okHttpClient,
+            patchRepository,
+            installedRepository,
+            baseRomRepository,
+            Storage.getInstance(appContext)
+        )
 
     private val _catalog = MutableLiveData<CatalogUiState>(CatalogUiState.Loading)
     val catalog: LiveData<CatalogUiState> = _catalog
 
     private val _install = MutableLiveData<InstallUiState>()
     val install: LiveData<InstallUiState> = _install
+
+    /** Hack ids with an install currently in flight, to ignore re-entry. */
+    private val installing = mutableSetOf<String>()
 
     init {
         // Render the cached catalog instantly; a refresh updates it from network.
@@ -85,26 +100,47 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
         baseRomRepository.getAll().any { it.crc32.equals(crc32, ignoreCase = true) }
 
     fun install(hack: HackEntry) {
-        _install.value = InstallUiState.Progress(hack.id, 0, 0)
+        // Guard against concurrent installs of the same hack (rapid re-taps on
+        // the download button would otherwise race the network + patch apply).
+        if (installing.contains(hack.id)) return
+        installing.add(hack.id)
+        _install.value = InstallUiState.Progress(hack.id, InstallPhase.DOWNLOADING, 0, 0)
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
-                downloadManager.download(hack) { downloaded, total ->
-                    _install.postValue(InstallUiState.Progress(hack.id, downloaded, total))
+                downloadManager.download(hack) { phase, downloaded, total ->
+                    _install.postValue(InstallUiState.Progress(hack.id, phase, downloaded, total))
                 }
             }
+            installing.remove(hack.id)
             result.onSuccess {
                 _install.postValue(InstallUiState.Success(hack.id))
+                publishShortcut(hack)
             }.onFailure { e ->
                 val message = when (e) {
                     is StoreException.NetworkError ->
                         appContext.getString(R.string.detail_error_network)
                     is StoreException.ChecksumMismatch ->
                         appContext.getString(R.string.detail_error_checksum)
+                    is StoreException.InvalidPatch ->
+                        appContext.getString(R.string.detail_error_patch_invalid)
+                    is StoreException.BaseRomMissing ->
+                        appContext.getString(R.string.detail_error_base_rom_missing, e.expectedCrc32)
                     else -> appContext.getString(R.string.detail_error_generic)
                 }
                 _install.postValue(InstallUiState.Error(hack.id, message))
             }
         }
+    }
+
+    /**
+     * Publish or update the launcher shortcut for [hack] right after a
+     * successful install, so the new game appears in the launcher's long-press
+     * menu without waiting for the next app restart.
+     */
+    private fun publishShortcut(hack: HackEntry) {
+        val entry = HackLibraryEntry(hack.id, hack.name, hack.coverImageUrl)
+        val history = GamePlayHistoryStore(File(appContext.filesDir, "game_play_history.json"))
+        GameShortcutsManager(appContext, history).publishOrUpdate(entry)
     }
 
     sealed class CatalogUiState {
@@ -115,7 +151,12 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
 
     sealed class InstallUiState {
         abstract val hackId: String
-        data class Progress(override val hackId: String, val downloaded: Long, val total: Long) : InstallUiState()
+        data class Progress(
+            override val hackId: String,
+            val phase: InstallPhase,
+            val downloaded: Long,
+            val total: Long
+        ) : InstallUiState()
         data class Success(override val hackId: String) : InstallUiState()
         data class Error(override val hackId: String, val message: String) : InstallUiState()
     }

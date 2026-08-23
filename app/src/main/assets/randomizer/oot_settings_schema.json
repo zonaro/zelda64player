@@ -1,0 +1,4507 @@
+{
+  "schemaVersion": 1,
+  "sourceVersion": "Dev",
+  "categories": [
+    {
+      "id": "main",
+      "options": [
+        {
+          "name": "logic_rules",
+          "type": "enum",
+          "label": "Logic Rules",
+          "default": "glitchless",
+          "cosmetic": false,
+          "tooltip": "Logic provides guiding sets of rules for world generation which the Randomizer uses to ensure the generated seeds are beatable. 'Glitchless': No glitches are required, but may require some minor tricks. Add minor tricks to consider for logic in the 'Detailed Logic' tab. 'Advanced': More Glitchless tricks and toggleable glitches for accessability to curate the overall difficulty level for every skill level. 'No Logic': Maximize randomization, All locations are considered available. MAY BE IMPOSSIBLE TO BEAT.",
+          "choices": [
+            {
+              "value": "glitchless",
+              "label": "Glitchless"
+            },
+            {
+              "value": "advanced",
+              "label": "Advanced"
+            },
+            {
+              "value": "none",
+              "label": "No Logic"
+            }
+          ]
+        },
+        {
+          "name": "reachable_locations",
+          "type": "enum",
+          "label": "Guarantee Reachable Locations",
+          "default": "all",
+          "cosmetic": false,
+          "tooltip": "This determines which items and locations are guaranteed to be reachable. 'All': The randomizer will guarantee that every item is obtainable and every location is reachable. 'All Goals': The randomizer will guarantee that every goal item is obtainable, not just the amount required to beat the game, but otherwise behaves like 'Required Only'. Goal items are the items required for the rainbow bridge and/or Ganon's Boss Key, so for example if the bridge is set to 1 Medallion and Ganon's Boss Key to 1 Gold Skulltula Token, all 6 Medallions and all 100 Tokens will be obtainable. In Triforce Hunt, this will instead guarantee that all Triforce Pieces can be obtained. Hint distributions that define custom goals or remove the default goals will affect item placement as well. 'Required Only': Only items and locations required to beat the game will be guaranteed reachable.",
+          "choices": [
+            {
+              "value": "all",
+              "label": "All"
+            },
+            {
+              "value": "goals",
+              "label": "All Goals"
+            },
+            {
+              "value": "beatable",
+              "label": "Required Only"
+            }
+          ]
+        },
+        {
+          "name": "triforce_hunt",
+          "type": "bool",
+          "label": "Triforce Hunt",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Pieces of the Triforce have been scattered around the world. Find some of them to beat the game. Game is saved on completion, and Ganon's Castle key is given if beating the game again is desired."
+        },
+        {
+          "name": "triforce_count_per_world",
+          "type": "int",
+          "label": "Triforces Per World",
+          "default": 30,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Triforce Pieces placed in each world. Each world will have the same number of triforces. A good number to choose is 1.5 times the amount of Triforce Pieces required per world, for example 30 Triforces placed with a goal of 20. Higher ratios will result in easier and shorter seeds, while a ratio closer to 1 will generally be longer and more difficult.",
+          "min": 1,
+          "max": 999,
+          "step": 1
+        },
+        {
+          "name": "triforce_goal_per_world",
+          "type": "int",
+          "label": "Required Triforces Per World",
+          "default": 20,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Triforce Pieces required to beat the game. In multiworld, the required amount will be per world collectively. For example, if this is set to 20 in a 2 player multiworld, players need 40 total, but one player could obtain 30 and the other 10.",
+          "min": 1,
+          "max": 999,
+          "step": 1
+        },
+        {
+          "name": "lacs_condition",
+          "type": "enum",
+          "label": "LACS Condition",
+          "default": "vanilla",
+          "cosmetic": false,
+          "tooltip": "Sets the condition for the Light Arrow Cutscene check to give you the item from Zelda. 'Vanilla': Shadow and Spirit Medallions. 'Stones': A configurable amount of Spiritual Stones. 'Medallions': A configurable amount of Medallions. 'Dungeon Rewards': A configurable amount of Dungeon Rewards. 'Tokens': A configurable amount of Gold Skulltula Tokens. 'Hearts': A configurable amount of hearts.",
+          "choices": [
+            {
+              "value": "vanilla",
+              "label": "Vanilla"
+            },
+            {
+              "value": "stones",
+              "label": "Stones"
+            },
+            {
+              "value": "medallions",
+              "label": "Medallions"
+            },
+            {
+              "value": "dungeons",
+              "label": "Dungeon Rewards"
+            },
+            {
+              "value": "tokens",
+              "label": "Tokens"
+            },
+            {
+              "value": "hearts",
+              "label": "Hearts"
+            }
+          ]
+        },
+        {
+          "name": "lacs_medallions",
+          "type": "int",
+          "label": "Medallions Required for LACS",
+          "default": 6,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Medallions required to trigger the Light Arrow Cutscene.",
+          "min": 1,
+          "max": 6,
+          "step": 1
+        },
+        {
+          "name": "lacs_stones",
+          "type": "int",
+          "label": "Spiritual Stones Required for LACS",
+          "default": 3,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Spiritual Stones required to trigger the Light Arrow Cutscene.",
+          "min": 1,
+          "max": 3,
+          "step": 1
+        },
+        {
+          "name": "lacs_rewards",
+          "type": "int",
+          "label": "Dungeon Rewards Required for LACS",
+          "default": 9,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Dungeon Rewards (Medallions and Spiritual Stones) required to trigger the Light Arrow Cutscene.",
+          "min": 1,
+          "max": 9,
+          "step": 1
+        },
+        {
+          "name": "lacs_tokens",
+          "type": "int",
+          "label": "Gold Skulltula Tokens Required for LACS",
+          "default": 100,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Gold Skulltula Tokens required to trigger the Light Arrow Cutscene.",
+          "min": 1,
+          "max": 999,
+          "step": 1
+        },
+        {
+          "name": "lacs_hearts",
+          "type": "int",
+          "label": "Hearts Required for LACS",
+          "default": 20,
+          "cosmetic": false,
+          "tooltip": "Select the amount of hearts required to trigger the Light Arrow Cutscene.",
+          "min": 4,
+          "max": 20,
+          "step": 1
+        },
+        {
+          "name": "bridge",
+          "type": "enum",
+          "label": "Rainbow Bridge Requirement",
+          "default": "medallions",
+          "cosmetic": false,
+          "tooltip": "'Always Open': Rainbow Bridge is always present. 'Vanilla Requirements': Spirit/Shadow Medallions and Light Arrows. 'Spiritual Stones': A configurable amount of Spiritual Stones. 'Medallions': A configurable amount of Medallions. 'Dungeon Rewards': A configurable amount of Dungeon Rewards. 'Gold Skulltula Tokens': A configurable amount of Gold Skulltula Tokens. 'Hearts': A configurable amount of hearts. 'Random': A random Rainbow Bridge requirement excluding Gold Skulltula Tokens.",
+          "choices": [
+            {
+              "value": "open",
+              "label": "Always Open"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla Requirements"
+            },
+            {
+              "value": "stones",
+              "label": "Spiritual Stones"
+            },
+            {
+              "value": "medallions",
+              "label": "Medallions"
+            },
+            {
+              "value": "dungeons",
+              "label": "Dungeon Rewards"
+            },
+            {
+              "value": "tokens",
+              "label": "Gold Skulltula Tokens"
+            },
+            {
+              "value": "hearts",
+              "label": "Hearts"
+            },
+            {
+              "value": "random",
+              "label": "Random"
+            }
+          ]
+        },
+        {
+          "name": "bridge_medallions",
+          "type": "int",
+          "label": "Medallions Required for Bridge",
+          "default": 6,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Medallions required to spawn the rainbow bridge.",
+          "min": 1,
+          "max": 6,
+          "step": 1
+        },
+        {
+          "name": "bridge_stones",
+          "type": "int",
+          "label": "Spiritual Stones Required for Bridge",
+          "default": 3,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Spiritual Stones required to spawn the rainbow bridge.",
+          "min": 1,
+          "max": 3,
+          "step": 1
+        },
+        {
+          "name": "bridge_rewards",
+          "type": "int",
+          "label": "Dungeon Rewards Required for Bridge",
+          "default": 9,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Dungeon Rewards (Medallions and Spiritual Stones) required to spawn the rainbow bridge.",
+          "min": 1,
+          "max": 9,
+          "step": 1
+        },
+        {
+          "name": "bridge_tokens",
+          "type": "int",
+          "label": "Skulltulas Required for Bridge",
+          "default": 100,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Gold Skulltula Tokens required to spawn the rainbow bridge.",
+          "min": 1,
+          "max": 999,
+          "step": 1
+        },
+        {
+          "name": "bridge_hearts",
+          "type": "int",
+          "label": "Hearts Required for Bridge",
+          "default": 20,
+          "cosmetic": false,
+          "tooltip": "Select the amount of hearts required to spawn the rainbow bridge.",
+          "min": 4,
+          "max": 20,
+          "step": 1
+        },
+        {
+          "name": "shuffle_ganon_bosskey",
+          "type": "enum",
+          "label": "Ganon's Boss Key",
+          "default": "dungeon",
+          "cosmetic": false,
+          "tooltip": "'Remove': Ganon's Castle Boss Key is removed and the boss door in Ganon's Tower starts unlocked. 'Vanilla': Ganon's Castle Boss Key will appear in the vanilla location. 'Own Dungeon': Ganon's Castle Boss Key can only appear inside Ganon's Castle. 'Regional': Ganon's Castle Boss Key can only appear in Hyrule Field, Lon Lon Ranch, Market, Temple of Time, Hyrule Castle, (Outside) Ganon's Castle, and Inside Ganon's Castle. 'Overworld Only': Ganon's Castle Boss Key can only appear outside of dungeons. 'Any Dungeon': Ganon's Castle Boss Key can only appear inside of a dungeon, but not necessarily Ganon's Castle. 'Anywhere': Ganon's Castle Boss Key can appear anywhere in the world. 'Light Arrow Cutscene': Ganon's Castle Boss Key will appear on the Light Arrow Cutscene. 'Stones': Ganon's Castle Boss Key will be awarded when reaching the target number of Spiritual Stones. 'Medallions': Ganon's Castle Boss Key will be awarded when reaching the target number of Medallions. 'Dungeon Rewards': Ganon's Castle Boss Key will be awarded when reaching the target number of Dungeon Rewards. 'Tokens': Ganon's Castle Boss Key will be awarded when reaching the target number of Gold Skulltula Tokens. 'Hearts': Ganon's Castle Boss Key will be awarded when reaching the target number of hearts.",
+          "choices": [
+            {
+              "value": "remove",
+              "label": "Remove (Keysy)"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla Location"
+            },
+            {
+              "value": "dungeon",
+              "label": "Own Dungeon"
+            },
+            {
+              "value": "regional",
+              "label": "Regional"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "any_dungeon",
+              "label": "Any Dungeon"
+            },
+            {
+              "value": "keysanity",
+              "label": "Anywhere (Keysanity)"
+            },
+            {
+              "value": "on_lacs",
+              "label": "Light Arrow Cutscene"
+            },
+            {
+              "value": "stones",
+              "label": "Stones"
+            },
+            {
+              "value": "medallions",
+              "label": "Medallions"
+            },
+            {
+              "value": "dungeons",
+              "label": "Dungeon Rewards"
+            },
+            {
+              "value": "tokens",
+              "label": "Tokens"
+            },
+            {
+              "value": "hearts",
+              "label": "Hearts"
+            }
+          ]
+        },
+        {
+          "name": "ganon_bosskey_medallions",
+          "type": "int",
+          "label": "Medallions Required for Ganon's BK",
+          "default": 6,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Medallions required to receive Ganon's Castle Boss Key.",
+          "min": 1,
+          "max": 6,
+          "step": 1
+        },
+        {
+          "name": "ganon_bosskey_stones",
+          "type": "int",
+          "label": "Spiritual Stones Required for Ganon's BK",
+          "default": 3,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Spiritual Stones required to receive Ganon's Castle Boss Key.",
+          "min": 1,
+          "max": 3,
+          "step": 1
+        },
+        {
+          "name": "ganon_bosskey_rewards",
+          "type": "int",
+          "label": "Dungeon Rewards Required for Ganon's BK",
+          "default": 9,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Dungeon Rewards (Medallions and Spiritual Stones) required to receive Ganon's Castle Boss Key.",
+          "min": 1,
+          "max": 9,
+          "step": 1
+        },
+        {
+          "name": "ganon_bosskey_tokens",
+          "type": "int",
+          "label": "Gold Skulltula Tokens Required for Ganon's BK",
+          "default": 100,
+          "cosmetic": false,
+          "tooltip": "Select the amount of Gold Skulltula Tokens required to receive Ganon's Castle Boss Key.",
+          "min": 1,
+          "max": 999,
+          "step": 1
+        },
+        {
+          "name": "ganon_bosskey_hearts",
+          "type": "int",
+          "label": "Hearts Required for Ganon's BK",
+          "default": 20,
+          "cosmetic": false,
+          "tooltip": "Select the amount of hearts required to receive Ganon's Castle Boss Key.",
+          "min": 4,
+          "max": 20,
+          "step": 1
+        }
+      ]
+    },
+    {
+      "id": "open",
+      "options": [
+        {
+          "name": "trials_random",
+          "type": "bool",
+          "label": "Random Number of Ganon's Trials",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Sets a random number of trials to enter Ganon's Tower."
+        },
+        {
+          "name": "trials",
+          "type": "int",
+          "label": "Ganon's Trials Count",
+          "default": 6,
+          "cosmetic": false,
+          "tooltip": "Trials are randomly selected. If hints are enabled, then there will be hints for which trials need to be completed.",
+          "min": 0,
+          "max": 6,
+          "step": 1
+        },
+        {
+          "name": "open_forest",
+          "type": "enum",
+          "label": "Forest",
+          "default": "closed",
+          "cosmetic": false,
+          "tooltip": "'Open Forest': Mido no longer blocks the path to the Deku Tree, and the Kokiri boy no longer blocks the path out of the forest. 'Closed Deku': The Kokiri boy no longer blocks the path out of the forest, but Mido still blocks the path to the Deku Tree, requiring Kokiri Sword and Deku Shield to access the Deku Tree. 'Closed Forest': Beating Deku Tree is logically required to leave the forest area (Kokiri Forest/Lost Woods/Sacred Forest Meadow/Deku Tree), while the Kokiri Sword and a Deku Shield are required to access the Deku Tree. Items needed for this will be guaranteed inside the forest area. This setting is incompatible with starting as adult, and so Starting Age will be locked to Child. With any of \"Shuffle Interior Entrances\" set to \"All\", \"Shuffle Overworld Entrances\" on, \"Randomize Warp Song Destinations\" on, \"Randomize Overworld Spawns\" on, or \"Shuffle Grottos\" in Advanced Logic, Closed Forest will instead be treated as Closed Deku with starting age Child and WILL NOT guarantee that these items are available in the forest area.",
+          "choices": [
+            {
+              "value": "open",
+              "label": "Open Forest"
+            },
+            {
+              "value": "closed_deku",
+              "label": "Closed Deku"
+            },
+            {
+              "value": "closed",
+              "label": "Closed Forest"
+            }
+          ]
+        },
+        {
+          "name": "open_kakariko",
+          "type": "enum",
+          "label": "Kakariko Gate",
+          "default": "closed",
+          "cosmetic": false,
+          "tooltip": "This changes the behavior of the Kakariko Gate to Death Mountain Trail as child. The gate is always open as adult. \"Open Gate\": The gate is always open instead of needing Zelda's Letter. The Happy Mask Shop opens upon obtaining Zelda's Letter without needing to show it to the guard. \"Zelda's Letter Opens Gate\": The gate is closed at the start, but opens automatically along with the Happy Mask Shop upon obtaining Zelda's Letter. \"Closed\": The gate and the Happy Mask Shop both remain closed until showing Zelda's Letter to the guard in Kakariko.",
+          "choices": [
+            {
+              "value": "open",
+              "label": "Open Gate"
+            },
+            {
+              "value": "zelda",
+              "label": "Zelda's Letter Opens Gate"
+            },
+            {
+              "value": "closed",
+              "label": "Closed Gate"
+            }
+          ]
+        },
+        {
+          "name": "open_door_of_time",
+          "type": "enum",
+          "label": "Door of Time",
+          "default": "sot",
+          "cosmetic": false,
+          "tooltip": "'Open': The Door of Time starts opened instead of needing to play the Song of Time. 'Song of Time': Only an Ocarina and Song of Time must be found to open the Door of Time. This is the vanilla behavior despite what the story suggests. 'Ocarina of Time + Song of Time': The Door of Time is opened by playing the Song of Time on the Ocarina of Time. '3 Spiritual Stones': The Door of Time automatically opens upon collecting all three Spiritual Stones. Song of Time is not required. '3 Stones + Song of Time': The Door of Time is opened by playing the Song of Time after collecting all three Spiritual Stones. '3 Stones + OoT + SoT': The Door of Time is opened by playing the Song of Time on the Ocarina of Time after collecting all three Spiritual Stones.",
+          "choices": [
+            {
+              "value": "open",
+              "label": "Open"
+            },
+            {
+              "value": "sot",
+              "label": "Song of Time"
+            },
+            {
+              "value": "oot_sot",
+              "label": "Ocarina of Time + Song of Time"
+            },
+            {
+              "value": "stones",
+              "label": "3 Spiritual Stones"
+            },
+            {
+              "value": "stones_sot",
+              "label": "3 Stones + Song of Time"
+            },
+            {
+              "value": "stones_oot_sot",
+              "label": "3 Stones + OoT + SoT"
+            }
+          ]
+        },
+        {
+          "name": "zora_fountain",
+          "type": "enum",
+          "label": "Zora's Fountain",
+          "default": "closed",
+          "cosmetic": false,
+          "tooltip": "'Default Behavior': King Zora obstructs the way to Zora's Fountain. Ruto's Letter must be shown as child in order to move him for both eras. 'Open For Adult': King Zora is always moved in the adult era. This means Ruto's Letter is only required to access Zora's Fountain as child. 'Always Open': King Zora starts as moved in both the child and adult eras. This also removes Ruto's Letter from the pool since it can't be used.",
+          "choices": [
+            {
+              "value": "closed",
+              "label": "Default Behavior (Closed)"
+            },
+            {
+              "value": "adult",
+              "label": "Open For Adult"
+            },
+            {
+              "value": "open",
+              "label": "Always Open"
+            }
+          ]
+        },
+        {
+          "name": "gerudo_fortress",
+          "type": "enum",
+          "label": "Gerudo's Fortress",
+          "default": "normal",
+          "cosmetic": false,
+          "tooltip": "'Rescue One Carpenter': Only the bottom left carpenter, in the cell with a single torch, must be rescued. This cell can be savewarped to from any room in the hideout. All but one of the Thieves' Hideout Keys are removed. 'Open Gerudo's Fortress': The carpenters are rescued from the start of the game, and if 'Shuffle Gerudo Card' is disabled, the player starts with the Gerudo Card in the inventory allowing access to Gerudo Training Ground.",
+          "choices": [
+            {
+              "value": "normal",
+              "label": "Default Behavior"
+            },
+            {
+              "value": "fast",
+              "label": "Rescue One Carpenter"
+            },
+            {
+              "value": "open",
+              "label": "Open Gerudo's Fortress"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_gerudo_fortress_heart_piece",
+          "type": "enum",
+          "label": "Shuffle Gerudo Fortress Heart Piece",
+          "default": "remove",
+          "cosmetic": false,
+          "tooltip": "There is an extra heart piece on the balcony above the jail in Gerudo's Fortress if accessed as child. Normally, this is not reachable without glitches, so it's not shuffled and not considered in logic. With the Thieves' Hideout entrances shuffled, it becomes reachable, so use this setting to decide how to handle that. 'Remove': The heart piece is completely removed from the game. There is no freestanding item to collect above the jail. 'Vanilla': The heart piece exists as an unshuffled heart piece. It is considered in logic for the purpose of heart win conditions. 'Shuffle': There is a shuffled item above the jail and the extra heart piece is shuffled into the item pool. Both are considered in logic.",
+          "choices": [
+            {
+              "value": "remove",
+              "label": "Remove"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla"
+            },
+            {
+              "value": "shuffle",
+              "label": "Shuffle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shuffle",
+      "options": [
+        {
+          "name": "shuffle_interior_entrances",
+          "type": "enum",
+          "label": "Shuffle Interior Entrances",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "'Simple Interiors': Shuffle the pool of interior entrances which contains most Houses and all Great Fairies. 'All Interiors': Extended version of 'Simple Interiors' with some extra places: Windmill, Link's House, Temple of Time and Kakariko Potion Shop. When shuffling any interior entrances, trade quest timers are disabled and items never revert, even when dying or loading a save.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "simple",
+              "label": "Simple Interiors"
+            },
+            {
+              "value": "all",
+              "label": "All Interiors"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_hideout_entrances",
+          "type": "bool",
+          "label": "Shuffle Thieves' Hideout Entrances",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Shuffle the pool of entrances to Thieves' Hideout into the pool of interior entrances. Note that savewarping in any room of Thieves' Hideout always takes you to the first room (with 1 torch)."
+        },
+        {
+          "name": "shuffle_grotto_entrances",
+          "type": "bool",
+          "label": "Shuffle Grotto Entrances",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Shuffle the pool of grotto entrances, including all graves, small Fairy Fountains and the Lost Woods Stage."
+        },
+        {
+          "name": "shuffle_dungeon_entrances",
+          "type": "enum",
+          "label": "Shuffle Dungeon Entrances",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Shuffle the pool of dungeon entrances, including Bottom of the Well, Ice Cavern, and Gerudo Training Ground. Additionally, the entrances of Deku Tree, Fire Temple and Bottom of the Well are opened for both adult and child. With Dungeon and Ganon selected, all dungeons including Ganon's castle will be shuffled. Thieves' Hideout is controlled by a separate setting.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "simple",
+              "label": "Dungeon"
+            },
+            {
+              "value": "all",
+              "label": "Dungeon and Ganon"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_bosses",
+          "type": "enum",
+          "label": "Shuffle Boss Entrances",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Shuffle dungeon boss rooms. This affects the boss rooms of all stone and medallion dungeons. 'Age-Restricted': Shuffle the locations of child boss rooms and adult boss rooms separately. 'Full': Shuffle the locations of all boss rooms together. Child may be expected to defeat Phantom Ganon and/or Bongo Bongo.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "limited",
+              "label": "Age-Restricted"
+            },
+            {
+              "value": "full",
+              "label": "Full"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_ganon_tower",
+          "type": "bool",
+          "label": "Shuffle Ganon's Tower Entrance",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Shuffle the entrance from Ganon's Castle to Ganon's Tower, just behind the trials barrier, into the adult boss entrance pool if \"Shuffle Boss Entrances\" is set to \"Age-Restricted\", or the boss entrance pool if it's set to \"Full\". The entrance from Ganon's Tower to Ganondorf's boss room is never shuffled."
+        },
+        {
+          "name": "shuffle_overworld_entrances",
+          "type": "bool",
+          "label": "Shuffle Overworld Entrances",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Shuffle the pool of Overworld entrances, which corresponds to almost all loading zones between Overworld areas. Some entrances are kept unshuffled to avoid issues: - Hyrule Castle Courtyard and Garden entrances - Both Market Back Alley entrances The entrance from Gerudo Valley to Lake Hylia is a one-way entrance and has its own setting below. Just like when shuffling interior entrances, shuffling overworld entrances disables trade timers and trade items never revert, even when dying or loading a save."
+        },
+        {
+          "name": "shuffle_gerudo_valley_river_exit",
+          "type": "bool",
+          "label": "Shuffle Gerudo Valley River Exit",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Randomize where the the one-way entrance down the river in Gerudo Valley leads to."
+        },
+        {
+          "name": "shuffle_song_items",
+          "type": "enum",
+          "label": "Shuffle Songs",
+          "default": "song",
+          "cosmetic": false,
+          "tooltip": "This restricts where song items can appear. 'Song Locations': Song will only appear at locations that normally teach songs. In Multiworld, songs will only appear in their own world. 'Dungeon Rewards': Songs appear at the end of dungeons. For major dungeons, they will be at the boss heart container location. The remaining 4 songs are placed at: - Zelda's Lullaby Location - Ice Cavern's Serenade of Water Location - Bottom of the Well's Lens of Truth Location - Gerudo Training Ground's Ice Arrow Location If some dungeons are pre-completed, songs that would have been located inside these dungeons are given for free along with the free dungeon rewards. 'Anywhere': Songs can appear in any location.",
+          "choices": [
+            {
+              "value": "song",
+              "label": "Song Locations"
+            },
+            {
+              "value": "dungeon",
+              "label": "Dungeon Rewards"
+            },
+            {
+              "value": "any",
+              "label": "Anywhere"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_scrubs",
+          "type": "enum",
+          "label": "Scrub Shuffle",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "'Off': Only the 3 Scrubs that give one-time items in the vanilla game (PoH, Deku Nut capacity, and Deku Stick capacity) will have random items. 'Affordable': All Scrub prices will be reduced to 10 rupees each. 'Expensive': All Scrub prices will be their vanilla prices. This will require spending over 1000 rupees on Scrubs. 'Random Prices': All Scrub prices will be between 0-99 rupees. This will on average be very, very expensive overall.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "low",
+              "label": "On (Affordable)"
+            },
+            {
+              "value": "regular",
+              "label": "On (Expensive)"
+            },
+            {
+              "value": "random",
+              "label": "On (Random Prices)"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_child_trade",
+          "type": "list",
+          "label": "Shuffle Child Trade Sequence Items",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Select the items to shuffle in the child trade sequence. To skip Child Zelda, do not shuffle Zelda's Letter and add it as a starting item.",
+          "choices": [
+            {
+              "value": "Weird Egg",
+              "label": "Weird Egg"
+            },
+            {
+              "value": "Chicken",
+              "label": "Chicken"
+            },
+            {
+              "value": "Zeldas Letter",
+              "label": "Zelda's Letter"
+            },
+            {
+              "value": "Keaton Mask",
+              "label": "Keaton Mask"
+            },
+            {
+              "value": "Skull Mask",
+              "label": "Skull Mask"
+            },
+            {
+              "value": "Spooky Mask",
+              "label": "Spooky Mask"
+            },
+            {
+              "value": "Bunny Hood",
+              "label": "Bunny Hood"
+            },
+            {
+              "value": "Goron Mask",
+              "label": "Goron Mask"
+            },
+            {
+              "value": "Zora Mask",
+              "label": "Zora Mask"
+            },
+            {
+              "value": "Gerudo Mask",
+              "label": "Gerudo Mask"
+            },
+            {
+              "value": "Mask of Truth",
+              "label": "Mask of Truth"
+            }
+          ]
+        },
+        {
+          "name": "adult_trade_shuffle",
+          "type": "bool",
+          "label": "Shuffle All Selected Adult Trade Items",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enable to shuffle every selected Adult Trade Item. If disabled and at least one of \"Shuffle Adult Trade Sequence Items\" is selected, Anju will always give a shuffled item even if Pocket Egg has not been shuffled."
+        },
+        {
+          "name": "shuffle_freestanding_items",
+          "type": "enum",
+          "label": "Shuffle Rupees & Hearts",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Shuffles freestanding rupees and recovery hearts, also shuffles: Shadow Temple Spinning Pot Drop All Goron Pot faces Off: No freestanding rupees/recovery hearts are shuffled. All: All Visible freestanding rupees/recovery hearts are shuffled. Overworld Only: Freestanding rupees/recovery hearts in the overworld are shuffled. Dungeons Only: Freestanding rupees/recovery hearts in dungeons are shuffled.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "all",
+              "label": "All"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "dungeons",
+              "label": "Dungeons Only"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_pots",
+          "type": "enum",
+          "label": "Shuffle Pots",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Shuffles pots, flying pots into the location pool. Off: Not shuffled. All: All pots/flying pots are shuffled. Overworld Only: Only overworld pots/flying pots are shuffled. Dungeons Only: Only dungeon pots/flying pots are shuffled. When this setting is enabled, the pots in Ganon's Tower will be accessible without Ganon's Boss Key. Proceeding up the tower out of the room with the pots will require Ganon's Boss Key.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "all",
+              "label": "All"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "dungeons",
+              "label": "Dungeons Only"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_empty_pots",
+          "type": "bool",
+          "label": "Include Empty Pots",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this will include empty pots into the location pool based on the Shuffle Pots setting chosen."
+        },
+        {
+          "name": "shuffle_crates",
+          "type": "enum",
+          "label": "Shuffle Crates",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Shuffles large and small crates into the location pool. Off: Not shuffled. All: crates are shuffled. Overworld Only: Only overworld crates are shuffled. Dungeons Only: Only dungeon crates are shuffled. Note: Only crates which normally drop an item are shuffled. Empty crates are not included.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "all",
+              "label": "All"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "dungeons",
+              "label": "Dungeons Only"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_empty_crates",
+          "type": "bool",
+          "label": "Include Empty Crates",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this will include empty crates into the location pool based on the Shuffle Crates setting chosen."
+        },
+        {
+          "name": "shuffle_cows",
+          "type": "bool",
+          "label": "Shuffle Cows",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this will let cows give you items upon performing Epona's song in front of them. There are 9 cows, and an extra in MQ Jabu."
+        },
+        {
+          "name": "shuffle_beehives",
+          "type": "bool",
+          "label": "Shuffle Beehives",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this will let beehives drop items. There are 32 Beehives located in: Generic Grottos (x2 per grotto) 2 Scrub Grottos (x1 per grotto) 3 Scrub Grottos (x1 per grotto) DMT Cow Grotto (x1) Zora's Domain (x3 child only)"
+        },
+        {
+          "name": "shuffle_wonderitems",
+          "type": "bool",
+          "label": "Shuffle Wonderitems",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling will shuffle drops from wonderitems. Wonderitems are invisible items in the game that will drop an item under a certain condition. These items will be marked in the game with a sparkle effect when shuffled so they can be easily found. There are 4 kinds of shuffled wonderitems. Proximity Drop (Yellow): Gives an item when Link touches it. Interact Switch (Red): Drops an item when hit with a certain damage type. (Sword, bow, slingshot, or hookshot) Free Multitag (Blue): Gives an item when a certain set of tag points are touched. The only free multitag is the stepping stones in Kokiri Forest. Ordered Multitag (Cyan): Gives an item when a set of tag points are touched in a specific order. The only ordered multitag is the grass stepping stones in Kokiri Forest."
+        },
+        {
+          "name": "shuffle_kokiri_sword",
+          "type": "bool",
+          "label": "Shuffle Kokiri Sword",
+          "default": true,
+          "cosmetic": false,
+          "tooltip": "Enabling this shuffles the Kokiri Sword into the pool. This will require extensive use of sticks until the sword is found."
+        },
+        {
+          "name": "shuffle_ocarinas",
+          "type": "bool",
+          "label": "Shuffle Ocarinas",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this shuffles the Fairy Ocarina and the Ocarina of Time into the pool. This will require finding an Ocarina before being able to play songs."
+        },
+        {
+          "name": "shuffle_gerudo_card",
+          "type": "bool",
+          "label": "Shuffle Gerudo Card",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this shuffles the Gerudo Card into the item pool. The Gerudo Card is required to enter the Gerudo Training Ground and prevents the guards from throwing you in jail."
+        },
+        {
+          "name": "shuffle_beans",
+          "type": "bool",
+          "label": "Shuffle Magic Beans",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this adds a pack of 10 beans to the item pool and changes the Magic Bean Salesman to sell a random item once at the price of 60 Rupees."
+        },
+        {
+          "name": "shuffle_expensive_merchants",
+          "type": "bool",
+          "label": "Shuffle Expensive Merchants",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this adds a Giant's Knife and a pack of Bombchus to the item pool and changes Medigoron, Granny's Potion Shop, and the Haunted Wasteland Carpet Salesman to sell a random item once at the same price as their vanilla items."
+        },
+        {
+          "name": "shuffle_frog_song_rupees",
+          "type": "bool",
+          "label": "Shuffle Frog Song Rupees",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this adds 5 Purple Rupees to the item pool and shuffles the rewards from playing Zelda's Lullaby, Epona's Song, Saria's Song, Sun's Song, and Song of Time to the frogs in Zora's River."
+        },
+        {
+          "name": "shuffle_100_skulltula_rupee",
+          "type": "bool",
+          "label": "Shuffle 100 Skulltula Reward",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this adds the repeatable Huge Rupee reward from the Skulltula house to the item pool. This is obtained by collecting all 100 gold skulltulas."
+        },
+        {
+          "name": "shuffle_loach_reward",
+          "type": "enum",
+          "label": "Shuffle Hyrule Loach Reward",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Enabling this shuffles the reward for catching the Hyrule Loach at the fishing pond into the item pool Vanilla Behavior shuffles the reward for catching the loach but otherwise keeps all behavior the same as in the vanilla game. The loach will spawn every fourth play of the fishing minigame and the sinking lure will become available only after obtaining the fishing prize for link's current age. Easier Behavior shuffles the loach reward but also modifies some behavior in order to make the loach easier to catch. When enabled the loach will always spawn at the fishing pond, the sinking lure will be available immediately at all four possible positions, and the child/adult fishing prizes are still obtainable if you use the sinking lure.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla Behavior"
+            },
+            {
+              "value": "easy",
+              "label": "Easier Behavior"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_individual_ocarina_notes",
+          "type": "bool",
+          "label": "Shuffle Individual Ocarina Notes",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this locks all Ocarina inputs, and adds 5 new items to find that each unlock one of the 5 Ocarina notes."
+        },
+        {
+          "name": "shuffle_dungeon_rewards",
+          "type": "enum",
+          "label": "Shuffle Dungeon Rewards",
+          "default": "reward",
+          "cosmetic": false,
+          "tooltip": "This controls where Medallions and Spiritual Stones can appear. 'Vanilla Locations': Medallions and Spiritual Stones will appear in their vanilla locations. 'Dungeon Reward Locations': Medallions and Spiritual Stones will be awarded when stepping into the blue warps of boss rooms, but not necessarily the boss's vanilla reward. In Multiworld, dungeon rewards will only appear in their own world. If you use one of the following options, note that after receiving the last required medallion for the Burning Kakariko cutscene while already in Kakariko, the cutscene doesn't play until you leave and reenter Kakariko (or enter and exit a building). 'Own Dungeon': Each dungeon reward appears in its respective dungeon, but not necessarily on the boss. If boss entrances are mixed, boss rooms that aren't in a dungeon can't have dungeon rewards. The Light Medallion appears in the Temple of Time, or may be a starting item if the \"Free Reward from Rauru\" setting is enabled. 'Regional': Dungeon rewards can only appear in regions near the original dungeon (including the dungeon itself or other dungeons in the region). <a href=\"https://wiki.ootrandomizer.com/index.php?title=Hints#Hint_Regions\" target=\"_blank\">The Wiki has a list of corresponding regions here.</a> 'Overworld Only': Dungeon rewards can only appear outside of dungeons. 'Any Dungeon': Dungeon rewards can only appear inside of dungeons. 'Anywhere': Dungeon rewards can appear anywhere in the world.",
+          "choices": [
+            {
+              "value": "vanilla",
+              "label": "Vanilla Locations"
+            },
+            {
+              "value": "reward",
+              "label": "Dungeon Reward Locations"
+            },
+            {
+              "value": "dungeon",
+              "label": "Own Dungeon"
+            },
+            {
+              "value": "regional",
+              "label": "Regional"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "any_dungeon",
+              "label": "Any Dungeon"
+            },
+            {
+              "value": "anywhere",
+              "label": "Anywhere"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_map",
+          "type": "enum",
+          "label": "Maps",
+          "default": "dungeon",
+          "cosmetic": false,
+          "tooltip": "'Remove': Maps are removed. This will add a small amount of money and refill items to the pool. 'Start With': Maps are given to you from the start. This will add a small amount of money and refill items to the pool. 'Vanilla': Maps will appear in their vanilla locations. 'Own Dungeon': Maps can only appear in their respective dungeon. 'Regional': Maps can only appear in regions near the original dungeon (including the dungeon itself or other dungeons in the region). <a href=\"https://wiki.ootrandomizer.com/index.php?title=Hints#Hint_Regions\" target=\"_blank\">The Wiki has a list of corresponding regions here.</a> 'Overworld Only': Maps can only appear outside of dungeons. 'Any Dungeon': Maps can only appear in a dungeon, but not necessarily the dungeon they are for. 'Anywhere': Maps can appear anywhere in the world. Setting 'Remove', 'Start With', 'Overworld', or 'Anywhere' will add 1 more possible location to each Dungeon. This makes dungeons more profitable, especially Ice Cavern, Water Temple, and Jabu Jabu's Belly. Regardless of the selected option, maps from pre-completed dungeons won't be placed outside their respective dungeons and maps from other dungeons won't be placed inside pre-completed dungeons.",
+          "choices": [
+            {
+              "value": "remove",
+              "label": "Remove"
+            },
+            {
+              "value": "startwith",
+              "label": "Start With"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla Locations"
+            },
+            {
+              "value": "dungeon",
+              "label": "Own Dungeon"
+            },
+            {
+              "value": "regional",
+              "label": "Regional"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "any_dungeon",
+              "label": "Any Dungeon"
+            },
+            {
+              "value": "keysanity",
+              "label": "Anywhere"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_compass",
+          "type": "enum",
+          "label": "Compasses",
+          "default": "dungeon",
+          "cosmetic": false,
+          "tooltip": "'Remove': Compasses are removed. This will add a small amount of money and refill items to the pool. 'Start With': Compasses are given to you from the start. This will add a small amount of money and refill items to the pool. 'Vanilla': Compasses will appear in their vanilla locations. 'Own Dungeon': Compasses can only appear in their respective dungeon. 'Regional': Compasses can only appear in regions near the original dungeon (including the dungeon itself or other dungeons in the region). <a href=\"https://wiki.ootrandomizer.com/index.php?title=Hints#Hint_Regions\" target=\"_blank\">The Wiki has a list of corresponding regions here.</a> 'Overworld Only': Compasses can only appear outside of dungeons. 'Any Dungeon': Compasses can only appear in a dungeon, but not necessarily the dungeon they are for. 'Anywhere': Compasses can appear anywhere in the world. Setting 'Remove', 'Start With', 'Overworld', or 'Anywhere' will add 1 more possible location to each Dungeon. This makes dungeons more profitable, especially Ice Cavern, Water Temple, and Jabu Jabu's Belly. Regardless of the selected option, compasses from pre-completed dungeons won't be placed outside their respective dungeons and compasses from other dungeons won't be placed inside pre-completed dungeons.",
+          "choices": [
+            {
+              "value": "remove",
+              "label": "Remove"
+            },
+            {
+              "value": "startwith",
+              "label": "Start With"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla Locations"
+            },
+            {
+              "value": "dungeon",
+              "label": "Own Dungeon"
+            },
+            {
+              "value": "regional",
+              "label": "Regional"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "any_dungeon",
+              "label": "Any Dungeon"
+            },
+            {
+              "value": "keysanity",
+              "label": "Anywhere"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_smallkeys",
+          "type": "enum",
+          "label": "Small Keys",
+          "default": "dungeon",
+          "cosmetic": false,
+          "tooltip": "'Remove': Small Keys are removed. All locked doors in dungeons will be unlocked. An easier mode. 'Vanilla': Small Keys will appear in their vanilla locations. You start with 3 keys in Spirit Temple MQ because the vanilla key layout is not beatable in logic. You start with 2 keys in Vanilla/MQ Shadow Temple with its dungeon shortcut enabled to prevent softlocks. 'Own Dungeon': Small Keys can only appear in their respective dungeon. If Fire Temple is not a Master Quest dungeon, the door to the Boss Key chest will be unlocked. 'Regional': Small Keys can only appear in regions near the original dungeon (including the dungeon itself or other dungeons in the region). <a href=\"https://wiki.ootrandomizer.com/index.php?title=Hints#Hint_Regions\" target=\"_blank\">The Wiki has a list of corresponding regions here.</a> 'Overworld Only': Small Keys can only appear outside of dungeons. You may need to enter a dungeon multiple times to gain items to access the overworld locations with the keys required to finish a dungeon. 'Any Dungeon': Small Keys can only appear inside of any dungeon, but won't necessarily be in the dungeon that the key is for. A difficult mode since it is more likely to need to enter a dungeon multiple times. 'Anywhere': Small Keys can appear anywhere in the world. A difficult mode since it is more likely to need to enter a dungeon multiple times. Try different combination out, such as: 'Small Keys: Dungeon' + 'Boss Keys: Anywhere' for a milder Keysanity experience. Regardless of the selected option, small keys from pre-completed dungeons won't be placed outside their respective dungeons and small keys from other dungeons won't be placed inside pre-completed dungeons.",
+          "choices": [
+            {
+              "value": "remove",
+              "label": "Remove (Keysy)"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla Locations"
+            },
+            {
+              "value": "dungeon",
+              "label": "Own Dungeon"
+            },
+            {
+              "value": "regional",
+              "label": "Regional"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "any_dungeon",
+              "label": "Any Dungeon"
+            },
+            {
+              "value": "keysanity",
+              "label": "Anywhere (Keysanity)"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_hideoutkeys",
+          "type": "enum",
+          "label": "Thieves' Hideout Keys",
+          "default": "vanilla",
+          "cosmetic": false,
+          "tooltip": "\"Vanilla\": Thieves' Hideout Keys will appear in their vanilla location, dropping from fighting Gerudo guards that attack when trying to free the jailed carpenters. \"Gerudo Fortress Region\": Thieves' Hideout Keys can only appear in Gerudo Fortress or Thieves' Hideout. \"Regional\": Thieves' Hideout Keys can only appear in Gerudo Valley, Gerudo Fortress, Thieves' Hideout, Gerudo Training Ground, Haunted Wasteland, Desert Colossus, or Spirit Temple. \"Overworld Only\": Thieves' Hideout Keys can only appear outside of dungeons. \"Any Dungeon\": Thieves' Hideout Keys can only appear inside of dungeons. \"Anywhere\": Thieves' Hideout Keys can appear anywhere in the world.",
+          "choices": [
+            {
+              "value": "vanilla",
+              "label": "Vanilla Locations"
+            },
+            {
+              "value": "fortress",
+              "label": "Gerudo Fortress Region"
+            },
+            {
+              "value": "regional",
+              "label": "Regional"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "any_dungeon",
+              "label": "Any Dungeon"
+            },
+            {
+              "value": "keysanity",
+              "label": "Anywhere (Keysanity)"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_tcgkeys",
+          "type": "enum",
+          "label": "Treasure Chest Game Keys",
+          "default": "vanilla",
+          "cosmetic": false,
+          "tooltip": "'Remove': All Treasure Chest Game keys will be removed and all doors will remained unlocked. 'Vanilla': Treasure Chest Game keys will have vanilla behavior (one random per room). The minigame will also have vanilla behavior. 'Regional': Treasure Chest Game keys can only appear in Hyrule Field, Lon Lon Ranch, the Market, the Temple of Time, Hyrule Castle, outside Ganon's Castle, or inside Ganon's Castle. 'Overworld Only': Treasure Chest Game keys can only appear outside of dungeons. 'Any Dungeon': Treasure Chest Game keys can only appear inside of dungeons. 'Anywhere': Treasure Chest Game keys can appear anywhere in the world.",
+          "choices": [
+            {
+              "value": "remove",
+              "label": "Remove (Keysy)"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla Locations"
+            },
+            {
+              "value": "regional",
+              "label": "Regional"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "any_dungeon",
+              "label": "Any Dungeon"
+            },
+            {
+              "value": "keysanity",
+              "label": "Anywhere (Keysanity)"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_bosskeys",
+          "type": "enum",
+          "label": "Boss Keys",
+          "default": "dungeon",
+          "cosmetic": false,
+          "tooltip": "'Remove': Boss Keys are removed. All locked doors in dungeons will be unlocked. An easier mode. 'Vanilla': Boss Keys will appear in their vanilla locations. 'Own Dungeon': Boss Keys can only appear in their respective dungeon. 'Regional': Boss Keys can only appear in regions near the original dungeon (including the dungeon itself or other dungeons in the region). <a href=\"https://wiki.ootrandomizer.com/index.php?title=Hints#Hint_Regions\" target=\"_blank\">The Wiki has a list of corresponding regions here.</a> 'Overworld Only': Boss Keys can only appear outside of dungeons. You may need to enter a dungeon without the boss key to get items required to find the key in the overworld. 'Any Dungeon': Boss Keys can only appear inside of any dungeon, but won't necessarily be in the dungeon that the key is for. A difficult mode since it is more likely to need to enter a dungeon multiple times. 'Anywhere': Boss Keys can appear anywhere in the world. A difficult mode since it is more likely to need to enter a dungeon multiple times. Try different combinations out, such as: 'Small Keys: Dungeon' + 'Boss Keys: Anywhere' for a milder Keysanity experience. Regardless of the selected option, boss keys from pre-completed dungeons won't be placed outside their respective dungeons and boss keys from other dungeons won't be placed inside pre-completed dungeons.",
+          "choices": [
+            {
+              "value": "remove",
+              "label": "Remove (Keysy)"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla Locations"
+            },
+            {
+              "value": "dungeon",
+              "label": "Own Dungeon"
+            },
+            {
+              "value": "regional",
+              "label": "Regional"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "any_dungeon",
+              "label": "Any Dungeon"
+            },
+            {
+              "value": "keysanity",
+              "label": "Anywhere (Keysanity)"
+            }
+          ]
+        },
+        {
+          "name": "shuffle_silver_rupees",
+          "type": "enum",
+          "label": "Shuffle Silver Rupees",
+          "default": "vanilla",
+          "cosmetic": false,
+          "tooltip": "Enabling this shuffles the Silver Rupee puzzles into to the item pool. Silver Rupees are grouped into sets of 5 (except for some Master Quest dungeons, which have sets of other amounts), each of which permanently unlocks something in a dungeon once all the rupees in that set are collected. Hints will only tell you the dungeon a Silver Rupee corresponds to, but upon collecting it, you will be told the exact room. The vanilla locations of Silver Rupees hold shuffled items. 'Remove': Silver Rupees are removed and the puzzles are solved. This will add a small amount of money and refill items to the pool. 'Vanilla': Silver Rupees will appear in their vanilla locations. You will have to collect all of a set in one go to to solve a puzzle. 'Own Dungeon': Silver Rupees can only appear in their respective dungeon. 'Regional': Silver Rupees can only appear in regions near the original dungeon (including the dungeon itself or other dungeons in the region). <a href=\"https://wiki.ootrandomizer.com/index.php?title=Hints#Hint_Regions\" target=\"_blank\">The Wiki has a list of corresponding regions here.</a> 'Overworld Only': Silver Rupees can only appear outside of dungeons. 'Any Dungeon': Silver Rupees can only appear in a dungeon, but not necessarily the dungeon they are for. 'Anywhere': Silver Rupees can appear anywhere in the world.",
+          "choices": [
+            {
+              "value": "remove",
+              "label": "Remove"
+            },
+            {
+              "value": "vanilla",
+              "label": "Vanilla Locations"
+            },
+            {
+              "value": "dungeon",
+              "label": "Own Dungeon"
+            },
+            {
+              "value": "regional",
+              "label": "Regional"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "any_dungeon",
+              "label": "Any Dungeon"
+            },
+            {
+              "value": "anywhere",
+              "label": "Anywhere"
+            }
+          ]
+        },
+        {
+          "name": "text_shuffle",
+          "type": "enum",
+          "label": "Text Shuffle",
+          "default": "none",
+          "cosmetic": false,
+          "tooltip": "Will make things confusing for comedic value. 'Shuffled except Important Text': For when you want comedy but don't want to impact gameplay. Text that has an impact on gameplay is not shuffled. This includes all hint text, key text, Good Deal! items sold in shops, random price scrubs, chicken count and poe count.",
+          "choices": [
+            {
+              "value": "none",
+              "label": "No Text Shuffled"
+            },
+            {
+              "value": "except_hints",
+              "label": "Shuffled except Important Text"
+            },
+            {
+              "value": "complete",
+              "label": "All Text Shuffled"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dungeons",
+      "options": [
+        {
+          "name": "dungeon_shortcuts_choice",
+          "type": "enum",
+          "label": "Dungeon Boss Shortcuts Mode",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Shortcuts to dungeon bosses are available without any requirements. Incompatible with glitched logic. Changes include (vanilla shown, MQ similar): <b>Deku Tree</b>: webs burned, block in the basement moved, 231 scrubs defeated <b>Dodongo's Cavern</b>: mud wall bombed, mouth opened and boss lobby floor bombed <b>Jabu Jabu</b>: pathway lowered <b>Forest Temple</b>: elevator raised and basement gates open <b>Fire Temple</b>: pillar knocked down <b>Water Temple</b>: no change, but see the note on \"Shuffle Boss Entrances\" below <b>Shadow Temple</b>: Truthspinner solved, boat block moved, and statue bridge moved. You start with 2 small keys if Shuffle Small Keys is set to Vanilla. <b>Spirit Temple</b>: lobby elevator activated, shortcut silver blocks moved, central room platform lowered, and statue face melted With \"Shuffle Boss Entrances\", the floor above King Dodongo's arena is opened based on the shortcut setting for the dungeon that contains the entrance to King Dodongo's boss room, not necessarily Dodongo's Cavern. Choose: Select dungeons with shortcuts All: Enable all dungeons shortcuts Random: Random dungeon shortcuts",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "choice",
+              "label": "Specific Dungeons"
+            },
+            {
+              "value": "all",
+              "label": "All Dungeons"
+            },
+            {
+              "value": "random",
+              "label": "Random Dungeons"
+            }
+          ]
+        },
+        {
+          "name": "dungeon_shortcuts",
+          "type": "list",
+          "label": "Dungeon Boss Shortcuts",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Select dungeons with shortcuts",
+          "choices": [
+            {
+              "value": "Deku Tree",
+              "label": "Deku Tree"
+            },
+            {
+              "value": "Dodongos Cavern",
+              "label": "Dodongo's Cavern"
+            },
+            {
+              "value": "Jabu Jabus Belly",
+              "label": "Jabu Jabu's Belly"
+            },
+            {
+              "value": "Forest Temple",
+              "label": "Forest Temple"
+            },
+            {
+              "value": "Fire Temple",
+              "label": "Fire Temple"
+            },
+            {
+              "value": "Water Temple",
+              "label": "Water Temple"
+            },
+            {
+              "value": "Shadow Temple",
+              "label": "Shadow Temple"
+            },
+            {
+              "value": "Spirit Temple",
+              "label": "Spirit Temple"
+            }
+          ]
+        },
+        {
+          "name": "mq_dungeons_mode",
+          "type": "enum",
+          "label": "MQ Dungeon Mode",
+          "default": "vanilla",
+          "cosmetic": false,
+          "tooltip": "'Vanilla': All dungeons will be the original versions. 'Master Quest': All dungeons will be the MQ versions. 'Specific Dungeons': Choose which specific dungeons will be MQ versions. 'Count': Choose how many MQ dungeons will be randomly chosen. 'Completely Random': Each dungeon will vanilla or MQ at random.",
+          "choices": [
+            {
+              "value": "vanilla",
+              "label": "Vanilla"
+            },
+            {
+              "value": "mq",
+              "label": "Master Quest"
+            },
+            {
+              "value": "specific",
+              "label": "Specific Dungeons"
+            },
+            {
+              "value": "count",
+              "label": "Count"
+            },
+            {
+              "value": "random",
+              "label": "Completely Random"
+            }
+          ]
+        },
+        {
+          "name": "mq_dungeons_specific",
+          "type": "list",
+          "label": "MQ Dungeons",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Select the specific dungeons you would like the Master Quest version of. The unselected dungeons will be the original version.",
+          "choices": [
+            {
+              "value": "Deku Tree",
+              "label": "Deku Tree"
+            },
+            {
+              "value": "Dodongos Cavern",
+              "label": "Dodongo's Cavern"
+            },
+            {
+              "value": "Jabu Jabus Belly",
+              "label": "Jabu Jabu's Belly"
+            },
+            {
+              "value": "Forest Temple",
+              "label": "Forest Temple"
+            },
+            {
+              "value": "Fire Temple",
+              "label": "Fire Temple"
+            },
+            {
+              "value": "Water Temple",
+              "label": "Water Temple"
+            },
+            {
+              "value": "Shadow Temple",
+              "label": "Shadow Temple"
+            },
+            {
+              "value": "Spirit Temple",
+              "label": "Spirit Temple"
+            },
+            {
+              "value": "Bottom of the Well",
+              "label": "Bottom of the Well"
+            },
+            {
+              "value": "Ice Cavern",
+              "label": "Ice Cavern"
+            },
+            {
+              "value": "Gerudo Training Ground",
+              "label": "Gerudo Training Ground"
+            },
+            {
+              "value": "Ganons Castle",
+              "label": "Ganon's Castle"
+            }
+          ]
+        },
+        {
+          "name": "mq_dungeons_count",
+          "type": "int",
+          "label": "MQ Dungeon Count",
+          "default": 0,
+          "cosmetic": false,
+          "tooltip": "Specify the number of Master Quest dungeons to appear in the game.",
+          "min": 0,
+          "max": 12,
+          "step": 1
+        },
+        {
+          "name": "empty_dungeons_mode",
+          "type": "enum",
+          "label": "Pre-completed Dungeons Mode",
+          "default": "none",
+          "cosmetic": false,
+          "tooltip": "Pre-completed dungeons are dungeons guaranteed to be barren and whose dungeon rewards are given for free to the player before the beginning of the game. This setting only applies to dungeons with dungeon rewards (blue warps). - 'None': No dungeon will be pre-completed. Some dungeons may still be randomly rolled with no major items, but their dungeon rewards won't be given for free. - 'Specific Dungeons': Choose which specific dungeons will be pre-completed. - 'Specific Rewards': Choose which specific dungeon rewards will be in pre-completed dungeons. If dungeon rewards are shuffled, rewards in side dungeons or the overworld will have no effect on pre-completion. - 'Count': Choose how many pre-completed dungeons will be randomly chosen. A same dungeon won't be both MQ and pre-completed unless it has been explicitly specified as such or unless it is the only way to fulfill both MQ and pre-completed selected settings. Pre-completed dungeons won't contain major items even if \"Dungeons Have One Major Item\" is on. Regardless of \"Shuffle Dungeon Items\" settings, dungeon items from pre-completed dungeons won't be placed outside their respective dungeons and dungeon items from other dungeons won't be placed inside pre-completed dungeons. If \"Shuffle Songs\" is set to \"Dungeon rewards\", then songs that would have been placed in pre-completed dungeons are given for free along with the free dungeon rewards.",
+          "choices": [
+            {
+              "value": "none",
+              "label": "Off"
+            },
+            {
+              "value": "specific",
+              "label": "Specific Dungeons"
+            },
+            {
+              "value": "rewards",
+              "label": "Specific Rewards"
+            },
+            {
+              "value": "count",
+              "label": "Count"
+            }
+          ]
+        },
+        {
+          "name": "empty_dungeons_specific",
+          "type": "list",
+          "label": "Pre-completed Dungeons",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Select the specific dungeons you would like to be pre-completed.",
+          "choices": [
+            {
+              "value": "Deku Tree",
+              "label": "Deku Tree"
+            },
+            {
+              "value": "Dodongos Cavern",
+              "label": "Dodongo's Cavern"
+            },
+            {
+              "value": "Jabu Jabus Belly",
+              "label": "Jabu Jabu's Belly"
+            },
+            {
+              "value": "Forest Temple",
+              "label": "Forest Temple"
+            },
+            {
+              "value": "Fire Temple",
+              "label": "Fire Temple"
+            },
+            {
+              "value": "Water Temple",
+              "label": "Water Temple"
+            },
+            {
+              "value": "Shadow Temple",
+              "label": "Shadow Temple"
+            },
+            {
+              "value": "Spirit Temple",
+              "label": "Spirit Temple"
+            }
+          ]
+        },
+        {
+          "name": "empty_dungeons_rewards",
+          "type": "list",
+          "label": "Pre-completed Dungeon Rewards",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Select the specific dungeons rewards whose dungeons you would like to be pre-completed.",
+          "choices": [
+            {
+              "value": "Kokiri Emerald",
+              "label": "Kokiri Emerald"
+            },
+            {
+              "value": "Goron Ruby",
+              "label": "Goron Ruby"
+            },
+            {
+              "value": "Zora Sapphire",
+              "label": "Zora Sapphire"
+            },
+            {
+              "value": "Light Medallion",
+              "label": "Light Medallion"
+            },
+            {
+              "value": "Forest Medallion",
+              "label": "Forest Medallion"
+            },
+            {
+              "value": "Fire Medallion",
+              "label": "Fire Medallion"
+            },
+            {
+              "value": "Water Medallion",
+              "label": "Water Medallion"
+            },
+            {
+              "value": "Shadow Medallion",
+              "label": "Shadow Medallion"
+            },
+            {
+              "value": "Spirit Medallion",
+              "label": "Spirit Medallion"
+            }
+          ]
+        },
+        {
+          "name": "empty_dungeons_count",
+          "type": "int",
+          "label": "Pre-completed Dungeon Count",
+          "default": 2,
+          "cosmetic": false,
+          "tooltip": "Specify the number of pre-completed dungeons to appear in the game.",
+          "min": 1,
+          "max": 8,
+          "step": 1
+        },
+        {
+          "name": "key_appearance_match_dungeon",
+          "type": "bool",
+          "label": "Key Appearance Matches Dungeon",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Small keys and boss keys (not key rings) will use custom models to match their dungeon."
+        },
+        {
+          "name": "one_item_per_dungeon",
+          "type": "bool",
+          "label": "Dungeons Have One Major Item",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Dungeons have exactly one major item. This naturally makes each dungeon similar in value rather than vary based on shuffled locations. Spirit Temple Colossus hands count as part of the dungeon. Spirit Temple has TWO items to match vanilla distribution. Boss Keys and Fortress Keys only count as major items if they are shuffled Anywhere (Keysanity) or in Any Dungeon, and Small Keys only count as major items if they are shuffled Anywhere (Keysanity). This setting is disabled if Small Keys are shuffled in Any Dungeon. GS Tokens only count as major items if the bridge or Ganon Boss Key requirements are set to \"GS Tokens\". Heart Containers and Pieces of Heart only count as major items if the bridge or Ganon Boss Key requirements are set to \"Hearts\". Bombchus only count as major items if the \"Add Bombchu Bag and Drops\" setting is enabled. Pre-completed dungeons (if any) won't have a major item. This setting has potential to conflict with other randomizer settings. Should seeds continuously fail to generate, consider turning this option off."
+        }
+      ]
+    },
+    {
+      "id": "tricks",
+      "options": [
+        {
+          "name": "allowed_tricks",
+          "type": "list",
+          "label": "Enable Tricks",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Tricks moved to the right column are in-logic and MAY be required to complete the game. Tricks in the left column are NEVER required.",
+          "choices": [
+            {
+              "value": "logic_visible_collisions",
+              "label": "Pass Through Visible One-Way Collisions"
+            },
+            {
+              "value": "logic_grottos_without_agony",
+              "label": "Hidden Grottos without Stone of Agony"
+            },
+            {
+              "value": "logic_fewer_tunic_requirements",
+              "label": "Fewer Tunic Requirements"
+            },
+            {
+              "value": "logic_beehives_bombchus",
+              "label": "Beehives with Bombchus"
+            },
+            {
+              "value": "logic_boomerang_boulders",
+              "label": "Boulder Freestandings with Boomerang"
+            },
+            {
+              "value": "logic_rusted_switches",
+              "label": "Hammer Rusted Switches and Boulders Through Walls"
+            },
+            {
+              "value": "logic_adult_kokiri_gs_hovers",
+              "label": "Adult Kokiri Forest GS with Hover Boots"
+            },
+            {
+              "value": "logic_adult_kokiri_gs_nothing",
+              "label": "Adult Kokiri Forest GS with Nothing"
+            },
+            {
+              "value": "logic_lost_woods_bridge",
+              "label": "Jump onto the Lost Woods Bridge as Adult with Nothing"
+            },
+            {
+              "value": "logic_mido_backflip",
+              "label": "Backflip over Mido as Adult"
+            },
+            {
+              "value": "logic_lost_woods_gs_bean",
+              "label": "Lost Woods Adult GS without Bean"
+            },
+            {
+              "value": "logic_castle_storms_gs",
+              "label": "Hyrule Castle Storms Grotto GS with Just Boomerang"
+            },
+            {
+              "value": "logic_man_on_roof",
+              "label": "Man on Roof without Hookshot"
+            },
+            {
+              "value": "logic_kakariko_tower_gs",
+              "label": "Kakariko Tower GS with Jump Slash"
+            },
+            {
+              "value": "logic_windmill_poh",
+              "label": "Windmill PoH as Adult with Nothing"
+            },
+            {
+              "value": "logic_kakariko_rooftop_gs",
+              "label": "Kakariko Rooftop GS with Hover Boots"
+            },
+            {
+              "value": "logic_graveyard_poh",
+              "label": "Graveyard Freestanding PoH with Boomerang"
+            },
+            {
+              "value": "logic_child_dampe_race_poh",
+              "label": "Second Dampe Race as Child"
+            },
+            {
+              "value": "logic_shadow_fire_arrow_entry",
+              "label": "Shadow Temple Entry with Fire Arrows"
+            },
+            {
+              "value": "logic_dmt_soil_gs",
+              "label": "Death Mountain Trail Soil GS without Destroying Boulder"
+            },
+            {
+              "value": "logic_dmt_bombable",
+              "label": "Death Mountain Trail Chest with Strength"
+            },
+            {
+              "value": "logic_trail_gs_lower",
+              "label": "Death Mountain Trail Lower Red Rock GS with Jump Slash"
+            },
+            {
+              "value": "logic_dmt_climb_hovers",
+              "label": "Death Mountain Trail Climb with Hover Boots"
+            },
+            {
+              "value": "logic_trail_gs_upper",
+              "label": "Death Mountain Trail Upper Red Rock GS without Hammer"
+            },
+            {
+              "value": "logic_biggoron_bolero",
+              "label": "Deliver Eye Drops with Bolero of Fire"
+            },
+            {
+              "value": "logic_goron_city_pot",
+              "label": "Goron City Spinning Pot PoH with Bombchu"
+            },
+            {
+              "value": "logic_goron_city_pot_with_strength",
+              "label": "Goron City Spinning Pot PoH with Strength"
+            },
+            {
+              "value": "logic_child_rolling_with_strength",
+              "label": "Rolling Goron (Hot Rodder Goron) as Child with Strength"
+            },
+            {
+              "value": "logic_link_goron_dins",
+              "label": "Stop Link the Goron with Din's Fire"
+            },
+            {
+              "value": "logic_goron_city_leftmost",
+              "label": "Goron City Maze Left Chest with Hover Boots"
+            },
+            {
+              "value": "logic_goron_grotto",
+              "label": "Goron City Grotto with Hookshot While Taking Damage"
+            },
+            {
+              "value": "logic_crater_bean_poh_with_hovers",
+              "label": "Crater's Bean PoH with Hover Boots"
+            },
+            {
+              "value": "logic_crater_bolero_jump",
+              "label": "Death Mountain Crater Jump to Bolero"
+            },
+            {
+              "value": "logic_crater_boulder_jumpslash",
+              "label": "Death Mountain Crater Upper to Lower with Hammer"
+            },
+            {
+              "value": "logic_crater_boulder_skip",
+              "label": "Death Mountain Crater Upper to Lower Boulder Skip"
+            },
+            {
+              "value": "logic_zora_river_lower",
+              "label": "Zora's River Lower Freestanding PoH as Adult with Nothing"
+            },
+            {
+              "value": "logic_zora_river_upper",
+              "label": "Zora's River Upper Freestanding PoH as Adult with Nothing"
+            },
+            {
+              "value": "logic_zora_with_cucco",
+              "label": "Zora's Domain Entry with Cucco"
+            },
+            {
+              "value": "logic_zora_with_hovers",
+              "label": "Zora's Domain Entry with Hover Boots"
+            },
+            {
+              "value": "logic_zora_river_rupees",
+              "label": "Zora's River Rupees with Jump Dive"
+            },
+            {
+              "value": "logic_king_zora_skip",
+              "label": "Skip King Zora as Adult with Nothing"
+            },
+            {
+              "value": "logic_domain_gs",
+              "label": "Zora's Domain GS with No Additional Items"
+            },
+            {
+              "value": "logic_lab_wall_gs",
+              "label": "Lake Hylia Lab Wall GS with Jump Slash"
+            },
+            {
+              "value": "logic_lab_diving",
+              "label": "Lake Hylia Lab Dive without Gold Scale"
+            },
+            {
+              "value": "logic_water_hookshot_entry",
+              "label": "Water Temple Entry without Iron Boots using Hookshot"
+            },
+            {
+              "value": "logic_valley_crate_hovers",
+              "label": "Gerudo Valley Crate PoH as Adult with Hover Boots"
+            },
+            {
+              "value": "logic_gerudo_kitchen",
+              "label": "Thieves' Hideout \"Kitchen\" with No Additional Items"
+            },
+            {
+              "value": "logic_gf_jump",
+              "label": "Gerudo's Fortress Ledge Jumps"
+            },
+            {
+              "value": "logic_gf_break_room_jump",
+              "label": "Gerudo's Fortress Break Room Entrance with Precise Jump"
+            },
+            {
+              "value": "logic_wasteland_crossing",
+              "label": "Wasteland Crossing without Hover Boots or Longshot"
+            },
+            {
+              "value": "logic_lens_wasteland",
+              "label": "Lensless Wasteland"
+            },
+            {
+              "value": "logic_reverse_wasteland",
+              "label": "Reverse Wasteland"
+            },
+            {
+              "value": "logic_colossus_gs",
+              "label": "Colossus Hill GS with Hookshot"
+            },
+            {
+              "value": "logic_deku_basement_gs",
+              "label": "Deku Tree Basement Vines GS with Jump Slash"
+            },
+            {
+              "value": "logic_deku_b1_skip",
+              "label": "Deku Tree Basement without Slingshot"
+            },
+            {
+              "value": "logic_deku_b1_webs_with_bow",
+              "label": "Deku Tree Basement Web to Gohma with Bow"
+            },
+            {
+              "value": "logic_deku_mq_lobby_gs",
+              "label": "Deku Tree MQ Lobby Crate GS with Boomerang"
+            },
+            {
+              "value": "logic_deku_mq_compass_gs",
+              "label": "Deku Tree MQ Compass Room GS Boulders with Just Hammer"
+            },
+            {
+              "value": "logic_deku_mq_log",
+              "label": "Deku Tree MQ Roll Under the Spiked Log"
+            },
+            {
+              "value": "logic_dc_scarecrow_gs",
+              "label": "Dodongo's Cavern Scarecrow GS with Armos Statue"
+            },
+            {
+              "value": "logic_dc_vines_gs",
+              "label": "Dodongo's Cavern Vines GS from Below with Longshot"
+            },
+            {
+              "value": "logic_dc_staircase",
+              "label": "Dodongo's Cavern Staircase with Bow"
+            },
+            {
+              "value": "logic_dc_slingshot_skip",
+              "label": "Dodongo's Cavern Child Slingshot Skips"
+            },
+            {
+              "value": "logic_dc_scrub_room",
+              "label": "Dodongo's Cavern Two Scrub Room with Strength"
+            },
+            {
+              "value": "logic_dc_jump",
+              "label": "Dodongo's Cavern Spike Trap Room Jump without Hover Boots"
+            },
+            {
+              "value": "logic_dc_chu_eyes",
+              "label": "Dodongo's Cavern Bombchu the Eyes from Below"
+            },
+            {
+              "value": "logic_dc_hammer_floor",
+              "label": "Dodongo's Cavern Smash the Boss Lobby Floor"
+            },
+            {
+              "value": "logic_dc_mq_child_bombs",
+              "label": "Dodongo's Cavern MQ Early Bomb Bag Area as Child"
+            },
+            {
+              "value": "logic_dc_mq_eyes_adult",
+              "label": "Dodongo's Cavern MQ Light the Eyes with Strength as Adult"
+            },
+            {
+              "value": "logic_dc_mq_eyes_child",
+              "label": "Dodongo's Cavern MQ Light the Eyes with Strength as Child"
+            },
+            {
+              "value": "logic_jabu_alcove_jump_dive",
+              "label": "Jabu Underwater Alcove as Adult with Jump Dive"
+            },
+            {
+              "value": "logic_jabu_boss_hover",
+              "label": "Jabu Near Boss Room with Hover Boots"
+            },
+            {
+              "value": "logic_jabu_near_boss_ranged",
+              "label": "Jabu Near Boss Ceiling Switch/GS without Boomerang or Explosives"
+            },
+            {
+              "value": "logic_jabu_near_boss_explosives",
+              "label": "Jabu Near Boss Ceiling Switch with Explosives"
+            },
+            {
+              "value": "logic_lens_jabu_mq",
+              "label": "Jabu MQ without Lens of Truth"
+            },
+            {
+              "value": "logic_jabu_mq_rang_jump",
+              "label": "Jabu MQ Compass Chest with Boomerang"
+            },
+            {
+              "value": "logic_jabu_mq_sot_gs",
+              "label": "Jabu MQ Song of Time Block GS with Boomerang"
+            },
+            {
+              "value": "logic_lens_botw",
+              "label": "Bottom of the Well without Lens of Truth"
+            },
+            {
+              "value": "logic_child_deadhand",
+              "label": "Child Dead Hand without Kokiri Sword"
+            },
+            {
+              "value": "logic_botw_basement",
+              "label": "Bottom of the Well Map Chest with Strength & Sticks"
+            },
+            {
+              "value": "logic_botw_mq_pits",
+              "label": "Bottom of the Well MQ Jump Over the Pits"
+            },
+            {
+              "value": "logic_botw_mq_dead_hand_key",
+              "label": "Bottom of the Well MQ Dead Hand Freestanding Key with Boomerang"
+            },
+            {
+              "value": "logic_forest_first_gs",
+              "label": "Forest Temple First Room GS with Difficult-to-Use Weapons"
+            },
+            {
+              "value": "logic_forest_courtyard_hearts",
+              "label": "Forest Temple West Courtyard Hearts with Boomerang"
+            },
+            {
+              "value": "logic_forest_outdoor_east_gs",
+              "label": "Forest Temple East Courtyard GS with Boomerang"
+            },
+            {
+              "value": "logic_forest_vines",
+              "label": "Forest Temple East Courtyard Vines with Hookshot"
+            },
+            {
+              "value": "logic_forest_outdoors_ledge",
+              "label": "Forest Temple NE Outdoors Ledge with Hover Boots"
+            },
+            {
+              "value": "logic_forest_door_frame",
+              "label": "Forest Temple East Courtyard Door Frame with Hover Boots"
+            },
+            {
+              "value": "logic_forest_outside_backdoor",
+              "label": "Forest Temple Outside Backdoor with Jump Slash"
+            },
+            {
+              "value": "logic_forest_well_swim",
+              "label": "Swim Through Forest Temple MQ Well with Hookshot"
+            },
+            {
+              "value": "logic_forest_mq_block_puzzle",
+              "label": "Skip Forest Temple MQ Block Puzzle with Bombchu"
+            },
+            {
+              "value": "logic_forest_mq_hallway_switch_jumpslash",
+              "label": "Forest Temple MQ Twisted Hallway Switch with Jump Slash"
+            },
+            {
+              "value": "logic_forest_mq_hallway_switch_boomerang",
+              "label": "Forest Temple MQ Twisted Hallway Switch with Boomerang"
+            },
+            {
+              "value": "logic_fire_boss_door_jump",
+              "label": "Fire Temple Boss Door without Hover Boots or Pillar"
+            },
+            {
+              "value": "logic_fire_song_of_time",
+              "label": "Fire Temple Song of Time Room GS without Song of Time"
+            },
+            {
+              "value": "logic_fire_strength",
+              "label": "Fire Temple Climb without Strength"
+            },
+            {
+              "value": "logic_fire_scarecrow",
+              "label": "Fire Temple East Tower without Scarecrow's Song"
+            },
+            {
+              "value": "logic_fire_flame_maze",
+              "label": "Fire Temple Flame Wall Maze Skip"
+            },
+            {
+              "value": "logic_fire_mq_child_flame",
+              "label": "Fire Temple MQ Entrance Flame Wall Skip as Child"
+            },
+            {
+              "value": "logic_fire_mq_near_boss",
+              "label": "Fire Temple MQ Chest Near Boss without Breaking Crate"
+            },
+            {
+              "value": "logic_fire_mq_blocked_chest",
+              "label": "Fire Temple MQ Big Lava Room Blocked Door without Hookshot"
+            },
+            {
+              "value": "logic_fire_mq_bk_chest",
+              "label": "Fire Temple MQ Boss Key Chest without Bow"
+            },
+            {
+              "value": "logic_fire_mq_climb",
+              "label": "Fire Temple MQ Climb without Fire Source"
+            },
+            {
+              "value": "logic_fire_mq_maze_side_room",
+              "label": "Fire Temple MQ Lizalfos Maze Side Room without Box"
+            },
+            {
+              "value": "logic_fire_mq_maze_hovers",
+              "label": "Fire Temple MQ Lower to Upper Lizalfos Maze with Hover Boots"
+            },
+            {
+              "value": "logic_fire_mq_maze_jump",
+              "label": "Fire Temple MQ Lower to Upper Lizalfos Maze with Precise Jump"
+            },
+            {
+              "value": "logic_fire_mq_above_maze_gs",
+              "label": "Fire Temple MQ Above Flame Wall Maze GS from Below with Longshot"
+            },
+            {
+              "value": "logic_fire_mq_flame_maze",
+              "label": "Fire Temple MQ Flame Wall Maze Skip"
+            },
+            {
+              "value": "logic_water_temple_torch_longshot",
+              "label": "Water Temple Torch Longshot"
+            },
+            {
+              "value": "logic_water_cracked_wall_hovers",
+              "label": "Water Temple Cracked Wall with Hover Boots"
+            },
+            {
+              "value": "logic_water_cracked_wall_nothing",
+              "label": "Water Temple Cracked Wall with No Additional Items"
+            },
+            {
+              "value": "logic_water_north_basement",
+              "label": "Water Temple North Basement with Hover Boots"
+            },
+            {
+              "value": "logic_water_north_basement_ledge_jump",
+              "label": "Water Temple North Basement Ledge with Precise Jump"
+            },
+            {
+              "value": "logic_water_bk_jump_dive",
+              "label": "Water Temple Boss Key Jump Dive"
+            },
+            {
+              "value": "logic_water_central_gs_fw",
+              "label": "Water Temple Central Pillar GS with Farore's Wind"
+            },
+            {
+              "value": "logic_water_central_gs_irons",
+              "label": "Water Temple Central Pillar GS with Iron Boots"
+            },
+            {
+              "value": "logic_water_central_bow",
+              "label": "Water Temple Central Bow Target without Longshot or Hover Boots"
+            },
+            {
+              "value": "logic_water_falling_platform_gs_hookshot",
+              "label": "Water Temple Falling Platform Room GS with Hookshot"
+            },
+            {
+              "value": "logic_water_falling_platform_gs_boomerang",
+              "label": "Water Temple Falling Platform Room GS with Boomerang"
+            },
+            {
+              "value": "logic_water_river_gs",
+              "label": "Water Temple River GS without Iron Boots"
+            },
+            {
+              "value": "logic_water_dragon_jump_dive",
+              "label": "Water Temple Dragon Statue Jump Dive"
+            },
+            {
+              "value": "logic_water_dragon_adult",
+              "label": "Water Temple Dragon Statue Switch from Above the Water as Adult"
+            },
+            {
+              "value": "logic_water_dragon_child",
+              "label": "Water Temple Dragon Statue Switch from Above the Water as Child"
+            },
+            {
+              "value": "logic_water_morpha",
+              "label": "Water Temple Morpha without Hookshot"
+            },
+            {
+              "value": "logic_water_mq_central_pillar",
+              "label": "Water Temple MQ Central Pillar with Fire Arrows"
+            },
+            {
+              "value": "logic_water_mq_dark_link",
+              "label": "Water Temple MQ Reach Dark Link without Longshot"
+            },
+            {
+              "value": "logic_water_mq_locked_gs",
+              "label": "Water Temple MQ North Basement GS without Small Key"
+            },
+            {
+              "value": "logic_lens_shadow",
+              "label": "Shadow Temple Stationary Objects without Lens of Truth"
+            },
+            {
+              "value": "logic_lens_shadow_platform",
+              "label": "Shadow Temple Invisible Moving Platform without Lens of Truth"
+            },
+            {
+              "value": "logic_lens_bongo",
+              "label": "Shadow Temple Bongo Bongo without Lens of Truth"
+            },
+            {
+              "value": "logic_shadow_umbrella",
+              "label": "Shadow Temple Stone Umbrella Skip"
+            },
+            {
+              "value": "logic_shadow_umbrella_gs",
+              "label": "Shadow Temple Falling Spikes GS with Hover Boots"
+            },
+            {
+              "value": "logic_shadow_freestanding_key",
+              "label": "Shadow Temple Freestanding Key with Bombchu"
+            },
+            {
+              "value": "logic_shadow_statue",
+              "label": "Shadow Temple River Statue with Bombchu"
+            },
+            {
+              "value": "logic_shadow_triple_pots",
+              "label": "Shadow Temple Triple Spinning Pots with Bombchus"
+            },
+            {
+              "value": "logic_shadow_bongo",
+              "label": "Shadow Temple Bongo Bongo without projectiles"
+            },
+            {
+              "value": "logic_lens_shadow_mq",
+              "label": "Shadow Temple MQ Stationary Objects without Lens of Truth"
+            },
+            {
+              "value": "logic_lens_shadow_mq_invisible_blades",
+              "label": "Shadow Temple MQ Invisible Blades Silver Rupees without Lens of Truth"
+            },
+            {
+              "value": "logic_lens_shadow_mq_platform",
+              "label": "Shadow Temple MQ Invisible Moving Platform without Lens of Truth"
+            },
+            {
+              "value": "logic_lens_shadow_mq_dead_hand",
+              "label": "Shadow Temple MQ 2nd Dead Hand without Lens of Truth"
+            },
+            {
+              "value": "logic_shadow_mq_gap",
+              "label": "Shadow Temple MQ Truth Spinner Gap with Longshot"
+            },
+            {
+              "value": "logic_shadow_mq_invisible_blades",
+              "label": "Shadow Temple MQ Invisible Blades without Song of Time"
+            },
+            {
+              "value": "logic_shadow_mq_huge_pit",
+              "label": "Shadow Temple MQ Lower Huge Pit without Fire Source"
+            },
+            {
+              "value": "logic_shadow_mq_windy_walkway",
+              "label": "Shadow Temple MQ Windy Walkway Reverse without Hover Boots"
+            },
+            {
+              "value": "logic_shadow_mq_after_boat_gs",
+              "label": "Shadow Temple MQ After Boat GS without Hookshot"
+            },
+            {
+              "value": "logic_lens_spirit",
+              "label": "Spirit Temple without Lens of Truth"
+            },
+            {
+              "value": "logic_spirit_child_bombchu",
+              "label": "Spirit Temple Child Side Bridge with Bombchu"
+            },
+            {
+              "value": "logic_spirit_fence_gs",
+              "label": "Spirit Temple Collect Metal Fence GS Through the Fence"
+            },
+            {
+              "value": "logic_spirit_lobby_gs",
+              "label": "Spirit Temple Main Room GS with Boomerang"
+            },
+            {
+              "value": "logic_spirit_lower_adult_switch",
+              "label": "Spirit Temple Lower Adult Switch with Bombs"
+            },
+            {
+              "value": "logic_spirit_lobby_jump",
+              "label": "Spirit Temple Main Room Jump from Hands to Upper Ledges"
+            },
+            {
+              "value": "logic_spirit_platform_hookshot",
+              "label": "Spirit Temple Main Room Hookshot to Boss Platform"
+            },
+            {
+              "value": "logic_spirit_adult_side_hovers",
+              "label": "Spirit Temple Climb to Adult Side with Hover Boots"
+            },
+            {
+              "value": "logic_spirit_map_chest",
+              "label": "Spirit Temple Map Chest with Bow"
+            },
+            {
+              "value": "logic_spirit_sun_chest_bow",
+              "label": "Spirit Temple Sun Block Room Chest with Bow"
+            },
+            {
+              "value": "logic_spirit_sun_chest_no_rupees",
+              "label": "Spirit Temple Sun Block Room Chest with Sticks without Silver Rupees"
+            },
+            {
+              "value": "logic_spirit_wall",
+              "label": "Spirit Temple Shifting Wall with No Additional Items"
+            },
+            {
+              "value": "logic_lens_spirit_mq",
+              "label": "Spirit Temple MQ without Lens of Truth"
+            },
+            {
+              "value": "logic_spirit_mq_sun_block_sot",
+              "label": "Spirit Temple MQ Sun Block Room as Child without Song of Time"
+            },
+            {
+              "value": "logic_spirit_mq_sun_block_gs",
+              "label": "Spirit Temple MQ Sun Block Room GS with Boomerang"
+            },
+            {
+              "value": "logic_spirit_mq_lower_adult",
+              "label": "Spirit Temple MQ Lower Adult without Fire Arrows"
+            },
+            {
+              "value": "logic_spirit_mq_frozen_eye",
+              "label": "Spirit Temple MQ Frozen Eye Switch without Fire"
+            },
+            {
+              "value": "logic_spirit_mq_water_rupee",
+              "label": "Spirit Temple MQ Water Jet Silver Rupee without Hammer"
+            },
+            {
+              "value": "logic_ice_frozen_rupee",
+              "label": "Ice Cavern Frozen Rupee with Nothing"
+            },
+            {
+              "value": "logic_ice_frozen_pot",
+              "label": "Ice Cavern Frozen Pot with No Additional Items"
+            },
+            {
+              "value": "logic_ice_block_gs",
+              "label": "Ice Cavern Block Room GS with Hover Boots"
+            },
+            {
+              "value": "logic_ice_mq_red_ice_gs",
+              "label": "Ice Cavern MQ Red Ice GS without Song of Time"
+            },
+            {
+              "value": "logic_ice_mq_scarecrow",
+              "label": "Ice Cavern MQ Scarecrow GS with No Additional Items"
+            },
+            {
+              "value": "logic_lens_gtg",
+              "label": "Gerudo Training Ground without Lens of Truth"
+            },
+            {
+              "value": "logic_gtg_underwater_highest",
+              "label": "Gerudo Training Ground Highest Underwater Rupee with Gold Scale"
+            },
+            {
+              "value": "logic_gtg_without_hookshot",
+              "label": "Gerudo Training Ground Left Side Ceiling Silver Rupee without Hookshot"
+            },
+            {
+              "value": "logic_gtg_flame_wall",
+              "label": "Gerudo Training Ground Boulder Room Flame Wall Skip"
+            },
+            {
+              "value": "logic_gtg_fake_wall",
+              "label": "Reach Gerudo Training Ground Fake Wall Ledge with Hover Boots"
+            },
+            {
+              "value": "logic_lens_gtg_mq",
+              "label": "Gerudo Training Ground MQ without Lens of Truth"
+            },
+            {
+              "value": "logic_gtg_mq_with_hookshot",
+              "label": "Gerudo Training Ground MQ Left Side Ceiling Silver Rupee with Hookshot"
+            },
+            {
+              "value": "logic_gtg_mq_eye_statue_jumpslash",
+              "label": "Gerudo Training Ground MQ Eye Statue Room Switch with Jump Slash"
+            },
+            {
+              "value": "logic_gtg_eye_statue_wonderitem",
+              "label": "Gerudo Training Ground Eye Statue Room Wonderitem with Jump Slash"
+            },
+            {
+              "value": "logic_gtg_mq_maze_right",
+              "label": "Gerudo Training Ground MQ Central Maze Right to Dinolfos Room with Hookshot"
+            },
+            {
+              "value": "logic_lens_castle",
+              "label": "Ganon's Castle without Lens of Truth"
+            },
+            {
+              "value": "logic_fire_trial_slug_rupee",
+              "label": "Fire Trial Torch Slug Silver Rupee as Child"
+            },
+            {
+              "value": "logic_spirit_trial_hookshot",
+              "label": "Spirit Trial Ceiling Silver Rupee without Hookshot"
+            },
+            {
+              "value": "logic_lens_castle_mq",
+              "label": "Ganon's Castle MQ Except Shadow Trial without Lens of Truth"
+            },
+            {
+              "value": "logic_lens_shadow_trial_mq",
+              "label": "Ganon's Castle MQ Shadow Trial without Lens of Truth"
+            },
+            {
+              "value": "logic_fire_trial_mq",
+              "label": "Fire Trial MQ with Hookshot"
+            },
+            {
+              "value": "logic_shadow_trial_mq",
+              "label": "Shadow Trial MQ Torch with Bow"
+            },
+            {
+              "value": "logic_light_trial_mq",
+              "label": "Light Trial MQ without Hookshot"
+            }
+          ]
+        },
+        {
+          "name": "advanced_allowed_tricks",
+          "type": "list",
+          "label": "Enable Advanced Tricks",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Tricks moved to the right column are in-logic and MAY be required to complete the game. Tricks in the left column are NEVER required.",
+          "choices": [
+            {
+              "value": "glitch_isg",
+              "label": "(Glitch) Infinite Sword Glitch (ISG)"
+            },
+            {
+              "value": "glitch_groundjump",
+              "label": "(Glitch) Groundjumps"
+            },
+            {
+              "value": "glitch_clipping",
+              "label": "(Glitch) Clipping"
+            },
+            {
+              "value": "glitch_tsc",
+              "label": "(Glitch) Triple Slash Clip"
+            },
+            {
+              "value": "glitch_ledge_clip",
+              "label": "(Glitch) Ledge Clips"
+            },
+            {
+              "value": "glitch_lunge_storage",
+              "label": "(Glitch) Lunge Storage"
+            },
+            {
+              "value": "glitch_equip_swap",
+              "label": "(Glitch) Equip Swap"
+            },
+            {
+              "value": "glitch_itemless_forest_escape",
+              "label": "(Glitch) Itemless Forest Escape"
+            },
+            {
+              "value": "glitch_pokey_escape",
+              "label": "(Glitch) Pokey Escape"
+            },
+            {
+              "value": "glitch_wess_escape",
+              "label": "(Glitch) WESS Escape"
+            },
+            {
+              "value": "glitch_hovering",
+              "label": "(Glitch) Hovering with Explosives"
+            },
+            {
+              "value": "glitch_megaflip",
+              "label": "(Glitch) Megaflips and Megasidehops"
+            },
+            {
+              "value": "glitch_oi",
+              "label": "(Glitch) Ocarina Items"
+            },
+            {
+              "value": "glitch_superslide",
+              "label": "(Glitch) Superslide"
+            },
+            {
+              "value": "glitch_hess",
+              "label": "(Glitch) HESS"
+            },
+            {
+              "value": "adv_hovers_recoil",
+              "label": "(Advanced) Hoverboots Recoil"
+            },
+            {
+              "value": "adv_recoil_jump",
+              "label": "(Advanced) Recoil Jumps"
+            },
+            {
+              "value": "glitch_damage_value",
+              "label": "(Glitch) Glitch Damage Value"
+            },
+            {
+              "value": "glitch_ledge_cancel",
+              "label": "(Glitch) Ledge Cancel"
+            },
+            {
+              "value": "glitch_weirdshot",
+              "label": "(Glitch) Weirdshot"
+            },
+            {
+              "value": "adv_damage_boost",
+              "label": "(Advanced) Damage Boost"
+            },
+            {
+              "value": "adv_wallwalking",
+              "label": "(Advanced) Wallwalking"
+            },
+            {
+              "value": "glitch_hookshot_jump",
+              "label": "(Glitch) Hookshot Jumps"
+            },
+            {
+              "value": "glitch_underwater_chests",
+              "label": "(Glitch) Open Underwater Chests"
+            },
+            {
+              "value": "glitch_lw_target_hover",
+              "label": "(Glitch) LW Target with GDV"
+            },
+            {
+              "value": "glitch_navi_dive",
+              "label": "(Glitch) Navi Dive"
+            },
+            {
+              "value": "glitch_aqua_escape_child",
+              "label": "(Glitch) Aqua Escape Child"
+            },
+            {
+              "value": "glitch_aqua_escape_adult",
+              "label": "(Glitch) Aqua Escape Adult"
+            },
+            {
+              "value": "adv_lh_tree_gs_hookshot",
+              "label": "(Advanced) LH Tree GS with only Hookshot"
+            },
+            {
+              "value": "glitch_lh_to_zd_child_nothing",
+              "label": "(Glitch) LH to Zora's Domain as Child with Nothing"
+            },
+            {
+              "value": "glitch_enter_water_groundclip",
+              "label": "(Glitch) Enter Water Groundclip"
+            },
+            {
+              "value": "glitch_enter_water_ledgeclip",
+              "label": "(Glitch) Enter Water Ledge Clip"
+            },
+            {
+              "value": "glitch_enter_water_ocarina",
+              "label": "(Glitch) Enter Water Slippery Dive with Ocarina"
+            },
+            {
+              "value": "glitch_enter_water_lab_clip_adult",
+              "label": "(Glitch) Enter Water Lab Clip Adult"
+            },
+            {
+              "value": "glitch_enter_water_lab_clip_child",
+              "label": "(Glitch) Enter Water Lab Clip Child"
+            },
+            {
+              "value": "glitch_lakeside_lab_with_less",
+              "label": "(Glitch) Lakeside Lab with less stuff"
+            },
+            {
+              "value": "glitch_kz_with_nothing",
+              "label": "(Glitch) Unfreeze King Zora with Nothing"
+            },
+            {
+              "value": "adv_gv_bridge_hookshot",
+              "label": "(Advanced) GV Broken Bridge with Hookshot"
+            },
+            {
+              "value": "adv_cucco_jump",
+              "label": "(Advanced) GV Broken Bridge Cucco Jump"
+            },
+            {
+              "value": "adv_gv_boulder_recoil",
+              "label": "(Advanced) GV Cross Broken Bridge with Recoil off Boulder"
+            },
+            {
+              "value": "adv_gv_tent_child",
+              "label": "(Advanced) GV Tent as Child"
+            },
+            {
+              "value": "glitch_gv_chest_longshot",
+              "label": "(Glitch) GV Chest with Longshot"
+            },
+            {
+              "value": "adv_gv_grotto_ledge_to_upper",
+              "label": "(Advanced) GV Grotto Ledge to Upper Stream"
+            },
+            {
+              "value": "glitch_gtg_adult_groundclip",
+              "label": "(Glitch) GTG Adult Groundclip"
+            },
+            {
+              "value": "glitch_gtg_child_groundclip",
+              "label": "(Glitch) GTG Child Groundclip"
+            },
+            {
+              "value": "adv_gf_gateskip",
+              "label": "(Advanced) GF Gate Skip"
+            },
+            {
+              "value": "adv_gf_unload",
+              "label": "(Advanced) GF Unload with Antigrav"
+            },
+            {
+              "value": "adv_gf_archery_no_card",
+              "label": "(Advanced) GF Archery Area without Gerudo Card as Adult"
+            },
+            {
+              "value": "glitch_gf_gate_groundclip",
+              "label": "(Glitch) GF Gate Skip Groundclip"
+            },
+            {
+              "value": "adv_th_breakroom_to_balcony_child",
+              "label": "(Advanced) TH Breakroom to Balcony as Child"
+            },
+            {
+              "value": "glitch_spirit_hover",
+              "label": "(Glitch) Spirit Hover"
+            },
+            {
+              "value": "glitch_colossus_grotto_weirdclip",
+              "label": "(Glitch) Colossus Grotto Weirdclip"
+            },
+            {
+              "value": "glitch_colossus_fairy_no_explosives",
+              "label": "(Glitch) Colossus Great Fairy Fountain without Explosives"
+            },
+            {
+              "value": "adv_market_night_baz_sling",
+              "label": "(Advanced) Market Night Baz and Sling"
+            },
+            {
+              "value": "adv_market_night_potion",
+              "label": "(Advanced) Market Night Potion"
+            },
+            {
+              "value": "adv_market_night_mask_shop",
+              "label": "(Advanced) Market Night Mask Shop"
+            },
+            {
+              "value": "adv_market_day_tcg",
+              "label": "(Advanced) Market Day Treasure Chest Game"
+            },
+            {
+              "value": "glitch_dot_skip_child_lunge",
+              "label": "(Glitch) ToT DoT Skip Child with Lunge Storage"
+            },
+            {
+              "value": "glitch_dot_skip_child_swordless",
+              "label": "(Glitch) ToT DoT Skip Child Swordless"
+            },
+            {
+              "value": "glitch_dot_skip_adult_hover_recoil",
+              "label": "(Glitch) ToT DoT Skip Adult with Hover Recoil"
+            },
+            {
+              "value": "glitch_dot_skip_adult_hovers_bgs",
+              "label": "(Glitch) ToT DoT Skip Adult with Hovers and BGS"
+            },
+            {
+              "value": "glitch_dot_skip_adult_bgs_only",
+              "label": "(Glitch) ToT DoT Skip Adult with BGS only"
+            },
+            {
+              "value": "glitch_hc_garden_no_trade",
+              "label": "(Glitch) HC Garden Ledge without Trade Item"
+            },
+            {
+              "value": "glitch_hc_fairy_wallwalk",
+              "label": "(Glitch) HC Fairy Fountain Wallwalk"
+            },
+            {
+              "value": "glitch_tcg_suns",
+              "label": "(Glitch) Treasure Chest Game with Suns Song and OI"
+            },
+            {
+              "value": "glitch_kakariko_tower_gs_isg",
+              "label": "(Glitch) Kakariko Tower GS with ISG"
+            },
+            {
+              "value": "glitch_kak_botw_odie",
+              "label": "(Glitch) Kak to BotW Odie Clip"
+            },
+            {
+              "value": "glitch_kak_botw_ledge",
+              "label": "(Glitch) Kak to BotW Ledge Clip Damage Boost"
+            },
+            {
+              "value": "glitch_botw_cucco_dive",
+              "label": "(Glitch) BotW Cucco Dive"
+            },
+            {
+              "value": "glitch_botw_blank_a",
+              "label": "(Glitch) BotW Blank A"
+            },
+            {
+              "value": "glitch_kak_child_granny",
+              "label": "(Glitch) Kak Granny's House as Child"
+            },
+            {
+              "value": "glitch_impas_cow_clip",
+              "label": "(Glitch) Impa's House Front to Back"
+            },
+            {
+              "value": "adv_kak_windmill_heart_child",
+              "label": "(Advanced) Kak Windmill HP Child Jumpslash"
+            },
+            {
+              "value": "adv_kak_tower_gs_rang",
+              "label": "(Advanced) Kakariko Tower GS with Boomerang"
+            },
+            {
+              "value": "adv_kak_backyard_night",
+              "label": "(Advanced) Kakariko Backyard as Child with Jumpslash"
+            },
+            {
+              "value": "adv_graveyard_hp_damage_boost",
+              "label": "(Advanced) Graveyard Box HP Damage Boost"
+            },
+            {
+              "value": "glitch_rft_js_clip_child",
+              "label": "(Glitch) Graveyard Royal Tomb Jumpslash Clip Child"
+            },
+            {
+              "value": "glitch_rft_chest_sticks",
+              "label": "(Glitch) Royal Family Tomb Chest with Sticks"
+            },
+            {
+              "value": "glitch_graveyard_shadow_early_hookshot",
+              "label": "(Glitch) Graveyard to Shadow Early Hookshot Jump"
+            },
+            {
+              "value": "glitch_graveyard_shadow_early_hover",
+              "label": "(Glitch) Graveyard to Shadow Early Hover"
+            },
+            {
+              "value": "glitch_graveyard_shadow_early_bomb_push",
+              "label": "(Glitch) Graveyard to Shadow Early Bomb Push"
+            },
+            {
+              "value": "adv_dmt_hp_jump",
+              "label": "(Advanced) DMT Heart Piece Damageless Jump"
+            },
+            {
+              "value": "glitch_dmt_hookshot_jump",
+              "label": "(Glitch) DMT to Summit with Hookshot Jump"
+            },
+            {
+              "value": "glitch_dmt_dc_groundclip",
+              "label": "(Glitch) DMT to DC Groundclip"
+            },
+            {
+              "value": "glitch_dmt_explosiveless_magic",
+              "label": "(Glitch) DMT Explosiveless Magic"
+            },
+            {
+              "value": "adv_gc_lw_boulders_bow",
+              "label": "(Advanced) Goron City LW Boulders with Bow"
+            },
+            {
+              "value": "glitch_gc_dmc_child",
+              "label": "(Glitch) GC to DMC as Child"
+            },
+            {
+              "value": "glitch_gc_darunia_no_explosives",
+              "label": "(Glitch) Goron City Darunia's Room No Explosives"
+            },
+            {
+              "value": "glitch_dmc_fairy_from_trail",
+              "label": "(Glitch) DMC Fairy Fountain from Trail"
+            },
+            {
+              "value": "glitch_lw_uw_rupees",
+              "label": "(Glitch) LW Underwater Rupees without Diving or Rang"
+            },
+            {
+              "value": "glitch_zr_lw_adult_ledge_clip",
+              "label": "(Glitch) ZR to LW as Adult Ledge Clip"
+            },
+            {
+              "value": "glitch_zr_lw_child_mega",
+              "label": "(Glitch) ZR to LW as Child Megasideohp"
+            },
+            {
+              "value": "glitch_zr_zd_itemless",
+              "label": "(Glitch) ZR to ZD Itemless"
+            },
+            {
+              "value": "glitch_zr_upper_skull_rang",
+              "label": "(Glitch) Zora's River upper GS with Boomerang"
+            },
+            {
+              "value": "glitch_zd_child_oob",
+              "label": "(Glitch) ZD Child OoB"
+            },
+            {
+              "value": "glitch_zd_zf_ledge_cancel",
+              "label": "(Glitch) ZD to ZF Ledge Cancel"
+            },
+            {
+              "value": "glitch_zd_zf_burning_stick",
+              "label": "(Glitch) ZD to ZF Burning Stick"
+            },
+            {
+              "value": "glitch_zd_reverse_kz_adult",
+              "label": "(Glitch) ZD Reverse KZ Adult"
+            },
+            {
+              "value": "glitch_zd_reverse_kz_child",
+              "label": "(Glitch) ZD Reverse KZ Child"
+            },
+            {
+              "value": "adv_jabu_no_fish",
+              "label": "(Advanced) ZF Enter Jabu Jumpslash"
+            },
+            {
+              "value": "glitch_zf_child_gs_hover",
+              "label": "(Glitch) ZF Child Wall GS with Hover"
+            },
+            {
+              "value": "glitch_adult_jabu_hovers",
+              "label": "(Glitch) ZF Enter Jabu Adult with Hovers"
+            },
+            {
+              "value": "glitch_adult_jabu_no_hovers",
+              "label": "(Glitch) ZF Enter Jabu Adult without Hovers"
+            },
+            {
+              "value": "glitch_child_ice",
+              "label": "(Glitch) Child Ice Cavern Hover"
+            },
+            {
+              "value": "adv_zf_fairy_no_explosives",
+              "label": "(Advanced) ZF Great Fairy Fountain without Explosives"
+            },
+            {
+              "value": "glitch_hf_web_groundclip",
+              "label": "(Glitch) HF Web Grotto Groundclip"
+            },
+            {
+              "value": "adv_tektite_hp_rang",
+              "label": "(Advanced) HF Tektite Grotto with Rang"
+            },
+            {
+              "value": "glitch_moustache_clip",
+              "label": "(Glitch) Moustache Clip"
+            },
+            {
+              "value": "adv_231_hammer",
+              "label": "(Advanced) Deku 231 with Hammer"
+            },
+            {
+              "value": "glitch_deku_boss_door_skip",
+              "label": "(Glitch) Deku Boss Door Skip"
+            },
+            {
+              "value": "glitch_deku_mq_sot_skull_hook",
+              "label": "(Glitch) MQ Deku SoT Chest with Hookshot"
+            },
+            {
+              "value": "glitch_dc_head_clip",
+              "label": "(Glitch) DC Beyond the Head without Explosives"
+            },
+            {
+              "value": "glitch_death_hookshot_jump",
+              "label": "(Glitch) Death Hookshot Jumps"
+            },
+            {
+              "value": "adv_kd_chus",
+              "label": "(Advanced) KD with Chus"
+            },
+            {
+              "value": "adv_dc_mq_hoverboots_boulder_jump",
+              "label": "(Advanced) MQ DC Pass Boulder with Hoverboots Jump"
+            },
+            {
+              "value": "adv_dc_mq_stairs_skulltula_jump",
+              "label": "(Advanced) MQ DC jump around stair Skulltulas"
+            },
+            {
+              "value": "glitch_jabu_switch_hover",
+              "label": "(Glitch) Jabu First Switch Hover"
+            },
+            {
+              "value": "glitch_jabu_compass_skip_tentacle",
+              "label": "(Glitch) Jabu Compass Tentacle Skip"
+            },
+            {
+              "value": "glitch_jabu_compass_with_death",
+              "label": "(Glitch) Jabu Compass with Death"
+            },
+            {
+              "value": "glitch_jabu_biri_hover",
+              "label": "(Glitch) Jabu Jabu Biri Hover"
+            },
+            {
+              "value": "adv_jabu_gs_near_boss_js",
+              "label": "(Advanced) Jabu Jabu GS Near Boss with Jumpslash"
+            },
+            {
+              "value": "glitch_forest_temple_basement",
+              "label": "(Glitch) Forest Temple Basement"
+            },
+            {
+              "value": "glitch_forest_basement_gs",
+              "label": "(Glitch) Forest Basement GS Hover"
+            },
+            {
+              "value": "glitch_forest_bk_skip",
+              "label": "(Glitch) Forest Temple Boss Key Skip"
+            },
+            {
+              "value": "glitch_fire_bk_skip_ledge",
+              "label": "(Glitch) Fire Temple Boss Key Skip (Ledge clip)"
+            },
+            {
+              "value": "glitch_fire_bk_skip_hover",
+              "label": "(Glitch) Fire Temple Boss Key Skip (Hover)"
+            },
+            {
+              "value": "glitch_fire_child_enemy_room",
+              "label": "(Glitch) Fire Temple Child enemy room"
+            },
+            {
+              "value": "glitch_fire_block_skip",
+              "label": "(Glitch) Fire Temple Block skip"
+            },
+            {
+              "value": "glitch_fire_scarecrow_hover",
+              "label": "(Glitch) Fire Temple Scarecrow Hover"
+            },
+            {
+              "value": "glitch_fire_mq_torch_puzzle",
+              "label": "(Glitch) MQ Fire Before Boss Torch puzzle with GDV"
+            },
+            {
+              "value": "adv_fire_mq_bk_chest_flame_skip",
+              "label": "(Advanced) MQ Fire Boss Key Chest Flame Skip"
+            },
+            {
+              "value": "adv_water_hop",
+              "label": "(Advanced) Water Hop"
+            },
+            {
+              "value": "glitch_water_bk_area_antigrav",
+              "label": "(Glitch) Water Temple Antigrav to Boss Key Area"
+            },
+            {
+              "value": "glitch_water_bottle_dive",
+              "label": "(Glitch) Water Temple Cutscene Dive to Eastern Column"
+            },
+            {
+              "value": "glitch_water_south_basement_clip",
+              "label": "(Glitch) Water Temple Ledge clip to South Basement"
+            },
+            {
+              "value": "glitch_water_central_pillar_with_torch_clip",
+              "label": "(Glitch) Water Temple Central Pillar with Torch Clip and Irons"
+            },
+            {
+              "value": "glitch_water_torch_clip",
+              "label": "(Glitch) Water Temple Torch Clips"
+            },
+            {
+              "value": "glitch_water_dragon_cs_dive",
+              "label": "(Glitch) Water Temple Dragon Head Cutscene Dive"
+            },
+            {
+              "value": "glitch_water_dragon_hover",
+              "label": "(Glitch) Water Temple Dragon Head Hover"
+            },
+            {
+              "value": "glitch_water_sot_block_skip",
+              "label": "(Glitch) Water Temple Song of Time Block Skip"
+            },
+            {
+              "value": "glitch_water_bk_skip_bombs",
+              "label": "(Glitch) Water Temple Boss Key Skip with Bombs"
+            },
+            {
+              "value": "glitch_water_bk_skip_chus",
+              "label": "(Glitch) Water Temple Boss Key Skip with Chus"
+            },
+            {
+              "value": "glitch_water_mq_bk_skip",
+              "label": "(Glitch) MQ Water BK Skip"
+            },
+            {
+              "value": "glitch_water_mq_bk_pit",
+              "label": "(Glitch) MQ Water Temple Boss Key Room Spout Pit"
+            },
+            {
+              "value": "adv_shadow_double_boosts",
+              "label": "(Advanced) Shadow Temple Double Damage Boosts"
+            },
+            {
+              "value": "glitch_child_shadow",
+              "label": "(Glitch) Shadow Temple as Child"
+            },
+            {
+              "value": "glitch_shadow_gate_falling_spikes",
+              "label": "(Glitch) Shadow Temple Gate clip to Falling Spikes"
+            },
+            {
+              "value": "glitch_shadow_boat_skull",
+              "label": "(Glitch) Shadow Boat Skull without Longshot Master"
+            },
+            {
+              "value": "glitch_shadow_boat_skull_adult_nothing",
+              "label": "(Glitch) Shadow Boat Skull as Adult with Nothing"
+            },
+            {
+              "value": "glitch_shadow_no_Boat",
+              "label": "(Glitch) Shadow Temple no Boat"
+            },
+            {
+              "value": "glitch_shadow_heart_chasm_hovers",
+              "label": "(Glitch) Shadow Temple Before Boss Recovery Hearts Hovers"
+            },
+            {
+              "value": "glitch_shadow_bk_skip_boat_key",
+              "label": "(Glitch) Shadow Temple Boss Key Skip Boat Key"
+            },
+            {
+              "value": "glitch_shadow_bk_skip_deadhand",
+              "label": "(Glitch) Shadow Temple Boss Key Skip from Deadhand"
+            },
+            {
+              "value": "glitch_shadow_bk_skip_boss",
+              "label": "(Glitch) Shadow Temple Boss Key Skip pre-boss"
+            },
+            {
+              "value": "glitch_spirit_child_side_as_adult",
+              "label": "(Glitch) Spirit Temple Child side as Adult"
+            },
+            {
+              "value": "glitch_spirit_adult_block_skip",
+              "label": "(Glitch) Spirit Temple Adult side Block Skip"
+            },
+            {
+              "value": "glitch_spirit_child_side_crawlspace_skip",
+              "label": "(Glitch) Spirit Temple Child side Crawlspace skip as Adult"
+            },
+            {
+              "value": "adv_spirit_compass_hoverboots_only",
+              "label": "(Advanced) Spirit Compass with just Hoverboots"
+            },
+            {
+              "value": "glitch_spirit_bk_skip_groundclip",
+              "label": "(Glitch) Spirit Temple Boss Key Skip Groundclip"
+            },
+            {
+              "value": "glitch_spirit_bk_skip_headclip",
+              "label": "(Glitch) Spirit Temple Boss Key Skip Headclip"
+            },
+            {
+              "value": "adv_spirit_mq_lobby_eye",
+              "label": "(Advanced) MQ Spirit Temple Lobby Eye Switch without Explosives"
+            },
+            {
+              "value": "adv_spirit_mq_child_gibdo_eye",
+              "label": "(Advanced) MQ Spirit Temple Child Gibdo Eye Switch without Explosives"
+            },
+            {
+              "value": "glitch_spirit_mq_silver_block_skip",
+              "label": "(Glitch) MQ Spirit Temple Silver Block Skip"
+            },
+            {
+              "value": "glitch_spirit_mq_ceiling_boulder_skip",
+              "label": "(Glitch) MQ Spirit Temple Ceiling Boulder Skip"
+            },
+            {
+              "value": "adv_spirit_mq_lower_adult_from_lobby",
+              "label": "(Advanced) MQ Spirit Temple Lower Adult from Lobby"
+            },
+            {
+              "value": "glitch_spirit_mq_lower_adult_no_fire",
+              "label": "(Glitch) MQ Spirit Temple Lower Adult without Fire"
+            },
+            {
+              "value": "glitch_spirit_mq_symphony_lullaby",
+              "label": "(Glitch) MQ Spirit Temple Symphony Room with just Lullaby"
+            },
+            {
+              "value": "glitch_ice_ledges_child",
+              "label": "(Glitch) Ice Cavern Ledges Room as Child"
+            },
+            {
+              "value": "adv_ice_hp_no_bottle",
+              "label": "(Advanced) Ice Cavern HP without Bottle"
+            },
+            {
+              "value": "adv_ice_push_block_silver",
+              "label": "(Advanced) Ice Cavern Push Block Silver Rupee Jumpslash"
+            },
+            {
+              "value": "glitch_reverse_ice",
+              "label": "(Glitch) Reverse Ice Cavern"
+            },
+            {
+              "value": "glitch_",
+              "label": "(Glitch) Void Warps (ToDo)"
+            },
+            {
+              "value": "glitch_gtg_lobby_eye",
+              "label": "(Glitch) GTG Lobby Eye Switch Hover"
+            },
+            {
+              "value": "glitch_gtg_vine_clip",
+              "label": "(Glitch) GTG Vine Clips"
+            },
+            {
+              "value": "adv_gtg_pillar_jumps",
+              "label": "(Advanced) GTG Pillar Jumps"
+            },
+            {
+              "value": "adv_gtg_burning_chest_without_hammer",
+              "label": "(Advanced) GTG Burning Chest without Hammer"
+            },
+            {
+              "value": "adv_gtg_mq_enemy_rooms_as_child",
+              "label": "(Advanced) MQ GTG Enemy Rooms as child"
+            },
+            {
+              "value": "glitch_gtg_mq_blue_fire_skip",
+              "label": "(Glitch) MQ GTG Blue Fire Wall Skip"
+            },
+            {
+              "value": "glitch_igc_rainbow_bridge",
+              "label": "(Glitch) Ganon's Tower Rainbow Bridge Skip"
+            },
+            {
+              "value": "glitch_igc_trials_skip",
+              "label": "(Glitch) Ganon's Tower Trials Skip"
+            },
+            {
+              "value": "glitch_igc_trials_skip_spirit_trial",
+              "label": "(Glitch) Ganon's Tower Trials Skip from Spirit Trial"
+            },
+            {
+              "value": "adv_shadow_trial_no_fire_gap",
+              "label": "(Advanced) Shadow Trial First Gap Without Fire"
+            },
+            {
+              "value": "glitch_shadow_trial_hess",
+              "label": "(Glitch) Shadow Trial Hess"
+            },
+            {
+              "value": "glitch_fire_trial_pillar_silver",
+              "label": "(Glitch) Fire Trial Pillar Silver without Gauntlets"
+            },
+            {
+              "value": "adv_fire_trial_longshot_skip",
+              "label": "(Advanced) Fire Trial Longshot Skip"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "timesavers",
+      "options": [
+        {
+          "name": "skip_reward_from_rauru",
+          "type": "enum",
+          "label": "Free Reward from Rauru",
+          "default": "not_free",
+          "cosmetic": false,
+          "tooltip": "The item given by Rauru beyond the Door of Time (the Light Medallion in the vanilla game) is given as a starting item instead. 'No': Rauru gives reward when you go beyond the Door of Time. 'Yes': You begin the game with the reward Rauru normally gives beyond the Door of Time. If dungeon rewards are shuffled then this will be as well. 'Yes (Forced)': You begin the game with the reward Rauru normally gives beyond the Door of Time, if dungeon rewards are shuffled you will still get a random Spiritual Stone or Medallion.",
+          "choices": [
+            {
+              "value": "not_free",
+              "label": "No"
+            },
+            {
+              "value": "free",
+              "label": "Yes"
+            },
+            {
+              "value": "free_forced",
+              "label": "Yes (Forced)"
+            }
+          ]
+        },
+        {
+          "name": "skip_some_minigame_phases",
+          "type": "bool",
+          "label": "Skip Some Minigame Phases",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Awards all eligible prizes after the first attempt for Dampe Race and Gerudo Horseback Archery. Dampe will start with the second race so you can finish the race in under a minute and get both rewards at once. You still get the first reward from the chest even if you don't complete the race in under a minute. Both rewards at the Gerudo Horseback Archery will be available from the first time you play the minigame. This means you can get both rewards at once if you get 1500 points in a single attempt."
+        },
+        {
+          "name": "fast_chests",
+          "type": "bool",
+          "label": "Fast Chest Cutscenes",
+          "default": true,
+          "cosmetic": false,
+          "tooltip": "All chest animations are fast. If disabled, the animation time is slow for major items."
+        },
+        {
+          "name": "fast_bunny_hood",
+          "type": "bool",
+          "label": "Fast Bunny Hood",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "The Bunny Hood mask behaves like it does in Majora's Mask and makes you go 1.5× faster."
+        },
+        {
+          "name": "fast_shadow_boat",
+          "type": "bool",
+          "label": "Fast Shadow Boat",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "The boat sequence in Shadow Temple will be massively sped up. The two Stalfos will still fall on the boat, but you won't have time to fight them."
+        }
+      ]
+    },
+    {
+      "id": "starting_items",
+      "options": [
+        {
+          "name": "starting_age",
+          "type": "enum",
+          "label": "Starting Age",
+          "default": "child",
+          "cosmetic": false,
+          "tooltip": "Choose which age Link will start as. Starting as adult means you start with the master sword in your inventory. Only the child option is compatible with Closed Forest.",
+          "choices": [
+            {
+              "value": "child",
+              "label": "Child"
+            },
+            {
+              "value": "adult",
+              "label": "Adult"
+            },
+            {
+              "value": "random",
+              "label": "Random"
+            }
+          ]
+        },
+        {
+          "name": "add_random_starting_items",
+          "type": "bool",
+          "label": "Additional Random Starting Items",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Begin the game with a configurable amount of randomly selected items in addition to your selections from the tables."
+        },
+        {
+          "name": "random_starting_items_exclude",
+          "type": "list",
+          "label": "Exclude Item Types",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Selections here will be excluded from the random starting item pool.",
+          "choices": [
+            {
+              "value": "songs",
+              "label": "Songs"
+            },
+            {
+              "value": "bombchus",
+              "label": "Bombchus"
+            },
+            {
+              "value": "shields",
+              "label": "Deku/Hylian Shields"
+            },
+            {
+              "value": "deku_upgrades",
+              "label": "Deku Stick/Nut Upgrades"
+            },
+            {
+              "value": "health_upgrades",
+              "label": "Health Upgrades"
+            },
+            {
+              "value": "junk",
+              "label": "Junk Items"
+            }
+          ]
+        },
+        {
+          "name": "random_starting_items_count",
+          "type": "int",
+          "label": "Amount of Items",
+          "default": 0,
+          "cosmetic": false,
+          "tooltip": "Configure the amount of random items to start with.",
+          "min": 0,
+          "max": 10,
+          "step": 1
+        },
+        {
+          "name": "starting_hearts",
+          "type": "int",
+          "label": "Starting Hearts",
+          "default": 3,
+          "cosmetic": false,
+          "tooltip": "Start the game with the selected number of hearts. Heart Containers and Pieces of Heart are removed from the item pool in equal proportion.",
+          "min": 3,
+          "max": 20,
+          "step": 1
+        },
+        {
+          "name": "starting_tod",
+          "type": "enum",
+          "label": "Starting Time of Day",
+          "default": "default",
+          "cosmetic": false,
+          "tooltip": "Change up Link's sleep routine. Daytime officially starts at 6:30, nighttime at 18:00 (6:00 PM).",
+          "choices": [
+            {
+              "value": "default",
+              "label": "Default (10:00)"
+            },
+            {
+              "value": "random",
+              "label": "Random Choice"
+            },
+            {
+              "value": "sunrise",
+              "label": "Sunrise (6:30)"
+            },
+            {
+              "value": "morning",
+              "label": "Morning (9:00)"
+            },
+            {
+              "value": "noon",
+              "label": "Noon (12:00)"
+            },
+            {
+              "value": "afternoon",
+              "label": "Afternoon (15:00)"
+            },
+            {
+              "value": "sunset",
+              "label": "Sunset (18:00)"
+            },
+            {
+              "value": "evening",
+              "label": "Evening (21:00)"
+            },
+            {
+              "value": "midnight",
+              "label": "Midnight (00:00)"
+            },
+            {
+              "value": "witching-hour",
+              "label": "Witching Hour (03:00)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "misc",
+      "options": [
+        {
+          "name": "show_seed_info",
+          "type": "bool",
+          "label": "Show Seed Info on File Screen",
+          "default": true,
+          "cosmetic": false,
+          "tooltip": "Display the version number, generation time, and user message on the file screen."
+        },
+        {
+          "name": "user_message",
+          "type": "string",
+          "label": "User-Configurable Message",
+          "default": "",
+          "cosmetic": false,
+          "tooltip": "Add a custom message to the seed info."
+        },
+        {
+          "name": "create_spoiler",
+          "type": "bool",
+          "label": "Create Spoiler Log",
+          "default": true,
+          "cosmetic": false,
+          "tooltip": "Enabling this will change the seed. Warning: Only disable this if you don't want any help in solving this seed!"
+        },
+        {
+          "name": "password_lock",
+          "type": "bool",
+          "label": "Lock Seed Behind Password",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Starting the seed will be locked behind a password provided in the spoiler log. The password is a sequence of 6 button presses (A and C)."
+        },
+        {
+          "name": "randomize_settings",
+          "type": "bool",
+          "label": "Randomize Main Rule Settings",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Randomizes all settings on the 'Main Rules' tab, except: - Logic Rules - (Random) Number of MQ Dungeons - Pre-completed Dungeons - Rainbow Bridge/Ganon Boss Key Requirements: Gold Skulltula Tokens - Variable numbers of Spiritual Stones, Medallions, or Dungeons for Rainbow Bridge and Ganon's Boss Key (you will always be required to obtain all the relevant rewards) - Scrub Shuffle will either be \"Off\" or \"On (Affordable)\""
+        },
+        {
+          "name": "owl_drops",
+          "type": "bool",
+          "label": "Randomize Owl Drops",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Randomize where Kaepora Gaebora (the Owl) drops you at when you talk to him at Lake Hylia or at the top of Death Mountain Trail."
+        },
+        {
+          "name": "warp_songs",
+          "type": "bool",
+          "label": "Randomize Warp Song Destinations",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Randomize where each of the 6 warp songs leads to."
+        },
+        {
+          "name": "spawn_positions",
+          "type": "list",
+          "label": "Randomize Overworld Spawns",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Randomize where you start when loading a save in the Overworld. This means you may not necessarily spawn inside Link's House or Temple of Time. 'Child': Child overworld spawn will be randomized. 'Adult': Adult overworld spawn will be randomized. Selecting both options will randomize both spawns. This stays consistent after saving and loading the game again.",
+          "choices": [
+            {
+              "value": "child",
+              "label": "Child"
+            },
+            {
+              "value": "adult",
+              "label": "Adult"
+            }
+          ]
+        },
+        {
+          "name": "free_bombchu_drops",
+          "type": "bool",
+          "label": "Add Bombchu Bag and Drops",
+          "default": true,
+          "cosmetic": false,
+          "tooltip": "Bombchus are properly considered in logic. The first Bombchu pack will always be a Bombchu Bag giving the same amount of Bombchus as would have been given by the item normally. For example, finding the Bombchus (5) item first will give the Bombchu Bag with 5 Bombchus inside. Bombchu refills will drop from grass, pots, crates, and enemies after finding the bag. Bombchus can be purchased for 60/99/180 rupees once the bag has been found. The Wasteland carpet merchant will not sell unshuffled Bombchus without finding a Bombchu Bag. If he is shuffled, he will sell his item without a Bombchu Bag. Bombchu Bowling opens with either Bomb Bag or Bombchu Bag. The Bombchu and Bomb prizes (3rd and 4th respectively) will change to a Purple Rupee if the corresponding bag has not yet been found."
+        },
+        {
+          "name": "shopsanity",
+          "type": "enum",
+          "label": "Shopsanity",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Randomizes Shop contents. 'X Items Per Shop': Each shop will have the specified number of items randomized and they will always appear on the left side (identified by the Special Deal! text). Remaining items will be shuffled between shops. 'Random # of Items Per Shop': Each shop will have 0 to 4 Special Deals. The randomized items have no requirements except money, while the remaining items retain normal requirements. Tunics that aren't a Special Deal! will still require you to be an adult to purchase for example. Bombchu Special Deals will unlock the Bombchu slot in your inventory and allow purchase of Bombchu Refills if \"Bombchus are considered in logic\" is enabled. Otherwise, the Bomb Bag is required to purchase Bombchu Refills.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "0",
+              "label": "0 Items Per Shop"
+            },
+            {
+              "value": "1",
+              "label": "1 Item Per Shop"
+            },
+            {
+              "value": "2",
+              "label": "2 Items Per Shop"
+            },
+            {
+              "value": "3",
+              "label": "3 Items Per Shop"
+            },
+            {
+              "value": "4",
+              "label": "4 Items Per Shop"
+            },
+            {
+              "value": "random",
+              "label": "Random # of Items Per Shop"
+            }
+          ]
+        },
+        {
+          "name": "special_deal_price_distribution",
+          "type": "enum",
+          "label": "Special Deal Prices",
+          "default": "betavariate",
+          "cosmetic": false,
+          "tooltip": "Controls how the prices for Special Deal items in shops are selected. For more control, utilize the plandomizer. 'Vanilla': Each item will be sold for the price of the item that appears in its slot in the vanilla game. 'Weighted': Shop prices will be biased towards slightly below the middle of the selected range, with very low or very high prices only appearing rarely. 'Uniform': Each price value in the selected range is equally likely.",
+          "choices": [
+            {
+              "value": "vanilla",
+              "label": "Vanilla"
+            },
+            {
+              "value": "betavariate",
+              "label": "Weighted"
+            },
+            {
+              "value": "uniform",
+              "label": "Uniform"
+            }
+          ]
+        },
+        {
+          "name": "special_deal_price_min",
+          "type": "int",
+          "label": "Minimum Special Deal Price",
+          "default": 0,
+          "cosmetic": false,
+          "tooltip": "Select the minimum price in rupees for Special Deal items in shops. Prices will be selected randomly in multiples of 5 according to the \"Special Deal Price Distribution\" setting. Set this setting and \"Maximum Special Deal Price\" to the same value to give all Special Deals a fixed price.",
+          "min": 0,
+          "max": 995,
+          "step": 5
+        },
+        {
+          "name": "special_deal_price_max",
+          "type": "int",
+          "label": "Maximum Special Deal Price",
+          "default": 300,
+          "cosmetic": false,
+          "tooltip": "Select the maximum price in rupees for Special Deal items in shops. Prices will be selected randomly in multiples of 5 according to the \"Special Deal Price Distribution\" setting. Set this setting and \"Minimum Special Deal Price\" to the same value to give all Special Deals a fixed price.",
+          "min": 0,
+          "max": 995,
+          "step": 5
+        },
+        {
+          "name": "tokensanity",
+          "type": "enum",
+          "label": "Tokensanity",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Token reward from Gold Skulltulas are shuffled into the pool. 'Dungeons Only': This only shuffles the GS locations that are within dungeons, increasing the value of most dungeons and making internal dungeon exploration more diverse. 'Overworld Only': This only shuffles the GS locations that are outside of dungeons. 'All Tokens': Effectively adds 100 new locations for items to appear.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "dungeons",
+              "label": "Dungeons Only"
+            },
+            {
+              "value": "overworld",
+              "label": "Overworld Only"
+            },
+            {
+              "value": "all",
+              "label": "All Tokens"
+            }
+          ]
+        },
+        {
+          "name": "adult_trade_start",
+          "type": "list",
+          "label": "Shuffle Adult Trade Sequence Items",
+          "default": [
+            "Pocket Egg",
+            "Pocket Cucco",
+            "Cojiro",
+            "Odd Mushroom",
+            "Odd Potion",
+            "Poachers Saw",
+            "Broken Sword",
+            "Prescription",
+            "Eyeball Frog",
+            "Eyedrops",
+            "Claim Check"
+          ],
+          "cosmetic": false,
+          "tooltip": "Select the Adult Trade Sequence items to shuffle. If \"Shuffle All Selected Adult Trade Items\" is enabled, every selected item will be shuffled. If \"Shuffle All Selected Adult Trade Items\" is disabled, only one of the selected items will be shuffled. If the Odd Mushroom, Eyeball Frog, or Eyedrops is removed from the player's inventory due to an expired timer or game reset, that item can be reacquired from its <i>non-shuffled</i> location.",
+          "choices": [
+            {
+              "value": "Pocket Egg",
+              "label": "Pocket Egg"
+            },
+            {
+              "value": "Pocket Cucco",
+              "label": "Pocket Cucco"
+            },
+            {
+              "value": "Cojiro",
+              "label": "Cojiro"
+            },
+            {
+              "value": "Odd Mushroom",
+              "label": "Odd Mushroom"
+            },
+            {
+              "value": "Odd Potion",
+              "label": "Odd Potion"
+            },
+            {
+              "value": "Poachers Saw",
+              "label": "Poacher's Saw"
+            },
+            {
+              "value": "Broken Sword",
+              "label": "Broken Sword"
+            },
+            {
+              "value": "Prescription",
+              "label": "Prescription"
+            },
+            {
+              "value": "Eyeball Frog",
+              "label": "Eyeball Frog"
+            },
+            {
+              "value": "Eyedrops",
+              "label": "Eyedrops"
+            },
+            {
+              "value": "Claim Check",
+              "label": "Claim Check"
+            }
+          ]
+        },
+        {
+          "name": "key_rings_choice",
+          "type": "enum",
+          "label": "Key Rings Mode",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Selected dungeons will have all of their keys found at once in a ring rather than individually. For example, instead of shuffling 5 Forest Temple small keys into the pool, you will find a single key ring which will give you all 5 keys at once. Selecting key ring for dungeons will have no effect if Small Keys are set to Remove or Vanilla. Selecting key ring for Thieves' Hideout will have no effect if Thieves' Hideout keys are in vanilla locations or Gerudo's Fortress is set to Rescue One Carpenter. Similarly, selecting Treasure Chest Game will have no effect if the keys aren't shuffled. Treasure Chest Game will be considered when selecting 'All dungeons' or 'Random selection'.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "choice",
+              "label": "Choose Dungeons"
+            },
+            {
+              "value": "all",
+              "label": "All Dungeons"
+            },
+            {
+              "value": "random",
+              "label": "Random Selection"
+            }
+          ]
+        },
+        {
+          "name": "key_rings",
+          "type": "list",
+          "label": "Key Rings",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Select areas with keyring instead of multiple keys",
+          "choices": [
+            {
+              "value": "Thieves Hideout",
+              "label": "Thieves' Hideout"
+            },
+            {
+              "value": "Treasure Chest Game",
+              "label": "Treasure Chest Game"
+            },
+            {
+              "value": "Forest Temple",
+              "label": "Forest Temple"
+            },
+            {
+              "value": "Fire Temple",
+              "label": "Fire Temple"
+            },
+            {
+              "value": "Water Temple",
+              "label": "Water Temple"
+            },
+            {
+              "value": "Shadow Temple",
+              "label": "Shadow Temple"
+            },
+            {
+              "value": "Spirit Temple",
+              "label": "Spirit Temple"
+            },
+            {
+              "value": "Bottom of the Well",
+              "label": "Bottom of the Well"
+            },
+            {
+              "value": "Gerudo Training Ground",
+              "label": "Gerudo Training Ground"
+            },
+            {
+              "value": "Ganons Castle",
+              "label": "Ganon's Castle"
+            }
+          ]
+        },
+        {
+          "name": "keyring_give_bk",
+          "type": "bool",
+          "label": "Key Rings give Boss Keys",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Boss Keys will be included in the Key Ring for the specific dungeon. This does not apply to the Ganon's Castle Boss Key."
+        },
+        {
+          "name": "silver_rupee_pouches_choice",
+          "type": "enum",
+          "label": "Silver Rupee Pouches Mode",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "Selected silver rupee puzzles will have all of their silver rupees found at once in a pouch rather than individually. For example, instead of shuffling 5 silver rupees for the Fire Trial in Ganon's Castle into the pool, you will find a single pouch which will give you all 5 of them at once.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "choice",
+              "label": "Choose Puzzles"
+            },
+            {
+              "value": "all",
+              "label": "All Puzzles"
+            },
+            {
+              "value": "random",
+              "label": "Random Puzzles"
+            }
+          ]
+        },
+        {
+          "name": "silver_rupee_pouches",
+          "type": "list",
+          "label": "Silver Rupee Pouches",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Select puzzles with silver rupee pouches instead of individual silver rupees.",
+          "choices": [
+            {
+              "value": "Dodongos Cavern Staircase",
+              "label": "Dodongo's Cavern Staircase"
+            },
+            {
+              "value": "Ice Cavern Spinning Scythe",
+              "label": "Ice Cavern Spinning Scythe"
+            },
+            {
+              "value": "Ice Cavern Push Block",
+              "label": "Ice Cavern Push Block"
+            },
+            {
+              "value": "Bottom of the Well Basement",
+              "label": "Bottom of the Well Basement"
+            },
+            {
+              "value": "Shadow Temple Scythe Shortcut",
+              "label": "Shadow Temple Scythe Shortcut"
+            },
+            {
+              "value": "Shadow Temple Invisible Blades",
+              "label": "Shadow Temple Invisible Blades"
+            },
+            {
+              "value": "Shadow Temple Huge Pit",
+              "label": "Shadow Temple Huge Pit"
+            },
+            {
+              "value": "Shadow Temple Invisible Spikes",
+              "label": "Shadow Temple Invisible Spikes"
+            },
+            {
+              "value": "Gerudo Training Ground Slopes",
+              "label": "Gerudo Training Ground Slopes"
+            },
+            {
+              "value": "Gerudo Training Ground Lava",
+              "label": "Gerudo Training Ground Lava"
+            },
+            {
+              "value": "Gerudo Training Ground Water",
+              "label": "Gerudo Training Ground Water"
+            },
+            {
+              "value": "Spirit Temple Child Early Torches",
+              "label": "Spirit Temple Child Early Torches"
+            },
+            {
+              "value": "Spirit Temple Adult Boulders",
+              "label": "Spirit Temple Adult Boulders"
+            },
+            {
+              "value": "Spirit Temple Lobby and Lower Adult",
+              "label": "Spirit Temple Lobby and Lower Adult"
+            },
+            {
+              "value": "Spirit Temple Sun Block",
+              "label": "Spirit Temple Sun Block"
+            },
+            {
+              "value": "Spirit Temple Adult Climb",
+              "label": "Spirit Temple Adult Climb"
+            },
+            {
+              "value": "Ganons Castle Spirit Trial",
+              "label": "Ganon's Castle Spirit Trial"
+            },
+            {
+              "value": "Ganons Castle Light Trial",
+              "label": "Ganon's Castle Light Trial"
+            },
+            {
+              "value": "Ganons Castle Fire Trial",
+              "label": "Ganon's Castle Fire Trial"
+            },
+            {
+              "value": "Ganons Castle Shadow Trial",
+              "label": "Ganon's Castle Shadow Trial"
+            },
+            {
+              "value": "Ganons Castle Water Trial",
+              "label": "Ganon's Castle Water Trial"
+            },
+            {
+              "value": "Ganons Castle Forest Trial",
+              "label": "Ganon's Castle Forest Trial"
+            }
+          ]
+        },
+        {
+          "name": "enhance_map_compass",
+          "type": "list",
+          "label": "Maps and Compasses Give Information",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Gives the Map and Compass extra functionality. Map can be enhanced to tell if a dungeon is vanilla or Master Quest, and to give dungeon locations if Dungeon entrance shuffle is enabled. Compass can be enhanced to reveal which boss is in the corresponding dungeon if Boss entrance shuffle is enabled, or to tell what medallion or stone is within. If compass is enabled, the Temple of Time Altar will no longer provide information on the location of medallions and stones. 'Maps/Compasses: Remove': The dungeon information is not available anywhere in the game. 'Maps/Compasses: Start With': The dungeon information is available immediately from the dungeon menu.",
+          "choices": [
+            {
+              "value": "map_mq",
+              "label": "Map gives MQ info"
+            },
+            {
+              "value": "map_dungeon_location",
+              "label": "Map gives dungeon location"
+            },
+            {
+              "value": "compass_boss_location",
+              "label": "Compass gives boss location"
+            },
+            {
+              "value": "compass_reward",
+              "label": "Compass gives reward info"
+            }
+          ]
+        },
+        {
+          "name": "logic_no_night_tokens_without_suns_song",
+          "type": "bool",
+          "label": "Nighttime Skulltulas Expect Sun's Song",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "GS Tokens that can only be obtained during the night expect you to have Sun's Song to collect them. This prevents needing to wait until night for some locations."
+        },
+        {
+          "name": "start_with_consumables",
+          "type": "bool",
+          "label": "Start with Consumables",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Start the game with maxed out Deku Sticks and Deku Nuts."
+        },
+        {
+          "name": "start_with_rupees",
+          "type": "bool",
+          "label": "Start with Max Rupees",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Start the game with a full wallet. Wallet upgrades will also fill the wallet."
+        },
+        {
+          "name": "no_escape_sequence",
+          "type": "bool",
+          "label": "Skip Tower Escape Sequence",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "The tower escape sequence between Ganondorf and Ganon will be skipped."
+        },
+        {
+          "name": "no_guard_stealth",
+          "type": "bool",
+          "label": "Skip Child Stealth",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "The crawlspace into Hyrule Castle goes straight to Zelda, skipping the guards."
+        },
+        {
+          "name": "no_epona_race",
+          "type": "bool",
+          "label": "Skip Epona Race",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Epona can be summoned with Epona's Song without needing to race Ingo."
+        },
+        {
+          "name": "complete_mask_quest",
+          "type": "bool",
+          "label": "Complete Mask Quest",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Once the Happy Mask Shop is opened, all masks will be available to be borrowed."
+        },
+        {
+          "name": "useful_cutscenes",
+          "type": "bool",
+          "label": "Enable Specific Glitch-Useful Cutscenes",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "The cutscenes of the Poes in Forest Temple and Darunia in Fire Temple will not be skipped. These cutscenes are useful in glitched gameplay only and do not provide any timesave for glitchless playthroughs."
+        },
+        {
+          "name": "scarecrow_behavior",
+          "type": "enum",
+          "label": "Scarecrow Behavior",
+          "default": "vanilla",
+          "cosmetic": false,
+          "tooltip": "\"Fast\" will require setting the same song both as child and adult, but pulling out the Ocarina near a spot at which Pierre can spawn will do so, without needing the song. \"Free\" removes both the need to set the song first and to play the song to summon Pierre.",
+          "choices": [
+            {
+              "value": "vanilla",
+              "label": "Vanilla"
+            },
+            {
+              "value": "fast",
+              "label": "Fast"
+            },
+            {
+              "value": "free",
+              "label": "Free"
+            }
+          ]
+        },
+        {
+          "name": "auto_equip_masks",
+          "type": "bool",
+          "label": "Maintain Mask Equips through Scene Changes",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Keep the currently equipped mask equipped after scene changes. Also persists through savewarps. If equip swap is used to wear a mask as adult and the ability to equip swap masks is lost, travelling through time will unequip the mask as adult."
+        },
+        {
+          "name": "plant_beans",
+          "type": "bool",
+          "label": "Plant Magic Beans",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this plants all 10 magic beans in soft soil causing the bean plants to be available as adult. You can still get beans normally."
+        },
+        {
+          "name": "easier_fire_arrow_entry",
+          "type": "bool",
+          "label": "Easier Fire Arrow Entry",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "It is possible to open the Shadow Temple entrance by lighting the torches with Fire Arrows, but can be difficult to light all 24 torches in time. Enabling this setting allows you to reduce the number of torches that need to be lit to open the entrance, making it easier to perform Fire Arrow Entry. Note that this setting does not affect logic. Whether it's used or not, the trick \"Shadow Temple Entry with Fire Arrows\" must be enabled for it to be in logic."
+        },
+        {
+          "name": "fae_torch_count",
+          "type": "int",
+          "label": "Fire Arrow Entry Torch Count",
+          "default": 3,
+          "cosmetic": false,
+          "tooltip": "The entrance to Shadow Temple will open after the chosen number of torches are lit.",
+          "min": 1,
+          "max": 23,
+          "step": 1
+        },
+        {
+          "name": "ruto_already_f1_jabu",
+          "type": "bool",
+          "label": "Ruto Already at F1",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Ruto in Jabu Jabu's Belly will already be at the top floor. Only applied in the original version of the dungeon, since in Master Quest you don't need to bring Ruto up."
+        },
+        {
+          "name": "chicken_count_random",
+          "type": "bool",
+          "label": "Random Cucco Count",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Anju will give a reward for collecting a random number of Cuccos."
+        },
+        {
+          "name": "chicken_count",
+          "type": "int",
+          "label": "Cucco Count",
+          "default": 7,
+          "cosmetic": false,
+          "tooltip": "Anju will give a reward for turning in the chosen number of Cuccos.",
+          "min": 0,
+          "max": 7,
+          "step": 1
+        },
+        {
+          "name": "big_poe_count_random",
+          "type": "bool",
+          "label": "Random Big Poe Target Count",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "The Poe buyer will give a reward for turning in a random number of Big Poes."
+        },
+        {
+          "name": "big_poe_count",
+          "type": "int",
+          "label": "Big Poe Target Count",
+          "default": 10,
+          "cosmetic": false,
+          "tooltip": "The Poe buyer will give a reward for turning in the chosen number of Big Poes.",
+          "min": 1,
+          "max": 10,
+          "step": 1
+        },
+        {
+          "name": "clearer_hints",
+          "type": "bool",
+          "label": "Clearer Hints",
+          "default": true,
+          "cosmetic": false,
+          "tooltip": "The hints provided by Gossip Stones will be very direct if this option is enabled."
+        },
+        {
+          "name": "hints",
+          "type": "enum",
+          "label": "Gossip Stones",
+          "default": "always",
+          "cosmetic": false,
+          "tooltip": "Gossip Stones can be made to give hints about where items can be found. Different settings can be chosen to decide which item is needed to speak to Gossip Stones. Choosing to stick with the Mask of Truth will make the hints very difficult to obtain. Hints for 'on the way of the hero' are locations that contain items that are required to beat the game.",
+          "choices": [
+            {
+              "value": "none",
+              "label": "No Hints"
+            },
+            {
+              "value": "mask",
+              "label": "Hints; Need Mask of Truth"
+            },
+            {
+              "value": "agony",
+              "label": "Hints; Need Stone of Agony"
+            },
+            {
+              "value": "always",
+              "label": "Hints; Need Nothing"
+            }
+          ]
+        },
+        {
+          "name": "misc_hints",
+          "type": "list",
+          "label": "Misc. Hints",
+          "default": [
+            "altar",
+            "ganondorf",
+            "warp_songs_and_owls"
+          ],
+          "cosmetic": false,
+          "tooltip": "This setting adds some hints at locations other than Gossip Stones: Reading the Temple of Time altar as child will tell you the locations of the Spiritual Stones (unless Maps and Compasses Give Information is enabled). Reading the Temple of Time altar as adult will tell you the locations of the Medallions (unless Maps and Compasses Give Information is enabled), as well as the conditions for building the Rainbow Bridge and getting the Boss Key for Ganon's Castle. Reading the diary of Dampé the gravekeeper as adult will tell you the location of one of the Hookshots. Talking to Ganondorf in his boss room will tell you the location of the Light Arrows. If this option is enabled and Ganondorf is reachable without Light Arrows, Gossip Stones will never hint the Light Arrows. Playing a warp song will tell you where it leads. (If warp song destinations are vanilla, this is always enabled.) The two Owls at Lake Hylia and Death Mountain that move you around will tell you where they go. Talking to a cursed House of Skulltula resident will tell you the reward they will give you for removing their curse. Placing yourself on the log at Zora River where you play the songs for the frogs will tell you what the reward is for playing all six non-warp songs. If shuffled, right side items in the mask shop will be visible but not obtainable before completing the child trade quest. Mask of Truth's shelf slot is always visible. If Shuffle Expensive Merchants is enabled, the three characters that sell a new item will tell what the reward is for buying their item. If Shuffle Magic Beans is enabled, the Magic bean salesman will tell what the reward is for buying the 60 Rupees item. The Poe collector will tell the reward for selling him Big Poes. The sign in Deku Theater will tell the reward for showing the Skull Mask and/or the Mask of Truth.",
+          "choices": [
+            {
+              "value": "altar",
+              "label": "Temple of Time Altar"
+            },
+            {
+              "value": "dampe_diary",
+              "label": "Dampé's Diary (Hookshot)"
+            },
+            {
+              "value": "ganondorf",
+              "label": "Ganondorf (Light Arrows)"
+            },
+            {
+              "value": "warp_songs_and_owls",
+              "label": "Warp Songs and Owls"
+            },
+            {
+              "value": "10_skulltulas",
+              "label": "House of Skulltula: 10"
+            },
+            {
+              "value": "20_skulltulas",
+              "label": "House of Skulltula: 20"
+            },
+            {
+              "value": "30_skulltulas",
+              "label": "House of Skulltula: 30"
+            },
+            {
+              "value": "40_skulltulas",
+              "label": "House of Skulltula: 40"
+            },
+            {
+              "value": "50_skulltulas",
+              "label": "House of Skulltula: 50"
+            },
+            {
+              "value": "100_skulltulas",
+              "label": "House of Skulltula: 100"
+            },
+            {
+              "value": "frogs2",
+              "label": "Frogs Ocarina Game"
+            },
+            {
+              "value": "mask_shop",
+              "label": "Shuffled Mask Shop"
+            },
+            {
+              "value": "unique_merchants",
+              "label": "Unique Merchants"
+            },
+            {
+              "value": "big_poes",
+              "label": "Market Big Poes"
+            },
+            {
+              "value": "skull_mask",
+              "label": "Deku Theater Skull Mask"
+            },
+            {
+              "value": "mask_of_truth",
+              "label": "Deku Theater Mask of Truth"
+            }
+          ]
+        },
+        {
+          "name": "correct_chest_appearances",
+          "type": "enum",
+          "label": "Chest Appearance Matches Contents",
+          "default": "off",
+          "cosmetic": false,
+          "tooltip": "If \"Texture\" is enabled, chest texture will reflect its contents regardless of size. Fancy chests will contain keys, Gilded chests will contain major items, shuffled tokens will be in Webbed chests, and Wooden chests will contain the rest. This allows skipping chests if they are wooden. However, skipping wooden chests will mean having low health, ammo, and rupees, so doing so is a risk. \"Size and Texture\" will change chests with major items and boss keys into big chests, and everything else into small chests. \"Classic\" is the behavior of CSMC in previous versions of the randomizer. This will change chests with major items and boss keys into big chests. Boss keys will remain in their fancy chest, while small key will be in a smaller version of the fancy chest.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "textures",
+              "label": "Texture"
+            },
+            {
+              "value": "both",
+              "label": "Both Size and Texture"
+            },
+            {
+              "value": "classic",
+              "label": "Classic"
+            }
+          ]
+        },
+        {
+          "name": "chest_textures_specific",
+          "type": "list",
+          "label": "Chest Textures",
+          "default": [
+            "major",
+            "bosskeys",
+            "keys",
+            "tokens",
+            "hearts"
+          ],
+          "cosmetic": false,
+          "tooltip": "Select specific chest textures. Any unchecked option will make all items in the category appear in brown chests.",
+          "choices": [
+            {
+              "value": "major",
+              "label": "Major items"
+            },
+            {
+              "value": "bosskeys",
+              "label": "Boss keys"
+            },
+            {
+              "value": "keys",
+              "label": "Small keys"
+            },
+            {
+              "value": "tokens",
+              "label": "Gold Skulltula tokens"
+            },
+            {
+              "value": "hearts",
+              "label": "Hearts"
+            }
+          ]
+        },
+        {
+          "name": "soa_unlocks_chest_texture",
+          "type": "bool",
+          "label": "Stone of Agony Unlocks Chest Textures",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Textures for chests will only be correct when Stone of Agony is found."
+        },
+        {
+          "name": "minor_items_as_major_chest",
+          "type": "list",
+          "label": "Minor Items in Big/Gold chests",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Chests with Hylian or Deku Shields, Deku Stick or Nut Capacity, or Bombchus will appear in Big and/or Gold chests, depending on the Chest Appearance Matches Contents setting. Bombchus are always in big chests if Add Bombchu Bag and Drops is on.",
+          "choices": [
+            {
+              "value": "bombchus",
+              "label": "Bombchus"
+            },
+            {
+              "value": "shields",
+              "label": "Deku & Hylian Shields"
+            },
+            {
+              "value": "capacity",
+              "label": "Deku Stick & Nut Capacity"
+            }
+          ]
+        },
+        {
+          "name": "invisible_chests",
+          "type": "bool",
+          "label": "Invisible Chests",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Chests will only be visible with the Lens of Truth. Lens is not logically required for normally visible chests."
+        },
+        {
+          "name": "correct_potcrate_appearances",
+          "type": "enum",
+          "label": "Pot, Crate, & Beehive Appearance Matches Contents",
+          "default": "textures_unchecked",
+          "cosmetic": false,
+          "tooltip": "If enabled, pot/crate textures, and beehive wiggling will reflect its contents. Off - Pots, crates, and beehives will appear as vanilla. Texture (Match Content) - Pot and crate textures will reflect the contents. Golden Pots/crates will contain major items. Pots/crates with keys on them will contain small keys. Pots/crates containing boss keys will use a variation of the boss key chest texture. Pots/crates with a spider web on them contain Gold Skulltula tokens. All other items will use the original texture. The texture will revert to the original texture once the item is collected. Beehives containing non-junk items will wiggle until collected. Texture (Unchecked) - All pots/crates containing shuffled items will appear with a golden texture. The texture will revert to the original texture once the item is collected. Beehives will wiggle until their item is collected.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "Off"
+            },
+            {
+              "value": "textures_content",
+              "label": "Texture (Match Content)"
+            },
+            {
+              "value": "textures_unchecked",
+              "label": "Texture (Unchecked)"
+            }
+          ]
+        },
+        {
+          "name": "potcrate_textures_specific",
+          "type": "list",
+          "label": "Pot and Crate Textures",
+          "default": [
+            "major",
+            "bosskeys",
+            "keys",
+            "tokens",
+            "hearts"
+          ],
+          "cosmetic": false,
+          "tooltip": "Select specific pots and crates textures. Any unchecked option will make all items in the category appear in regular pots/crates.",
+          "choices": [
+            {
+              "value": "major",
+              "label": "Major items"
+            },
+            {
+              "value": "bosskeys",
+              "label": "Boss keys"
+            },
+            {
+              "value": "keys",
+              "label": "Small keys"
+            },
+            {
+              "value": "tokens",
+              "label": "Gold Skulltula tokens"
+            },
+            {
+              "value": "hearts",
+              "label": "Hearts"
+            }
+          ]
+        },
+        {
+          "name": "soa_unlocks_potcrate_texture",
+          "type": "bool",
+          "label": "Stone of Agony Unlocks Pot and Crate Textures",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Textures for pots and crates will only be correct when Stone of Agony is found."
+        },
+        {
+          "name": "ocarina_songs",
+          "type": "list",
+          "label": "Randomize Ocarina Melodies",
+          "default": [],
+          "cosmetic": false,
+          "tooltip": "Will need to memorize a new set of songs. Can be silly, but difficult. All songs are generally sensible, but warp songs are typically more difficult than top row songs. \"Top Row Songs\": Randomizes Zelda's Lullaby, Epona's Song, Saria's Song, Sun's Song, Song of Time, and Song of Storms. \"Warp Songs\": Randomizes Minuet of Forest, Bolero of Fire, Serenade of Water, Requiem of Spirit, Nocturne of Shadow, and Prelude of Light. \"Frogs Ocarina Game\": Randomizes the 14 notes of the final song of the Fabulous Five Froggish Tenors.",
+          "choices": [
+            {
+              "value": "frog",
+              "label": "Top Row Songs"
+            },
+            {
+              "value": "warp",
+              "label": "Warp Songs"
+            },
+            {
+              "value": "frogs2",
+              "label": "Frogs Ocarina Game"
+            }
+          ]
+        },
+        {
+          "name": "damage_multiplier",
+          "type": "enum",
+          "label": "Damage Multiplier",
+          "default": "normal",
+          "cosmetic": false,
+          "tooltip": "Changes the amount of damage taken. 'OHKO': Link dies in one hit.",
+          "choices": [
+            {
+              "value": "half",
+              "label": "Half"
+            },
+            {
+              "value": "normal",
+              "label": "Normal"
+            },
+            {
+              "value": "double",
+              "label": "Double"
+            },
+            {
+              "value": "quadruple",
+              "label": "Quadruple"
+            },
+            {
+              "value": "ohko",
+              "label": "OHKO"
+            }
+          ]
+        },
+        {
+          "name": "deadly_bonks",
+          "type": "enum",
+          "label": "Bonks Do Damage",
+          "default": "none",
+          "cosmetic": false,
+          "tooltip": "When rolling, hitting a wall or object will hurt Link. Damage is unaffected by the damage multiplier setting.",
+          "choices": [
+            {
+              "value": "none",
+              "label": "No Damage"
+            },
+            {
+              "value": "half",
+              "label": "Quarter Heart"
+            },
+            {
+              "value": "normal",
+              "label": "Half Heart"
+            },
+            {
+              "value": "double",
+              "label": "Whole Heart"
+            },
+            {
+              "value": "quadruple",
+              "label": "Two Hearts"
+            },
+            {
+              "value": "ohko",
+              "label": "One Bonk KO"
+            }
+          ]
+        },
+        {
+          "name": "blue_fire_arrows",
+          "type": "bool",
+          "label": "Blue Fire Arrows",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Ice arrows gain the power of blue fire. They can be used to melt red ice and break the mud walls in Dodongo's Cavern."
+        },
+        {
+          "name": "fix_broken_drops",
+          "type": "bool",
+          "label": "Fix Broken Drops",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Enabling this fixes drops that are broken in the vanilla game. There is a deku shield drop from a pot in the Spirit Temple child side Anubis room that does not appear in the vanilla game, and logic might require you to get a deku shield this way. There is a magic jar on top of the Gerudo Training Ground eye statue that does not always refill your magic in the vanilla game."
+        },
+        {
+          "name": "tcg_requires_lens",
+          "type": "bool",
+          "label": "Require Lens of Truth for Treasure Chest Game",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "Force the player to always lose the treasure chest game in the first room unless they have the Lens of Truth and a Magic Meter. Does not function if Treasure Chest Game small keys are shuffled."
+        },
+        {
+          "name": "no_collectible_hearts",
+          "type": "bool",
+          "label": "Hero Mode",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "No recovery hearts will drop from enemies or objects. (You might still find some freestanding or in chests depending on other settings.)"
+        },
+        {
+          "name": "gold_skulls_ignore_daytime",
+          "type": "bool",
+          "label": "Nighttime Skulltulas in Daytime",
+          "default": false,
+          "cosmetic": false,
+          "tooltip": "GS Tokens that can only be obtained during the night do not disappear when it is day time."
+        },
+        {
+          "name": "item_pool_value",
+          "type": "enum",
+          "label": "Item Pool",
+          "default": "balanced",
+          "cosmetic": false,
+          "tooltip": "'Ludicrous': Every item in the game is a major item. Incompatible with one major item per dungeon. 'Plentiful': One additional copy of each major item is added. 'Balanced': Original item pool. 'Scarce': An extra copy of major item upgrades that are not required to open location checks is removed (e.g. Bow upgrade, Magic upgrade). Heart Containers are removed as well. Number of Bombchu items is reduced. 'Minimal': All major item upgrades not used to open location checks are removed. All health upgrades are removed. Only one Bombchu item is available.",
+          "choices": [
+            {
+              "value": "ludicrous",
+              "label": "Ludicrous"
+            },
+            {
+              "value": "plentiful",
+              "label": "Plentiful"
+            },
+            {
+              "value": "balanced",
+              "label": "Balanced"
+            },
+            {
+              "value": "scarce",
+              "label": "Scarce"
+            },
+            {
+              "value": "minimal",
+              "label": "Minimal"
+            }
+          ]
+        },
+        {
+          "name": "junk_ice_traps",
+          "type": "enum",
+          "label": "Ice Traps",
+          "default": "normal",
+          "cosmetic": false,
+          "tooltip": "'Off': All Ice Traps are removed. 'Normal': Only Ice Traps from the base item pool are placed. 'Extra Ice Traps': Chance to add extra Ice Traps when junk items are added to the itempool. 'Ice Trap Mayhem': All added junk items will be Ice Traps. 'Ice Trap Onslaught': All junk items will be replaced by Ice Traps, even those in the base pool. 'Custom (count)': Allows specifying a specific number of \"Junk items\" to be converted to Ice Traps in the pool. 'Custom (%)': Allows specifiying a percentage of \"Junk\" items to be converted to Ice Traps in the pool.",
+          "choices": [
+            {
+              "value": "off",
+              "label": "No Ice Traps"
+            },
+            {
+              "value": "normal",
+              "label": "Normal Ice Traps"
+            },
+            {
+              "value": "on",
+              "label": "Extra Ice Traps"
+            },
+            {
+              "value": "mayhem",
+              "label": "Ice Trap Mayhem"
+            },
+            {
+              "value": "onslaught",
+              "label": "Ice Trap Onslaught"
+            },
+            {
+              "value": "custom_count",
+              "label": "Custom (count)"
+            },
+            {
+              "value": "custom_percent",
+              "label": "Custom (%)"
+            }
+          ]
+        },
+        {
+          "name": "custom_ice_trap_percent",
+          "type": "int",
+          "label": "Custom Ice Trap Percent",
+          "default": 50,
+          "cosmetic": false,
+          "tooltip": "Percentage of junk items that will be replaced with Ice Traps when using 'Custom' Ice Traps setting.",
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        {
+          "name": "custom_ice_trap_count",
+          "type": "int",
+          "label": "Custom Ice Trap Count",
+          "default": 100,
+          "cosmetic": false,
+          "tooltip": "Number of junk items that will be replaced with Ice Traps when using 'Custom' Ice Traps setting.",
+          "min": 0,
+          "max": 2000,
+          "step": 1
+        },
+        {
+          "name": "ice_trap_appearance",
+          "type": "enum",
+          "label": "Ice Trap Appearance",
+          "default": "major_only",
+          "cosmetic": false,
+          "tooltip": "Changes the categories of items Ice Traps may appear as, both when freestanding and when in chests with Chest Size Matches Contents enabled. 'Major Items Only': Ice Traps appear as Major Items (and in large chests if CSMC enabled). 'Junk Items Only': Ice Traps appear as Junk Items (and in small chests if CSMC enabled). 'Anything': Ice Traps may appear as anything.",
+          "choices": [
+            {
+              "value": "major_only",
+              "label": "Major Items Only"
+            },
+            {
+              "value": "junk_only",
+              "label": "Junk Items Only"
+            },
+            {
+              "value": "anything",
+              "label": "Anything"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

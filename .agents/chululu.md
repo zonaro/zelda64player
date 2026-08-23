@@ -12,6 +12,17 @@ Bruce or Lobby provides screenshots/recordings when:
 
 ## Analysis Checklist per Screen
 
+### Material 3 Expressive Compliance (All Screens)
+- [ ] **Theme parent**: `Theme.Material3.Expressive.DayNight` (or `NoActionBar`) applied app-wide
+- [ ] **Expressive shapes**: Cards, sheets, buttons use `ShapeAppearance`/`MaterialShapes` (cookie, scallop, extra-large corners) — no hand-rolled drawables for standard components
+- [ ] **Typography hierarchy**: Emphasized typescale used (`TextAppearance.Material3.TitleLarge.Emphasized`, `BodyLarge.Emphasized`, etc.) — clear visual hierarchy
+- [ ] **Motion**: Spring-based transitions (expressive `MotionSpec`) on primary navigation/dialogs — no linear easing for main flows
+- [ ] **Action emphasis**: Clear primary (filled) / secondary (tonal) / tertiary (outlined) button distinction
+- [ ] **Component sizing**: Generous touch targets (≥48×48 dp), expressive defaults respected
+- [ ] **Color**: Expressive palette via theme; CSS variables (`color_primary`, `color_surface`) still functional for customization
+- [ ] **No legacy styles**: No `Widget.MaterialComponents.*` or plain `AppCompat` widgets in new code
+- [ ] **Exemption respected**: Gamepad overlay + in-game menu card style unchanged (frozen per Rule 14)
+
 ### LibraryActivity (Hack Grid)
 - [ ] Grid spans: 2 cols portrait, 3+ cols landscape/TV (per `library_span_count` + `values-land`)
 - [ ] Cover images: correct aspect (16:9), no stretching, placeholder shown if missing

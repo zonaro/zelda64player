@@ -5,10 +5,16 @@ import android.hardware.input.InputManager
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.widget.RelativeLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import br.com.redclaw.zelda64player.databinding.ActivityGameBinding
+import br.com.redclaw.zelda64player.ocarina.ui.OcarinaHudView
+import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
+import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.viewmodels.GameActivityViewModel
+import br.com.redclaw.zelda64player.views.InstalledLibrary
+import java.io.File
 
 class GameActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGameBinding
@@ -27,10 +33,39 @@ class GameActivity : AppCompatActivity() {
         registerInputListener()
         viewModel.setConfigOrientation(this)
         viewModel.updateGamePadVisibility(this, binding.gamepadOverlay)
-        viewModel.prepareMenu(this)
 
         val hackId = intent.getStringExtra("hack_id")
             ?: throw IllegalStateException("No hack_id provided to launch")
+
+        // Bump recency and re-rank dynamic shortcuts so the most recently played
+        // game surfaces first in the launcher's long-press menu.
+        val history = GamePlayHistoryStore(File(filesDir, "game_play_history.json"))
+        GameShortcutsManager(this, history).apply {
+            markPlayed(hackId)
+            sync(InstalledLibrary.entries(this@GameActivity))
+        }
+
+        // Detect Ocarina support BEFORE building the menu so the Auto-Ocarina
+        // item can be shown conditionally (hidden for unsupported base ROMs).
+        viewModel.prepareOcarinaDetection(hackId)
+        viewModel.prepareMenu(this)
+
+        // Build and attach the Auto-Ocarina HUD (hidden until a song is played).
+        // Added last so it sits above the gamepad overlay in z-order; it is
+        // non-interactive so touches fall through to the controls beneath.
+        val hud = OcarinaHudView(this)
+        val hudParams = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.WRAP_CONTENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+            addRule(RelativeLayout.CENTER_HORIZONTAL)
+            val margin = (16 * resources.displayMetrics.density).toInt()
+            bottomMargin = margin
+        }
+        binding.root.addView(hud, hudParams)
+        viewModel.attachOcarinaHud(hud)
+
         viewModel.launchHack(
             this,
             binding.retroviewContainer,
@@ -45,12 +80,15 @@ class GameActivity : AppCompatActivity() {
         inputManager.registerInputDeviceListener(object : InputManager.InputDeviceListener {
             override fun onInputDeviceAdded(deviceId: Int) {
                 viewModel.updateGamePadVisibility(this@GameActivity, binding.gamepadOverlay)
+                viewModel.refreshMenuBadges()
             }
             override fun onInputDeviceRemoved(deviceId: Int) {
                 viewModel.updateGamePadVisibility(this@GameActivity, binding.gamepadOverlay)
+                viewModel.refreshMenuBadges()
             }
             override fun onInputDeviceChanged(deviceId: Int) {
                 viewModel.updateGamePadVisibility(this@GameActivity, binding.gamepadOverlay)
+                viewModel.refreshMenuBadges()
             }
         }, null)
     }
@@ -72,10 +110,14 @@ class GameActivity : AppCompatActivity() {
            dispatch (it's still a registered observer) as this instance goes
            away, and onCreate() builds a fresh one, exactly like a normal
            (working) cold launch. Do NOT call retroView.view.onDestroy() here
-           directly -- it races with the GL render thread and can crash. */
+           directly -- it races with the GL render thread and can crash.
+
+           The recreate is delegated to GameActivityViewModel.handleBackgroundReturn,
+           which only recreates once a frame has rendered (coreReady). If the core is
+           still loading it defers the recreate until the first frame arrives, avoiding
+           destruction of a mid-load core (SIGSEGV in retro_deinit). */
         if (hasStarted) {
-            viewModel.preserveState()
-            recreate()
+            viewModel.handleBackgroundReturn(this)
             return
         }
 
@@ -83,6 +125,13 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        /* Cancel any Auto-Ocarina playback (releases the held button) before the
+           native core is torn down by super.onDestroy(). */
+        viewModel.cancelOcarina()
+        /* Stop the RetroAchievements session before the core dies: the RA
+           client aliases the emulated memory region, which becomes invalid
+           once super.onDestroy() releases the native core. */
+        viewModel.stopRaSession()
         /* super.onDestroy() dispatches ON_DESTROY to the still-registered
            RetroView observer, releasing its native core (~90MB+). Cleaning up
            the observer beforehand (as this used to) skips that dispatch
@@ -95,6 +144,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onPause() {
         viewModel.preserveState()
+        viewModel.cancelOcarina()
         super.onPause()
     }
 

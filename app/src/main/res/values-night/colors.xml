@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material 3 Expressive design tokens (night) -->
+    <color name="color_background">#141218</color>
+    <color name="color_surface">#141218</color>
+    <color name="color_surface_container">#211F26</color>
+    <color name="color_surface_container_high">#2B2930</color>
+    <color name="color_surface_variant">#49454F</color>
+    <color name="color_primary">#D0BCFF</color>
+    <color name="color_on_primary">#381E72</color>
+    <color name="color_primary_container">#4F378B</color>
+    <color name="color_on_primary_container">#EADDFF</color>
+    <color name="color_on_surface">#E6E0E9</color>
+    <color name="color_on_surface_variant">#CAC4D0</color>
+    <color name="color_secondary">#CCC2DC</color>
+    <color name="color_on_secondary">#332D41</color>
+    <color name="color_error">#F2B8B5</color>
+    <color name="color_on_error">#601410</color>
+
+    <!-- Pill input background: surfaceVariant at ~50% alpha -->
+    <color name="color_input_background">#8049454F</color>
+
+    <!-- Neutral cover backdrop (blends with the card surface) -->
+    <color name="color_cover_background">#211F26</color>
+</resources>

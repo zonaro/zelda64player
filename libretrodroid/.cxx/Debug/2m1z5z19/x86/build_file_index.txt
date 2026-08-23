@@ -1,0 +1,2 @@
+/mnt/GIT/zelda64player/libretrodroid/src/main/cpp/CMakeLists.txt
+/mnt/GIT/zelda64player/libretrodroid/src/main/cpp/oboe/CMakeLists.txt

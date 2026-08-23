@@ -1,6 +1,8 @@
 package br.com.redclaw.zelda64player.data.local
 
 import android.content.Context
+import br.com.redclaw.zelda64player.randomizer.repository.RandomizedSeedRepository
+import br.com.redclaw.zelda64player.repositories.Storage
 import java.io.File
 
 /**
@@ -34,5 +36,20 @@ object AppRepositories {
     fun patchRepository(context: Context): PatchRepository {
         val external = context.getExternalFilesDir(null) ?: context.filesDir
         return PatchRepository(File(external, "patches"))
+    }
+
+    /**
+     * Persistent store for generated OoTRandomizer randomizer seeds. The ROM
+     * directory is the app's durable external-files dir (same as
+     * [Storage.storagePath]) so each seed's patched ROM lands at `rom_<id>` and
+     * the normal [br.com.redclaw.zelda64player.views.GameActivity] launch path
+     * resolves it via [Storage.rom]. The index lives under `filesDir/randomizer`.
+     */
+    fun randomizedSeedRepository(context: Context): RandomizedSeedRepository {
+        val storage = Storage.getInstance(context)
+        return RandomizedSeedRepository(
+            romsDir = File(storage.storagePath),
+            indexFile = File(context.filesDir, "randomizer/seeds.json")
+        )
     }
 }

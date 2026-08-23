@@ -23,6 +23,15 @@ Generates all **raster images (PNG/JPG)** and **SVG icons** needed by the app. D
 | `ic_category_bugfix.svg` | Bugfix-only patches | 24×24 dp |
 | `ic_category_randomizer.svg` | Randomizer hacks (future) | 24×24 dp |
 
+### RetroAchievements Icons (SVG → PNG for UI)
+| Icon | Use Case | Specs |
+|------|----------|-------|
+| `ic_ra_trophy.svg` | Library header button (Achievements screen entry) | 24×24 dp, monochrome, tintable |
+| `ic_ra_trophy_filled.svg` | Selected state / badge | 24×24 dp, filled |
+| `ic_ra_leaderboard.svg` | In-game menu "Leaderboards" item | 24×24 dp, monochrome, tintable |
+| `ic_ra_badge_placeholder.svg` | Fallback when badge image fails to load | 48×48 dp, monochrome |
+| `ic_ra_mastery.svg` | In-game mastery flash overlay | 96×96 dp, full color (gold) |
+
 ### Cover Placeholders (PNG)
 For hacks without `coverImageUrl` in catalog:
 - **Template**: 16:9 aspect (320×180 px base), stylized frame with hack `id` text, category icon, "Cover Art Missing" subtitle
@@ -30,7 +39,7 @@ For hacks without `coverImageUrl` in catalog:
 - **Engine**: Level 1 (code-based) — fast, consistent, text-crisp
 
 ### UI Illustrations (Optional)
-- Empty state illustrations: "No ROMs imported", "No hacks installed", "Store empty/offline"
+- Empty state illustrations: "No ROMs imported", "No hacks installed", "Store empty/offline", "No achievements — install compatible hacks"
 - Style: Minimal, Zelda-themed (rupee, heart container, triforce motifs), consistent with app color scheme
 
 ## Technical Requirements
@@ -38,6 +47,7 @@ For hacks without `coverImageUrl` in catalog:
 - **PNG exports**: 3 densities (mdpi/hdpi/xhdpi/xxhdpi/xxxhdpi) via script or Android Studio Vector Asset
 - **Color palette**: Use CSS variables from `plano.md` / `config.xml` → `--color-primary`, `--color-surface`, `--color-on-surface`
 - **Naming**: `ic_<name>.svg` / `ic_<name>.xml` (VectorDrawable), `cover_<hackId>.png`
+- **M3 Expressive harmony**: Generated icons/art should align with expressive shape language — rounded, bold, simple geometry; prefer expressive corner radii (extra-large/cookie/scallop where appropriate) over sharp corners; avoid overly intricate details that conflict with generous component sizing
 
 ## Coordination
 - **Requests from**: Bruce (implementation needs), Wally (README screenshots)

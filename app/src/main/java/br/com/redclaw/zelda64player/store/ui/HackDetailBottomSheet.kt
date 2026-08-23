@@ -8,6 +8,7 @@ import android.widget.Toast
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.databinding.FragmentHackDetailBinding
+import br.com.redclaw.zelda64player.store.InstallPhase
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -130,16 +131,25 @@ class HackDetailBottomSheet : BottomSheetDialogFragment() {
             if (state.hackId != hack.id) return@observe
             when (state) {
                 is StoreViewModel.InstallUiState.Progress -> {
-                    val percent = if (state.total > 0) {
-                        (state.downloaded * 100 / state.total).toInt()
-                    } else 0
                     binding.detailProgress.visibility = View.VISIBLE
-                    binding.detailProgress.progress = percent
-                    binding.detailProgressText.visibility = View.VISIBLE
-                    binding.detailProgressText.text =
-                        getString(R.string.detail_installing, percent)
                     binding.detailError.visibility = View.GONE
                     binding.detailDownload.isEnabled = false
+                    if (state.phase == InstallPhase.PATCHING) {
+                        // No byte progress while applying the patch; show an
+                        // indeterminate bar with a dedicated message.
+                        binding.detailProgress.isIndeterminate = true
+                        binding.detailProgressText.visibility = View.VISIBLE
+                        binding.detailProgressText.text = getString(R.string.detail_patching)
+                    } else {
+                        binding.detailProgress.isIndeterminate = false
+                        val percent = if (state.total > 0) {
+                            (state.downloaded * 100 / state.total).toInt()
+                        } else 0
+                        binding.detailProgress.progress = percent
+                        binding.detailProgressText.visibility = View.VISIBLE
+                        binding.detailProgressText.text =
+                            getString(R.string.detail_installing, percent)
+                    }
                 }
                 is StoreViewModel.InstallUiState.Success -> {
                     binding.detailProgress.visibility = View.GONE

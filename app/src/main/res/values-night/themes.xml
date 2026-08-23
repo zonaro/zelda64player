@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Full night theme. Style resources are NOT merged across config
+         qualifiers, so every token must be redeclared here; the @color/*
+         references resolve to the night variants automatically. -->
+    <style name="Theme.Zelda64Player" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Window -->
+        <item name="android:windowBackground">@color/color_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
+        <!-- Material 3 color tokens -->
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorOnPrimary">@color/color_on_primary</item>
+        <item name="colorSecondary">@color/color_secondary</item>
+        <item name="colorOnSecondary">@color/color_on_secondary</item>
+        <item name="colorError">@color/color_error</item>
+        <item name="colorOnError">@color/color_on_error</item>
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="colorSurface">@color/color_surface</item>
+        <item name="colorOnSurface">@color/color_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/color_on_surface_variant</item>
+        <item name="colorSurfaceContainer">@color/color_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/color_surface_container_high</item>
+        <item name="colorSurfaceVariant">@color/color_surface_variant</item>
+
+        <!-- Pill buttons everywhere (fully rounded) -->
+        <item name="materialButtonStyle">@style/Widget.Zelda.PillButton</item>
+
+        <!-- Bottom-sheet dialog (hack detail) -->
+        <item name="bottomSheetDialogTheme">@style/Theme.Zelda64Player.BottomSheet</item>
+    </style>
+</resources>

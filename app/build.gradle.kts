@@ -22,6 +22,11 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        // RetroAchievements native runtime: same ABI set as the prebuilt cores.
+        ndk {
+            abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+        }
     }
 
     buildTypes {
@@ -48,47 +53,126 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    // RetroAchievements runtime: rcheevos (vendored, MIT) + app JNI bridge,
+    // compiled for the same ABI set as the prebuilt libretro cores.
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
+
+    // Keep .so cores as real files inside the APK so LibretroDroid can dlopen
+    // them from the native library directory. Without this, AGP extracts the
+    // libraries to a location the dynamic linker cannot execute from on modern
+    // Android, and the core fails to load ("Core library missing from
+    // nativeLibraryDir").
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
-// Ported from Ludere: downloads the LibRetro cores (mupen64plus_next GLES3/GLES2
-// and parallel_n64) for every ABI from the LibRetro buildbot into jniLibs. If a
-// specific core+ABI combo is unavailable (404), it is skipped gracefully, exactly
-// like the original implementation.
+// Ported from Ludere: downloads the LibRetro cores (mupen64plus_next GLES3 and
+// parallel_n64) for every ABI into jniLibs. mupen64plus_next is fetched as a zip
+// from the LibRetro buildbot. parallel_n64 is fetched from our self-built rolling
+// release (updated dynarec binaries) first, and falls back to the buildbot
+// nightly zip if that is unavailable. If a specific core+ABI combo is unavailable
+// (404 on every candidate), it is skipped gracefully, exactly like the original
+// implementation. Cores already present in jniLibs are not re-downloaded.
+
+// A download candidate for a core. `url` may contain the placeholders {abi} and
+// {core}, which are substituted at runtime. `isZip` candidates are downloaded as
+// an archive and extracted (renamed to the output .so); non-zip candidates are
+// downloaded directly to the output .so.
+data class CoreCandidate(val url: String, val isZip: Boolean, val label: String)
+data class CoreTarget(val outputName: String, val candidates: List<CoreCandidate>)
+
 val prepareCore by tasks.registering {
     doLast {
-        val cores = mapOf(
-            "mupen64plus_next_gles3" to "libcore_mupen_gles3.so",
-            "mupen64plus_next_gles2" to "libcore_mupen_gles2.so",
-            "parallel_n64" to "libcore_parallel.so"
-        )
         val abis = listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+
+        // coreName -> target (output .so name + ordered candidate URL list).
+        // The first candidate that downloads successfully wins; failures fall
+        // through to the next candidate.
+        val cores = mapOf(
+            "mupen64plus_next_gles3" to CoreTarget(
+                outputName = "libcore_mupen_gles3.so",
+                candidates = listOf(
+                    CoreCandidate(
+                        url = "https://buildbot.libretro.com/nightly/android/latest/{abi}/{core}_libretro_android.so.zip",
+                        isZip = true,
+                        label = "buildbot nightly zip"
+                    )
+                )
+            ),
+            "parallel_n64" to CoreTarget(
+                outputName = "libcore_parallel.so",
+                candidates = listOf(
+                    CoreCandidate(
+                        url = "https://github.com/zonaro/zelda64player/releases/download/parallel-n64-latest/parallel_n64_libretro_android_{abi}.so",
+                        isZip = false,
+                        label = "self-built rolling release"
+                    ),
+                    CoreCandidate(
+                        url = "https://buildbot.libretro.com/nightly/android/latest/{abi}/{core}_libretro_android.so.zip",
+                        isZip = true,
+                        label = "buildbot nightly zip"
+                    )
+                )
+            )
+        )
 
         for (abi in abis) {
             val jniAbiFolder = file("${rootProject.projectDir}/app/src/main/jniLibs/$abi")
-            if (jniAbiFolder.exists() && jniAbiFolder.list()?.isNotEmpty() == true)
-                continue
             jniAbiFolder.mkdirs()
 
-            for ((coreName, outputName) in cores) {
-                val zipFile = file("$jniAbiFolder/${coreName}_libretro_android.so.zip")
-                val url =
-                    "https://buildbot.libretro.com/nightly/android/latest/$abi/${coreName}_libretro_android.so.zip"
-                try {
-                    project.download.run(object : Action<DownloadSpec> {
-                        override fun execute(spec: DownloadSpec) {
-                            spec.src(url)
-                            spec.dest(zipFile)
-                            spec.overwrite(true)
+            for ((coreName, target) in cores) {
+                val outputFile = file("$jniAbiFolder/${target.outputName}")
+                if (outputFile.exists()) {
+                    println("Skipping $coreName for $abi (already present)")
+                    continue
+                }
+
+                for (candidate in target.candidates) {
+                    val url = candidate.url
+                        .replace("{abi}", abi)
+                        .replace("{core}", coreName)
+                    val zipFile = file("$jniAbiFolder/${coreName}_libretro_android.so.zip")
+                    try {
+                        if (candidate.isZip) {
+                            project.download.run(object : Action<DownloadSpec> {
+                                override fun execute(spec: DownloadSpec) {
+                                    spec.src(url)
+                                    spec.dest(zipFile)
+                                    spec.overwrite(true)
+                                }
+                            })
+                            project.copy {
+                                from(project.zipTree(zipFile))
+                                into(jniAbiFolder)
+                                rename("${coreName}_libretro_android.so", target.outputName)
+                            }
+                            project.delete(zipFile)
+                        } else {
+                            project.download.run(object : Action<DownloadSpec> {
+                                override fun execute(spec: DownloadSpec) {
+                                    spec.src(url)
+                                    spec.dest(outputFile)
+                                    spec.overwrite(true)
+                                }
+                            })
                         }
-                    })
-                    project.copy {
-                        from(project.zipTree(zipFile))
-                        into(jniAbiFolder)
-                        rename("${coreName}_libretro_android.so", outputName)
+                        println("Fetched $coreName for $abi (${candidate.label})")
+                        break
+                    } catch (e: Exception) {
+                        println("Candidate failed for $coreName/$abi (${candidate.label}): ${e.message}")
+                        // Clean up partial artifacts so the next candidate starts fresh.
+                        if (zipFile.exists()) project.delete(zipFile)
+                        if (outputFile.exists()) project.delete(outputFile)
                     }
-                    project.delete(zipFile)
-                } catch (e: Exception) {
-                    println("Skipping $coreName for $abi (not available): ${e.message}")
                 }
             }
         }
@@ -113,7 +197,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 
     implementation("com.github.swordfish90:radialgamepad:0.6.0")
-    implementation("com.github.swordfish90:libretrodroid:0.6.2")
+    // Vendored LibretroDroid 0.13.2 (local module) instead of the JitPack AAR:
+    // adds getMemoryData/getMemorySize JNI passthroughs so the RetroAchievements
+    // runtime (rcheevos) can read emulated memory. See libretrodroid/build.gradle.kts.
+    implementation(project(":libretrodroid"))
 
     // Background periodic catalog refresh (WorkManager).
     implementation("androidx.work:work-runtime-ktx:2.9.0")
@@ -124,4 +211,7 @@ dependencies {
 
     // Required by the frozen gamepad/ package (CompositeDisposable, pad.events()).
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
+
+    // OoTR Randomizer: encrypted storage of the user's API key (AES256 master key).
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 }

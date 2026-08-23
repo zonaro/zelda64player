@@ -29,7 +29,7 @@
         }
       },
       "tags": ["quality-of-life", "restoration", "enhancement"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     },
     {
       "id": "ultimate_trial",
@@ -58,7 +58,7 @@
         }
       },
       "tags": ["new-content", "achievements"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     },
     {
       "id": "majoras_mask_redux",
@@ -86,7 +86,7 @@
         }
       },
       "tags": ["quality-of-life"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     },
     {
       "id": "master_of_time_revisited",
@@ -115,7 +115,7 @@
         }
       },
       "tags": ["bugfix", "enhancement"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     },
     {
       "id": "the_missing_link",
@@ -144,7 +144,7 @@
         }
       },
       "tags": ["story", "new-content"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     },
     {
       "id": "sealed_palace",
@@ -173,7 +173,7 @@
         }
       },
       "tags": ["story", "new-content"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     },
     {
       "id": "dawn_and_dusk",
@@ -202,7 +202,7 @@
         }
       },
       "tags": ["new-content"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     }
   ]
 }

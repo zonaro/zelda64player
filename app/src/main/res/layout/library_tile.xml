@@ -2,37 +2,89 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="4dp">
+    android:padding="4dp"
+    android:focusable="true"
+    android:clickable="true"
+    android:foreground="@drawable/tile_focus">
 
-    <!-- Covers are bundled at their native 10:7 landscape ratio, so
-         adjustViewBounds derives the height from the measured width and the
-         item is exactly as tall as its thumbnail. -->
-    <ImageView
-        android:id="@+id/tile_cover"
+    <!-- Rounded 24dp card (surfaceContainer) wrapping the cover. The cover uses
+         CoverImageView, which fixes its height to width * 7/10 (the native 10:7
+         landscape ratio) so the placeholder's portrait ratio can never stretch
+         the card. Corners are clipped to the card radius so the artwork never
+         overflows the card. -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        android:background="#202020"
-        android:contentDescription="@string/cover_content_description" />
+        android:background="@drawable/shape_card"
+        android:elevation="@dimen/card_elevation">
 
-    <!-- Title overlays the bottom of the cover so the whole item is just the
-         thumbnail; a gradient scrim keeps it legible over any artwork. -->
+        <br.com.redclaw.zelda64player.views.CoverImageView
+            android:id="@+id/tile_cover"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"
+            android:background="@drawable/shape_cover"
+            android:clipToOutline="true"
+            android:contentDescription="@string/cover_content_description" />
+
+        <!-- Title overlays the bottom of the cover; a gradient scrim keeps it
+             legible over any artwork. -->
+        <TextView
+            android:id="@+id/tile_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/tile_title_scrim"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingTop="18dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="6dp"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+    </FrameLayout>
+
+    <!-- Overflow button (top-end corner): opens the per-game context menu. It
+         is intentionally NOT focusable so D-pad grid navigation is undisturbed;
+         gamepad users open the menu via SELECT/X/Y instead. It consumes its own
+         click so the tile's click never fires. -->
     <TextView
-        android:id="@+id/tile_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@drawable/tile_title_scrim"
-        android:ellipsize="end"
+        android:id="@+id/tile_overflow"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="4dp"
+        android:background="@drawable/bg_icon_button"
+        android:clickable="true"
+        android:focusable="false"
         android:gravity="center"
-        android:maxLines="1"
-        android:paddingStart="8dp"
-        android:paddingTop="18dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="6dp"
+        android:text="@string/menu_overflow"
+        android:textColor="?attr/colorOnSurface"
+        android:textStyle="bold"
+        android:contentDescription="@string/menu_overflow_content_description" />
+
+    <!-- Badge (top-start corner): distinguishes special tiles, e.g. an "R" for
+         generated randomizer seeds. Hidden unless the entry provides badgeText. -->
+    <TextView
+        android:id="@+id/tile_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_margin="4dp"
+        android:background="@drawable/bg_badge"
+        android:gravity="center"
+        android:paddingStart="6dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="2dp"
         android:textColor="@android:color/white"
-        android:textSize="13sp"
-        android:textStyle="bold" />
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:contentDescription="@string/randomizer_badge_content_description" />
 
 </FrameLayout>

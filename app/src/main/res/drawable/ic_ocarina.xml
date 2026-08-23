@@ -1,0 +1,41 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <!-- Auto-Ocarina menu icon. Converted from the provided SVG asset.
+         Colors are intentional (blue body, gold Triforce, silver blower);
+         the menu is told NOT to tint this icon (see MenuActionItem.tintIcon). -->
+    <path
+        android:fillColor="#1E40AF"
+        android:strokeColor="#0F172A"
+        android:strokeWidth="12"
+        android:strokeLineJoin="round"
+        android:pathData="M120,350 C90,320 60,250 90,180 C120,110 220,80 320,100 C420,120 480,180 470,240 C450,300 380,360 280,380 C180,400 140,370 120,350 Z" />
+    <path
+        android:fillColor="#CBD5E1"
+        android:strokeColor="#0F172A"
+        android:strokeWidth="12"
+        android:strokeLineJoin="round"
+        android:pathData="M120,350 L60,410 C50,420 30,400 40,390 L95,320 Z" />
+    <!-- Triforce detail on the mouthpiece (drawn above the body so it stays visible) -->
+    <path android:fillColor="#FFD700" android:pathData="M120,340 L140,310 L160,340 Z" />
+    <path android:fillColor="#FFD700" android:pathData="M140,310 L150,295 L160,310 Z" />
+    <path android:fillColor="#FFD700" android:pathData="M100,340 L120,310 L140,340 Z" />
+    <!-- Finger holes -->
+    <path android:fillColor="#0F172A" android:pathData="M184,180 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z" />
+    <path android:fillColor="#0F172A" android:pathData="M244,170 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z" />
+    <path android:fillColor="#0F172A" android:pathData="M304,180 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z" />
+    <path android:fillColor="#0F172A" android:pathData="M354,205 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z" />
+    <path android:fillColor="#0F172A" android:pathData="M218,240 a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0 Z" />
+    <path android:fillColor="#0F172A" android:pathData="M278,245 a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0 Z" />
+    <path android:fillColor="#0F172A" android:pathData="M338,260 a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0 Z" />
+    <!-- Glossy highlight -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="8"
+        android:strokeLineCap="round"
+        android:strokeAlpha="0.3"
+        android:pathData="M160,150 C220,110 300,120 360,140" />
+</vector>

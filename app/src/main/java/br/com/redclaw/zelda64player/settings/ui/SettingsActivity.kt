@@ -13,13 +13,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
 import br.com.redclaw.zelda64player.data.local.SaveBackupManager
 import br.com.redclaw.zelda64player.data.model.BaseRom
 import br.com.redclaw.zelda64player.databinding.ActivitySettingsBinding
 import br.com.redclaw.zelda64player.databinding.SettingsBaseRomItemBinding
 import br.com.redclaw.zelda64player.databinding.SettingsCatalogUrlItemBinding
+import br.com.redclaw.zelda64player.randomizer.api.OotrApiKeyStore
 import br.com.redclaw.zelda64player.repositories.Storage
+import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
 import br.com.redclaw.zelda64player.settings.SettingsViewModel
 import br.com.redclaw.zelda64player.store.CatalogFetcher
 import br.com.redclaw.zelda64player.utils.CorePrefs
@@ -79,6 +82,8 @@ class SettingsActivity : AppCompatActivity() {
         setupImportSection()
         setupBaseRomList()
         setupCatalogSection()
+        setupRandomizerSection()
+        setupRetroAchievementsSection()
         setupCoreSection()
         setupBackupSection()
         setupAboutSection()
@@ -291,6 +296,102 @@ class SettingsActivity : AppCompatActivity() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    private fun setupRandomizerSection() {
+        val keyStore: OotrApiKeyStore = Zelda64PlayerApp.ootrApiKeyStore
+        updateRandomizerStatus(keyStore)
+
+        binding.settingsRandomizerSave.setOnClickListener {
+            val key = binding.settingsRandomizerInput.text.toString().trim()
+            if (key.isEmpty()) {
+                binding.settingsRandomizerStatus.setText(R.string.settings_randomizer_empty)
+                return@setOnClickListener
+            }
+            keyStore.setKey(key)
+            // Never keep the secret visible on screen after saving.
+            binding.settingsRandomizerInput.text.clear()
+            updateRandomizerStatus(keyStore)
+        }
+
+        binding.settingsRandomizerClear.setOnClickListener {
+            keyStore.clear()
+            binding.settingsRandomizerInput.text.clear()
+            updateRandomizerStatus(keyStore)
+        }
+    }
+
+    private fun updateRandomizerStatus(keyStore: OotrApiKeyStore) {
+        val res = if (keyStore.hasKey()) {
+            R.string.settings_randomizer_status_configured
+        } else {
+            R.string.settings_randomizer_status_none
+        }
+        binding.settingsRandomizerStatus.setText(res)
+    }
+
+    /**
+     * RetroAchievements section: master enable switch plus username/password
+     * login. The password is used once for the credential exchange and never
+     * persisted; only the issued token is stored (encrypted).
+     */
+    private fun setupRetroAchievementsSection() {
+        val credentials = Zelda64PlayerApp.raCredentialStore
+        val authService = Zelda64PlayerApp.raAuthService
+
+        binding.settingsRaEnabledSwitch.isChecked =
+            CorePrefs.getRetroAchievementsEnabled(this)
+        binding.settingsRaEnabledSwitch.setOnCheckedChangeListener { _, checked ->
+            CorePrefs.setRetroAchievementsEnabled(this, checked)
+            updateRaStatus(credentials)
+        }
+
+        binding.settingsRaLogin.setOnClickListener {
+            val username = binding.settingsRaUsername.text.toString().trim()
+            val password = binding.settingsRaPassword.text.toString()
+            if (username.isEmpty() || password.isEmpty()) {
+                binding.settingsRaStatus.setText(R.string.settings_ra_error_missing)
+                return@setOnClickListener
+            }
+            binding.settingsRaLogin.isEnabled = false
+            binding.settingsRaStatus.setText(R.string.settings_ra_logging_in)
+            lifecycleScope.launch {
+                val result = authService.login(username, password)
+                binding.settingsRaLogin.isEnabled = true
+                // Never keep the secret visible on screen after use.
+                binding.settingsRaPassword.text.clear()
+                result.fold(
+                    onSuccess = {
+                        binding.settingsRaUsername.text.clear()
+                        binding.settingsRaStatus.setText(R.string.settings_ra_status_logged_in)
+                    },
+                    onFailure = {
+                        binding.settingsRaStatus.setText(R.string.settings_ra_status_failed)
+                    }
+                )
+                updateRaStatus(credentials)
+            }
+        }
+
+        binding.settingsRaLogout.setOnClickListener {
+            authService.logout()
+            updateRaStatus(credentials)
+        }
+
+        updateRaStatus(credentials)
+    }
+
+    /** Refreshes the RA status line from stored credential state + toggle. */
+    private fun updateRaStatus(credentials: RaCredentialStore) {
+        val enabled = CorePrefs.getRetroAchievementsEnabled(this)
+        binding.settingsRaStatus.setText(
+            when {
+                !enabled -> R.string.settings_ra_status_disabled
+                credentials.hasCredentials() ->
+                    R.string.settings_ra_status_logged_in
+                else -> R.string.settings_ra_status_logged_out
+            }
+        )
     }
 
     private fun setupCoreSection() {

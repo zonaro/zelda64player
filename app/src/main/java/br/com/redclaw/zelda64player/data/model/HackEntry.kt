@@ -1,5 +1,6 @@
 package br.com.redclaw.zelda64player.data.model
 
+import br.com.redclaw.zelda64player.ocarina.OcarinaSong
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -65,7 +66,9 @@ data class HackEntry(
     val patch: PatchRef,
     val coverImageUrl: String? = null,
     val tags: List<String> = emptyList(),
-    val compatibleCores: List<String> = emptyList()
+    val compatibleCores: List<String> = emptyList(),
+    /** Optional Ocarina songs contributed by a downloaded hack (catalog extension). */
+    val ocarinaSongs: List<OcarinaSong> = emptyList()
 ) {
     fun toJson(): JSONObject = JSONObject().apply {
         put("id", id)
@@ -78,6 +81,7 @@ data class HackEntry(
         put("coverImageUrl", coverImageUrl)
         put("tags", JSONArray(tags))
         put("compatibleCores", JSONArray(compatibleCores))
+        put("ocarinaSongs", JSONArray(ocarinaSongs.map { it.toJson() }))
     }
 
     companion object {
@@ -93,6 +97,14 @@ data class HackEntry(
             tags = if (o.has("tags")) jsonToStringList(o.getJSONArray("tags")) else emptyList(),
             compatibleCores = if (o.has("compatibleCores")) {
                 jsonToStringList(o.getJSONArray("compatibleCores"))
+            } else {
+                emptyList()
+            },
+            ocarinaSongs = if (o.has("ocarinaSongs")) {
+                val arr = o.getJSONArray("ocarinaSongs")
+                (0 until arr.length()).mapNotNull { i ->
+                    runCatching { OcarinaSong.fromCatalogJson(arr.getJSONObject(i)) }.getOrNull()
+                }
             } else {
                 emptyList()
             }

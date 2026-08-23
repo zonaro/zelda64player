@@ -46,7 +46,7 @@ See `catalog/catalog.json` for the shipped (empty) default catalog and
 | `patch.checksums.md5`   | No       | string          | Optional extra validation (checked only when present). |
 | `coverImageUrl`         | No       | string (URL)    | Cover image. A placeholder is shown when absent. |
 | `tags`                  | No       | array of string| Free-form tags (future filtering). |
-| `compatibleCores`       | No       | array of string| Libretro core ids known to work (e.g. `mupen64plus_next_gles3`). |
+| `compatibleCores`       | No       | array of string| Libretro core ids known to work. Valid values are `mupen64plus_next_gles3` and `parallel_n64` (the GLES2 core was removed). |
 
 A malformed individual hack entry (missing required field, bad JSON) is skipped
 at parse time so a single bad entry cannot break the whole catalog.

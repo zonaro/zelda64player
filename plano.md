@@ -101,7 +101,7 @@ O novo app NÃO é uma cópia integral do Ludere: é uma **extração enxuta**. 
 | `views/GameActivity.kt` + `viewmodels/GameActivityViewModel.kt` | `gameId` → `hackId`; menu ganha atalho pra Loja/Settings (opcional) |
 | `gamepad/` COMPLETO (ver seção abaixo) | **Congelado** — apenas rename de package |
 | `input/` COMPLETO (`ControllerInput`, `InputMapper`) | **Congelado** — apenas rename de package |
-| `utils/CorePrefs.kt` | Sem mudanças (seleção de core GLES3/GLES2/Parallel) |
+| `utils/CorePrefs.kt` | Sem mudanças (seleção de core GLES3/Parallel) |
 | Ícone do app (`mipmap-*/ic_launcher*`, `drawable/ic_launcher_foreground.xml`, `values/ic_launcher_background.xml`) | **Reutilizado por enquanto** (decisão do usuário). Ícone próprio tema Zelda fica como tarefa futura da Dolfi |
 | `res/values/config.xml` | Atualizar `config_id`/`config_name`; resto intacto |
 | `repositories/Storage.kt` | Já é keyado por id — reutilizado como `hackId` |
@@ -123,7 +123,8 @@ O layout de botões atual do Ludere foi desenhado especificamente para jogos de 
 9. **DoubleTapContainer**: wrapper intercept-only — detecta double-tap sem interferir no drag analógico.
 10. **Controle físico espelhado**: o stick direito do gamepad físico espelha ao vivo o modo/sensibilidade do ButtonStick touch (mesma lambda de target); `ControllerInput.autoZEnabled` replica o Auto-Z no físico.
 11. **Sensibilidade por stick**: dois sliders 0–200% (analógico N64 e ButtonStick), aplicados ao vivo e persistidos.
-12. **Menu in-game**: Reset, Save State, Load State, Mute, Fast Forward, Button Stick (modo), Auto-Z (toggle), Sensibilidade.
+12. **Menu in-game em grade**: menu redesenhado como grade com funções agrupadas em categorias e **ícone em todos os itens** (facilidade de uso) — **Jogo**: Reiniciar, Salvar Estado, Carregar Estado, Sair; **Áudio e Vídeo**: Silenciar, Acelerar; **Controles**: Button Stick (modo), Auto-Z (toggle), Sensibilidade. "Sair" preserva o estado do emulador e finaliza a GameActivity (volta pra Library).
+13. **Tamanho do vídeo no menu** (a implementar): nova opção no menu para ajustar o aspecto do vídeo entre **4:3**, **16:9** ou **Esticar**; preferência **persistida por hack** (cada jogo lembra sua escolha); **padrão 16:9**.
 
 #### Regras técnicas de integração (não regressar)
 
@@ -222,7 +223,7 @@ flowchart TD
       },
       "coverImageUrl": "https://raw.githubusercontent.com/user/repo/main/assets/covers/oot_dx.png",
       "tags": ["quality-of-life", "restoration", "enhancement"],
-      "compatibleCores": ["mupen64plus_next_gles3", "mupen64plus_next_gles2", "parallel_n64"]
+      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
     },
     {
       "id": "majoras_mask_redux",
@@ -401,7 +402,7 @@ Após normalizar para z64 (BE), ler offsets:
 | **Patch BPS corrompido / incompleto** | Média | Falha silenciosa ou crash no core | Validação tripla: CRC32 do patch (download), CRC32 source (antes de aplicar), CRC32 target (após aplicar). Falha → delete patch + erro amigável |
 | **Memória baixa** (OoT/MM = 32–64 MB descomprimidos; patcheados similar) | Média em low-end | OOM ao carregar ROM em bytes (`config_load_bytes=true`) | **Default `config_load_bytes=false`** → usa arquivo em cache (Storage.rom). Streaming patcher evita 2x RAM. Testar em dispositivos 2GB RAM. |
 | **Licença GPL-3.0 do rom_patcher_js / UniPatcher** | — | Contaminação legal se copiar código | **Clean-room**: implementar só da spec BPS (documentos públicos: bps_spec.md, romhacking.net). Não ler código GPL. Documentar no AGENTS.md. |
-| **Cores Libretro incompatíveis** (alguns hacks precisam GLES2, outros GLES3) | Baixa | Crash gráfico / performance ruim | Catálogo declara `compatibleCores`. App permite usuário trocar core nas configurações (CorePrefs existente). Default GLES3. |
+| **Cores Libretro incompatíveis** (modelo de 2 cores: GLES3 padrão + Parallel; GLES2 removido) | Baixa | Crash gráfico / performance ruim | Catálogo declara `compatibleCores`. App permite usuário trocar core nas configurações (CorePrefs existente). Default GLES3. |
 | **Byte order detection falha** (ROMs homebrew, headers atípicos) | Baixa | ROM rejeitada incorretamente | Fallback: se magic não reconhecido, tentar heurística (tamanho múltiplo de 512KB, header válido em alguma ordem). Log detalhado para debug. |
 | **Catálogo remoto indisponível / alterado** | Baixa | Loja vazia / hacks somem | Cache local persistente (último JSON válido). Modo offline funcional. ETag/If-None-Match economiza banda. |
 
@@ -484,3 +485,796 @@ Após normalizar para z64 (BE), ler offsets:
 8. **Wally** finaliza README.md, traduz strings pt-BR/en/es
 9. **Calamari** valida checksums de ROMs conhecidas (No-Intro/Redump)
 10. **Puffy** pesquisa updates de LibretroDroid / cores novos
+
+---
+
+## Feature: Gerador de Randomizador OoT (OoTR)
+
+### Visão Geral
+
+Adicionar um gerador de randomizador/plandomizer de **Ocarina of Time** integrado ao app, usando a API oficial do **OoT Randomizer (OoTR)** em `https://ootrandomizer.com/api/docs`. O usuário insere sua chave de API privada (obtida via Discord do OoTR) nas configurações. O app renderiza um formulário completo baseado em schema (~200 opções), permite plandomizer via editor de texto + importação JSON + builder visual, submete à API, faz polling de status, baixa o patch (`.zpf`/`.zpfz`), aplica na ROM base do usuário (validando CZLE/CZLJ v1.0 apenas), e salva a seed resultante como entrada jogável na seção **"Randomizadores"** da Library (separada da Loja de Hacks). Seeds ilimitadas.
+
+### Decisões do Usuário (Finais)
+
+1. **API Key**: O usuário insere a própria chave privada em Settings → Randomizer. Sem chave, a UI explica como obter (link para Discord OoTR). A chave **nunca** é hardcoded, logada, ou comitada.
+2. **Settings Menu (Schema-driven)**: Schema JSON completo (~200 opções) empacotado como asset em `assets/randomizer/oot_settings_schema.json`, derivado de `SettingsList.py` do OoTR (campos: `name`, `type`, `choices`, `default`, `gui_tooltip`, `gui_params` min/max/step, `category`). UI genérica renderiza abas por categoria.
+3. **Plandomizer**: Três modos — (a) Editor de texto bruto (JSON), (b) Importação de arquivo `.json`, (c) Builder visual que monta o JSON de placement. O JSON segue a estrutura do OoTR: `settings`, `randomized_settings`, `starting_items`, `item_pool`, `dungeons`, `trials`, `entrances`, `locations`, `gossip_stones`, `custom_groups`, `file_hash` (array até 5 ícones), chaves `:`-prefixadas (read-only/spoiler).
+4. **Library**: Nova seção/aba **"Randomizadores"** distinta de "Hacks da Loja". Cada seed gerada = entrada jogável. Armazenamento ilimitado.
+
+### Fluxo da API (Mermaid)
+
+```mermaid
+flowchart TD
+    A[User opens Randomizer screen] --> B{API Key configured?}
+    B -->|No| C[Show setup guide + Discord link]
+    B -->|Yes| D[Load schema from assets/randomizer/oot_settings_schema.json]
+    D --> E[Render category tabs + form fields]
+    E --> F[User configures settings + optional plandomizer JSON]
+    F --> G[Validate: base ROM CZLE/CZLJ v0 selected?]
+    G -->|No| H[Error: select valid OoT 1.0 base ROM first]
+    G -->|Yes| I[POST /api/v2/seed/create?key=KEY&version=latest]
+    I --> J{Response}
+    J -->|200 OK| K[Extract seed ID]
+    J -->|400| L[Show validation errors from API]
+    J -->|409| M[Error: version ambiguous - specify exact version]
+    J -->|423| N[Error: queue full - retry later]
+    J -->|429| O[Error: rate limited - wait 10s]
+    J -->|500| P[Error: server error - retry]
+    K --> Q[Poll GET /api/v2/seed/status?key=KEY&id=ID]
+    Q --> R{Status}
+    R -->|0 generating| S[Show progress % + queue position]
+    R -->|1 success| T[GET /api/v2/seed/patch?key=KEY&id=ID]
+    R -->|3 failed| U[Error: generation failed - check settings]
+    T --> V[Save .zpf/.zpfz to cacheDir/randomizer_patches/<seedId>.zpfz]
+    V --> W[Validate base ROM checksum matches seed requirements]
+    W --> X[Apply ZPF/ZPFZ via ZpfApplier → patched ROM]
+    X --> Y[Recompute N64 boot CRC (CIC 6105) as safety]
+    Y --> Z[Write to Storage.rom(randomizer_<seedId>)]
+    Z --> AA[Create RandomizedSeedEntry in RandomizedSeedRepository]
+    AA --> AB[Library "Randomizadores" tab shows new entry]
+    AB --> AC[User taps → GameActivity loads patched ROM]
+```
+
+### Nova Estrutura de Pacotes: `randomizer/`
+
+```
+br.com.redclaw.zelda64player
+├── randomizer/
+│   ├── api/
+│   │   ├── OotrApiClient.kt          # OkHttp client: create seed, poll status, download patch
+│   │   ├── OotrApiModels.kt          # Data classes: CreateSeedRequest/Response, StatusResponse, PatchResponse
+│   │   ├── OotrApiException.kt       # Sealed hierarchy: ValidationError, QueueFull, RateLimited, ServerError, NetworkError
+│   │   └── RateLimiter.kt            # Token bucket: 20 req / 10s global (per API docs)
+│   ├── settings/
+│   │   ├── OotrSettingsSchema.kt     # Data classes mirroring asset JSON: SettingDef, Category, Type, Choice, GuiParams
+│   │   ├── SchemaLoader.kt           # Loads assets/randomizer/oot_settings_schema.json → OotrSettingsSchema
+│   │   ├── SettingsFormRenderer.kt   # Generic UI: category tabs → dynamic fields per type (bool, enum, int range, string, etc.)
+│   │   ├── SettingsValidator.kt      # Client-side validation (required, min/max, enum values) before submit
+│   │   └── PlandomizerModels.kt      # Data classes for plandomizer JSON structure (settings, randomized_settings, starting_items, item_pool, dungeons, trials, entrances, locations, gossip_stones, custom_groups, file_hash)
+│   ├── patch/
+│   │   ├── ZpfParser.kt              # Parse .zpf (single zlib stream) / .zpfz (concatenated zlib streams)
+│   │   ├── ZpfApplier.kt             # Apply DMA updates + XOR edits to COMPRESSED ROM (big-endian)
+│   │   ├── ZpfValidator.kt           # Verify patch structure, magic 'ZPFv', version, CRC safety
+│   │   └── N64BootCrcCalculator.kt   # CIC 6105 algorithm: seed 0xDF26F436, range 0x1000..0x101000, step t1 += BE32(data[0x750 + (i & 0xFF)]) ^ d
+│   ├── ui/
+│   │   ├── RandomizerActivity.kt     # Main entry: key check → schema form → plandomizer tabs → generate
+│   │   ├── RandomizerViewModel.kt    # StateFlow: schema, form values, plandomizer JSON, generation state (idle/polling/done/error)
+│   │   ├── PlandomizerEditorFragment.kt  # Text editor + file import + validation
+│   │   ├── PlandomizerBuilderFragment.kt # Visual builder (tree/group UI) → emits placement JSON
+│   │   └── GenerationProgressDialog.kt   # Polling progress: % + queue position + ETA
+│   └── repository/
+│       ├── RandomizedSeedEntry.kt    # Model: seedId, name, settingsHash, baseRomId, patchedRomPath, sramPath, statePath, createdAt, spoilersJson?
+│       └── RandomizedSeedRepository.kt  # JSON in filesDir/randomizer_seeds.json + files in cacheDir/randomizer_roms/, cacheDir/randomizer_patches/
+```
+
+### Especificação Resumida: Aplicador ZPF/ZPFZ
+
+**Formato .zpfz** (verificado em `Notes/ZPFZ patch format.txt` do repo OoTR):
+- `.zpfz` = concatenação de streams zlib (um por world); single-world = `.zpf` (um stream zlib).
+- Cada stream descomprimido (`.zpf`), big-endian:
+  - Magic: `ZPFv` (4 bytes)
+  - Version: `1` (1 byte)
+  - [4] DMA table start offset
+  - [4] Key address range min
+  - [4] Key address range max
+  - [4] Key address (onde ler o byte de XOR key na ROM source)
+- **DMA updates**: lista terminada por `0xFFFF`. Entrada: `[2] DMA index`, `[4] from-file address`, `[4] file start address`, `[3] file start` (24-bit). Escreve nova entrada `(start, end, start, 0)` na DMA table assumindo uncompressed. Se `from-file address != 0xFFFFFFFF`, copia dados daquele endereço para o novo start (padding zeros se maior); senão, padding zeros.
+- **XOR data edits**: XOR key lida da ROM SOURCE no key address (limitada por key range min/max com wraparound; pula bytes `0x00` da key).
+  - Start block: `[4] address`, `[2] size`, `data[]`
+  - Continue block: `[1] 0xFF`, `[1] key-skip count`, `[2] size`, `data[]`
+  - EOF termina.
+  - Byte 0 no patch escreve 0; senão escreve `key_byte XOR patch_byte`.
+- Aplicado **diretamente na ROM base COMPRIMIDA** (z64 BE ~32MB). Saída permanece comprimida. Funciona direto no mupen64plus_next.
+- Save type **deve ser SRAM (Memory Pak)**.
+- Patch já contém bytes corrigidos do check code do header, mas **recomputar N64 boot CRC (CIC 6105) como rede de segurança**.
+
+### Validação de ROM Base para Randomização
+
+**ACEITAR APENAS**:
+- **Ocarina of Time NTSC-U 1.0** → Game Code `CZLE`, Version Byte `0x00` (offset 0x3F), CRC32 `cd16c529`, MD5 `5bd1fe107bf8106b2ab6650abecd54d6`
+- **Ocarina of Time NTSC-J 1.0** → Game Code `CZLJ`, Version Byte `0x00`, checksums conhecidos (validar via Calamari/No-Intro)
+
+**REJEITAR** (com mensagem clara):
+- OoT 1.1 / 1.2 / PAL / Master Quest / GameCube / Wii VC / iQue
+- Majora's Mask (qualquer versão) — OoTR só suporta OoT
+- ROMs com byte order não normalizado (app normaliza antes de validar)
+
+### Integração Storage + Catalog (Library "Randomizadores")
+
+- **Storage paths** (reuso `repositories/Storage.kt` pattern):
+  - `rom_randomizer_<seedId>` — ROM patcheada final (~32MB z64 BE)
+  - `sram_randomizer_<seedId>` — SRAM isolado por seed
+  - `state_randomizer_<seedId>` — Save states isolados por seed
+- **RandomizedSeedRepository** persiste `List<RandomizedSeedEntry>` em `filesDir/randomizer_seeds.json` (atomic write + backup).
+- **LibrarySource implementation**: nova classe `RandomizerLibrarySource` implementando a mesma interface `HackLibrarySource` usada por `CatalogBackedLibrarySource`. `LibraryActivity` usa `CompositeLibrarySource` (ou ViewModel merge) para mostrar duas seções/abas: "Hacks da Loja" + "Randomizadores".
+- **RetroView interception inalterado**: continua lendo `Storage.rom(hackId)` — agora `hackId` = `randomizer_<seedId>`.
+
+### Asset: Schema de Settings (`assets/randomizer/oot_settings_schema.json`)
+
+Estrutura (derivada de `SettingsList.py` do OoTR):
+```json
+{
+  "schemaVersion": 1,
+  "apiVersion": "v2",
+  "categories": [
+    {
+      "id": "logic",
+      "name": "Logic Rules",
+      "order": 0,
+      "settings": [
+        {
+          "name": "logic_rules",
+          "type": "enum",
+          "label": "Logic Rules",
+          "default": "standard",
+          "choices": [
+            {"value": "standard", "label": "Standard"},
+            {"value": "noglitches", "label": "No Glitches"},
+            {"value": "glitched", "label": "Glitched"}
+          ],
+          "tooltip": "Determines what tricks are considered valid for progression.",
+          "guiParams": null
+        },
+        {
+          "name": "open_forest",
+          "type": "bool",
+          "label": "Open Forest",
+          "default": false,
+          "tooltip": "Start with Kokiri Forest open.",
+          "guiParams": null
+        },
+        {
+          "name": "bridge",
+          "type": "enum",
+          "label": "Bridge",
+          "default": "vanilla",
+          "choices": [
+            {"value": "vanilla", "label": "Vanilla"},
+            {"value": "open", "label": "Open"},
+            {"value": "closed", "label": "Closed"}
+          ],
+          "tooltip": "State of the Gerudo Valley bridge.",
+          "guiParams": null
+        }
+      ]
+    }
+  ]
+}
+```
+- **Tipos suportados**: `bool`, `enum` (choices), `int_range` (guiParams: min, max, step), `string`, `float_range`.
+- **i18n pragmático**: Labels/tooltips das ~200 opções ficam em **inglês no asset JSON** (domínio técnico, nomes canônicos da comunidade OoTR). Chrome da UI (títulos de abas, botões, mensagens de erro, placeholders) em `strings.xml` (pt-BR/en/es). **Exceção documentada**: não traduzir labels de settings individuais — seria impraticável manter sincronizado com upstream e a comunidade usa termos em inglês.
+
+### Estratégia Plandomizer (API Undocumented)
+
+- **Tentativa**: Enviar no body do `POST /seed/create`: `"enable_distribution_file": true, "distribution_file": <JSON stringificado do placement>`.
+- **Degradação graciosa**: Se API retornar 400 com erro relacionado a `distribution_file`, mostrar mensagem: "Plandomizer via API não suportado nesta versão do OoTR. Use o site oficial para seeds customizadas." Isolar esse detalhe de transporte em `OotrApiClient.createSeedWithPlandomizer()` para ajuste fácil após teste real.
+- **Validação client-side**: `PlandomizerValidator` valida estrutura JSON contra schema conhecido antes de enviar (evita 400 desnecessários).
+
+### Política de Rate Limit + Polling
+
+- **Rate limit oficial**: 20 requests / 10 segundos (global por IP/key).
+- **RateLimiter** (token bucket) em `OotrApiClient` — aplica a **todas** chamadas (create, status, patch, version).
+- **Polling**: Backoff exponencial iniciando em 2s, max 10s, jitter ±500ms. Cancelável via `Job` no `viewModelScope`. Mostrar progresso % + posição na fila + tempo estimado (se `maxWaitTime` retornado).
+- **Timeout total**: 10 minutos (configurável). Após timeout → erro "Tempo esgotado. A seed pode ainda estar processando; verifique depois na aba Randomizadores."
+
+### Matriz de Tratamento de Erros (API → User Message)
+
+| HTTP / Código | Causa | Mensagem ao Usuário (pt-BR) |
+|---------------|-------|------------------------------|
+| 400 (validation) | Settings inválidos / combinação impossível | "Configuração inválida: {detalhes do erro da API}. Verifique as opções marcadas." |
+| 400 (distribution_file) | Plandomizer não suportado | "Plandomizer via API não disponível nesta versão. Use o site do OoTR para seeds customizadas." |
+| 409 | Version ambígua (ex: "latest" aponta para múltiplas) | "Versão ambígua. Selecione uma versão específica nas configurações avançadas." |
+| 423 | Queue cheia | "Fila de geração cheia. Tente novamente em alguns minutos." |
+| 429 | Rate limit (20/10s) | "Muitas requisições. Aguarde 10 segundos e tente novamente." |
+| 500 | Erro interno do servidor | "Erro no servidor do OoTR. Tente novamente mais tarde." |
+| Network/Timeout | Sem internet / timeout | "Sem conexão ou tempo esgotado. Verifique sua internet e tente novamente." |
+| Patch download fail | Patch corrompido / 404 | "Falha ao baixar o patch. A seed pode ter expirado. Gere uma nova." |
+| ZPF apply fail | Patch inválido / ROM base errada | "Falha ao aplicar patch. Verifique se a ROM base é OoT 1.0 NTSC-U/J (CZLE/CZLJ v1.0)." |
+| Boot CRC mismatch | CRC final não confere | "Aviso: CRC de boot da ROM resultante não confere. O jogo pode não iniciar. Tente regenerar." |
+
+### Segurança
+
+- **API Key**: Armazenada **apenas** em `SharedPreferences` (ou `EncryptedSharedPreferences` se API 23+), chave `pref_ootr_api_key`. **Nunca** em logs, `BuildConfig`, assets, catálogo, backups, ou network requests além do header/query param da API OoTR.
+- **Logs**: Sanitizar key em qualquer log de debug (substituir por `***`).
+- **Network**: Apenas chamadas para `ootrandomizer.com` (API) — nenhum outro endpoint.
+- **Base ROM**: Validação estrita (CZLE/CZLJ v0) antes de qualquer geração.
+
+### i18n: Abordagem Pragmática para ~200 Labels
+
+- **Chrome da UI** (títulos de tela, abas de categoria, botões, mensagens de erro, placeholders, tooltips genéricos) → `strings.xml` (pt-BR/en/es) — **traduzido**.
+- **Labels/tooltips individuais de settings** (ex: "Logic Rules", "Open Forest", "Bridge", "Trials", "Entrance Shuffle") → **Inglês no asset JSON** (`oot_settings_schema.json`).
+- **Justificativa**: (1) Termos são jargão da comunidade OoTR (p. ex. "MQ", "MQ Dungeons", "Keysanity", "Tokensanity") — tradução perde precisão; (2) Schema vem do upstream (SettingsList.py) e muda a cada versão — manter tradução sincronizada é impraticável; (3) Usuários avançados de randomizer esperam termos em inglês.
+- **Documentação**: Esta exceção é **explícita e intencional** — registrada aqui e no `AGENTS.md` (Hard Rule #8 i18n tem exceção documentada para randomizer settings labels).
+
+### Plano de Testes
+
+**Unit Tests (puro Kotlin, `randomizer/` module):**
+- `OotrApiClientTest`: mock OkHttp → create/poll/download flows, rate limiter, error mapping
+- `SchemaLoaderTest`: load asset JSON → parse all categories/settings, validate required fields
+- `SettingsValidatorTest`: client-side validation (required, enum, min/max, type coercion)
+- `PlandomizerValidatorTest`: validate placement JSON structure, detect unknown keys
+- `ZpfParserTest`: parse synthetic .zpf (single stream) + .zpfz (multi-stream concat)
+- `ZpfApplierTest`: apply known patch → output matches expected bytes (fixture)
+- `N64BootCrcCalculatorTest`: known OoT 1.0 ROM → CRC matches 0xDEADBEEF (valor real verificado via Calamari)
+- `RandomizedSeedRepositoryTest`: CRUD + atomic write + migration schemaVersion
+
+**Instrumented Tests:**
+- `RandomizerIntegrationTest`: full flow (mock API) → seed appears in Library "Randomizadores" → launches in GameActivity
+- `BaseRomValidationTest`: import OoT 1.0 U/J → accepted; import 1.1/PAL/MQ → rejected with correct message
+- `PlandomizerUITest`: editor import/export, builder emits valid JSON
+
+**Fixtures:**
+- `test/fixtures/randomizer/` — minimal .zpf/.zpfz patches, synthetic placement JSONs, schema subset
+- `test/fixtures/roms/` — OoT 1.0 U/J headers (valid gameCode/versionByte) + dummy bodies
+
+### Checklist de Milestones (Fases R1–R5)
+
+#### Fase R1: API Client + Key Management (Semana 1)
+- [ ] `randomizer/api/OotrApiClient.kt` + models + RateLimiter (20/10s token bucket)
+- [ ] `randomizer/api/OotrApiException.kt` sealed hierarchy + error mapping
+- [ ] Settings: `RandomizerApiKeyFragment` (pref encrypted, setup guide UI, Discord link)
+- [ ] Unit tests: API flows, rate limiter, error mapping
+- [ ] **Entregável**: App abre tela Randomizer → pede key → valida formato → mostra schema vazio (ainda não carrega asset)
+
+#### Fase R2: ZPF Applier + Boot CRC (Semana 2)
+- [ ] `randomizer/patch/ZpfParser.kt` (single + multi-stream zlib concat)
+- [ ] `randomizer/patch/ZpfApplier.kt` (DMA updates + XOR edits on compressed ROM)
+- [ ] `randomizer/patch/ZpfValidator.kt` (magic, version, structure)
+- [ ] `randomizer/patch/N64BootCrcCalculator.kt` (CIC 6105, seed 0xDF26F436)
+- [ ] Reuse `patcher/n64/RomNormalizer`, `RomHeader`, `ChecksumCalculator` for base ROM prep
+- [ ] Unit tests: parser/applier/validator/CRC with fixtures
+- [ ] **Entregável**: Dado .zpf/.zpfz fixture + OoT 1.0 base ROM → produz ROM patcheada que passa boot CRC e roda no core
+
+#### Fase R3: Schema-Driven Settings UI (Semana 3)
+- [ ] `assets/randomizer/oot_settings_schema.json` (gerado a partir de SettingsList.py do OoTR — script offline, comitado)
+- [ ] `randomizer/settings/SchemaLoader.kt` + `OotrSettingsSchema.kt` models
+- [ ] `randomizer/settings/SettingsFormRenderer.kt` — category tabs + dynamic fields (bool/enum/int_range/string)
+- [ ] `randomizer/settings/SettingsValidator.kt` — client-side validation
+- [ ] `randomizer/ui/RandomizerActivity.kt` + `RandomizerViewModel.kt` — form state, submit → API create
+- [ ] Integration: base ROM selector (reuse `BaseRomRepository`) — only show CZLE/CZLJ v0
+- [ ] Unit tests: schema load, form render logic, validation
+- [ ] **Entregável**: Tela Randomizer carrega schema → usuário configura → submete → cria seed → polling → patch baixado → aplicado → seed aparece na Library
+
+#### Fase R4: Plandomizer (Semana 4)
+- [ ] `randomizer/settings/PlandomizerModels.kt` (full placement JSON structure)
+- [ ] `randomizer/ui/PlandomizerEditorFragment.kt` — text editor (monospace, syntax highlight básico), file import (SAF), validate button
+- [ ] `randomizer/ui/PlandomizerBuilderFragment.kt` — visual tree builder (locations → items, entrances, etc.) — MVP: categories + drag-drop básico
+- [ ] `OotrApiClient.createSeedWithPlandomizer()` — attempt `enable_distribution_file` + graceful degradation
+- [ ] Unit tests: placement JSON validation, builder → JSON emission
+- [ ] **Entregável**: Usuário pode criar plandomizer via editor/import/builder → seed gerada com placement customizado
+
+#### Fase R5: Library Integration + Polish (Semana 5)
+- [ ] `randomizer/repository/RandomizedSeedEntry.kt` + `RandomizedSeedRepository.kt`
+- [ ] `RandomizerLibrarySource` implementing `HackLibrarySource` interface
+- [ ] `LibraryActivity` / ViewModel: merge `CatalogBackedLibrarySource` + `RandomizerLibrarySource` → two tabs/sections
+- [ ] Storage paths: `rom_randomizer_<seedId>`, `sram_randomizer_<seedId>`, `state_randomizer_<seedId>`
+- [ ] i18n: `strings.xml` chrome (pt-BR/en/es) — Wally
+- [ ] Accessibility: TalkBack, touch targets, contrast
+- [ ] Visual QA: Chululu screenshots (Randomizer form, Plandomizer editor, Library tabs, Generation progress)
+- [ ] **Entregável**: Feature completa, integrada, testada, pronta para release
+
+---
+
+## Riscos e Mitigações (Atualizado)
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|-------|---------------|---------|-----------|
+| **API OoTR muda / quebra compatibilidade** | Média | Feature para de funcionar | Versionamento no schema asset (`schemaVersion`, `apiVersion`). Fallback: abrir site OoTR no navegador via intent. |
+| **Plandomizer não suportado na API** | Alta (~75% confiança) | Usuário não consegue seeds customizadas | Degradação graciosa documentada + mensagem clara. Isolar transporte para fix rápido. |
+| **ZPF/ZPFZ multi-stream (multiworld) complexo** | Média | Patch não aplica corretamente | Implementar parser genérico de concatenação zlib; testar com patches single-world primeiro; multiworld como stretch. |
+| **Boot CRC CIC 6105 incorreto** | Baixa | ROM não inicia no emulador | Testes unitários com ROMs conhecidas (Calamari valida). Recompute como safety net. |
+| **Rate limit 20/10s estourado em uso real** | Baixa | Usuário bloqueado temporariamente | Token bucket client-side + backoff exponencial no polling. Queue local se necessário. |
+| **Schema asset desatualizado vs API** | Média | Settings faltando / extras causam 400 | `apiVersion` no schema; `CatalogFetcher` pode buscar `/api/version` no startup e avisar se desatualizado. |
+| **Memória ao aplicar ZPF em ROM 32MB** | Baixa | OOM em low-end | Streaming via `FileChannel` + `MappedByteBuffer` (read-only source, write target). Não carregar tudo em heap. |
+| **Chave API vazada em logs/backup** | Baixa | Comprometimento da conta OoTR | EncryptedSharedPreferences; sanitização em logs; não incluir em backup automático. |
+
+---
+
+## Decisões Técnicas Adicionais (Randomizer)
+
+| Decisão | Justificativa |
+|---------|---------------|
+| **OkHttp direto (não Retrofit)** | Consistente com `store/CatalogFetcher` e `DownloadManager`. Leve, sem reflection, já no classpath. |
+| **Coroutines + Flow para polling** | `viewModelScope` + `delay` com backoff. Cancela automaticamente se usuário sai da tela. |
+| **Asset JSON para schema (não Room/DB)** | Schema é estático por build, ~200 entradas, ~50KB. Carregamento único no startup da feature. Fácil atualizar via release. |
+| **EncryptedSharedPreferences para API key** | API 23+ (minSdk 24). Proteção contra extração via backup/root. |
+| **FileChannel + MappedByteBuffer para ZPF apply** | ROM 32MB comprimida → random access reads/writes para DMA/XOR. Evita heap 2x. `RandomAccessFile` fallback se mmap falhar. |
+| **RandomizedSeedRepository = JSON file (não Room)** | Poucas seeds por usuário (tipicamente <50). JSON simples, atomic write, migração trivial via `schemaVersion`. Room = overkill. |
+| **Library tabs (não merge flat)** | UX: "Hacks da Loja" (curados, estáveis) vs "Randomizadores" (gerados pelo usuário, experimentais). Separação clara evita confusão. |
+
+---
+
+# Feature: Integração RetroAchievements
+
+## Visão Geral
+
+Adicionar suporte completo a **RetroAchievements (RA)** ao emulador, permitindo que usuários loguem com sua conta RA, vejam conquistas desbloqueadas/pendentes por jogo instalado, recebam notificações de desbloqueio *in-game* (toast customizado + badge), e acessem leaderboards **apenas dentro do menu in-game** (GameActivity menu — **nunca** como overlay sobre o gameplay). A integração usa a biblioteca **rcheevos** (MIT, ANSI C) via JNI, com o core LibretroDroid 0.13.2 vendorado localmente para expor ponteiros de memória (RDRAM) ao rcheevos.
+
+### Decisões do Usuário (Finais)
+
+1. **Escopo completo INCLUINDO leaderboards**, MAS leaderboards **só aparecem no menu in-game** (GameActivity menu). Nada de tracker/overlay sobre o gameplay.
+2. **Tela de login** acessada da Library (tela principal); primeiro login com usuário+senha, token armazenado criptografado (reuso padrão `OotrApiKeyStore`, prefs file separado); logins subsequentes silenciosos via token; suporte a logout.
+3. **Tela de Conquistas** mostra progresso de todos os jogos instalados (via hash RA computado no install + resolução gameId via rapi, badges carregados com Coil); tocar num jogo abre lista completa de conquistas.
+4. **Desbloqueio de conquista** gera toast-style popup **customizado in-game** (View sobre o GLRetroView, mais confiável que Toast de sistema sobre fullscreen GL) COM o ícone da badge **+** notificação de sistema opcional (toggle nas settings, default ON; precisa `POST_NOTIFICATIONS` no API 33+).
+5. **Catálogo ganha metadados opcionais de compatibilidade RA** (JSON backward-compatible; bump de `catalogVersion`). Store UI mostra badge RA em hacks compatíveis. No **INSTALL**, computa hash RA (via rhash exposto pelo nosso JNI) e resolve `gameId`, cacheando `{raHash, raGameId, raTitle}` por `hackId` para a tela Library.
+6. **Hardcore mode**: setting existe mas default **OFF** (softcore) até UA ser validado com RAdmin.
+
+---
+
+## Arquitetura rcheevos + LibretroDroid (Vendored)
+
+### Por que vendor LibretroDroid 0.13.2?
+
+O LibretroDroid 0.13.2 (JitPack `com.github.swordfish90:libretrodroid`) **não expõe memória do core** ao código do app. Porém, seu `GLRetroView` **emite `GLRetroEvents.FrameRendered` a CADA frame** (Flow, emitido pós-frame da thread GL para main dispatcher) — usável como tick per-frame **sem forkar**.
+
+**Decisão aprovada**: Vendor LibretroDroid 0.13.2 source em módulo Gradle local `:libretrodroid` e adicionar **dois JNI passthroughs mínimos**:
+- `LibretroDroid.getMemoryData(id: Int): ByteBuffer?` — direct buffer wrapando ponteiro `retro_get_memory_data`
+- `LibretroDroid.getMemorySize(id: Int): Int` — tamanho da região
+
+Para N64 + mupen64plus-next, `RETRO_MEMORY_SYSTEM_RAM` é **RDRAM** (8MB com expansion pak) em endereço estável enquanto o jogo carrega; endereços RA N64 mapeiam **direto na RDRAM**.
+
+### rcheevos (MIT) — API de Alto Nível (`rc_client_t`)
+
+| Função | Propósito |
+|--------|-----------|
+| `rc_client_create(read_memory_fn, server_call_fn)` | Cria cliente; callbacks obrigatórios |
+| `rc_client_begin_login_with_password(user, pass)` | Login inicial |
+| `rc_client_begin_login_with_token(token)` | Login silencioso subsequente |
+| `rc_client_get_user_info` | username/token/display_name/score |
+| `rc_client_begin_identify_and_load_game(client, RC_CONSOLE_NINTENDO_64, file_path, NULL, 0, cb, ud)` | **Usa rhash interno** para computar hash RA correto do arquivo ROM (trata byte-order/header N64); hash computado na **ROM final patcheada** |
+| `rc_client_get_game_info` | title/badge_name/badge_url |
+| `rc_client_get_user_game_summary` | num unlocked/total |
+| `rc_client_create_achievement_list(client, category, grouping)` | Retorna buckets (label + achievements com title/description/points/badge_url/badge_locked_url/unlocked/measured_progress) |
+| `rc_client_destroy_achievement_list` | Libera lista |
+| `rc_client_do_frame(client)` | **Chamar 1x por frame emulado** |
+| `rc_client_set_event_handler` | Eventos: ACHIEVEMENT_TRIGGERED, ACHIEVEMENT_CHALLENGE_INDICATOR_SHOW/HIDE, ACHIEVEMENT_PROGRESS_INDICATOR_SHOW/UPDATE/HIDE, LEADERBOARD_STARTED/FAILED/SUBMITTED, LEADERBOARD_TRACKER_SHOW/UPDATE/HIDE, GAME_MASTERY, etc. |
+| `rc_client_set_hardcore_enabled` | Hardcore on/off |
+| `rc_client_enable_logging` | Debug logs |
+| `rc_client_disconnect` | Logout |
+| `rc_client_unload_game` | Descarrega jogo atual |
+| `rc_client_set_userdata/get_userdata` | Ponteiro user data |
+
+**Host deve implementar**:
+- `read_memory(address, buffer, num_bytes)` → retorna bytes lidos (chamado pela thread do rcheevos)
+- `server_call(request, callback, callback_data, client)` → **HTTP ASYNC** (GET se `request->post_data==NULL` senão POST); invoca callback com `rc_api_server_response_t{body, body_length, http_status_code}` de **qualquer thread**
+- `log_message` → log interno
+
+**User-Agent obrigatório**: `<produto>/<semver> (<system-info>) <extensões>` ex: `Zelda64Player/1.0 (Android) rcheevos/12.x`. Hardcore unlocks precisam UA validado por RAdmin; até lá, server faz downgrade para softcore.
+
+### rapi (standalone requests)
+
+Headers `rc_api_user.h`, `rc_api_runtime.h` permitem construir requests standalone (login, fetch_game_data, fetch_user_unlocks, resolve_hash, fetch_leaderboards, fetch_leaderboard_entries) — úteis para mostrar dados de jogos **não-rodando** sem bootar cores.
+
+---
+
+## Nova Estrutura de Pacotes: `retroachievements/`
+
+```
+br.com.redclaw.zelda64player
+├── retroachievements/
+│   ├── jni/
+│   │   ├── RcheevosJni.kt              # JNI bridge: nativeInit, nativeShutdown, nativeDoFrame, nativeReadMemory, nativeServerCall, nativeLogin, nativeLogout, nativeIdentifyGame, nativeGetAchievements, nativeGetLeaderboards, nativeSetHardcore, nativeSetUserdata
+│   │   └── LibretroDroidMemoryJni.kt   # JNI bridge para :libretrodroid module: getMemoryData(id), getMemorySize(id)
+│   ├── api/
+│   │   ├── RaHttpClient.kt             # OkHttp dispatcher para rc_api requests (login, fetch_game_data, fetch_user_unlocks, resolve_hash, fetch_leaderboards, fetch_leaderboard_entries) — implementa server_call callback do rcheevos
+│   │   ├── RaApiModels.kt              # Data classes para requests/responses rapi
+│   │   └── RaApiException.kt           # Sealed hierarchy: AuthError, NetworkError, RateLimited, ServerError, NotFound
+│   ├── auth/
+│   │   ├── RaCredentialStore.kt        # EncryptedSharedPreferences (pref_ra_token, pref_ra_username, pref_ra_hardcore_token) — padrão OotrApiKeyStore
+│   │   ├── RaSessionManager.kt         # Lifecycle: login(password) → token, login(token) → restore, logout, auto-refresh token, user info cache
+│   │   └── RaLoginFragment.kt          # Settings fragment: username/password + "Get Token" link → RA site; token login silencioso
+│   ├── data/
+│   │   ├── RaGameMetadata.kt           # Cached per hackId: raHash (String), raGameId (Int), raTitle (String), badgeUrl (String?), consoleId (Int = RC_CONSOLE_NINTENDO_64)
+│   │   ├── RaAchievement.kt            # Achievement model: id, title, description, points, badgeUrl, badgeLockedUrl, unlocked, measuredProgress, measuredTarget, category, grouping
+│   │   ├── RaLeaderboard.kt            # Leaderboard model: id, title, description, format, lowerIsBetter, entries (rank, score, user, date)
+│   │   └── RaRepository.kt             # Persists RaGameMetadata per hackId (JSON em filesDir/ra_metadata.json); caches achievement lists per gameId (cacheDir/ra_achievements_<gameId>.json)
+│   ├── ui/
+│   │   ├── AchievementsActivity.kt     # Main screen: RecyclerView de jogos instalados com progresso (unlocked/total), badge do jogo, cover; click → AchievementDetailActivity
+│   │   ├── AchievementDetailActivity.kt # Full list: sections por categoria/grouping, badges Coil-loaded, progress bars, unlocked state
+│   │   ├── InGameAchievementOverlay.kt # Custom View overlay (addView no FrameLayout do GameActivity): toast animado com badge icon + title + points; queue para múltiplos desbloqueios rápidos
+│   │   └── LeaderboardDialog.kt        # DialogFragment shown from GameActivity menu: tabs (leaderboards do jogo), RecyclerView entries, Coil badges
+│   ├── viewmodel/
+│   │   ├── AchievementsViewModel.kt    # StateFlow: installedGamesWithRA (List<RaGameMetadata>), selectedGameAchievements, loading states
+│   │   └── InGameRaViewModel.kt        # Tied to GameActivityViewModel lifecycle: rc_client_do_frame driven by FrameRendered Flow; event handler → posts to overlay/notification
+│   └── install/
+│       ├── RaHashService.kt            # Install-time: given hackId + patched ROM path → compute RA hash via JNI (rhash), resolve gameId via rapi, cache RaGameMetadata
+│       └── RaInstallRepository.kt      # Persists install-time RA metadata alongside existing install metadata
+├── libretrodroid/                      # NOVO MÓDULO GRADLE LOCAL (vendor)
+│   └── src/main/...                    # LibretroDroid 0.13.2 source + 2 JNI passthroughs (getMemoryData, getMemorySize)
+└── app/src/main/cpp/rcheevos/          # rcheevos sources vendored (git subtree pinned to release tag master~12.x)
+```
+
+---
+
+## Modelo de Threading
+
+| Componente | Thread | Detalhes |
+|------------|--------|----------|
+| `rc_client_do_frame` | **Main thread** | Drivido por `GLRetroEvents.FrameRendered` Flow (já em main dispatcher). Chamado 1x por frame. |
+| `read_memory` callback | **Thread do rcheevos** (background) | Recebe endereço N64 (RDRAM offset). Deve ler via `LibretroDroidMemoryJni.getMemoryData(RETRO_MEMORY_SYSTEM_RAM)` → `ByteBuffer` → copy para buffer de saída. **Ponteiro válido apenas enquanto core rodando**. |
+| `server_call` callback | **Qualquer thread** (OkHttp callback) | `RaHttpClient` faz request assíncrono OkHttp; no `onResponse`/`onFailure`, invoca callback C do rcheevos via JNI `nativeServerCallComplete(requestPtr, responseBody, httpStatus)`. **Marshaling thread-safe**: JNI `AttachCurrentThread` se necessário. |
+| `event_handler` callbacks | **Thread do rcheevos** | Eventos: ACHIEVEMENT_TRIGGERED, CHALLENGE_INDICATOR_*, PROGRESS_INDICATOR_*, LEADERBOARD_*, GAME_MASTERY. **Post para Main** via `Handler(Looper.getMainLooper())` ou `runOnUiThread` → `InGameRaViewModel` processa → mostra overlay/notification. |
+| `RaHttpClient` (rapi standalone) | **Dispatchers.IO** | Coroutines + OkHttp. Usado pela AchievementsActivity/ViewModel para fetch sem core rodando. |
+| Teardown / GL destroy | **Main thread** | Ordem crítica (invariante existente): `super.onDestroy()` ANTES de `dispose()` → dispatch ON_DESTROY libera ~90MB nativos. `RaSessionManager` deve chamar `rc_client_unload_game` + `rc_client_destroy` **antes** do core ser destruído. `InGameRaViewModel.onCleared()` faz cleanup. |
+
+### Guarda contra ponteiro inválido (game unload/reload)
+
+- `rc_client_unload_game` chamado em `InGameRaViewModel.onCleared()` (ViewModel cleared quando GameActivity destroyed).
+- `read_memory` **pode** ser chamado após unload se rcheevos ainda processando frame anterior → **defesa**: `LibretroDroidMemoryJni.getMemoryData` retorna `null` se core não inicializado; `read_memory` retorna 0 bytes lidos (rcheevos trata como falha de leitura, não crash).
+- **Leituras rasgadas (torn reads)** da main thread durante avaliação de conquistas: **aceitável v1**, documentado. RDRAM não é atômica; rcheevos lê palavras de 1-4 bytes. Probabilidade baixa, impacto visual apenas (conquista dispara 1 frame tarde). Mitigação futura: travar emulação durante `do_frame` (precisa fork LibretroDroid).
+
+---
+
+## Integração Native Build (CMake + rcheevos)
+
+### Estrutura
+
+```
+app/
+├── src/main/cpp/
+│   ├── CMakeLists.txt              # App-level: add_subdirectory(rcheevos), link rcheevos + libretrodroid JNI
+│   ├── rcheevos/                   # VENDORED rcheevos sources (git subtree pinned to tag)
+│   │   ├── include/rc_client.h
+│   │   ├── include/rc_api_*.h
+│   │   ├── src/rc_client.c
+│   │   ├── src/rc_api_*.c
+│   │   ├── src/rc_compat.c
+│   │   ├── src/md5.c, sha1.c       # deps internas
+│   │   └── LICENSE (MIT)           # MANTER
+│   ├── ra_jni_bridge.c             # Thin JNI: RcheevosJni + LibretroDroidMemoryJni implementations
+│   └── ra_jni_bridge.h
+├── build.gradle.kts                # externalNativeBuild { cmake { path "src/main/cpp/CMakeLists.txt" } }
+└── libretrodroid/                  # Módulo Gradle separado (vendor)
+    ├── build.gradle.kts
+    └── src/main/...                # LibretroDroid 0.13.2 + 2 JNI passthroughs
+```
+
+### CMakeLists.txt (app/src/main/cpp)
+
+```cmake
+cmake_minimum_required(VERSION 3.22.1)
+project("zelda64player_ra" LANGUAGES C CXX)
+
+# rcheevos vendored (pinned to release tag)
+add_subdirectory(rcheevos)
+
+# JNI bridge
+add_library(ra_jni_bridge SHARED ra_jni_bridge.c)
+target_link_libraries(ra_jni_bridge PRIVATE rcheevos log android)
+target_include_directories(ra_jni_bridge PRIVATE rcheevos/include ${CMAKE_CURRENT_SOURCE_DIR})
+
+# Link com libretrodroid JNI (do módulo :libretrodroid) — via find_library ou imported target
+find_library(LIBRETRODROID_JNI libretrodroid_jni PATHS ${CMAKE_SOURCE_DIR}/../libretrodroid/build/intermediates/cmake/debug/obj)
+target_link_libraries(ra_jni_bridge PRIVATE ${LIBRETRODROID_JNI})
+```
+
+### Vendoring Strategy: **Git Subtree (Recomendado)**
+
+```bash
+# No repo zelda64player:
+git subtree add --prefix=app/src/main/cpp/rcheevos https://github.com/RetroAchievements/rcheevos.git master --squash
+# Para updates futuros:
+git subtree pull --prefix=app/src/main/cpp/rcheevos https://github.com/RetroAchievements/rcheevos.git master --squash
+```
+
+**Por que subtree e não snapshot copiado?**
+- Mantém histórico de updates rastreável
+- Fácil `pull` para novas releases (tag `master` ~12.x series)
+- LICENSE MIT mantido no lugar
+- Evita "vendored snapshot esquecido por anos"
+
+### ABI Coverage
+
+Deve matchar `jniLibs` existentes: **x86, x86_64, armeabi-v7a, arm64-v8a**. CMake `ANDROID_ABI` loop no `build.gradle.kts` do app.
+
+### Debug Symbols / Stripping
+
+- `debug` build: `-g` symbols kept, `strip` disabled
+- `release` build: `-O2 -DNDEBUG`, `strip` enabled (default AGP). `rcheevos` não tem símbolos sensíveis.
+
+---
+
+## Mudanças no Modelo de Dados
+
+### HackEntry — Campo Opcional `retroAchievements`
+
+```json
+{
+  "id": "ocarina_of_time_dx",
+  "name": "Ocarina of Time DX",
+  ...
+  "retroAchievements": {
+    "supported": true,
+    "gameId": 12345,
+    "title": "The Legend of Zelda: Ocarina of Time",
+    "badgeName": "Ocarina of Time",
+    "badgeUrl": "https://media.retroachievements.org/Badge/12345.png"
+  }
+}
+```
+
+- **Backward-compatible**: campo opcional; apps antigos ignoram.
+- `catalogVersion` bumped para **2** (migração graceful: campo ausente = `supported=false`).
+- `gameId` opcional no catálogo (pode ser resolvido no install via hash); se presente, Store mostra badge RA imediatamente.
+
+### Armazenamento por Hack (Install-time)
+
+Local: `filesDir/ra_metadata.json` (JSON array de `RaGameMetadata` keyed by hackId)
+
+```json
+{
+  "schemaVersion": 1,
+  "entries": {
+    "ocarina_of_time_dx": {
+      "raHash": "a1b2c3d4e5f6...",
+      "raGameId": 12345,
+      "raTitle": "The Legend of Zelda: Ocarina of Time",
+      "badgeUrl": "https://media.retroachievements.org/Badge/12345.png",
+      "consoleId": 13
+    }
+  }
+}
+```
+
+### Settings Keys (CorePrefs Convention)
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `pref_ra_enabled` | Boolean | `true` | Master toggle RA integration |
+| `pref_ra_hardcore` | Boolean | `false` | Hardcore mode (OFF até UA validado) |
+| `pref_ra_system_notifications` | Boolean | `true` | System notification on unlock (API 33+ needs POST_NOTIFICATIONS) |
+| `pref_ra_show_challenge_indicators` | Boolean | `true` | Show challenge/progress indicators in-game |
+| `pref_ra_username` | String | `""` | Cached username (display only) |
+
+---
+
+## Mudanças no Manifest
+
+```xml
+<!-- Nova Activity -->
+<activity
+    android:name=".retroachievements.ui.AchievementsActivity"
+    android:exported="false"
+    android:theme="@style/Theme.Zelda64Player.NoActionBar" />
+
+<activity
+    android:name=".retroachievements.ui.AchievementDetailActivity"
+    android:exported="false"
+    android:theme="@style/Theme.Zelda64Player.NoActionBar" />
+
+<!-- Permissão para notificações de sistema (API 33+) -->
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+```
+
+---
+
+## Ponto de Entrada na Navegação (LibraryActivity)
+
+`LibraryActivity` já tem 3 botões no header: Settings, Store, Randomizer. Adicionar **4º botão: Conquistas (ícone troféu)**.
+
+- Verificar `LibraryMenuController` / `MenuGridBuilder` — o padrão atual usa `binding.librarySettings`, `binding.libraryStore`, `binding.libraryRandomizer` (ImageView/ImageButton no header).
+- Adicionar `binding.libraryAchievements` → `startActivity(Intent(this, AchievementsActivity::class.java))`.
+- Ícone: Dolfi gera SVG troféu consistente com estilo atual (Material Icons outlined style, 24dp).
+
+---
+
+## Plano de Implementação em Fases (B1–B5)
+
+### Fase B1: Foundation — Vendored LibretroDroid + rcheevos Native + JNI Bridge (Semana 1)
+
+**Objetivo**: Build compila, JNI carrega, `rc_client_create` + `rc_client_do_frame` chamado a cada frame (log de teste).
+
+- [ ] Criar módulo Gradle `:libretrodroid` (vendor LibretroDroid 0.13.2 source do GitHub tag 0.13.2)
+- [ ] Adicionar 2 JNI passthroughs no módulo `:libretrodroid`:
+  - `Java_br_com_redclaw_zelda64player_libretrodroid_LibretroDroidMemoryJni_getMemoryData`
+  - `Java_br_com_redclaw_zelda64player_libretrodroid_LibretroDroidMemoryJni_getMemorySize`
+- [ ] No app module: `externalNativeBuild { cmake { path "src/main/cpp/CMakeLists.txt" } }`
+- [ ] `git subtree add` rcheevos em `app/src/main/cpp/rcheevos/` (pinned to `master` tag ~12.x)
+- [ ] `app/src/main/cpp/ra_jni_bridge.c` + `.h` — implementa `RcheevosJni` + `LibretroDroidMemoryJni` native methods
+- [ ] `CMakeLists.txt` compila rcheevos + ra_jni_bridge, linka com `:libretrodroid` JNI lib
+- [ ] `RcheevosJni.kt` + `LibretroDroidMemoryJni.kt` (Kotlin bindings, `System.loadLibrary("ra_jni_bridge")`)
+- [ ] `RaHttpClient.kt` skeleton (OkHttp dispatcher para `server_call` callback)
+- [ ] Integração mínima em `GameActivityViewModel` / `InGameRaViewModel`: `rc_client_create` no `launchHack`, `rc_client_do_frame` no `FrameRendered` Flow, `rc_client_destroy` no `onCleared`
+- [ ] **Build verification**: `./gradlew :app:assembleDebug` + `./gradlew :libretrodroid:assembleDebug` sucesso
+- [ ] **Runtime verification**: Log "RA frame tick" a cada frame no logcat (filtro `RetroAchievements`)
+
+**Critério de aceite**: App compila, roda, core carrega, log "RA frame tick" aparece a cada frame sem crash.
+
+---
+
+### Fase B2: Auth + Session + Install-time Hash Resolution (Semana 2)
+
+**Objetivo**: Login/logout funcional, token persistido criptografado, hash RA computado no install e cacheado.
+
+- [ ] `RaCredentialStore.kt` (EncryptedSharedPreferences, prefs file `ra_secure_prefs`, keys: `pref_ra_token`, `pref_ra_username`, `pref_ra_hardcore_token`)
+- [ ] `RaSessionManager.kt`: `login(username, password) → Result<Token>`, `loginWithToken() → Result<UserInfo>`, `logout()`, `getUserInfo()`, `refreshToken()`
+- [ ] `RaLoginFragment.kt` (Settings): username/password fields, "Obter Token" link → `https://retroachievements.org/controlpanel.php` (página de API), botão Login, loading state, erro amigável
+- [ ] `RaHttpClient.kt` completo: implementa `server_call` callback do rcheevos (async OkHttp → JNI callback completion) + rapi standalone methods (`fetchGameData`, `fetchUserUnlocks`, `resolveHash`, `fetchLeaderboards`, `fetchLeaderboardEntries`)
+- [ ] `RaRepository.kt`: persiste `RaGameMetadata` por hackId em `filesDir/ra_metadata.json` (atomic write)
+- [ ] `RaHashService.kt`: `suspend fun computeAndResolve(hackId: String, patchedRomPath: String): Result<RaGameMetadata>`
+  - Chama `RcheevosJni.nativeComputeHash(romPath)` → usa `rhash` do rcheevos (já trata N64 byte-order/header)
+  - Chama `RaHttpClient.resolveHash(hash)` → `gameId`
+  - Chama `RaHttpClient.fetchGameData(gameId)` → title, badgeUrl
+  - Salva no `RaRepository`
+- [ ] Integração no `DownloadManager` / install flow: após patch aplicado e ROM patcheada escrita em `Storage.rom(hackId)`, chamar `RaHashService.computeAndResolve` (background, não bloqueia UI)
+- [ ] Store UI: se `HackEntry.retroAchievements.supported == true`, mostra badge RA no card/bottom sheet
+- [ ] **Unit tests**: `RaCredentialStoreTest`, `RaSessionManagerTest` (mock OkHttp), `RaHashServiceTest` (fixture ROM conhecida)
+- [ ] **Build verification**: `./gradlew :app:assembleDebug :app:testDebugUnitTest`
+
+**Critério de aceite**: Usuário loga com user/pass → token salvo → reloga app → login silencioso funciona; instala hack compatível → hash RA computado + gameId resolvido → metadata salvo em `ra_metadata.json`.
+
+---
+
+### Fase B3: Achievements Screens (Library) (Semana 3)
+
+**Objetivo**: Tela de Conquistas (lista de jogos instalados com progresso) + tela de detalhe por jogo.
+
+- [ ] `AchievementsActivity.kt` + `AchievementsViewModel.kt`
+  - `StateFlow<List<RaGameMetadata>> installedGamesWithRA` — merge `InstalledLibrary.entries()` + `RaRepository.getAll()` (join por hackId)
+  - RecyclerView grid/list: cover (Coil), título, badge do jogo (Coil), progresso "X/Y unlocked", points total
+  - Empty state: "Nenhum jogo com conquistas instalado. Instale hacks compatíveis da Loja ou gere seeds."
+- [ ] `AchievementDetailActivity.kt` + ViewModel
+  - Recebe `gameId` + `hackId` via intent
+  - `RaRepository.getAchievements(gameId)` → cache local (JSON) ou fetch via `RaHttpClient.fetchUserUnlocks` + `rc_client_create_achievement_list` (preferir cache; refresh pull-to-refresh)
+  - UI: TabLayout por categoria/grouping (como RA site), RecyclerView por aba: badge (Coil), título, descrição, points, progress bar (measured), unlocked checkmark
+  - Pull-to-refresh → re-fetch + update cache
+- [ ] `RaApiModels.kt` + `RaApiException.kt` completos
+- [ ] i18n: `strings.xml` pt-BR/en/es para todas as strings novas (chrome UI — labels de conquistas vêm da API em inglês, **não traduzir**)
+- [ ] Acessibilidade: contentDescription, TalkBack, touch targets ≥48dp
+- [ ] **Visual QA**: Chululu screenshots AchievementsActivity (grid vazio, grid populado), AchievementDetailActivity (abas, badges, progress)
+- [ ] **Build verification**: `./gradlew :app:assembleDebug :app:connectedAndroidTest`
+
+**Critério de aceite**: Abre Conquistas → vê jogos instalados com progresso → toca um → vê lista completa com badges, progresso, descrições → pull-to-refresh atualiza.
+
+---
+
+### Fase B4: In-Game Overlay + Notifications + Challenge/Progress Indicators (Semana 4)
+
+**Objetivo**: Toast custom in-game no desbloqueio + notificação sistema opcional + indicadores de challenge/progress.
+
+- [ ] `InGameRaViewModel.kt` (scoped to GameActivity lifecycle):
+  - `rc_client_set_event_handler` → callbacks para:
+    - `ACHIEVEMENT_TRIGGERED` → `InGameAchievementOverlay.show(achievement)`
+    - `ACHIEVEMENT_CHALLENGE_INDICATOR_SHOW/UPDATE/HIDE` → overlay indicator (pequeno, canto, não intrusivo)
+    - `ACHIEVEMENT_PROGRESS_INDICATOR_SHOW/UPDATE/HIDE` → overlay progress bar (ex: "Kill 10 enemies: 7/10")
+    - `LEADERBOARD_STARTED/FAILED/SUBMITTED` → log apenas (leaderboards só no menu)
+    - `GAME_MASTERY` → overlay especial "Mastery!"
+  - `rc_client_do_frame` driven by `RetroView.frameRendered` Flow (já em main)
+  - `rc_client_unload_game` + `rc_client_destroy` em `onCleared()`
+- [ ] `InGameAchievementOverlay.kt` (custom View):
+  - Adicionado ao `FrameLayout` do GameActivity (acima do GLRetroView, abaixo do gamepad overlay)
+  - Animação: slide-in from top → stay 3s → slide-out
+  - Queue para múltiplos desbloqueios rápidos (sequencial, 3s cada)
+  - Badge icon via Coil (carregado async, placeholder enquanto carrega)
+  - Respeita `pref_ra_enabled` (se OFF, não mostra)
+- [ ] System Notification (opcional, `pref_ra_system_notifications`):
+  - `NotificationCompat.Builder` com `MediaStyle` ou `BigPictureStyle` (badge)
+  - Channel `ra_unlocks` (importance HIGH, sound default)
+  - API 33+: `POST_NOTIFICATIONS` runtime permission request no primeiro unlock se granted
+- [ ] Settings integration: `SettingsActivity` ganha fragment/section "RetroAchievements" com toggles para: enabled, hardcore, system notifications, challenge/progress indicators
+- [ ] Hardcore toggle: `rc_client_set_hardcore_enabled` (só efetivo se UA validado; default OFF)
+- [ ] **Visual QA**: Chululu screenshots overlay in-game (desbloqueio, challenge indicator, progress indicator), notification shade
+- [ ] **Build verification**: `./gradlew :app:assembleDebug`
+
+**Critério de aceite**: Joga hack compatível logado → desbloqueia conquista → toast in-game aparece com badge + título + points → notificação sistema aparece (se enabled) → challenge/progress indicators aparecem/desaparecem corretamente → hardcore OFF por default.
+
+---
+
+### Fase B5: Leaderboards (In-Game Menu Only) + Catalog Integration + Polish (Semana 5)
+
+**Objetivo**: Leaderboards acessíveis **apenas** no menu in-game (GameActivity menu), integração catálogo v2, polimento final.
+
+- [ ] `LeaderboardDialog.kt` (DialogFragment):
+  - Aberto via novo item no menu in-game (GameActivity menu grid: categoria "Conquistas" → "Leaderboards")
+  - Tabs: um por leaderboard do jogo (fetch via `RaHttpClient.fetchLeaderboards(gameId)` → `fetchLeaderboardEntries(leaderboardId)`)
+  - RecyclerView entries: rank, user, score (formatado per `format` field), date, badge do user (Coil)
+  - **NUNCA** overlay sobre gameplay — só DialogFragment modal
+- [ ] Integração no menu in-game (GameActivityViewModel.prepareMenu / menu grid builder):
+  - Nova categoria "Conquistas" com itens: "Ver Conquistas" (abre AchievementsActivity via intent), "Leaderboards" (abre LeaderboardDialog)
+  - Ícones: troféu, leaderboard (Dolfi)
+- [ ] Catálogo v2: `catalogVersion: 2`, campo `retroAchievements` opcional em `HackEntry` (ver schema acima)
+- [ ] `CatalogFetcher` / `MergedCatalogRepository`: handle `catalogVersion` migration (v1 → v2: default `supported=false`)
+- [ ] Store UI: badge RA em hacks com `retroAchievements.supported == true`
+- [ ] i18n completo: todas strings chrome pt-BR/en/es (Wally)
+- [ ] Third-party license notices: adicionar rcheevos MIT license em `licenses/` + `About` screen / `Licenses` menu item
+- [ ] **Risk register updates** (ver abaixo)
+- [ ] **Visual QA**: Chululu screenshots menu in-game leaderboards, Store badge RA, Achievements screens
+- [ ] **Build verification**: `./gradlew :app:assembleRelease` (release build test), `./gradlew :app:testDebugUnitTest :app:connectedAndroidTest`
+
+**Critério de aceite**: Menu in-game tem "Conquistas" → "Leaderboards" abre dialog com tabs/entries → Store mostra badge RA → catálogo v2 parse OK → release build assinado roda → licenças terceiros documentadas.
+
+---
+
+## Registro de Riscos (Adições RetroAchievements)
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|-------|---------------|---------|-----------|
+| **JNI crashes** (segfault em `read_memory` / `do_frame`) | Média | App crash nativo (tombstone) | Defensive null checks em `LibretroDroidMemoryJni`; `read_memory` retorna 0 se ponteiro null; testar exaustivamente unload/reload; sanitizers (ASan) em CI se possível |
+| **Ponteiro memória inválido após unload/reload** | Média | Leitura lixo / crash | `rc_client_unload_game` em `onCleared()` ANTES de core destroy; `getMemoryData` retorna null se core não ready; documentar torn reads aceitáveis v1 |
+| **Leituras rasgadas (torn reads) RDRAM** | Baixa | Conquista dispara 1 frame tarde / progresso inconsistente | Aceitável v1 (documentado). Mitigação futura: travar emulação durante `do_frame` (precisa fork LibretroDroid) |
+| **Rate limits RA API** (não documentados publicamente) | Baixa | Requests falham 429 | `RaHttpClient` com retry exponencial + `RateLimiter` token bucket (conservador: 10 req/s). Cache agressivo (achievements lists, leaderboards) |
+| **Comportamento offline** | Média | Features RA indisponíveis | Cache local (achievements, leaderboards, user info). UI mostra "Offline — dados cacheados". Login falha com mensagem clara. Queue actions (unlocks sync quando online) — stretch |
+| **Segurança conta (hardcore off by default)** | — | — | Hardcore **default OFF**. UA validation com RAdmin antes de habilitar. Token criptografado. Sem telemetria. |
+| **GPL-3.0 / MIT attribution** | — | Compliance legal | rcheevos MIT → adicionar `licenses/rcheevos-LICENSE` + entrada no menu "Licenças". LibretroDroid/cores GPL-3.0 já cobertos. |
+| **Play Store policy (UGC-ish)** | Baixa | Rejeição / remoção | RA não é UGC gerado pelo app; é integração com serviço terceiros. Sem chat, sem upload de conteúdo. Leaderboards read-only. Baixo risco. Documentar no README. |
+| **Catálogo v2 migration** | Baixa | Loja quebra para usuários antigos | `catalogVersion` integer; `MergedCatalogRepository` trata campo ausente como `false`. Testar upgrade v1→v2. |
+
+---
+
+## Checklist de Milestones (Fases B1–B5)
+
+#### Fase B1: Foundation — Vendored LibretroDroid + rcheevos Native + JNI Bridge
+- [ ] Módulo `:libretrodroid` (vendor 0.13.2 + 2 JNI passthroughs)
+- [ ] `app/src/main/cpp/rcheevos/` (git subtree pinned to master tag)
+- [ ] `CMakeLists.txt` + `ra_jni_bridge.c/h` + `RcheevosJni.kt` + `LibretroDroidMemoryJni.kt`
+- [ ] `RaHttpClient` skeleton (server_call dispatcher)
+- [ ] `InGameRaViewModel` mínimo: create/do_frame/destroy no lifecycle GameActivity
+- [ ] **Build**: `./gradlew :app:assembleDebug :libretrodroid:assembleDebug` ✓
+- [ ] **Runtime**: "RA frame tick" log a cada frame ✓
+
+#### Fase B2: Auth + Session + Install-time Hash Resolution
+- [ ] `RaCredentialStore` + `RaSessionManager` + `RaLoginFragment` (Settings)
+- [ ] `RaHttpClient` completo (server_call + rapi standalone)
+- [ ] `RaRepository` + `RaHashService` (install-time hash → gameId → metadata cache)
+- [ ] Store UI: badge RA em hacks compatíveis
+- [ ] Unit tests auth/hash
+- [ ] **Build + Unit tests** ✓
+
+#### Fase B3: Achievements Screens (Library)
+- [ ] `AchievementsActivity` + `AchievementsViewModel` (grid jogos instalados com progresso)
+- [ ] `AchievementDetailActivity` (abas categorias, badges, progresso, pull-to-refresh)
+- [ ] i18n strings.xml (chrome apenas)
+- [ ] Acessibilidade + Visual QA (Chululu)
+- [ ] **Build + Instrumented tests** ✓
+
+#### Fase B4: In-Game Overlay + Notifications + Indicators
+- [ ] `InGameRaViewModel` event handlers completos
+- [ ] `InGameAchievementOverlay` (toast custom animado + queue)
+- [ ] System notification (channel, permission API 33+)
+- [ ] Settings fragment RA (enabled, hardcore, notifications, indicators)
+- [ ] Hardcore default OFF
+- [ ] Visual QA (Chululu)
+- [ ] **Build** ✓
+
+#### Fase B5: Leaderboards (Menu Only) + Catalog v2 + Polish
+- [ ] `LeaderboardDialog` (DialogFragment, tabs, entries, Coil badges)
+- [ ] Menu in-game integração (categoria "Conquistas")
+- [ ] Catálogo v2 + `retroAchievements` field + migration
+- [ ] Store badge RA
+- [ ] Third-party licenses (rcheevos MIT)
+- [ ] i18n completo (Wally)
+- [ ] Visual QA final (Chululu)
+- [ ] **Release build test** ✓
+
+---
+
+## Referências Técnicas
+
+- **rcheevos repo**: https://github.com/RetroAchievements/rcheevos (branch `develop`, releases em tag `master` ~12.x)
+- **rcheevos docs**: `docs/` no repo (client API, rapi, event codes, memory callbacks)
+- **LibretroDroid 0.13.2**: https://github.com/Swordfish90/LibretroDroid (tag 0.13.2)
+- **RetroAchievements API**: https://retroachievements.org/API/ (rapi endpoints)
+- **N64 RDRAM mapping**: https://n64brew.dev/wiki/RDRAM (0x80000000–0x807FFFFF base, 8MB com expansion)
+- **RetroArch RA integration** (referência de implementação host): `retroarch/libretro-common/include/libretro.h` + `retroarch/retroachievements.c`
+
+(End of file)

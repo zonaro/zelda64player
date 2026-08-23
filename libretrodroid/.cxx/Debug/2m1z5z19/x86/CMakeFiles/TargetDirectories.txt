@@ -1,0 +1,14 @@
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/CMakeFiles/libretrodroid.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/CMakeFiles/edit_cache.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/CMakeFiles/rebuild_cache.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/CMakeFiles/list_install_components.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/CMakeFiles/install.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/CMakeFiles/install/local.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/CMakeFiles/install/strip.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/oboe/CMakeFiles/oboe.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/oboe/CMakeFiles/edit_cache.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/oboe/CMakeFiles/rebuild_cache.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/oboe/CMakeFiles/list_install_components.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/oboe/CMakeFiles/install.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/oboe/CMakeFiles/install/local.dir
+/mnt/GIT/zelda64player/libretrodroid/.cxx/Debug/2m1z5z19/x86/oboe/CMakeFiles/install/strip.dir

@@ -1,6 +1,6 @@
 # Zelda 64 Player
 
-Native Android (Kotlin) player for fan-made Zelda 64 ROM hacks. Users provide their own legally-owned Ocarina of Time / Majora's Mask base ROMs; the app applies BPS (and legacy IPS) patches on-the-fly and plays them via Libretro cores (mupen64plus-next GLES3/GLES2, parallel-n64). No ROMs are embedded or distributed.
+Native Android (Kotlin) player for fan-made Zelda 64 ROM hacks. Users provide their own legally-owned Ocarina of Time / Majora's Mask base ROMs; the app applies BPS (and legacy IPS) patches on-the-fly and plays them via Libretro cores (mupen64plus-next GLES3 and parallel-n64). No ROMs are embedded or distributed.
 
 ---
 
@@ -33,10 +33,14 @@ cd zelda64player
 ./gradlew assembleDebug
 ```
 
-The first build runs a `prepareCore` Gradle task that downloads Libretro cores
-(mupen64plus_next GLES3/GLES2 and parallel-n64) from buildbot.libretro.com into
-`app/src/main/jniLibs` (needs internet). Cores are skipped gracefully if unavailable
-for a given ABI.
+The first build runs a `prepareCore` Gradle task that downloads the two Libretro
+cores into `app/src/main/jniLibs` (needs internet): `mupen64plus_next` (GLES3) is
+fetched as a zip from buildbot.libretro.com, and `parallel_n64` is fetched from our
+self-built rolling release (see `.github/workflows/build-parallel-n64.yml`, which
+builds updated dynarec binaries from libretro/parallel-n64 with the current NDK)
+and falls back to the buildbot nightly zip if that is unavailable. Cores already
+present in `jniLibs` are not re-downloaded, and any core unavailable for a given
+ABI is skipped gracefully.
 
 ---
 

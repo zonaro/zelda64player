@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="4dp">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/row_item"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="@string/plandomizer_item_hint"
+        android:inputType="text" />
+
+    <Spinner
+        android:id="@+id/row_type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:contentDescription="@string/plandomizer_type_hint" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/row_count"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="@string/plandomizer_count_hint"
+        android:inputType="number" />
+
+    <ImageButton
+        android:id="@+id/row_remove"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/plandomizer_remove_row"
+        android:src="@drawable/ic_close" />
+</LinearLayout>

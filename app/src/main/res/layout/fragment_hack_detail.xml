@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/black"
+    android:background="@drawable/shape_bottom_sheet"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -16,7 +16,8 @@
             android:id="@+id/detail_cover"
             android:layout_width="96dp"
             android:layout_height="96dp"
-            android:background="#202020"
+            android:background="@drawable/shape_cover"
+            android:clipToOutline="true"
             android:contentDescription="@string/cover_content_description"
             android:scaleType="fitCenter"
             tools:src="@drawable/store_cover_placeholder" />
@@ -32,7 +33,7 @@
                 android:id="@+id/detail_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
+                android:textColor="@color/color_on_surface"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 tools:text="Ocarina of Time DX" />
@@ -42,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="#cccccc"
+                android:textColor="@color/color_on_surface_variant"
                 android:textSize="13sp"
                 tools:text="Autor: Kazemaru" />
 
@@ -51,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:textColor="#cccccc"
+                android:textColor="@color/color_on_surface_variant"
                 android:textSize="13sp"
                 tools:text="Versão: 2.5.1" />
         </LinearLayout>
@@ -64,7 +65,7 @@
         android:layout_marginTop="12dp"
         android:maxHeight="160dp"
         android:scrollbars="vertical"
-        android:textColor="#dddddd"
+        android:textColor="@color/color_on_surface_variant"
         android:textSize="14sp"
         tools:text="Quality-of-life improvements..." />
 
@@ -73,7 +74,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textColor="#999999"
+        android:textColor="@color/color_on_surface_variant"
         android:textSize="12sp"
         android:visibility="gone"
         tools:text="Tags: quality-of-life, restoration"
@@ -84,7 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:textColor="#999999"
+        android:textColor="@color/color_on_surface_variant"
         android:textSize="12sp"
         android:visibility="gone"
         tools:text="Cores compatíveis: mupen64plus_next_gles3"
@@ -95,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="@string/detail_required_base"
-        android:textColor="@android:color/white"
+        android:textColor="@color/color_on_surface"
         android:textSize="13sp"
         android:textStyle="bold" />
 
@@ -104,7 +105,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:textColor="#cccccc"
+        android:textColor="@color/color_on_surface_variant"
         android:textSize="13sp"
         tools:text="The Legend of Zelda: OoT (Código: CZLE, Versão: 0)" />
 
@@ -131,7 +132,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textColor="#cccccc"
+        android:textColor="@color/color_on_surface_variant"
         android:textSize="12sp"
         android:visibility="gone"
         tools:text="Instalando… 42%" />
@@ -141,7 +142,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textColor="#ff8888"
+        android:textColor="@color/color_error"
         android:textSize="13sp"
         android:visibility="gone"
         tools:text="Erro de rede."
@@ -153,5 +154,4 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="@string/detail_download" />
-
 </LinearLayout>
