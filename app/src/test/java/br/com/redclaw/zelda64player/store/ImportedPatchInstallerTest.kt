@@ -82,8 +82,8 @@ class ImportedPatchInstallerTest {
         )
 
         val result = runBlocking { installer.install(patchFile, "my_hack") }
-        assertTrue(result is ImportPatchResult.Success)
-        result as ImportPatchResult.Success
+        assertTrue(result is ImportPatchSuccess)
+        result as ImportPatchSuccess
         assertEquals("my_hack", result.hackId)
         assertEquals(OcarinaGame.OOT, result.family)
 
@@ -117,8 +117,8 @@ class ImportedPatchInstallerTest {
         )
 
         val result = runBlocking { installer.install(patchFile, "orphan") }
-        assertTrue(result is ImportPatchResult.NoCompatibleRom)
-        result as ImportPatchResult.NoCompatibleRom
+        assertTrue(result is ImportPatchNoCompatibleRom)
+        result as ImportPatchNoCompatibleRom
         assertEquals(expectedCrc, result.expectedCrc32)
         assertTrue(result.foundCrc32s.isEmpty())
     }
@@ -145,7 +145,7 @@ class ImportedPatchInstallerTest {
         )
 
         val result = runBlocking { installer.install(patchFile, "garbage") }
-        assertTrue(result is ImportPatchResult.UnsupportedFormat)
+        assertTrue(result is ImportPatchUnsupported)
     }
 
     @Test
@@ -179,7 +179,7 @@ class ImportedPatchInstallerTest {
         )
 
         val result = runBlocking { installer.install(patchFile, "corrupt") }
-        assertTrue(result is ImportPatchResult.InvalidPatch)
+        assertTrue(result is ImportPatchInvalid)
         assertFalse(Storage(context).rom("corrupt").exists())
     }
 }

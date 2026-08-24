@@ -23,29 +23,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * Outcome of [ImportedPatchInstaller.install].
- *
- * - [Success]: the patch was applied and the hack is installed (available in the
- *   Library). [family] is the detected game family (OoT/MM) or null.
- * - [NoCompatibleRom]: a BPS patch whose required base ROM CRC32 matches no
- *   imported base ROM. [targetDescription] names the expected game (from
- *   [KnownBaseRomTable]) when known, else null. [foundCrc32s] lists the CRC32s
- *   of the currently imported base ROMs (for diagnostics).
- * - [InvalidPatch]: the patch could not be applied (corrupt/unsupported BPS/IPS).
- * - [UnsupportedFormat]: the file is neither BPS nor IPS.
- */
-sealed class ImportPatchResult {
-    data class Success(val hackId: String, val title: String, val family: OcarinaGame?)
-    data class NoCompatibleRom(
-        val expectedCrc32: String,
-        val targetDescription: String?,
-        val foundCrc32s: List<String>
-    )
-    data class InvalidPatch(val message: String)
-    data class UnsupportedFormat(val message: String)
-}
-
-/**
  * Installs a user-imported patch (BPS or IPS) into the Library.
  *
  * The flow mirrors [br.com.redclaw.zelda64player.store.DownloadManager] but
@@ -70,7 +47,7 @@ class ImportedPatchInstaller(
         withContext<ImportPatchResult>(Dispatchers.IO) {
             val format = PatcherFacade.detectPatchFormat(patchFile)
             if (format == PatcherFacade.PatchFormat.UNKNOWN) {
-                return@withContext ImportPatchResult.UnsupportedFormat(
+                return@withContext ImportPatchUnsupported(
                     context.getString(R.string.import_unsupported_message)
                 )
             }
@@ -79,14 +56,14 @@ class ImportedPatchInstaller(
             // is self-contained (null base).
             val baseRom: BaseRom? = if (format == PatcherFacade.PatchFormat.BPS) {
                 val expectedCrc = PatcherFacade.expectedSourceCrc32(patchFile)
-                    .getOrElse { e -> return@withContext ImportPatchResult.InvalidPatch(mapMessage(e)) }
+                    .getOrElse { e -> return@withContext ImportPatchInvalid(mapMessage(e)) }
                 val found = findBaseRomByCrc(baseRomRepository.getAll(), expectedCrc)
                 if (found == null) {
                     val info = KnownBaseRomTable.infoFor(expectedCrc)
                     val targetDescription = info?.let {
                         context.getString(gameNameRes(it.game)) + " (" + it.versionLabel + ")"
                     }
-                    return@withContext ImportPatchResult.NoCompatibleRom(
+                    return@withContext ImportPatchNoCompatibleRom(
                         expectedCrc32 = expectedCrc,
                         targetDescription = targetDescription,
                         foundCrc32s = baseRomRepository.getAll().map { it.crc32 }
@@ -102,7 +79,7 @@ class ImportedPatchInstaller(
             try {
                 val baseFile = baseRom?.let { File(it.path) } ?: emptyBaseFile()
                 PatcherFacade.applyPatchBlocking(baseFile, patchFile, romTemp)
-                    .getOrElse { e -> return@withContext ImportPatchResult.InvalidPatch(mapMessage(e)) }
+                    .getOrElse { e -> return@withContext ImportPatchInvalid(mapMessage(e)) }
 
                 // Atomically publish: rename temp ROM -> final, record install.
                 val finalRom = storage.rom(hackId)
@@ -146,7 +123,7 @@ class ImportedPatchInstaller(
                 val family = baseRom?.let {
                     OcarinaSongCatalog.detectGame(RomHeader(it.gameCode, it.versionByte, ""))
                 }
-                ImportPatchResult.Success(hackId, entry.name, family)
+                ImportPatchSuccess(hackId, entry.name, family)
             } finally {
                 romTemp.delete()
             }

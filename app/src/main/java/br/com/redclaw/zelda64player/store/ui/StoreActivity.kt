@@ -23,7 +23,11 @@ import br.com.redclaw.zelda64player.databinding.ActivityStoreBinding
 import br.com.redclaw.zelda64player.ocarina.OcarinaGame
 import br.com.redclaw.zelda64player.store.DownloadPhase
 import br.com.redclaw.zelda64player.store.DownloadQueueManager
+import br.com.redclaw.zelda64player.store.ImportPatchInvalid
+import br.com.redclaw.zelda64player.store.ImportPatchNoCompatibleRom
 import br.com.redclaw.zelda64player.store.ImportPatchResult
+import br.com.redclaw.zelda64player.store.ImportPatchSuccess
+import br.com.redclaw.zelda64player.store.ImportPatchUnsupported
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -235,7 +239,7 @@ class StoreActivity : AppCompatActivity() {
         val titleRes: Int
         val message: String
         when (result) {
-            is ImportPatchResult.Success -> {
+            is ImportPatchSuccess -> {
                 titleRes = R.string.import_success_title
                 message = getString(
                     R.string.import_success_message,
@@ -243,7 +247,7 @@ class StoreActivity : AppCompatActivity() {
                     gameName(result.family)
                 )
             }
-            is ImportPatchResult.NoCompatibleRom -> {
+            is ImportPatchNoCompatibleRom -> {
                 titleRes = R.string.import_no_rom_title
                 message = if (result.targetDescription != null) {
                     getString(
@@ -255,11 +259,11 @@ class StoreActivity : AppCompatActivity() {
                     getString(R.string.import_no_rom_unknown_message, result.expectedCrc32)
                 }
             }
-            is ImportPatchResult.InvalidPatch -> {
+            is ImportPatchInvalid -> {
                 titleRes = R.string.import_invalid_title
                 message = getString(R.string.import_invalid_message, result.message)
             }
-            is ImportPatchResult.UnsupportedFormat -> {
+            is ImportPatchUnsupported -> {
                 titleRes = R.string.import_invalid_title
                 message = getString(R.string.import_unsupported_message)
             }

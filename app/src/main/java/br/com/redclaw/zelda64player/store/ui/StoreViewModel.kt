@@ -167,7 +167,7 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
         val installer = ImportedPatchInstaller(
             getApplication(),
             AppRepositories.baseRomRepository(getApplication()),
-            InstalledHacksRepository(File(getApplication().filesDir, "installed_hacks.json")),
+            InstalledHacksRepository(File(appContext.filesDir, "installed_hacks.json")),
             AppRepositories.userHacksRepository(getApplication()),
             Storage.getInstance(getApplication())
         )
