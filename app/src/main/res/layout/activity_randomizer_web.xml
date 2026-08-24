@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/switch_bg">
+
+    <!-- Header: back button + title (Nintendo Switch UI tokens). -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/switch_screen_margin">
+
+        <ImageButton
+            android:id="@+id/randomizer_back"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:background="@drawable/bg_icon_button"
+            android:src="@drawable/ic_close"
+            android:tint="@color/switch_text_primary"
+            android:contentDescription="@string/about_dialog_close" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/randomizer_web_title"
+            android:textColor="@color/switch_text_primary"
+            android:textSize="@dimen/switch_title_text"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Thin separator below the header. -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/switch_text_secondary" />
+
+    <!-- Loading indicator while a page is loading. -->
+    <ProgressBar
+        android:id="@+id/randomizer_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <!-- The ootrandomizer.com generator WebView. -->
+    <WebView
+        android:id="@+id/randomizer_webview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

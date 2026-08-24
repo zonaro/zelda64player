@@ -231,6 +231,6 @@ dependencies {
     // Required by the frozen gamepad/ package (CompositeDisposable, pad.events()).
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
 
-    // OoTR Randomizer: encrypted storage of the user's API key (AES256 master key).
+    // EncryptedSharedPreferences (AES256 master key) for RetroAchievements credentials.
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 }

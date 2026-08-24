@@ -13,7 +13,7 @@ Owns all **documentation**, **translation (i18n)**, and **code documentation (KD
   - Installation: GitHub Releases / F-Droid / sideload APK
   - Usage: Import ROMs → Browse Store → Download hack → Play
   - **RetroAchievements integration**: login, achievements screen, in-game unlocks, leaderboards (in-game menu only)
-  - **OoT Randomizer Generator**: API key, schema-driven settings, plandomizer, seed library
+  - **OoT Randomizer Generator**: embedded OoTR WebView generator (ootrandomizer.com), ROM auto-fill, client-side patch capture, seed library
   - **Nintendo Switch UI**: custom native implementation, no M3 Expressive
   - Supported hacks (from catalog.json)
   - Supported cores (mupen64plus_next_gles3, parallel_n64)
@@ -33,7 +33,7 @@ Owns all **documentation**, **translation (i18n)**, and **code documentation (KD
   3. Validate: no missing keys, no hardcoded strings in code
   4. Special terms: "Base ROM" → "ROM Base" (pt-BR) / "Base ROM" (en) / "ROM Base" (es); "Patch" → "Patch" (all); "Hack" → "Hack" (pt-BR/en) / "Hack" (es); "Achievement" → "Conquista" (pt-BR) / "Achievement" (en) / "Logro" (es); "Leaderboard" → "Ranking" (pt-BR) / "Leaderboard" (en) / "Clasificación" (es); "Hardcore" → "Hardcore" (all); "Seed" → "Seed" (all)
 - **RetroAchievements exception**: Achievement titles/descriptions come from RA API in English — **do NOT translate** (community canonical terms). Only UI chrome (tabs, buttons, errors, placeholders) translated.
-- **Randomizer exception**: ~200 setting labels/tooltips in `assets/randomizer/oot_settings_schema.json` remain in English (canonical OoTR terminology). Only UI chrome translated.
+- **Randomizer exception**: the embedded OoTR WebView generator renders its own English UI (canonical OoTR terminology). Only the app's native chrome (ROM picker, capture progress, dialogs) is translated.
 - **Switch UI strings scope** (NEW):
   - Dock labels: "Loja", "Randomizador", "RetroAchievements", "Sobre/Licenças"
   - Side panel items: "Tema", "Perfil RA", "Configurações Completas", "Efeitos Sonoros"

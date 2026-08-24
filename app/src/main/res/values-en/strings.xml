@@ -164,15 +164,17 @@
     <string name="settings_catalog_delete_desc">Remove catalog URL</string>
     <string name="settings_catalog_remove_confirm_title">Remove catalog URL?</string>
 
-    <!-- Settings: randomizer API key -->
-    <string name="settings_randomizer_title">Randomizer API Key</string>
-    <string name="settings_randomizer_description">Paste your OoTR API key (obtained from the OoTR Discord). The key is stored encrypted and is never shown.</string>
-    <string name="settings_randomizer_hint">Paste the API key here</string>
-    <string name="settings_randomizer_save">Save</string>
-    <string name="settings_randomizer_clear">Clear</string>
-    <string name="settings_randomizer_status_configured">Key configured</string>
-    <string name="settings_randomizer_status_none">No key configured</string>
-    <string name="settings_randomizer_empty">Paste a valid key before saving.</string>
+    <!-- Randomizer WebView (ootrandomizer.com generator) -->
+    <string name="randomizer_web_title">Randomizer</string>
+    <string name="randomizer_web_loading">Loading…</string>
+    <string name="randomizer_web_select_rom">Select the vanilla OoT ROM</string>
+    <string name="randomizer_web_no_vanilla">No vanilla OoT ROM imported. Import an OoT 1.0 NTSC-U/J ROM in Settings.</string>
+    <string name="randomizer_web_open_settings">Open Settings</string>
+    <string name="randomizer_web_patch_captured">Patched ROM captured! Added to Randomizers.</string>
+    <string name="randomizer_web_open_library">Go to Library</string>
+    <string name="randomizer_web_capture_failed">Failed to capture the patch. Please try again.</string>
+    <string name="randomizer_web_extract_failed">Could not extract the .z64 from the ZIP.</string>
+    <string name="randomizer_web_rom_picker_title">Choose the OoT ROM</string>
 
     <!-- Settings: emulator core -->
     <string name="settings_core_title">Emulator core</string>

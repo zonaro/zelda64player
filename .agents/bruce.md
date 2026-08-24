@@ -135,7 +135,7 @@
 3. **Library Home rebuild** — `SwitchHomeRow` (horizontal RecyclerView), `SwitchGameCard` (square, cover, focus label, dimming), `SwitchAllGamesCard` (circular, charcoal, cyan grid icon), `SwitchDock` (4 circular buttons), `SwitchFooterHints` (TV/gamepad + "(i) Sobre" / "+ Opções"). Vanilla games first, then store hacks, then randomizer seeds.
 4. **Todos os Jogos grid** — `SwitchGridScreen` (fullscreen): header icon+title "Todos os Jogos" 20sp bold + separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders. All entries together (vanilla + hacks + seeds).
 5. **Side panel + Settings restyle** — `SwitchSidePanel` (right slide-in, ~50% width, sharp edges). Quick settings: theme toggle, RA profile status, link to full Settings. Full SettingsActivity restyled entirely (SwitchGridScreen or fullscreen SwitchSidePanel).
-6. **Store / Randomizer / RetroAchievements screens restyle** — Store: Switch cards in grid, detail → SwitchDialog. Randomizer: schema-driven form in SwitchDialog rows, plandomizer editor/builder in SwitchDialog. RA: SwitchGridScreen (games), SwitchDialog (detail, leaderboards).
+6. **Store / Randomizer / RetroAchievements screens restyle** — Store: Switch cards in grid, detail → SwitchDialog. Randomizer: embedded OoTR WebView generator (ootrandomizer.com) styled with Switch chrome, ROM picker dialog + capture progress dialog. RA: SwitchGridScreen (games), SwitchDialog (detail, leaderboards).
 7. **In-game menu + overlays restyle** — Pause menu → SwitchDialog, leaderboards → SwitchDialog, achievement unlock overlay → custom Switch-style toast, ocarina HUD → Switch-style overlay. **RadialGamePad touch layout FROZEN (Rule 14)** — only chrome restyled.
 8. **Splash** — `SplashActivity` or splash theme: Zelda gold/green palette (Dolfi original art), same structural layout as NS Launcher splash (flanking iconic shapes + two-line logo "Zelda 64" / "PLAYER"). No Nintendo IP.
 9. **SFX integration + polish** — Wire SFX to all focus/select/back/panel actions, volume respect, mute toggle, cross-screen consistency, visual QA (Chululu).
@@ -147,7 +147,7 @@
 | Library Home | SwitchHomeRow, SwitchAllGamesCard, SwitchDock, SwitchFooterHints | Vanilla → hacks → seeds order |
 | Todos os Jogos | SwitchGridScreen | Search/filter, all entries |
 | Store | SwitchGridScreen + SwitchDialog | Cards + detail bottom sheet |
-| Randomizer | SwitchSidePanel + SwitchDialog | Schema form, plandomizer |
+| Randomizer | RandomizerWebActivity (WebView) + SwitchDialog | Embedded OoTR generator, ROM picker, capture progress |
 | Settings (Quick) | SwitchSidePanel | Theme, RA status, link to full |
 | Settings (Full) | SwitchGridScreen / SwitchSidePanel | Full restyle |
 | RetroAchievements | SwitchGridScreen + SwitchDialog | Games, detail, leaderboards |
@@ -221,7 +221,7 @@
 **Objective**: Login/logout functional, token persisted encrypted, RA hash computed at install and cached.
 
 **Files to create:**
-- `retroachievements/auth/RaCredentialStore.kt` — `EncryptedSharedPreferences` (prefs file `ra_secure_prefs`, keys: `pref_ra_token`, `pref_ra_username`, `pref_ra_hardcore_token`). Pattern identical to `OotrApiKeyStore`.
+- `retroachievements/auth/RaCredentialStore.kt` — `EncryptedSharedPreferences` (prefs file `ra_secure_prefs`, keys: `pref_ra_token`, `pref_ra_username`, `pref_ra_hardcore_token`).
 - `retroachievements/auth/RaSessionManager.kt`:
   - `suspend fun login(username: String, password: String): Result<UserInfo>` — calls `RcheevosJni.nativeLoginPassword` + `RaHttpClient.fetchUserInfo()` → cache token + username
   - `suspend fun loginWithToken(): Result<UserInfo>` — `RcheevosJni.nativeLoginToken(token)` + fetch user info
@@ -395,103 +395,34 @@
 - **Leaderboards never overlaid**: Only DialogFragment in GameActivity menu.
 - **RA hash from final patched ROM only**: Install-time, after BPS/ZPF applied.
 
-### Phase R1: API Client + Key Management
-**Files to create:**
-- `randomizer/api/OotrApiClient.kt` — OkHttp client with coroutines; methods: `createSeed(settings, plandomizerJson?)`, `pollStatus(seedId)`, `downloadPatch(seedId)`, `fetchVersions()`. Uses `RateLimiter` (token bucket: 20 req / 10s). All calls on `Dispatchers.IO`. Returns `Result<T>` sealed class.
-- `randomizer/api/OotrApiModels.kt` — Data classes: `CreateSeedRequest`, `CreateSeedResponse(id, version, spoilers)`, `StatusResponse(status, progress, positionQueue?, maxWaitTime?)`, `VersionResponse`. `@Serializable` (kotlinx-serialization) or manual JSON parsing (org.json) — match existing project JSON lib.
-- `randomizer/api/OotrApiException.kt` — Sealed hierarchy: `ValidationError(details)`, `QueueFull`, `RateLimited(retryAfterMs)`, `ServerError`, `NetworkError(cause)`, `VersionAmbiguous`, `PlandomizerUnsupported`.
-- `randomizer/api/RateLimiter.kt` — Token bucket implementation; `suspend fun acquire()` blocks until token available. Thread-safe.
-- `settings/ui/RandomizerApiKeyFragment.kt` — Preference fragment: `EncryptedSharedPreferences` key `pref_ootr_api_key`. UI: key input (password visibility toggle), "Get Key" button → intent to Discord OoTR invite URL, validation regex (OoTR key format), save → sanitize in logs. If no key, RandomizerActivity shows this fragment first.
+### Phase R: OoT Randomizer via WebView (ootrandomizer.com)
+
+The Randomizer feature embeds the **official OoTR WebView generator** (https://ootrandomizer.com/generator) inside a native Android `WebView`. No API key, no local patch logic, no schema, no ZPF. The user configures options on the site, generates a seed, and is redirected to the seed page (`/seed/get?id=<id>`). The app:
+
+1. Auto-fills the ROM field with the user's imported vanilla OoT ROM (extracting the `.z64` from a `.zip` if needed) via a JS injection that clicks the file input and supplies a `content://` URI through a `FileProvider`.
+2. Intercepts the patched-ROM download (generated client-side via WASM) when the user clicks "Patch ROM!", by hooking the blob download in JS and POSTing the bytes to a local `127.0.0.1` server (fallback: base64 chunks via a `JavascriptInterface`).
+3. Saves the captured ROM to `Storage.rom("randomizer_<seedId>")` via `RandomizedSeedRepository.add(...)`, adding it to the dedicated "Randomizadores" Library section. Unlimited seeds.
+
+**Files (created):**
+- `randomizer/RomZipExtractor.kt` — `object`; `extractZ64(zipFile, outDir): File?` streaming via `ZipInputStream` (no full-file load).
+- `randomizer/RomFileProvider.kt` — `FileProvider` subclass; authority `br.com.redclaw.zelda64player.randomizer.romfileprovider`; serves the temp ROM from `cacheDir/randomizer_rom/`.
+- `randomizer/RandomizerJs.kt` — `const val INJECT_ROM_AUTOFILL` (clicks ROM file input via MutationObserver) + `fun hookDownload(port: Int)` (POSTs blob to `http://127.0.0.1:<PORT>/patch`, fallback base64 chunks to `window.AndroidRandomizer`).
+- `randomizer/WebViewJsBridge.kt` — `@JavascriptInterface appendChunk(base64)` + `endCapture(fileName)`; accumulates decoded chunks to a temp file.
+- `randomizer/LocalRomServer.kt` — `ServerSocket` on `127.0.0.1` ephemeral port; reads headers via raw `InputStream` (NOT `BufferedReader`, to avoid consuming body bytes); streams POST `/patch` body to a temp file; calls `onCaptured(file, fileName)`.
+- `randomizer/RandomizerWebViewModel.kt` — `AndroidViewModel`; loads OoT ROMs (`gameCode.startsWith("CZL")`); `selectRom` copies/extracts to `cacheDir/randomizer_rom/oot_vanilla.z64`, builds content URI via `RomFileProvider` + grants to own package; `consumeCapture(file, fileName)` builds `RandomizedSeedEntry(id="randomizer_$seedId", ootrVersion="web", hasPlandomizer=false, romFileName="rom_$id", baseRomLabel=rom.displayName)` and saves via `seedRepository.add`.
+- `randomizer/RandomizerWebActivity.kt` — WebView host styled with Switch chrome; `GENERATOR_URL="https://ootrandomizer.com/generator"`, `SEED_PATH="/seed/get"`; `onShowFileChooser` auto-supplies `romUri` for ROM requests; `shouldOverrideUrlLoading` restricts nav to ootrandomizer.com; `onPageFinished` injects `INJECT_ROM_AUTOFILL` (delay 1200ms) on seed page and `hookDownload(port)` on all pages; captures via `onPatchCaptured` -> `viewModel.consumeCapture` -> success/error `SwitchDialog`.
+- `randomizer/repository/RandomizedSeedEntry.kt` — kept as-is (fields: id, name, ootrSeedId, ootrVersion, createdAt, hasPlandomizer, romFileName, baseRomLabel).
+- `randomizer/repository/RandomizedSeedRepository.kt` — kept; `add(entry, file)` moves file to `romsDir/rom_<id>` = `Storage.rom(id)`.
+- `views/RandomizerLibrarySource.kt` — kept; uses only id + name.
 
 **Integration points:**
-- `di/AppContainer.kt` — provide `OotrApiClient` singleton (needs OkHttpClient, RateLimiter).
-- `settings/SettingsViewModel.kt` — expose API key state (Flow<Boolean> hasKey).
-- Reuse `store/DownloadManager.kt` patterns for progress notification / checksum validation.
+- `views/LibraryActivity.kt` — dock "Randomizador" launches `RandomizerWebActivity`.
+- `AndroidManifest.xml` — `<activity .randomizer.RandomizerWebActivity>` + `<provider .randomizer.RomFileProvider>` (authorities `br.com.redclaw.zelda64player.randomizer.romfileprovider`, `grantUriPermissions=true`, meta-data `FILE_PROVIDER_PATHS` -> `@xml/randomizer_file_paths`).
+- `repositories/GameRomResolver.kt` — resolves `randomizer_<seedId>` via `Storage.rom(hackId)` (unchanged).
 
 **Invariants:**
-- **Never log API key** — sanitize in all `Timber`/`Log` calls (`key.take(4) + "***"` or just `"***"`).
-- **EncryptedSharedPreferences** only (minSdk 24 supports it).
-- **RateLimiter applies to ALL endpoints** (create, status, patch, version).
-- **Coroutines + Flow** — no RxJava in new randomizer code.
-
-### Phase R2: ZPF Applier + Boot CRC
-**Files to create:**
-- `randomizer/patch/ZpfParser.kt` — Parse `.zpf` (single zlib stream) and `.zpfz` (concatenated zlib streams). Returns `ZpfPatch` model: `magic`, `version`, `dmaTableStart`, `keyRangeMin`, `keyRangeMax`, `keyAddress`, `dmaUpdates: List<DmaUpdate>`, `xorEdits: List<XorEdit>`. Streaming parse via `InflaterInputStream` — **no full decompression to heap**.
-- `randomizer/patch/ZpfApplier.kt` — `suspend fun apply(sourceRom: File, patch: ZpfPatch, output: File): Result<Unit>`. Uses `FileChannel` + `MappedByteBuffer` (read-only source, read-write target) for random access DMA/XOR ops. Falls back to `RandomAccessFile` if mmap fails. **Streaming: never load full 32MB ROM into byte[]**.
-- `randomizer/patch/ZpfValidator.kt` — Verify magic `ZPFv`, version `1`, structural integrity (DMA terminator 0xFFFF, XOR blocks well-formed), optional CRC checks.
-- `randomizer/patch/N64BootCrcCalculator.kt` — CIC 6105 algorithm: seed `0xDF26F436`, range `0x1000..0x101000` (inclusive start, exclusive end), step `t1 += BE32(data[0x750 + (i & 0xFF)]) ^ d`. Returns `Pair<UInt, UInt>` (CRC1, CRC2). **Pure Kotlin, no Android deps** — unit testable.
-
-**Reuse existing:**
-- `patcher/n64/RomNormalizer.kt` — normalize base ROM to z64 BE before patch.
-- `patcher/n64/RomHeader.kt` — validate gameCode `CZLE`/`CZLJ`, versionByte `0x00`.
-- `patcher/n64/ChecksumCalculator.kt` — verify base ROM CRC32 matches expected (cd16c529 for CZLE).
-- `repositories/Storage.kt` — `rom(randomizer_<seedId>)`, `sram(randomizer_<seedId>)`, `state(randomizer_<seedId>)`.
-
-**Invariants:**
-- **Streaming / memory-mapped I/O** — target ROM ~32MB compressed; `MappedByteBuffer` avoids 2x heap.
-- **Apply to COMPRESSED ROM** — ZPF designed for compressed z64; output stays compressed.
-- **Boot CRC recompute as safety net** — patch already contains corrected header bytes, but verify.
-- **Save type = SRAM** — document in seed entry; core config must use Memory Pak.
-
-### Phase R3: Schema-Driven Settings UI
-**Files to create:**
-- `assets/randomizer/oot_settings_schema.json` — Generated offline from OoTR `SettingsList.py` (script not in repo; commit resulting JSON). Structure: `schemaVersion`, `apiVersion`, `categories[]` (id, name, order, settings[]). Each setting: `name`, `type` (bool/enum/int_range/string/float_range), `label`, `default`, `choices?`, `tooltip`, `guiParams?` (min/max/step).
-- `randomizer/settings/OotrSettingsSchema.kt` — `@Serializable` data classes mirroring JSON.
-- `randomizer/settings/SchemaLoader.kt` — `suspend fun load(context: Context): Result<OotrSettingsSchema>` — reads asset via `context.assets.open()`, parses JSON (org.json or kotlinx-serialization).
-- `randomizer/settings/SettingsFormRenderer.kt` — Generic UI builder: given `OotrSettingsSchema` + current values `Map<String, Any>`, produces category tabs (TabLayout/ViewPager2) + dynamic fields per type:
-  - `bool` → SwitchMaterial
-  - `enum` → MaterialSpinner (or RadioGroup if ≤3 choices)
-  - `int_range` → Slider + EditText (step from guiParams)
-  - `string` → TextInputEditText
-  - `float_range` → Slider (float)
-  - All fields: label (from schema), tooltip (info icon → tooltip dialog), default pre-filled.
-- `randomizer/settings/SettingsValidator.kt` — Client-side: required fields, enum values, min/max, type coercion. Returns `ValidationResult` (valid + error map).
-- `randomizer/ui/RandomizerActivity.kt` — Single activity: if no API key → show `RandomizerApiKeyFragment`; else load schema → render form → plandomizer tab (Editor/Builder) → Generate button → `RandomizerViewModel.generateSeed()`.
-- `randomizer/ui/RandomizerViewModel.kt` — StateFlow: `schema`, `formValues: Map<String, Any>`, `plandomizerJson: String?`, `generationState: GenerationState` (Idle, Polling(progress, queuePos, eta), Success(seedId), Error(message)). `generateSeed()`: validate → select base ROM (CZLE/CZLJ v0 only) → `OotrApiClient.createSeed()` → poll → download patch → `ZpfApplier.apply()` → `N64BootCrcCalculator` → `Storage.rom()` → `RandomizedSeedRepository.save()` → navigate to Library.
-
-**Integration points:**
-- `BaseRomRepository` — filter to only CZLE/CZLJ v0 ROMs for base ROM picker.
-- `RandomizedSeedRepository` (Phase R5) — save seed entry after generation.
-- `LibraryActivity` — will show new seed in "Randomizadores" tab (Phase R5).
-
-**Invariants:**
-- **All UI strings in `strings.xml`** (chrome only — schema labels stay English in asset).
-- **Coroutines + Flow** — `viewModelScope` for polling job (cancels on clear).
-- **Backoff polling**: 2s → 4s → 8s → 10s (max) + jitter ±500ms.
-- **Timeout**: 10 min total (configurable constant).
-
-### Phase R4: Plandomizer
-**Files to create:**
-- `randomizer/settings/PlandomizerModels.kt` — Data classes for full placement JSON: `settings`, `randomized_settings`, `starting_items`, `item_pool`, `dungeons`, `trials`, `entrances`, `locations`, `gossip_stones`, `custom_groups`, `file_hash: List<String>`, plus `:`-prefixed keys (ignored on submit).
-- `randomizer/ui/PlandomizerEditorFragment.kt` — Text editor (monospace font, basic syntax highlight via `TextInputLayout` + custom `Span`), toolbar: Validate (client-side), Import File (SAF picker → read JSON → populate editor), Export File (SAF saver). Validation uses `PlandomizerValidator`.
-- `randomizer/ui/PlandomizerBuilderFragment.kt` — Visual builder MVP: expandable categories (Locations, Entrances, Items, etc.) → drag-drop or picker to assign items/entrances → emits placement JSON. Start simple: list-based assignment per category.
-- `randomizer/settings/PlandomizerValidator.kt` — Validates placement JSON structure against known schema (required top-level keys, known location/item names from embedded reference data). Returns `ValidationResult`.
-- `OotrApiClient.createSeedWithPlandomizer(settings, placementJson)` — Attempts body: `settings + "enable_distribution_file": true, "distribution_file": placementJson`. On 400 with `distribution_file` error → throw `PlandomizerUnsupported` → UI shows graceful message.
-
-**Invariants:**
-- **Graceful degradation** — plandomizer transport isolated in one method for easy fix.
-- **Client-side validation first** — avoid 400 round-trips.
-- **JSON import/export via SAF** — no raw file paths, works on scoped storage.
-
-### Phase R5: Library Integration + Polish
-**Files to create:**
-- `randomizer/repository/RandomizedSeedEntry.kt` — Data class: `seedId`, `name` (user-editable), `settingsHash` (SHA-256 of settings map for dedup), `baseRomId`, `patchedRomPath`, `sramPath`, `statePath`, `createdAt`, `spoilersJson?`, `version` (OoTR version used).
-- `randomizer/repository/RandomizedSeedRepository.kt` — JSON persistence in `filesDir/randomizer_seeds.json` (atomic write: write temp → rename). Methods: `getAll()`, `save(entry)`, `delete(seedId)`, `updateName(seedId, name)`. Migration via `schemaVersion` in JSON root.
-- `randomizer/ui/RandomizerLibrarySource.kt` — Implements `HackLibrarySource` interface (same as `CatalogBackedLibrarySource`): `getEntries(): Flow<List<LibraryEntry>>`, `getEntry(id)`, `deleteEntry(id)`. Maps `RandomizedSeedEntry` → `LibraryEntry` (common UI model).
-- `views/LibraryActivity.kt` / ViewModel — Merge sources: `combine(catalogSource.entries, randomizerSource.entries) { catalog, randomizer -> LibraryState(catalog, randomizer) }` → two tabs (TabLayout): "Hacks da Loja" / "Randomizadores". Each tab: RecyclerView grid with cover (randomizer: generated placeholder or spoiler logo), name, version, last played.
-
-**Storage paths (via `Storage.kt`):**
-- `rom_randomizer_<seedId>` — patched ROM (~32MB z64 BE)
-- `sram_randomizer_<seedId>` — SRAM
-- `state_randomizer_<seedId>` — save states
-
-**Polish:**
-- i18n: `strings.xml` additions for Randomizer chrome (pt-BR/en/es) — coordinate with Wally.
-- Accessibility: contentDescription on all dynamic fields, TalkBack tested, touch targets ≥48dp.
-- Visual QA: Chululu screenshots for Randomizer form, Plandomizer editor/builder, Library tabs, Generation progress dialog.
-
-**Invariants:**
+- **No API key, no local patch logic** — the app only supplies the vanilla ROM and captures the client-side generated patch. Base-ROM legality (OoT 1.0 NTSC-U/J) is enforced by ootrandomizer.com itself.
 - **RetroView unchanged** — reads `Storage.rom(hackId)` where `hackId = "randomizer_<seedId>"`.
 - **SRAM/State isolation** — each seed gets own paths via `Storage`.
-- **Atomic JSON writes** — temp file + rename prevents corruption.
-- **No Room** — JSON file sufficient (<50 seeds typical).
+- **i18n** — all native chrome strings in `strings.xml` (pt-BR/en/es); the generator site renders its own English UI.
+- **Security** — `allowFileAccess=false`, `allowContentAccess=true`, `mixedContentMode=MIXED_CONTENT_ALWAYS_ALLOW`; nav restricted to ootrandomizer.com; local server bound to `127.0.0.1` only.

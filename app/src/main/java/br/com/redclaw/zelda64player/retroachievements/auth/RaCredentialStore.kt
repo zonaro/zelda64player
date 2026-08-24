@@ -12,7 +12,8 @@ import java.security.GeneralSecurityException
  * token is functionally a password: it is persisted via
  * [EncryptedSharedPreferences] (AES256 master key in the Android Keystore),
  * never logged, never included in backups, and sanitized as `***` anywhere it
- * could surface. Mirrors [br.com.redclaw.zelda64player.randomizer.api.OotrApiKeyStore].
+ * could surface. Mirrors the encrypted-key pattern previously used by the
+ * OoT Randomizer API key store (now removed in favor of the WebView generator).
  *
  * @param context Application context used to open the encrypted preferences.
  */

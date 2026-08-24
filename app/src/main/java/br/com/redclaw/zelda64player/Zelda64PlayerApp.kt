@@ -7,9 +7,6 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import br.com.redclaw.zelda64player.randomizer.api.OotrApiClient
-import br.com.redclaw.zelda64player.randomizer.api.OotrApiKeyStore
-import br.com.redclaw.zelda64player.randomizer.settings.SchemaLoader
 import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.store.DownloadQueueManager
 import br.com.redclaw.zelda64player.retroachievements.api.RaHttpClient
@@ -29,18 +26,13 @@ import br.com.redclaw.zelda64player.work.CatalogRefreshWorker
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-/**
- * Application entry point. Schedules the periodic background catalog refresh on
- * startup so the Library always has reasonably fresh data without requiring the
- * user to open the Store. The periodic work is unique (KEEP policy) so repeated
- * process starts never enqueue duplicates.
- *
- * Also acts as the manual service-locator (DI container) for the OoTR
- * Randomizer singletons: [ootrApiKeyStore] (encrypted key storage) and
- * [ootrApiClient] (rate-limited API client). Both are lazily constructed on
- * first access so no work happens before they are needed.
- */
-class Zelda64PlayerApp : Application() {
+    /**
+     * Application entry point. Schedules the periodic background catalog refresh on
+     * startup so the Library always has reasonably fresh data without requiring the
+     * user to open the Store. The periodic work is unique (KEEP policy) so repeated
+     * process starts never enqueue duplicates.
+     */
+    class Zelda64PlayerApp : Application() {
     override fun onCreate() {
         // Apply the persisted Switch UI theme before the first view is inflated
         // to avoid a theme flash on cold start.
@@ -105,21 +97,6 @@ class Zelda64PlayerApp : Application() {
 
         private lateinit var instance: Zelda64PlayerApp
             private set
-
-        /** Encrypted, secure storage for the user's OoTR API key. */
-        val ootrApiKeyStore: OotrApiKeyStore by lazy {
-            OotrApiKeyStore(instance.applicationContext)
-        }
-
-        /** Shared OoTR API client (rate-limited, 20 requests / 10s). */
-        val ootrApiClient: OotrApiClient by lazy {
-            OotrApiClient.default()
-        }
-
-        /** Shared loader/parser for the bundled OoTR settings schema asset. */
-        val randomizerSchemaLoader: SchemaLoader by lazy {
-            SchemaLoader(instance.applicationContext)
-        }
 
         /** Encrypted, secure storage for RetroAchievements credentials. */
         val raCredentialStore: RaCredentialStore by lazy {

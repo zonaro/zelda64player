@@ -43,8 +43,9 @@ Bruce or Lobby provides screenshots/recordings when:
 - [ ] SFX mute toggle in side panel
 
 ### Randomizer
-- [ ] Schema-driven form in SwitchDialog rows
-- [ ] Plandomizer editor/builder in SwitchDialog
+- [ ] Embedded OoTR WebView generator (ootrandomizer.com) styled with Switch chrome
+- [ ] ROM picker dialog (SwitchDialog) + capture progress dialog
+- [ ] Success/error dialog after patch capture
 
 ### RetroAchievements
 - [ ] `SwitchGridScreen` for games with RA

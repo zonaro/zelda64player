@@ -19,7 +19,6 @@ import br.com.redclaw.zelda64player.data.model.BaseRom
 import br.com.redclaw.zelda64player.databinding.ActivitySettingsBinding
 import br.com.redclaw.zelda64player.databinding.SettingsBaseRomItemBinding
 import br.com.redclaw.zelda64player.databinding.SettingsCatalogUrlItemBinding
-import br.com.redclaw.zelda64player.randomizer.api.OotrApiKeyStore
 import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
 import br.com.redclaw.zelda64player.settings.SettingsViewModel
@@ -87,7 +86,6 @@ class SettingsActivity : AppCompatActivity() {
         setupImportSection()
         setupBaseRomList()
         setupCatalogSection()
-        setupRandomizerSection()
         setupRetroAchievementsSection()
         setupCoreSection()
         setupBackupSection()
@@ -114,8 +112,6 @@ class SettingsActivity : AppCompatActivity() {
             binding.settingsBackupExport,
             binding.settingsBackupImport,
             binding.settingsCatalogAdd,
-            binding.settingsRandomizerSave,
-            binding.settingsRandomizerClear,
             binding.settingsRaLogin,
             binding.settingsRaLogout,
             binding.settingsCoreButton,
@@ -339,40 +335,6 @@ class SettingsActivity : AppCompatActivity() {
             }
             .negativeButton(getString(android.R.string.cancel))
             .show()
-    }
-
-    private fun setupRandomizerSection() {
-        val keyStore: OotrApiKeyStore = Zelda64PlayerApp.ootrApiKeyStore
-        updateRandomizerStatus(keyStore)
-
-        binding.settingsRandomizerSave.setOnClickListener {
-            sfx?.select()
-            val key = binding.settingsRandomizerInput.text.toString().trim()
-            if (key.isEmpty()) {
-                binding.settingsRandomizerStatus.setText(R.string.settings_randomizer_empty)
-                return@setOnClickListener
-            }
-            keyStore.setKey(key)
-            // Never keep the secret visible on screen after saving.
-            binding.settingsRandomizerInput.text.clear()
-            updateRandomizerStatus(keyStore)
-        }
-
-        binding.settingsRandomizerClear.setOnClickListener {
-            sfx?.select()
-            keyStore.clear()
-            binding.settingsRandomizerInput.text.clear()
-            updateRandomizerStatus(keyStore)
-        }
-    }
-
-    private fun updateRandomizerStatus(keyStore: OotrApiKeyStore) {
-        val res = if (keyStore.hasKey()) {
-            R.string.settings_randomizer_status_configured
-        } else {
-            R.string.settings_randomizer_status_none
-        }
-        binding.settingsRandomizerStatus.setText(res)
     }
 
     /**

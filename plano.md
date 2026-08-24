@@ -498,294 +498,124 @@ Após normalizar para z64 (BE), ler offsets:
 
 ---
 
-## Feature: Gerador de Randomizador OoT (OoTR)
+## Feature: Gerador de Randomizador OoT via WebView (OoTR)
 
-### Visão Geral
+### Visao Geral
 
-Adicionar um gerador de randomizador/plandomizer de **Ocarina of Time** integrado ao app, usando a API oficial do **OoT Randomizer (OoTR)** em `https://ootrandomizer.com/api/docs`. O usuário insere sua chave de API privada (obtida via Discord do OoTR) nas configurações. O app renderiza um formulário completo baseado em schema (~200 opções), permite plandomizer via editor de texto + importação JSON + builder visual, submete à API, faz polling de status, baixa o patch (`.zpf`/`.zpfz`), aplica na ROM base do usuário (validando CZLE/CZLJ v1.0 apenas), e salva a seed resultante como entrada jogável na seção **"Randomizadores"** da Library (separada da Loja de Hacks). Seeds ilimitadas.
+Substitui a integracao anterior baseada na API privada do OoT Randomizer por uma **WebView nativa** que embute o gerador oficial em `https://ootrandomizer.com/generator`. O usuario configura as opcoes no proprio site, gera a seed, e e redirecionado para a pagina da seed (`https://ootrandomizer.com/seed/get?id=<id>`). O app **pre-preenche automaticamente** o campo da ROM com a ROM vanilla que o usuario ja importou (extraindo o `.z64` de um `.zip` se necessario) e, quando o usuario clica em **"Patch ROM!"**, **intercepta o download da ROM patcheada** (gerada client-side via WASM no navegador) e a adiciona ao catalogo **"Randomizadores"** da Library. Seeds ilimitadas.
 
-### Decisões do Usuário (Finais)
+> **Filosofia mantida**: o app NUNCA distribui, baixa ou inclui ROMs base. O patch e feito pelo proprio site; o app apenas captura o resultado e o registra localmente. GPL-3.0, i18n (pt-BR/en/es), sem emojis em codigo/recursos.
 
-1. **API Key**: O usuário insere a própria chave privada em Settings → Randomizer. Sem chave, a UI explica como obter (link para Discord OoTR). A chave **nunca** é hardcoded, logada, ou comitada.
-2. **Settings Menu (Schema-driven)**: Schema JSON completo (~200 opções) empacotado como asset em `assets/randomizer/oot_settings_schema.json`, derivado de `SettingsList.py` do OoTR (campos: `name`, `type`, `choices`, `default`, `gui_tooltip`, `gui_params` min/max/step, `category`). UI genérica renderiza abas por categoria.
-3. **Plandomizer**: Três modos — (a) Editor de texto bruto (JSON), (b) Importação de arquivo `.json`, (c) Builder visual que monta o JSON de placement. O JSON segue a estrutura do OoTR: `settings`, `randomized_settings`, `starting_items`, `item_pool`, `dungeons`, `trials`, `entrances`, `locations`, `gossip_stones`, `custom_groups`, `file_hash` (array até 5 ícones), chaves `:`-prefixadas (read-only/spoiler).
-4. **Library**: Nova seção/aba **"Randomizadores"** distinta de "Hacks da Loja". Cada seed gerada = entrada jogável. Armazenamento ilimitado.
+### Decisoes do Usuario (Finais)
 
-### Fluxo da API (Mermaid)
+1. **Remocao total da API**: telas e funcoes da API do OoTR (api/, settings/ schema-driven, plandomizer, patch/ ZPF/ZPFZ) sao removidas. O servidor do site passa a fazer geracao + patch.
+2. **Tela WebView**: nova `RandomizerWebActivity` carrega `https://ootrandomizer.com/generator` com chrome no padrao Nintendo Switch.
+3. **Pre-preenchimento da ROM**: ao detectar a pagina de seed (`/seed/get?id=`), o app injeta a ROM vanilla do usuario no `<input type=file>` da ROM. Se a ROM importada for `.zip`, extrai o `.z64` primeiro.
+4. **Captura do patch**: ao clicar em "Patch ROM!", o app intercepta o blob da ROM patcheada, grava em `Storage.rom(randomizer_<seedId>)` e registra em `RandomizedSeedRepository`.
+
+### Fluxo (Mermaid)
 
 ```mermaid
 flowchart TD
-    A[User opens Randomizer screen] --> B{API Key configured?}
-    B -->|No| C[Show setup guide + Discord link]
-    B -->|Yes| D[Load schema from assets/randomizer/oot_settings_schema.json]
-    D --> E[Render category tabs + form fields]
-    E --> F[User configures settings + optional plandomizer JSON]
-    F --> G[Validate: base ROM CZLE/CZLJ v0 selected?]
-    G -->|No| H[Error: select valid OoT 1.0 base ROM first]
-    G -->|Yes| I[POST /api/v2/seed/create?key=KEY&version=latest]
-    I --> J{Response}
-    J -->|200 OK| K[Extract seed ID]
-    J -->|400| L[Show validation errors from API]
-    J -->|409| M[Error: version ambiguous - specify exact version]
-    J -->|423| N[Error: queue full - retry later]
-    J -->|429| O[Error: rate limited - wait 10s]
-    J -->|500| P[Error: server error - retry]
-    K --> Q[Poll GET /api/v2/seed/status?key=KEY&id=ID]
-    Q --> R{Status}
-    R -->|0 generating| S[Show progress % + queue position]
-    R -->|1 success| T[GET /api/v2/seed/patch?key=KEY&id=ID]
-    R -->|3 failed| U[Error: generation failed - check settings]
-    T --> V[Save .zpf/.zpfz to cacheDir/randomizer_patches/<seedId>.zpfz]
-    V --> W[Validate base ROM checksum matches seed requirements]
-    W --> X[Apply ZPF/ZPFZ via ZpfApplier → patched ROM]
-    X --> Y[Recompute N64 boot CRC (CIC 6105) as safety]
-    Y --> Z[Write to Storage.rom(randomizer_<seedId>)]
-    Z --> AA[Create RandomizedSeedEntry in RandomizedSeedRepository]
-    AA --> AB[Library "Randomizadores" tab shows new entry]
-    AB --> AC[User taps → GameActivity loads patched ROM]
+    A[User taps Dock 'Randomizador'] --> B[RandomizerWebActivity loads /generator]
+    B --> C[User configures options on site + clicks 'Generate Seed!']
+    C --> D[Site redirects to /seed/get?id=XXXX]
+    D --> E{App has OoT vanilla ROM?}
+    E -->|No| F[Show message: import OoT ROM in Settings]
+    E -->|Yes 1 ROM| G[Auto-select that ROM]
+    E -->|Yes multiple| H[Show picker dialog -> select ROM]
+    G --> I[Inject ROM into file input via onShowFileChooser auto-supply]
+    H --> I
+    I --> J[User clicks 'Patch ROM!' on site]
+    J --> K[Site patches client-side WASM -> blob download]
+    K --> L[JS hook captures blob bytes -> local server POST]
+    L --> M[App writes Storage.rom randomizer_<seedId>]
+    M --> N[RandomizedSeedRepository.save entry]
+    N --> O[Library 'Randomizadores' shows new entry]
+    O --> P[User taps -> GameActivity loads patched ROM]
 ```
 
-### Nova Estrutura de Pacotes: `randomizer/`
+### Estrutura de Pacotes: `randomizer/` (nova)
 
 ```
 br.com.redclaw.zelda64player
 ├── randomizer/
-│   ├── api/
-│   │   ├── OotrApiClient.kt          # OkHttp client: create seed, poll status, download patch
-│   │   ├── OotrApiModels.kt          # Data classes: CreateSeedRequest/Response, StatusResponse, PatchResponse
-│   │   ├── OotrApiException.kt       # Sealed hierarchy: ValidationError, QueueFull, RateLimited, ServerError, NetworkError
-│   │   └── RateLimiter.kt            # Token bucket: 20 req / 10s global (per API docs)
-│   ├── settings/
-│   │   ├── OotrSettingsSchema.kt     # Data classes mirroring asset JSON: SettingDef, Category, Type, Choice, GuiParams
-│   │   ├── SchemaLoader.kt           # Loads assets/randomizer/oot_settings_schema.json → OotrSettingsSchema
-│   │   ├── SettingsFormRenderer.kt   # Generic UI: category tabs → dynamic fields per type (bool, enum, int range, string, etc.)
-│   │   ├── SettingsValidator.kt      # Client-side validation (required, min/max, enum values) before submit
-│   │   └── PlandomizerModels.kt      # Data classes for plandomizer JSON structure (settings, randomized_settings, starting_items, item_pool, dungeons, trials, entrances, locations, gossip_stones, custom_groups, file_hash)
-│   ├── patch/
-│   │   ├── ZpfParser.kt              # Parse .zpf (single zlib stream) / .zpfz (concatenated zlib streams)
-│   │   ├── ZpfApplier.kt             # Apply DMA updates + XOR edits to COMPRESSED ROM (big-endian)
-│   │   ├── ZpfValidator.kt           # Verify patch structure, magic 'ZPFv', version, CRC safety
-│   │   └── N64BootCrcCalculator.kt   # CIC 6105 algorithm: seed 0xDF26F436, range 0x1000..0x101000, step t1 += BE32(data[0x750 + (i & 0xFF)]) ^ d
-│   ├── ui/
-│   │   ├── RandomizerActivity.kt     # Main entry: key check → schema form → plandomizer tabs → generate
-│   │   ├── RandomizerViewModel.kt    # StateFlow: schema, form values, plandomizer JSON, generation state (idle/polling/done/error)
-│   │   ├── PlandomizerEditorFragment.kt  # Text editor + file import + validation
-│   │   ├── PlandomizerBuilderFragment.kt # Visual builder (tree/group UI) → emits placement JSON
-│   │   └── GenerationProgressDialog.kt   # Polling progress: % + queue position + ETA
-│   └── repository/
-│       ├── RandomizedSeedEntry.kt    # Model: seedId, name, settingsHash, baseRomId, patchedRomPath, sramPath, statePath, createdAt, spoilersJson?
-│       └── RandomizedSeedRepository.kt  # JSON in filesDir/randomizer_seeds.json + files in cacheDir/randomizer_roms/, cacheDir/randomizer_patches/
+│   ├── RomZipExtractor.kt        # Extrai .z64/.n64 de um .zip importado (stream)
+│   ├── RomFileProvider.kt        # ContentProvider que serve o .z64 (ou zip extraido) a WebView
+│   ├── RandomizerWebViewModel.kt # Estado: ROM vanilla selecionada, URI, captura
+│   ├── WebViewJsBridge.kt        # JavascriptInterface: recebe bytes/nome/seedId do patch
+│   ├── RandomizerJs.kt           # Strings JS: auto-click input + hook de download blob
+│   ├── LocalRomServer.kt         # ServerSocket 127.0.0.1 p/ receber o patch (fallback de interface)
+│   └── repository/               # MANTIDO: RandomizedSeedEntry, RandomizedSeedRepository
+└── views/
+    └── RandomizerLibrarySource.kt # MANTIDO (ja em views/): mapeia seeds -> LibraryEntry
 ```
 
-### Especificação Resumida: Aplicador ZPF/ZPFZ
+Removidos: `randomizer/api/`, `randomizer/settings/`, `randomizer/patch/`, `randomizer/ui/RandomizerActivity.kt`, `randomizer/ui/RandomizerViewModel.kt`, `randomizer/ui/Plandomizer*`, `randomizer/ui/SettingsFormRenderer*`, `randomizer/ui/SettingsOptionAdapter*`, `randomizer/BaseRomValidator.kt`. Tambem: `tools/randomizer/`, `app/src/main/assets/randomizer/`, fragment `RandomizerApiKey` em Settings, e `OotrApiKeyStore`/`SchemaLoader`/`OotrApiClient` no `Zelda64PlayerApp`.
 
-**Formato .zpfz** (verificado em `Notes/ZPFZ patch format.txt` do repo OoTR):
-- `.zpfz` = concatenação de streams zlib (um por world); single-world = `.zpf` (um stream zlib).
-- Cada stream descomprimido (`.zpf`), big-endian:
-  - Magic: `ZPFv` (4 bytes)
-  - Version: `1` (1 byte)
-  - [4] DMA table start offset
-  - [4] Key address range min
-  - [4] Key address range max
-  - [4] Key address (onde ler o byte de XOR key na ROM source)
-- **DMA updates**: lista terminada por `0xFFFF`. Entrada: `[2] DMA index`, `[4] from-file address`, `[4] file start address`, `[3] file start` (24-bit). Escreve nova entrada `(start, end, start, 0)` na DMA table assumindo uncompressed. Se `from-file address != 0xFFFFFFFF`, copia dados daquele endereço para o novo start (padding zeros se maior); senão, padding zeros.
-- **XOR data edits**: XOR key lida da ROM SOURCE no key address (limitada por key range min/max com wraparound; pula bytes `0x00` da key).
-  - Start block: `[4] address`, `[2] size`, `data[]`
-  - Continue block: `[1] 0xFF`, `[1] key-skip count`, `[2] size`, `data[]`
-  - EOF termina.
-  - Byte 0 no patch escreve 0; senão escreve `key_byte XOR patch_byte`.
-- Aplicado **diretamente na ROM base COMPRIMIDA** (z64 BE ~32MB). Saída permanece comprimida. Funciona direto no mupen64plus_next.
-- Save type **deve ser SRAM (Memory Pak)**.
-- Patch já contém bytes corrigidos do check code do header, mas **recomputar N64 boot CRC (CIC 6105) como rede de segurança**.
+### Selecao da ROM Vanilla
 
-### Validação de ROM Base para Randomização
+- `BaseRomRepository` ja lista ROMs vanilla importadas com deteccao de familia (OoT/MM).
+- Apenas ROMs **OoT** sao elegiveis (OoTR so suporta OoT; o servidor valida versao 1.0 NTSC-U/J).
+- Se houver exatamente 1 ROM OoT -> usa automaticamente.
+- Se houver multiplas -> dialogo Switch-style de selecao.
+- Se nenhuma -> mensagem instruindo a importar em Settings (botao abre Settings).
 
-**ACEITAR APENAS**:
-- **Ocarina of Time NTSC-U 1.0** → Game Code `CZLE`, Version Byte `0x00` (offset 0x3F), CRC32 `cd16c529`, MD5 `5bd1fe107bf8106b2ab6650abecd54d6`
-- **Ocarina of Time NTSC-J 1.0** → Game Code `CZLJ`, Version Byte `0x00`, checksums conhecidos (validar via Calamari/No-Intro)
+### Desafio A — Pre-preencher `<input type=file>` (RECOMENDADO: onShowFileChooser auto-supply)
 
-**REJEITAR** (com mensagem clara):
-- OoT 1.1 / 1.2 / PAL / Master Quest / GameCube / Wii VC / iQue
-- Majora's Mask (qualquer versão) — OoTR só suporta OoT
-- ROMs com byte order não normalizado (app normaliza antes de validar)
+A pagina de seed (`/seed/get?id=`) contem o campo da ROM. Abordagem escolhida:
 
-### Integração Storage + Catalog (Library "Randomizadores")
+1. Apos `onPageFinished` na URL de seed, injetar JS que **clica programaticamente** o `<input type=file>` da ROM (selector inspecionado uma vez; fallback: primeiro `input[type=file]` da pagina ou o que casa com label "ROM").
+2. O clique dispara `WebChromeClient.onShowFileChooser`. Nosso codigo, em modo "auto-fill", chama imediatamente `filePathCallback.onReceiveValue(arrayOf(romUri))` **sem abrir o seletor do sistema**.
+3. `romUri` e um `content://` do `RomFileProvider` apontando para o `.z64` (ou o `.z64` extraido do zip), com permissao de leitura concedida ao processo da WebView (`context.grantUriPermission(webViewPackage, uri, FLAG_GRANT_READ_URI_PERMISSION)` ou provider permissivo dentro do app).
+4. O site le `input.files` normalmente quando o usuario clica em "Patch ROM!".
 
-- **Storage paths** (reuso `repositories/Storage.kt` pattern):
-  - `rom_randomizer_<seedId>` — ROM patcheada final (~32MB z64 BE)
-  - `sram_randomizer_<seedId>` — SRAM isolado por seed
-  - `state_randomizer_<seedId>` — Save states isolados por seed
-- **RandomizedSeedRepository** persiste `List<RandomizedSeedEntry>` em `filesDir/randomizer_seeds.json` (atomic write + backup).
-- **LibrarySource implementation**: nova classe `RandomizerLibrarySource` implementando a mesma interface `HackLibrarySource` usada por `CatalogBackedLibrarySource`. `LibraryActivity` usa `CompositeLibrarySource` (ou ViewModel merge) para mostrar duas seções/abas: "Hacks da Loja" + "Randomizadores".
-- **RetroView interception inalterado**: continua lendo `Storage.rom(hackId)` — agora `hackId` = `randomizer_<seedId>`.
+Alternativa documentada (nao usada por padrao): injetar `File` via `DataTransfer` construido a partir de bytes buscados de um server local — mais fragil e pesada. O `onShowFileChooser` e o caminho principal por nao exigir bytes no contexto JS nem mixed-content.
 
-### Asset: Schema de Settings (`assets/randomizer/oot_settings_schema.json`)
+**Risco**: se o site impedir clique programatico nao-confiavel ou mudar o seletor do input. Mitigacao: inspecao unica do DOM (Chululu/Manual) + fallback de clique manual do usuario (nesse caso mostramos nosso proprio chooser ja posicionado na ROM).
 
-Estrutura (derivada de `SettingsList.py` do OoTR):
-```json
-{
-  "schemaVersion": 1,
-  "apiVersion": "v2",
-  "categories": [
-    {
-      "id": "logic",
-      "name": "Logic Rules",
-      "order": 0,
-      "settings": [
-        {
-          "name": "logic_rules",
-          "type": "enum",
-          "label": "Logic Rules",
-          "default": "standard",
-          "choices": [
-            {"value": "standard", "label": "Standard"},
-            {"value": "noglitches", "label": "No Glitches"},
-            {"value": "glitched", "label": "Glitched"}
-          ],
-          "tooltip": "Determines what tricks are considered valid for progression.",
-          "guiParams": null
-        },
-        {
-          "name": "open_forest",
-          "type": "bool",
-          "label": "Open Forest",
-          "default": false,
-          "tooltip": "Start with Kokiri Forest open.",
-          "guiParams": null
-        },
-        {
-          "name": "bridge",
-          "type": "enum",
-          "label": "Bridge",
-          "default": "vanilla",
-          "choices": [
-            {"value": "vanilla", "label": "Vanilla"},
-            {"value": "open", "label": "Open"},
-            {"value": "closed", "label": "Closed"}
-          ],
-          "tooltip": "State of the Gerudo Valley bridge.",
-          "guiParams": null
-        }
-      ]
-    }
-  ]
-}
-```
-- **Tipos suportados**: `bool`, `enum` (choices), `int_range` (guiParams: min, max, step), `string`, `float_range`.
-- **i18n pragmático**: Labels/tooltips das ~200 opções ficam em **inglês no asset JSON** (domínio técnico, nomes canônicos da comunidade OoTR). Chrome da UI (títulos de abas, botões, mensagens de erro, placeholders) em `strings.xml` (pt-BR/en/es). **Exceção documentada**: não traduzir labels de settings individuais — seria impraticável manter sincronizado com upstream e a comunidade usa termos em inglês.
+### Desafio B — Capturar o download da ROM patcheada (blob client-side)
 
-### Estratégia Plandomizer (API Undocumented)
+O site faz o patch em WASM e dispara download do `.z64` via **blob** (nao e requisicao de rede comum). `DownloadListener` nao entrega os bytes do blob. Abordagem escolhida:
 
-- **Tentativa**: Enviar no body do `POST /seed/create`: `"enable_distribution_file": true, "distribution_file": <JSON stringificado do placement>`.
-- **Degradação graciosa**: Se API retornar 400 com erro relacionado a `distribution_file`, mostrar mensagem: "Plandomizer via API não suportado nesta versão do OoTR. Use o site oficial para seeds customizadas." Isolar esse detalhe de transporte em `OotrApiClient.createSeedWithPlandomizer()` para ajuste fácil após teste real.
-- **Validação client-side**: `PlandomizerValidator` valida estrutura JSON contra schema conhecido antes de enviar (evita 400 desnecessários).
+1. Injetar JS que **monkeypatcha** `HTMLAnchorElement.prototype.click` (ou `URL.createObjectURL`) para detectar anchors com atributo `download` cujo `href` comeca com `blob:`.
+2. Ao detectar, o JS faz `fetch(href).then(r => r.blob()).then(b => b.arrayBuffer())` e envia os bytes ao app:
+   - **Caminho principal**: `fetch('http://127.0.0.1:<port>/patch', {method:'POST', body: blob})` para `LocalRomServer` (ServerSocket no app) que grava o arquivo. localhost e secure context -> sem bloqueio de mixed-content.
+   - **Fallback**: `@JavascriptInterface` em chunks base64 (evita limite de 1MB do Binder).
+3. O app identifica o `seedId` da URL atual (`/seed/get?id=`), nomeia o arquivo (do atributo `download` do anchor, ex: `OoTR_<...>.z64`), grava em `Storage.rom("randomizer_<seedId>")`, e registra `RandomizedSeedEntry`.
+4. Mostra toast de sucesso e oferece ir para a Library.
 
-### Política de Rate Limit + Polling
+**Risco**: mudanca no mecanismo interno de download do site (ex: usar `saveAs` do FileSaver, ou `navigator.download`). Mitigacao: hook abranger `HTMLAnchorElement.click`, `URL.createObjectURL`, e `window.open`; revalidar com Chululu apos qualquer mudanca do site.
 
-- **Rate limit oficial**: 20 requests / 10 segundos (global por IP/key).
-- **RateLimiter** (token bucket) em `OotrApiClient` — aplica a **todas** chamadas (create, status, patch, version).
-- **Polling**: Backoff exponencial iniciando em 2s, max 10s, jitter ±500ms. Cancelável via `Job` no `viewModelScope`. Mostrar progresso % + posição na fila + tempo estimado (se `maxWaitTime` retornado).
-- **Timeout total**: 10 minutos (configurável). Após timeout → erro "Tempo esgotado. A seed pode ainda estar processando; verifique depois na aba Randomizadores."
+### Desafio C — Extracao de ZIP
 
-### Matriz de Tratamento de Erros (API → User Message)
+`RomZipExtractor.extractZ64(zipFile, outDir): File?` usa `ZipInputStream` para achar a primeira entrada `.z64`/`.n64`, copia para arquivo temporario em `cacheDir`, retorna o path. O `RomFileProvider` serve esse temporario. ZIPs grandes (32MB+) sao processados em stream (sem carregar tudo na heap).
 
-| HTTP / Código | Causa | Mensagem ao Usuário (pt-BR) |
-|---------------|-------|------------------------------|
-| 400 (validation) | Settings inválidos / combinação impossível | "Configuração inválida: {detalhes do erro da API}. Verifique as opções marcadas." |
-| 400 (distribution_file) | Plandomizer não suportado | "Plandomizer via API não disponível nesta versão. Use o site do OoTR para seeds customizadas." |
-| 409 | Version ambígua (ex: "latest" aponta para múltiplas) | "Versão ambígua. Selecione uma versão específica nas configurações avançadas." |
-| 423 | Queue cheia | "Fila de geração cheia. Tente novamente em alguns minutos." |
-| 429 | Rate limit (20/10s) | "Muitas requisições. Aguarde 10 segundos e tente novamente." |
-| 500 | Erro interno do servidor | "Erro no servidor do OoTR. Tente novamente mais tarde." |
-| Network/Timeout | Sem internet / timeout | "Sem conexão ou tempo esgotado. Verifique sua internet e tente novamente." |
-| Patch download fail | Patch corrompido / 404 | "Falha ao baixar o patch. A seed pode ter expirado. Gere uma nova." |
-| ZPF apply fail | Patch inválido / ROM base errada | "Falha ao aplicar patch. Verifique se a ROM base é OoT 1.0 NTSC-U/J (CZLE/CZLJ v1.0)." |
-| Boot CRC mismatch | CRC final não confere | "Aviso: CRC de boot da ROM resultante não confere. O jogo pode não iniciar. Tente regenerar." |
+### Integracao Storage + Catalog (Library "Randomizadores") — MANTIDA
 
-### Segurança
+- `Storage.rom("randomizer_<seedId>")`, `sram(...)`, `state(...)` — inalterado.
+- `RandomizedSeedRepository` persiste `List<RandomizedSeedEntry>` em `filesDir/randomizer/seeds.json` — inalterado.
+- `RandomizerLibrarySource` (em `views/`) — inalterado; `InstalledLibrary` ja o consome.
+- `GameRomResolver` ja resolve `randomizer_<seedId>` -> `Storage.rom(...)`. Inalterado.
+- `RetroView` inalterado: le `Storage.rom(hackId)`.
 
-- **API Key**: Armazenada **apenas** em `SharedPreferences` (ou `EncryptedSharedPreferences` se API 23+), chave `pref_ootr_api_key`. **Nunca** em logs, `BuildConfig`, assets, catálogo, backups, ou network requests além do header/query param da API OoTR.
-- **Logs**: Sanitizar key em qualquer log de debug (substituir por `***`).
-- **Network**: Apenas chamadas para `ootrandomizer.com` (API) — nenhum outro endpoint.
-- **Base ROM**: Validação estrita (CZLE/CZLJ v0) antes de qualquer geração.
+### Seguranca
 
-### i18n: Abordagem Pragmática para ~200 Labels
+- Apenas navegacao para `ootrandomizer.com` (e subdomínios) na WebView; bloquear outros destinos (`shouldOverrideUrlLoading`).
+- `RomFileProvider` expoe APENAS o arquivo temporario da ROM do usuario, com permissao restrita ao app/WebView.
+- Nenhuma chave de API, nenhum dado do usuario sai do app alem do que o proprio site exige para gerar a seed (conforme politica do site).
+- Logs: nunca logar conteudo de ROM nem dados do usuario.
 
-- **Chrome da UI** (títulos de tela, abas de categoria, botões, mensagens de erro, placeholders, tooltips genéricos) → `strings.xml` (pt-BR/en/es) — **traduzido**.
-- **Labels/tooltips individuais de settings** (ex: "Logic Rules", "Open Forest", "Bridge", "Trials", "Entrance Shuffle") → **Inglês no asset JSON** (`oot_settings_schema.json`).
-- **Justificativa**: (1) Termos são jargão da comunidade OoTR (p. ex. "MQ", "MQ Dungeons", "Keysanity", "Tokensanity") — tradução perde precisão; (2) Schema vem do upstream (SettingsList.py) e muda a cada versão — manter tradução sincronizada é impraticável; (3) Usuários avançados de randomizer esperam termos em inglês.
-- **Documentação**: Esta exceção é **explícita e intencional** — registrada aqui e no `AGENTS.md` (Hard Rule #8 i18n tem exceção documentada para randomizer settings labels).
+### i18n
 
-### Plano de Testes
+- Strings novas em `strings.xml` (pt-BR `values/`, `values-en/`, `values-es/`): titulo da tela, "gerando...", "selecione a ROM OoT", "nenhuma ROM OoT importada", "patch capturado!", "ir para a Library", erros de captura/extracao. Zero hardcoded strings.
 
-**Unit Tests (puro Kotlin, `randomizer/` module):**
-- `OotrApiClientTest`: mock OkHttp → create/poll/download flows, rate limiter, error mapping
-- `SchemaLoaderTest`: load asset JSON → parse all categories/settings, validate required fields
-- `SettingsValidatorTest`: client-side validation (required, enum, min/max, type coercion)
-- `PlandomizerValidatorTest`: validate placement JSON structure, detect unknown keys
-- `ZpfParserTest`: parse synthetic .zpf (single stream) + .zpfz (multi-stream concat)
-- `ZpfApplierTest`: apply known patch → output matches expected bytes (fixture)
-- `N64BootCrcCalculatorTest`: known OoT 1.0 ROM → CRC matches 0xDEADBEEF (valor real verificado via Calamari)
-- `RandomizedSeedRepositoryTest`: CRUD + atomic write + migration schemaVersion
+### Testes
 
-**Instrumented Tests:**
-- `RandomizerIntegrationTest`: full flow (mock API) → seed appears in Library "Randomizadores" → launches in GameActivity
-- `BaseRomValidationTest`: import OoT 1.0 U/J → accepted; import 1.1/PAL/MQ → rejected with correct message
-- `PlandomizerUITest`: editor import/export, builder emits valid JSON
-
-**Fixtures:**
-- `test/fixtures/randomizer/` — minimal .zpf/.zpfz patches, synthetic placement JSONs, schema subset
-- `test/fixtures/roms/` — OoT 1.0 U/J headers (valid gameCode/versionByte) + dummy bodies
-
-### Checklist de Milestones (Fases R1–R5)
-
-#### Fase R1: API Client + Key Management (Semana 1)
-- [ ] `randomizer/api/OotrApiClient.kt` + models + RateLimiter (20/10s token bucket)
-- [ ] `randomizer/api/OotrApiException.kt` sealed hierarchy + error mapping
-- [ ] Settings: `RandomizerApiKeyFragment` (pref encrypted, setup guide UI, Discord link)
-- [ ] Unit tests: API flows, rate limiter, error mapping
-- [ ] **Entregável**: App abre tela Randomizer → pede key → valida formato → mostra schema vazio (ainda não carrega asset)
-
-#### Fase R2: ZPF Applier + Boot CRC (Semana 2)
-- [ ] `randomizer/patch/ZpfParser.kt` (single + multi-stream zlib concat)
-- [ ] `randomizer/patch/ZpfApplier.kt` (DMA updates + XOR edits on compressed ROM)
-- [ ] `randomizer/patch/ZpfValidator.kt` (magic, version, structure)
-- [ ] `randomizer/patch/N64BootCrcCalculator.kt` (CIC 6105, seed 0xDF26F436)
-- [ ] Reuse `patcher/n64/RomNormalizer`, `RomHeader`, `ChecksumCalculator` for base ROM prep
-- [ ] Unit tests: parser/applier/validator/CRC with fixtures
-- [ ] **Entregável**: Dado .zpf/.zpfz fixture + OoT 1.0 base ROM → produz ROM patcheada que passa boot CRC e roda no core
-
-#### Fase R3: Schema-Driven Settings UI (Semana 3)
-- [ ] `assets/randomizer/oot_settings_schema.json` (gerado a partir de SettingsList.py do OoTR — script offline, comitado)
-- [ ] `randomizer/settings/SchemaLoader.kt` + `OotrSettingsSchema.kt` models
-- [ ] `randomizer/settings/SettingsFormRenderer.kt` — category tabs + dynamic fields (bool/enum/int_range/string)
-- [ ] `randomizer/settings/SettingsValidator.kt` — client-side validation
-- [ ] `randomizer/ui/RandomizerActivity.kt` + `RandomizerViewModel.kt` — form state, submit → API create
-- [ ] Integration: base ROM selector (reuse `BaseRomRepository`) — only show CZLE/CZLJ v0
-- [ ] Unit tests: schema load, form render logic, validation
-- [ ] **Entregável**: Tela Randomizer carrega schema → usuário configura → submete → cria seed → polling → patch baixado → aplicado → seed aparece na Library
-
-#### Fase R4: Plandomizer (Semana 4)
-- [ ] `randomizer/settings/PlandomizerModels.kt` (full placement JSON structure)
-- [ ] `randomizer/ui/PlandomizerEditorFragment.kt` — text editor (monospace, syntax highlight básico), file import (SAF), validate button
-- [ ] `randomizer/ui/PlandomizerBuilderFragment.kt` — visual tree builder (locations → items, entrances, etc.) — MVP: categories + drag-drop básico
-- [ ] `OotrApiClient.createSeedWithPlandomizer()` — attempt `enable_distribution_file` + graceful degradation
-- [ ] Unit tests: placement JSON validation, builder → JSON emission
-- [ ] **Entregável**: Usuário pode criar plandomizer via editor/import/builder → seed gerada com placement customizado
-
-#### Fase R5: Library Integration + Polish (Semana 5)
-- [ ] `randomizer/repository/RandomizedSeedEntry.kt` + `RandomizedSeedRepository.kt`
-- [ ] `RandomizerLibrarySource` implementing `HackLibrarySource` interface
-- [ ] `LibraryActivity` / ViewModel: merge `CatalogBackedLibrarySource` + `RandomizerLibrarySource` → two tabs/sections
-- [ ] Storage paths: `rom_randomizer_<seedId>`, `sram_randomizer_<seedId>`, `state_randomizer_<seedId>`
-- [ ] i18n: `strings.xml` chrome (pt-BR/en/es) — Wally
-- [ ] Accessibility: TalkBack, touch targets, contrast
-- [ ] Visual QA: Chululu screenshots (Randomizer form, Plandomizer editor, Library tabs, Generation progress)
-- [ ] **Entregável**: Feature completa, integrada, testada, pronta para release
-
----
-
-# Feature: Auto-Ocarina
+- `RomZipExtractorTest` (JVM): zip com .z64 -> extracao correta; zip sem .z64 -> null.
+- `RandomizerLibrarySourceTest` ja existe — manter.
+- Teste de integracao manual: gerar seed real, capturar patch, confirmar entrada na Library e lancamento.
+- Chululu: QA de conformidade Switch da `RandomizerWebActivity` (chrome, dock, foco).
 
 ## Visão Geral
 

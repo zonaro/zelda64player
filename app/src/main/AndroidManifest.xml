@@ -52,8 +52,18 @@
             android:name=".settings.ui.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".randomizer.ui.RandomizerActivity"
+            android:name=".randomizer.RandomizerWebActivity"
             android:exported="false" />
+
+        <provider
+            android:name=".randomizer.RomFileProvider"
+            android:authorities="br.com.redclaw.zelda64player.randomizer.romfileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/randomizer_file_paths" />
+        </provider>
         <activity
             android:name=".retroachievements.ui.AchievementsActivity"
             android:exported="false" />

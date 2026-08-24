@@ -18,7 +18,7 @@ The app **never** embeds, downloads, or distributes base ROMs. Users must legall
 - **On-the-fly patching** with triple CRC32 validation (source checksum, patch checksum, target CRC after patch application), supporting BPS and legacy IPS formats.
 - **N64 byte-order normalization** (.z64 / .v64 / .n64 → big-endian z64) via the pure Kotlin N64 normalizer module.
 - **Checksum-based base ROM matching** using gameCode + versionByte + CRC32 to validate that the user's base ROM is compatible with a given hack before applying patches.
-- **OoT Randomizer generator** — schema-driven settings UI (~200 options from the OoTR asset JSON), plandomizer support (text editor + JSON import + visual builder), ZPF/ZPFZ patch application on compressed ROM, N64 boot CRC (CIC 6105) recomputation. Generated seeds are obtained via the official OoTR API using a user-provided API key (stored in EncryptedSharedPreferences); seeds live in a dedicated "Randomizadores" Library section, separate from Store hacks. Only OoT 1.0 NTSC-U (CZLE) and NTSC-J (CZLJ) version byte 0x00 are accepted for randomization; all other ROM versions are rejected with clear error messages.
+- **OoT Randomizer via WebView** — embeds the official OoTR generator (ootrandomizer.com) inside a native Android WebView. The user configures options on the site, generates a seed, and the app auto-fills the ROM field with the user's imported vanilla OoT ROM (extracting the .z64 from a .zip if needed) and intercepts the patched-ROM download (generated client-side via WASM) when the user clicks "Patch ROM!", adding the result to the dedicated "Randomizadores" Library section. Unlimited seeds. No API key, no local patch logic, no schema. Only OoT seeds are supported; base-ROM legality (OoT 1.0 NTSC-U/J) is enforced by ootrandomizer.com itself.
 - **Auto-Ocarina** — in-game HUD that auto-plays Ocarina songs in OoT/MM from the pause menu. Built-in song catalog (OoT: 12 songs, MM: 11) plus optional per-hack custom songs from the catalog `ocarinaSongs` field. Coroutine sequencer sends key events to GLRetroView (~330ms/note), cancellable by any user input, menu open, or lifecycle changes. Game detection at launch via `RomHeader.gameCode` prefix: `CZL*` = OoT family (incl. randomizer seeds), `NZL*`/`NSM*` = MM family. Unknown games hide the menu item.
 - **RetroAchievements** — sign in with your RetroAchievements.org account; achievements are tracked during play with unlock popups, challenge/progress indicators, and system notifications. Leaderboards are accessible only inside the in-game menu. The RA hash is computed exclusively from the final patched ROM at install time, never from the base ROM or uncompressed intermediates. RA credentials (username/password/token) are never logged (sanitized as `***`) and are stored only in EncryptedSharedPreferences in a separate `ra_secure_prefs` file. Hardcore mode defaults OFF (`pref_ra_hardcore = false`) until User-Agent validated with RAdmin. System notifications opt-in default ON but require `POST_NOTIFICATIONS` runtime permission on API 33+.
 - **Nintendo Switch-style UI revamp** — all screens follow a custom native implementation of the Nintendo Switch HOME menu aesthetic (inspired by NS_Launcher / FLauncher). Design tokens include dark background `#2D2D2D`, cyan accent `#00BCD4`, amber `#FFA000`, square game cards, focus borders, side panels, and dock. The RadialGamePad touch-control LAYOUT remains frozen (measured for OoT/MM control placement, ButtonStick modes, Auto-Z, FloatingJoystick, physical-controller mirroring); only chrome (menus, dialogs, overlays) is restyled to the Switch standard. Sound effects (focus-move "toc", select, back, panel open/close) are CC0/synthesized only, stored in `res/raw/`, and respect system volume with a mute toggle in Settings.
@@ -26,7 +26,7 @@ The app **never** embeds, downloads, or distributes base ROMs. Users must legall
 - **Custom gamepad layout** (RadialGamePad) — C-button mapping, Auto-Z, ButtonStick modes, FloatingJoystick. The layout is frozen/measured from a reference image tuned for OoT/MM; the RadialGamePad package is unchanged from Ludere and must not be modified without explicit user approval and an update to the "Layout de Controles Sob Medida" section of `plano.md`.
 - **Save backup/restore** via ZIP (local, no cloud). Backups stored in `filesDir` per hackId.
 - **Background catalog refresh** via WorkManager (`CatalogRefreshWorker`, 12h periodic, CONNECTED network requirement).
-- **i18n** (pt-BR default, English, Spanish) — all user-facing strings externalized to `strings.xml` (pt-BR in `values/`, en in `values-en/`, es in `values-es/`). Zero hardcoded strings in Kotlin/XML layouts. The ~200 individual setting labels/tooltips in `assets/randomizer/oot_settings_schema.json` remain in English (canonical OoTR community terminology); only UI chrome uses `strings.xml`.
+- **i18n** (pt-BR default, English, Spanish) — all user-facing strings externalized to `strings.xml` (pt-BR in `values/`, en in `values-en/`, es in `values-es/`). Zero hardcoded strings in Kotlin/XML layouts. The embedded OoTR WebView generator renders its own English UI (canonical OoTR community terminology); only the app's native chrome uses `strings.xml`.
 
 ---
 
@@ -50,7 +50,7 @@ The first build runs a `prepareCore` Gradle task that downloads the two Libretro
 2. Browse the **Store** → view available hacks and download one.
 3. The app validates the base ROM checksum, downloads the BPS (or ZIP) patch, applies it, and launches the game.
 4. To play a vanilla base ROM without patches, select it from the Library screen.
-5. To use the Randomizer, generate a seed via the OoTR API in the Randomizer section, then launch from the Library.
+5. To use the Randomizer, open the Randomizer section (dock) to launch the embedded OoTR generator WebView, generate a seed, then click "Patch ROM!" to capture it; launch from the Library.
 6. To use Auto-Ocarina, start a game and open the pause menu — the HUD will auto-play songs from the built-in catalog or per-hack custom songs.
 
 ---
@@ -80,7 +80,7 @@ See **docs/CATALOG.md** for the JSON catalog schema and **docs/catalog.example.j
 | Background Tasks | WorkManager 2.9.0 | `CatalogRefreshWorker` (12h periodic) |
 | RetroAchievements | rcheevos ~12.x (master tag) | MIT licensed, ANSI C; git subtree in `app/src/main/cpp/rcheevos/`; JNI bridge `libra_jni.so` |
 | UI Toolkit | Custom Nintendo Switch skin | Material Components 1.14.0 is technical base only; visual standard is custom Switch HOME menu aesthetic (dark bg #2D2D2D, cyan accent #00BCD4, amber #FFA000, square cards, focus borders, dock) |
-| Testing | JUnit 5, MockK, Turbine | Unit + Instrumented; 191 JVM unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, randomizer patching/validation and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed. |
+| Testing | JUnit 5, MockK, Turbine | Unit + Instrumented; JVM unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, randomizer WebView capture (RomZipExtractor) and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed. |
 
 ---
 
@@ -104,12 +104,15 @@ br.com.redclaw.zelda64player
 ├── settings/       # SettingsActivity (ROM import/list, catalog URLs, backups, RA login) + helpers
 ├── work/           # CatalogRefreshWorker (periodic background refresh)
 ├── repositories/   # Storage (per-hack ROM/SRAM/state paths) + GameRomResolver
-├── randomizer/     # OoT Randomizer Generator feature
-│   ├── api/        # OotrApiClient, models, exceptions, RateLimiter
-│   ├── settings/   # Schema loader, form renderer, validator, plandomizer models
-│   ├── patch/      # ZPF/ZPFZ parser, applier, validator, N64 boot CRC (CIC 6105)
-│   ├── ui/         # RandomizerActivity, ViewModel, Plandomizer fragments, progress dialog
-│   └── repository/ # RandomizedSeedEntry, RandomizedSeedRepository
+├── randomizer/     # OoT Randomizer Generator feature (WebView)
+│   ├── RomZipExtractor.kt       # Extract .z64/.n64 from imported .zip (stream)
+│   ├── RomFileProvider.kt       # ContentProvider serving the ROM to the WebView
+│   ├── RandomizerWebViewModel.kt  # Selected vanilla ROM, URI, capture state
+│   ├── WebViewJsBridge.kt       # JavascriptInterface: receives patched ROM bytes
+│   ├── RandomizerJs.kt          # JS: auto-click ROM input + blob download hook
+│   ├── LocalRomServer.kt        # 127.0.0.1 server to receive the patched ROM
+│   ├── RandomizerWebActivity.kt # WebView host styled with Switch chrome
+│   └── repository/              # RandomizedSeedEntry, RandomizedSeedRepository
 ├── ocarina/        # Auto-Ocarina feature
 │   ├── OcarinaNote.kt           # Enum A/C_UP/C_DOWN/C_LEFT/C_RIGHT → raw keycodes
 │   ├── OcarinaSong.kt           # Song model + tolerant JSON parsing
@@ -139,7 +142,7 @@ br.com.redclaw.zelda64player
 ├── libretrodroid/       # LOCAL GRADLE MODULE (vendor LibretroDroid 0.13.2 + 2 JNI passthroughs)
 ```
 
-**Testing:** `./gradlew :app:testDebugUnitTest` — 191 unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, randomizer patching/validation and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed.
+**Testing:** `./gradlew :app:testDebugUnitTest` — JVM unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, randomizer WebView capture (RomZipExtractor) and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed.
 
 **Roadmap:** See **plano.md** (pt-BR). Shipped: BPS + IPS patching, hack store, settings, save backup/restore, background catalog refresh, OoT Randomizer generator, Auto-Ocarina, RetroAchievements, Nintendo Switch UI revamp, Vanilla Games in Library. Remaining stretch goals (post-MVP): multiple save slots per hack, optional opt-in telemetry (privacy-first, deferred), hardcore mode enablement pending RAdmin User-Agent validation.
 
@@ -154,7 +157,7 @@ br.com.redclaw.zelda64player
 - **LibretroDroid** — Android embedding framework
 - **rcheevos** (MIT) — RetroAchievements client library powering the achievements integration
 - **RetroAchievements.org** — achievement database and web API
-- **OoTR** (ootrandomizer.com) — randomizer generation API
+- **OoTR** (ootrandomizer.com) — official OoT Randomizer generator (embedded via WebView)
 - **BPS format** — by byuu / rombp (MIT reference implementation consulted for clean-room)
 - **Inspired by** the romhacking community and the original Ludere project (GPL-3.0)
 - **Dolfi** — SVG icon and cover art generation for the project
@@ -187,9 +190,9 @@ GPL-3.0 — See [LICENSE](LICENSE). This project is a derivative of Ludere (GPL-
 | 14 | Gamepad layout FROZEN | RadialGamePad layout measured for OoT/MM; no changes without user approval + `plano.md` update. In-game chrome restyled to Switch UI. |
 | 15 | No telemetry without opt-in | No analytics, crash reporting, or network calls except user-initiated catalog fetch, patch download, core download (build-time only). |
 | 16 | Validate all inputs | ROM checksums, patch checksums, catalog JSON schema, downloaded file sizes. |
-| 17 | Randomizer legality | Only OoT 1.0 NTSC-U (CZLE) and NTSC-J (CZLJ) accepted; all other versions rejected. |
-| 18 | API key security | Never hardcoded, logged, or committed; stored only in `EncryptedSharedPreferences` (key `pref_ootr_api_key`), sanitized in all logs (`***`). |
-| 19 | i18n exception for settings | ~200 setting labels/tooltips in `oot_settings_schema.json` remain in English; only UI chrome uses `strings.xml`. |
+| 17 | Randomizer is OoT-only (WebView) | Only OoT seeds generated via the official WebView generator are added to the "Randomizadores" Library section (RandomizerLibrarySource is always OoT). The base-ROM legality check (OoT 1.0 NTSC-U/J) is enforced by ootrandomizer.com; the app only supplies the user's imported vanilla OoT ROM and never patches locally. |
+| 18 | Randomizer WebView | No API key, no local patch logic, no schema. The app supplies the user's imported vanilla OoT ROM and captures the client-side generated patch; base-ROM legality is enforced by ootrandomizer.com. |
+| 19 | i18n exception for WebView generator | The OoTR generator site renders its own English UI; only the app's native chrome uses `strings.xml`. |
 | 20 | RA credentials | Never logged; stored only in `EncryptedSharedPreferences` (`ra_secure_prefs`). |
 | 21 | RA hash from final patched ROM | Computed at install time after BPS/ZPF patch applied and ROM written to `Storage.rom(hackId)`. |
 | 22 | Leaderboards never overlaid on gameplay | Accessible ONLY via GameActivity in-game menu (DialogFragment). |

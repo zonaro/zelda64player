@@ -29,7 +29,7 @@ import androidx.appcompat.app.AppCompatActivity
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.databinding.ActivityLibraryBinding
-import br.com.redclaw.zelda64player.randomizer.ui.RandomizerActivity
+import br.com.redclaw.zelda64player.randomizer.RandomizerWebActivity
 import br.com.redclaw.zelda64player.viewmodels.LibraryMenuHostDelegate
 import br.com.redclaw.zelda64player.retroachievements.ui.AchievementsActivity
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
@@ -158,7 +158,7 @@ class LibraryActivity : AppCompatActivity() {
             SwitchDock.DockItem(
                 R.drawable.ic_randomizer,
                 R.string.dock_randomizer
-            ) { startActivity(Intent(this, RandomizerActivity::class.java)) },
+            ) { startActivity(Intent(this, RandomizerWebActivity::class.java)) },
             SwitchDock.DockItem(
                 R.drawable.ic_trophy,
                 R.string.dock_achievements

@@ -164,15 +164,17 @@
     <string name="settings_catalog_delete_desc">Remover URL de catálogo</string>
     <string name="settings_catalog_remove_confirm_title">Remover URL de catálogo?</string>
 
-    <!-- Settings: randomizer API key -->
-    <string name="settings_randomizer_title">API Key do Randomizador</string>
-    <string name="settings_randomizer_description">Cole a chave de API do OoTR (obtida no Discord do OoTR). A chave é armazenada criptografada e nunca é exibida.</string>
-    <string name="settings_randomizer_hint">Cole a chave de API aqui</string>
-    <string name="settings_randomizer_save">Salvar</string>
-    <string name="settings_randomizer_clear">Limpar</string>
-    <string name="settings_randomizer_status_configured">Chave configurada</string>
-    <string name="settings_randomizer_status_none">Nenhuma chave configurada</string>
-    <string name="settings_randomizer_empty">Cole uma chave válida antes de salvar.</string>
+    <!-- Randomizer WebView (ootrandomizer.com generator) -->
+    <string name="randomizer_web_title">Randomizador</string>
+    <string name="randomizer_web_loading">Carregando…</string>
+    <string name="randomizer_web_select_rom">Selecione a ROM vanilla de OoT</string>
+    <string name="randomizer_web_no_vanilla">Nenhuma ROM vanilla de OoT importada. Importe uma ROM de OoT 1.0 NTSC-U/J em Configurações.</string>
+    <string name="randomizer_web_open_settings">Abrir Configurações</string>
+    <string name="randomizer_web_patch_captured">ROM patcheada capturada! Adicionada aos Randomizadores.</string>
+    <string name="randomizer_web_open_library">Ir para a Library</string>
+    <string name="randomizer_web_capture_failed">Falha ao capturar o patch. Tente novamente.</string>
+    <string name="randomizer_web_extract_failed">Não foi possível extrair o .z64 do ZIP.</string>
+    <string name="randomizer_web_rom_picker_title">Escolha a ROM de OoT</string>
 
     <!-- Settings: RetroAchievements -->
     <string name="settings_ra_title">RetroAchievements</string>
