@@ -41,14 +41,15 @@ class ImportedPatchInstaller(
     private val baseRomRepository: BaseRomRepository,
     private val installedRepository: InstalledHacksRepository,
     private val userHacksRepository: UserHacksRepository,
-    private val storage: Storage
+    private val storage: Storage,
+    private val stringResolver: (Int) -> String = { context.getString(it) }
 ) {
     suspend fun install(patchFile: File, suggestedName: String): ImportPatchResult =
         withContext<ImportPatchResult>(Dispatchers.IO) {
             val format = PatcherFacade.detectPatchFormat(patchFile)
             if (format == PatcherFacade.PatchFormat.UNKNOWN) {
                 return@withContext ImportPatchUnsupported(
-                    context.getString(R.string.import_unsupported_message)
+                    stringResolver(R.string.import_unsupported_message)
                 )
             }
 
@@ -61,7 +62,7 @@ class ImportedPatchInstaller(
                 if (found == null) {
                     val info = KnownBaseRomTable.infoFor(expectedCrc)
                     val targetDescription = info?.let {
-                        context.getString(gameNameRes(it.game)) + " (" + it.versionLabel + ")"
+                        stringResolver(gameNameRes(it.game)) + " (" + it.versionLabel + ")"
                     }
                     return@withContext ImportPatchNoCompatibleRom(
                         expectedCrc32 = expectedCrc,
@@ -93,8 +94,8 @@ class ImportedPatchInstaller(
                 val entry = HackEntry(
                     id = hackId,
                     name = LocalPatchesSource.prettify(suggestedName),
-                    description = context.getString(R.string.import_description_auto),
-                    author = context.getString(R.string.import_author_user),
+                    description = stringResolver(R.string.import_description_auto),
+                    author = stringResolver(R.string.import_author_user),
                     version = "1.0",
                     baseRom = baseRom?.let {
                         BaseRomRef(
@@ -104,7 +105,7 @@ class ImportedPatchInstaller(
                             Checksums(it.crc32, it.md5, it.sha1)
                         )
                     } ?: BaseRomRef(
-                        context.getString(R.string.import_unknown_base),
+                        stringResolver(R.string.import_unknown_base),
                         "",
                         0,
                         Checksums("", null, null)
@@ -131,8 +132,8 @@ class ImportedPatchInstaller(
 
     /** Map a patcher failure to a user-facing message string. */
     private fun mapMessage(e: Throwable): String = when (e) {
-        is PatcherException -> e.message ?: context.getString(R.string.import_invalid_generic)
-        else -> context.getString(R.string.import_invalid_generic)
+        is PatcherException -> e.message ?: stringResolver(R.string.import_invalid_generic)
+        else -> stringResolver(R.string.import_invalid_generic)
     }
 
     /** Resource id for a game family's name (used to build target descriptions). */

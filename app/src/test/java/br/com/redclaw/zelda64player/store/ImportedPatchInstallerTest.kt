@@ -1,7 +1,8 @@
 package br.com.redclaw.zelda64player.store
 
-import android.test.mock.MockContext
+import android.content.ContextWrapper
 import br.com.redclaw.zelda64player.data.local.BaseRomRepository
+import br.com.redclaw.zelda64player.data.local.RegisterResult
 import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
 import br.com.redclaw.zelda64player.data.local.UserHacksRepository
 import br.com.redclaw.zelda64player.ocarina.OcarinaGame
@@ -16,24 +17,22 @@ import org.junit.Test
 import java.io.File
 
 /**
- * Tests [ImportedPatchInstaller] end-to-end on the JVM (no emulator). A
- * [MockContext] provides the temp directories and string resources the
+ * Tests [ImportedPatchInstaller] end-to-end on the JVM (no emulator). A minimal
+ * [ContextWrapper] provides the temp directories and string resources the
  * installer needs; the patcher's own test encoder builds valid BPS fixtures.
  */
 class ImportedPatchInstallerTest {
 
-    /** Minimal [MockContext] backed by temp directories. */
+    /** Minimal [android.content.Context] backed by temp directories. */
     private class TestContext(
         private val filesDir: File,
         private val cacheDir: File,
         private val externalFilesDir: File
-    ) : MockContext() {
+    ) : ContextWrapper(null) {
         override fun getFilesDir(): File = filesDir
         override fun getCacheDir(): File = cacheDir
         override fun getExternalFilesDir(type: String?): File = externalFilesDir
         override fun getExternalCacheDir(): File = cacheDir
-        override fun getString(resId: Int): String = "str$resId"
-        override fun getString(resId: Int, vararg formatArgs: Any?): String = "str$resId"
     }
 
     private fun newWorkspace(): Triple<File, File, File> {
@@ -66,7 +65,7 @@ class ImportedPatchInstallerTest {
         val source = dummySource()
         val sourceFile = File(baseStorageDir, "source.z64").apply { writeBytes(source) }
         val reg = baseRepo.registerNormalizedFile(sourceFile, "dummy")
-        assertTrue(reg is BaseRomRepository.RegisterResult.Success)
+        assertTrue(reg is RegisterResult.Success)
 
         val target = ByteArray(1024) { (it * 3).toByte() }
         val patchBytes = BpsPatchEncoder.encode(source, target)
@@ -78,7 +77,8 @@ class ImportedPatchInstallerTest {
             baseRepo,
             InstalledHacksRepository(File(filesDir, "installed.json")),
             UserHacksRepository(File(filesDir, "user_hacks.json")),
-            Storage(context)
+            Storage(context),
+            stringResolver = { "x" }
         )
 
         val result = runBlocking { installer.install(patchFile, "my_hack") }
@@ -113,7 +113,8 @@ class ImportedPatchInstallerTest {
             baseRepo,
             InstalledHacksRepository(File(filesDir, "installed.json")),
             UserHacksRepository(File(filesDir, "user_hacks.json")),
-            Storage(context)
+            Storage(context),
+            stringResolver = { "x" }
         )
 
         val result = runBlocking { installer.install(patchFile, "orphan") }
@@ -141,7 +142,8 @@ class ImportedPatchInstallerTest {
             baseRepo,
             InstalledHacksRepository(File(filesDir, "installed.json")),
             UserHacksRepository(File(filesDir, "user_hacks.json")),
-            Storage(context)
+            Storage(context),
+            stringResolver = { "x" }
         )
 
         val result = runBlocking { installer.install(patchFile, "garbage") }
@@ -160,13 +162,13 @@ class ImportedPatchInstallerTest {
         val source = dummySource()
         val sourceFile = File(File(storageDir, "base_storage"), "source.z64").apply { writeBytes(source) }
         val reg = baseRepo.registerNormalizedFile(sourceFile, "dummy")
-        assertTrue(reg is BaseRomRepository.RegisterResult.Success)
+        assertTrue(reg is RegisterResult.Success)
 
         val target = ByteArray(1024) { (it * 3).toByte() }
-        val patchBytes = BpsPatchEncoder.encode(source, target).toByteArray()
+        val patchBytes = BpsPatchEncoder.encode(source, target)
         // Flip a body byte (not in the trailing 12-byte footer) so the embedded
         // patch CRC no longer verifies -> InvalidPatch.
-        patchBytes[20] = patchBytes[20].inc()
+        patchBytes[20] = (patchBytes[20] + 1).toByte()
         val patchFile = File(cacheDir, "corrupt.bps").apply { writeBytes(patchBytes) }
 
         val context = TestContext(filesDir, cacheDir, storageDir)
@@ -175,7 +177,8 @@ class ImportedPatchInstallerTest {
             baseRepo,
             InstalledHacksRepository(File(filesDir, "installed.json")),
             UserHacksRepository(File(filesDir, "user_hacks.json")),
-            Storage(context)
+            Storage(context),
+            stringResolver = { "x" }
         )
 
         val result = runBlocking { installer.install(patchFile, "corrupt") }
