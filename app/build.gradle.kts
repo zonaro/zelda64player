@@ -5,6 +5,7 @@
 // Ludere) into app/src/main/jniLibs for every ABI.
 import de.undercouch.gradle.tasks.download.DownloadSpec
 import org.gradle.api.Action
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -44,7 +45,7 @@ android {
     // without it fall back to an unsigned release artifact.
     val keystorePropsFile = rootProject.file("keystore.properties")
     if (keystorePropsFile.exists()) {
-        val keystoreProps = java.util.Properties().apply {
+        val keystoreProps = Properties().apply {
             keystorePropsFile.inputStream().use { load(it) }
         }
         signingConfigs {
