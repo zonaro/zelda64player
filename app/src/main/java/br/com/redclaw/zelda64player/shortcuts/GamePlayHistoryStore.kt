@@ -31,6 +31,9 @@ class GamePlayHistoryStore(private val file: File) {
     /** Last-played epoch millis for [hackId], or null if never played. */
     fun lastPlayed(hackId: String): Long? = load()[hackId]
 
+    /** Whole history map (hackId -> last-played epoch millis), for bulk ordering. */
+    fun all(): Map<String, Long> = load()
+
     /**
      * Remove [hackId] from the play-history store (e.g. after uninstalling the
      * game). Safe to call when the hack was never played.

@@ -114,7 +114,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:textColor="#88ff88"
+        android:textColor="@color/switch_accent"
         android:textSize="13sp"
         tools:text="Você possui uma ROM base compatível." />
 
@@ -150,6 +150,7 @@
 
     <Button
         android:id="@+id/detail_download"
+        style="@style/SwitchButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"

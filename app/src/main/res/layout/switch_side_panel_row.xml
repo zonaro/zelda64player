@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A single row inside the quick side panel: optional leading icon, label,
+     optional gray suffix, optional trailing chevron, and a full-width focus
+     border (cyan by default, amber variant for theme/appearance actions). -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Focus border sits behind the content; shown only while focused. -->
+    <View
+        android:id="@+id/row_border"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/switch_focus_border"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <ImageView
+            android:id="@+id/row_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="@null"
+            android:visibility="gone"
+            android:tint="@color/switch_text_primary" />
+
+        <TextView
+            android:id="@+id/row_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/switch_text_primary"
+            android:textSize="@dimen/switch_row_text" />
+
+        <TextView
+            android:id="@+id/row_suffix"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/switch_text_secondary"
+            android:textSize="@dimen/switch_suffix_text"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/row_chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_chevron_right"
+            android:tint="@color/switch_text_secondary"
+            android:visibility="gone" />
+    </LinearLayout>
+</merge>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Landscape (13:9) cover placeholder for Switch game cards. A layer-list has
+     no intrinsic size, so it fills the card bounds exactly: no letterboxing,
+     no cropping. Rounded to the same radius as the card and focus border. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/color_surface_container" />
+            <corners android:radius="@dimen/switch_card_corner_radius" />
+        </shape>
+    </item>
+    <item
+        android:drawable="@drawable/ic_gamepad"
+        android:gravity="center"
+        android:tint="@color/switch_text_secondary" />
+</layer-list>

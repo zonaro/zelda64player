@@ -1,104 +1,96 @@
+/*
+ * Zelda 64 Player - native Android N64 emulator frontend for Zelda ROM hacks.
+ * Copyright (C) 2026 RedClaw
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package br.com.redclaw.zelda64player.views
 
-import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.hardware.input.InputManager
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.Window
 import android.view.WindowInsets
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.databinding.ActivityLibraryBinding
-import br.com.redclaw.zelda64player.data.local.AppRepositories
-import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
-import br.com.redclaw.zelda64player.randomizer.repository.RandomizedSeedRepository
-import br.com.redclaw.zelda64player.repositories.SaveBackupManager
-import br.com.redclaw.zelda64player.repositories.Storage
-import br.com.redclaw.zelda64player.repositories.uninstallHackFiles
-import br.com.redclaw.zelda64player.settings.ui.SettingsActivity
+import br.com.redclaw.zelda64player.randomizer.ui.RandomizerActivity
+import br.com.redclaw.zelda64player.viewmodels.LibraryMenuHostDelegate
+import br.com.redclaw.zelda64player.retroachievements.ui.AchievementsActivity
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
 import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.store.ui.StoreActivity
+import br.com.redclaw.zelda64player.settings.ui.SettingsActivity
+import br.com.redclaw.zelda64player.ui.switchui.SwitchDock
+import br.com.redclaw.zelda64player.ui.switchui.SwitchHomeRow
+import br.com.redclaw.zelda64player.ui.switchui.SwitchSidePanel
+import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
+import br.com.redclaw.zelda64player.ui.switchui.ThemeManager
+import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.viewmodels.LibraryMenuController
-import br.com.redclaw.zelda64player.viewmodels.LibraryMenuHost
-import br.com.redclaw.zelda64player.randomizer.ui.RandomizerActivity
-import coil.load
+import br.com.redclaw.zelda64player.ui.switchui.SwitchGridActivity
+import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import java.io.File
 
-class LibraryActivity : AppCompatActivity(), LibraryMenuHost {
+/**
+ * Library home screen, rebuilt in Phase B to match the Nintendo Switch HOME menu
+ * aesthetic: a horizontal row of square game cards showing the 5 most-recently
+ * played installed entries (newest first), with a focused-game label above, a
+ * circular "Todos os Jogos" card at the end of the row, a bottom dock of four
+ * circular buttons, and a footer hints bar.
+ *
+ * The home row order is produced by [InstalledLibrary.recentEntries] (which ranks
+ * by last-played timestamp descending, played-only, capped at 5, and falls back to
+ * the default [InstalledLibrary.entries] order capped at 5 on a fresh install when
+ * nothing has ever been played). The full, sortable library lives in
+ * [br.com.redclaw.zelda64player.ui.switchui.SwitchGridActivity].
+ *
+ * All data flow is preserved from the previous grid implementation: the entry
+ * list is still produced by [InstalledLibrary.entries] (which merges the vanilla,
+ * store and randomizer sources in the required order), and every existing behavior
+ * is kept — import/export save flows, the per-game context menu (long-press /
+ * overflow / physical SELECT-X-Y), uninstall and delete-seed, RetroAchievements
+ * deep-link, shortcut sync, empty state, and immersive mode. Only the presentation
+ * layer changed; the [LibraryMenuController] and [LibraryMenuHost] contracts are
+ * untouched.
+ */
+class LibraryActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLibraryBinding
 
     /* Stateless: rebuilt from the source on every (re)create, so process
        death / configuration changes need no saved instance state. */
     private lateinit var items: List<HackLibraryEntry>
 
-    /* Debounce for grid taps so a rapid double-tap fires only ONE launch
-       intent (prevents two GameActivity instances racing the same install). */
-    private var lastLaunchClickTime = 0L
-
     private lateinit var menuController: LibraryMenuController
 
-    /* Entry whose save operation is pending in a SAF picker (one-shot). */
-    private var pendingExportEntry: HackLibraryEntry? = null
-    private var pendingImportEntry: HackLibraryEntry? = null
+    /* Shared host logic (launch, SAF save pickers, uninstall, delete-seed, pin,
+       achievements). Extracted to [LibraryMenuHostDelegate] so the full-screen
+       grid screen reuses the exact same context-menu actions (DRY). */
+    private lateinit var menuHost: LibraryMenuHostDelegate
 
-    private val exportLauncher = registerForActivityResult(
-        ActivityResultContracts.CreateDocument("application/zip")
-    ) { uri ->
-        val entry = pendingExportEntry ?: return@registerForActivityResult
-        pendingExportEntry = null
-        if (uri == null) return@registerForActivityResult
-        val storage = Storage.getInstance(this)
-        try {
-            contentResolver.openOutputStream(uri)?.use { out ->
-                SaveBackupManager.exportToStream(out, storage.sram(entry.id), storage.state(entry.id))
-            }
-            showToast(R.string.menu_export_success)
-        } catch (e: Exception) {
-            Log.e(TAG, "exportSaves failed for ${entry.id}", e)
-            showToast(R.string.menu_export_failure)
-        }
-    }
-
-    private val importLauncher = registerForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        val entry = pendingImportEntry ?: return@registerForActivityResult
-        pendingImportEntry = null
-        if (uri == null) return@registerForActivityResult
-        val storage = Storage.getInstance(this)
-        try {
-            contentResolver.openInputStream(uri)?.use { input ->
-                val summary = SaveBackupManager.importFromStream(
-                    input, storage.sram(entry.id), storage.state(entry.id)
-                )
-                if (summary.ok) showToast(R.string.menu_import_success)
-                else showToast(R.string.menu_import_failure)
-            } ?: showToast(R.string.menu_import_failure)
-        } catch (e: Exception) {
-            Log.e(TAG, "importSaves failed for ${entry.id}", e)
-            showToast(R.string.menu_import_failure)
-        }
-    }
+    /** Live quick-options side panel (Phase D); null when not showing. */
+    private var optionsPanel: SwitchSidePanel? = null
 
     companion object {
         private const val TAG = "LibraryActivity"
 
-        /** Minimum interval between grid launches, in milliseconds. */
-        private const val LAUNCH_CLICK_DEBOUNCE_MS = 700L
+        /** Index of the SFX row within the quick-options panel (for live suffix). */
+        private const val SFX_ROW_INDEX = 1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,24 +99,20 @@ class LibraryActivity : AppCompatActivity(), LibraryMenuHost {
         setContentView(binding.root)
 
         window.decorView.setOnApplyWindowInsetsListener { view, windowInsets ->
-            view.post { immersive(window) }
+            view.post { SwitchImmersive.enterFullscreen(this) }
             windowInsets
         }
 
-        menuController = LibraryMenuController(this)
+        menuHost = LibraryMenuHostDelegate(this) { onLibraryChanged() }
+        menuController = LibraryMenuController(menuHost)
 
-        items = InstalledLibrary.entries(this)
+        items = InstalledLibrary.recentEntries(this)
 
-        setupGrid()
-        binding.librarySettings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-        binding.libraryStore.setOnClickListener {
-            startActivity(Intent(this, StoreActivity::class.java))
-        }
-        binding.libraryRandomizer.setOnClickListener {
-            startActivity(Intent(this, RandomizerActivity::class.java))
-        }
+        setupHomeRow()
+        setupDock()
+        setupFooter()
+        updateEmptyState()
+        syncShortcuts()
 
         registerInputListener()
     }
@@ -132,12 +120,62 @@ class LibraryActivity : AppCompatActivity(), LibraryMenuHost {
     override fun onResume() {
         super.onResume()
         // Rebuild the list so hacks installed in the Store appear on return
-        // without needing to recreate the activity.
-        items = InstalledLibrary.entries(this)
-        (binding.libraryGrid.adapter as? LibraryAdapter)?.update(items)
-            ?: setupGrid()
+        // without needing to recreate the activity. Uses the shared recent-5
+        // helper so the home row stays consistent with the context-menu refresh.
+        items = InstalledLibrary.recentEntries(this)
+        binding.libraryHomeRow.submitList(items)
         updateEmptyState()
         syncShortcuts()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) SwitchImmersive.enterFullscreen(this)
+    }
+
+    /**
+     * Wire the home row: entry ordering comes from [InstalledLibrary.recentEntries]
+     * (the 5 most-recently-played entries, newest first; falls back to the default
+     * order on a fresh install). Click launches, long-press opens the context menu,
+     * and the trailing "Todos os Jogos" card opens the grid.
+     */
+    private fun setupHomeRow() {
+        binding.libraryHomeRow.setOnEntryActivate { menuHost.launchGame(it.id) }
+        binding.libraryHomeRow.setOnEntryMenu { menuController.openMenu(it) }
+        binding.libraryHomeRow.setOnAllGamesActivate {
+            startActivity(Intent(this, SwitchGridActivity::class.java))
+        }
+        binding.libraryHomeRow.submitList(items)
+    }
+
+    /** Build the four dock destinations (Loja, Randomizador, RA, Configurações). */
+    private fun setupDock() {
+        val dockItems = listOf(
+            SwitchDock.DockItem(
+                R.drawable.ic_store,
+                R.string.dock_store
+            ) { startActivity(Intent(this, StoreActivity::class.java)) },
+            SwitchDock.DockItem(
+                R.drawable.ic_randomizer,
+                R.string.dock_randomizer
+            ) { startActivity(Intent(this, RandomizerActivity::class.java)) },
+            SwitchDock.DockItem(
+                R.drawable.ic_trophy,
+                R.string.dock_achievements
+            ) { startActivity(Intent(this, AchievementsActivity::class.java)) },
+            SwitchDock.DockItem(
+                R.drawable.ic_settings,
+                R.string.dock_settings
+            ) { startActivity(Intent(this, SettingsActivity::class.java)) }
+        )
+        binding.libraryDock.setItems(dockItems)
+    }
+
+    /** Wire the footer hints: "(i) Sobre" opens the About dialog, "+ Opções" is a
+     *  Phase D stub hook (quick side panel). */
+    private fun setupFooter() {
+        binding.libraryFooter.setOnAbout { showAboutDialog() }
+        binding.libraryFooter.setOnOptions { openOptionsPanel() }
     }
 
     /**
@@ -150,144 +188,136 @@ class LibraryActivity : AppCompatActivity(), LibraryMenuHost {
     }
 
     /**
-     * Offer to pin [entry] to the home screen. If the device/launcher does not
-     * support pinning, explain it with a localized toast instead of failing
-     * silently.
+     * Rebuild the library list after a mutation performed by [menuHost] (uninstall
+     * or delete-seed) and refresh the dependent UI: the home row, the empty state
+     * and the dynamic shortcuts. Centralized here so the shared
+     * [LibraryMenuHostDelegate] only has to invoke this single callback (DRY).
      */
-    override fun pinShortcut(entry: HackLibraryEntry) {
-        val history = GamePlayHistoryStore(File(filesDir, "game_play_history.json"))
-        val ok = GameShortcutsManager(this, history).requestPin(entry)
-        if (!ok) {
-            Toast.makeText(this, R.string.shortcut_pin_unsupported, Toast.LENGTH_SHORT).show()
+    private fun onLibraryChanged() {
+        // Rebuild via the shared recent-5 helper so a delete/uninstall refresh
+        // stays consistent with onCreate/onResume (DRY).
+        items = InstalledLibrary.recentEntries(this)
+        binding.libraryHomeRow.submitList(items)
+        updateEmptyState()
+        syncShortcuts()
+    }
+
+    /** Shows the About & Licenses dialog (GPL-3.0 + rcheevos MIT notice). */
+    private fun showAboutDialog() {
+        val version = try {
+            packageManager.getPackageInfo(packageName, 0).versionName
+        } catch (_: PackageManager.NameNotFoundException) {
+            "?"
         }
-    }
-
-    /**
-     * Launch [hackId] the same way tapping its tile does, respecting the shared
-     * debounce so a rapid repeat (e.g. physical A + tile tap) fires only once.
-     */
-    override fun launchGame(hackId: String) {
-        val now = System.currentTimeMillis()
-        if (now - lastLaunchClickTime < LAUNCH_CLICK_DEBOUNCE_MS) return
-        lastLaunchClickTime = now
-        val intent = Intent(this, GameActivity::class.java).apply {
-            putExtra("hack_id", hackId)
+        val appName = getString(R.string.config_name)
+        val body = buildString {
+            append(appName)
+            append("\n")
+            append(getString(R.string.settings_about_version, version))
+            append("\n\n")
+            append(getString(R.string.settings_about_licenses))
         }
-        startActivity(intent)
-    }
-
-    /** Open the RetroAchievements screen for [entry]. */
-    override fun openAchievements(entry: HackLibraryEntry) {
-        startActivity(
-            Intent(this, AchievementsActivity::class.java).apply {
-                putExtra(AchievementsActivity.EXTRA_HACK_ID, entry.id)
-            }
-        )
-    }
-
-    override fun requestExportSaves(entry: HackLibraryEntry) {
-        val storage = Storage.getInstance(this)
-        val hasSaves = storage.sram(entry.id).exists() || storage.state(entry.id).exists()
-        if (!hasSaves) {
-            showToast(R.string.menu_export_nothing)
-            return
-        }
-        pendingExportEntry = entry
-        val safeName = entry.title.replace(Regex("[^a-zA-Z0-9 _-]"), "_").trim()
-        exportLauncher.launch("$safeName${getString(R.string.menu_export_filename_suffix)}")
-    }
-
-    override fun requestImportSaves(entry: HackLibraryEntry) {
-        if (!Storage.getInstance(this).rom(entry.id).exists()) {
-            showToast(R.string.menu_import_not_installed)
-            return
-        }
-        pendingImportEntry = entry
-        importLauncher.launch(arrayOf("application/zip"))
-    }
-
-    override fun confirmUninstall(entry: HackLibraryEntry) {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.menu_uninstall_title, entry.title))
-            .setMessage(R.string.menu_uninstall_message)
-            .setPositiveButton(R.string.menu_uninstall_button) { _, _ -> performUninstall(entry) }
-            .setNegativeButton(R.string.dialog_cancel, null)
-            .show()
-    }
-
-    override fun confirmDeleteSeed(entry: HackLibraryEntry) {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.randomizer_delete_title, entry.title))
-            .setMessage(R.string.randomizer_delete_message)
-            .setPositiveButton(R.string.randomizer_delete_button) { _, _ -> performDeleteSeed(entry) }
-            .setNegativeButton(R.string.dialog_cancel, null)
+        SwitchDialog(this)
+            .title(getString(R.string.about_dialog_title))
+            .message(body)
+            .positiveButton(getString(R.string.about_dialog_close))
             .show()
     }
 
     /**
-     * Delete the game's files, unmark it as installed and drop its play-history
-     * entry, then rebuild the grid so the tile disappears. Orchestrated here
-     * (the caller of the pure [uninstallHackFiles]); the file deletion itself is
-     * a JVM-testable pure function.
+     * Opens the quick Options side panel (Phase D): theme toggle (amber focus
+     * border), interface-sound on/off with a live suffix, RetroAchievements
+     * login status (drills into Settings where login lives), and a link to the
+     * full Settings screen. All rows reuse the reusable [SwitchSidePanel].
      */
-    private fun performUninstall(entry: HackLibraryEntry) {
-        val storage = Storage.getInstance(this)
-        uninstallHackFiles(File(storage.storagePath), entry.id)
-        InstalledHacksRepository(File(filesDir, "installed_hacks.json")).unmarkInstalled(entry.id)
-        GamePlayHistoryStore(File(filesDir, "game_play_history.json")).remove(entry.id)
+    private fun openOptionsPanel() {
+        // Toggle: a second tap on the footer hint closes an open panel instead
+        // of stacking a second overlay.
+        if (optionsPanel?.isShowing == true) {
+            optionsPanel?.dismiss()
+            return
+        }
+        val isLight = ThemeManager.isLight(this)
+        val sfxOn = CorePrefs.getSwitchSfxEnabled(this)
+        val raCredentials = Zelda64PlayerApp.raCredentialStore
+        val raLabel = if (raCredentials.hasCredentials()) {
+            getString(R.string.options_ra_status_connected, raCredentials.getUsername().orEmpty())
+        } else {
+            getString(R.string.options_ra_status_disconnected)
+        }
 
-        items = InstalledLibrary.entries(this)
-        (binding.libraryGrid.adapter as? LibraryAdapter)?.update(items)
-        updateEmptyState()
-        syncShortcuts()
-        showToast(R.string.menu_uninstall_done)
-    }
-
-    /**
-     * Delete a generated randomizer seed: remove its index entry + ROM/SRAM/state
-     * files via [RandomizedSeedRepository.remove] (which reuses the same
-     * per-hack file cleanup as store-hack uninstall), then rebuild the grid.
-     */
-    private fun performDeleteSeed(entry: HackLibraryEntry) {
-        val repository: RandomizedSeedRepository = AppRepositories.randomizedSeedRepository(this)
-        val ok = repository.remove(entry.id)
-        GamePlayHistoryStore(File(filesDir, "game_play_history.json")).remove(entry.id)
-
-        items = InstalledLibrary.entries(this)
-        (binding.libraryGrid.adapter as? LibraryAdapter)?.update(items)
-        updateEmptyState()
-        syncShortcuts()
-        showToast(if (ok) R.string.randomizer_delete_done else R.string.randomizer_delete_failed)
-    }
-
-    override fun showToast(resId: Int) {
-        Toast.makeText(this, resId, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun context(): android.app.Activity = this
-
-    private fun setupGrid() {
-        val spanCount = resources.getInteger(R.integer.library_span_count)
-        binding.libraryGrid.layoutManager = GridLayoutManager(this, spanCount)
-        binding.libraryGrid.adapter = LibraryAdapter(
-            items,
-            onItemClick = { item -> launchGame(item.id) },
-            onItemLongClick = { item -> menuController.openMenu(item) }
+        val rows = listOf(
+            SwitchSidePanel.Row(
+                iconRes = if (isLight) R.drawable.ic_moon else R.drawable.ic_sun,
+                label = getString(
+                    if (isLight) R.string.options_theme_to_dark
+                    else R.string.options_theme_to_light
+                ),
+                amberFocus = true,
+                onClick = { ThemeManager.toggle(this) /* auto-recreates */ }
+            ),
+            SwitchSidePanel.Row(
+                iconRes = R.drawable.ic_volume_up,
+                label = getString(R.string.options_sfx),
+                suffix = getString(
+                    if (sfxOn) R.string.options_sfx_on else R.string.options_sfx_off
+                ),
+                onClick = {
+                    val newOn = !CorePrefs.getSwitchSfxEnabled(this)
+                    Zelda64PlayerApp.sfxManager.setEnabled(newOn)
+                    optionsPanel?.setRowSuffix(
+                        SFX_ROW_INDEX,
+                        getString(if (newOn) R.string.options_sfx_on else R.string.options_sfx_off)
+                    )
+                }
+            ),
+            SwitchSidePanel.Row(
+                iconRes = R.drawable.ic_trophy,
+                label = raLabel,
+                showChevron = true,
+                onClick = {
+                    optionsPanel?.dismiss()
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                }
+            ),
+            SwitchSidePanel.Row(
+                iconRes = R.drawable.ic_settings,
+                label = getString(R.string.options_settings_full),
+                showChevron = true,
+                onClick = {
+                    optionsPanel?.dismiss()
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                }
+            )
         )
-        updateEmptyState()
+
+        optionsPanel = SwitchSidePanel(this)
+        optionsPanel?.show(getString(R.string.options_panel_title), R.drawable.ic_tune, rows)
     }
 
     private fun updateEmptyState() {
         val isEmpty = items.isEmpty()
+        binding.libraryHomeRow.visibility = if (isEmpty) View.GONE else View.VISIBLE
         binding.libraryEmpty.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        binding.libraryGrid.visibility = if (isEmpty) View.GONE else View.VISIBLE
     }
 
     /**
-     * Route physical gamepad keys when no menu is open: A launches the focused
-     * tile, SELECT/X/Y open the context menu for the focused tile. While the
-     * menu is showing, its own decor-view key listener handles keys, so we let
-     * those events fall through to the system.
+     * Route physical gamepad keys when no menu is open: A activates the focused
+     * tile / dock button / "Todos os Jogos" card; SELECT/X/Y open the context
+     * menu for the focused tile; the gamepad HOME / guide button toggles the
+     * quick-options side panel open/closed. While the menu is showing, its own
+     * decor-view key listener handles keys, so we let those events fall through
+     * to the system. The HOME toggle is guarded against key repeats so holding
+     * the button does not spam open/close.
+     *
+     * Note on the keycode: the physical gamepad "home"/"guide" button is
+     * delivered as [KeyEvent.KEYCODE_GUIDE] (value 172, added in API 11, safe
+     * on minSdk 24). The names KEYCODE_BUTTON_HOME and KEYCODE_HOMEPAGE from
+     * the original spec do not exist in the Android SDK; the Linux KEY_HOMEPAGE
+     * usage is translated by Android into KEYCODE_HOME (3), which is
+     * system-reserved and never delivered to apps, so it cannot be intercepted
+     * here. KEYCODE_GUIDE is therefore the correct and only interceptable
+     * constant for this button.
      */
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (menuController.isMenuShowing()) {
@@ -295,17 +325,42 @@ class LibraryActivity : AppCompatActivity(), LibraryMenuHost {
         }
         if (event.action == KeyEvent.ACTION_DOWN) {
             val focused = currentFocus
-            val entry = focused?.tag as? HackLibraryEntry
-            if (entry != null) {
-                when (event.keyCode) {
-                    KeyEvent.KEYCODE_BUTTON_A -> {
-                        focused.performClick()
+            val tag = focused?.tag
+            when (event.keyCode) {
+                KeyEvent.KEYCODE_BUTTON_A -> {
+                    when (tag) {
+                        is HackLibraryEntry -> {
+                            focused.performClick()
+                            return true
+                        }
+                        is SwitchDock.DockItem -> {
+                            focused.performClick()
+                            return true
+                        }
+                        SwitchHomeRow.ALL_GAMES_TAG -> {
+                            focused.performClick()
+                            return true
+                        }
+                    }
+                }
+                KeyEvent.KEYCODE_BUTTON_SELECT,
+                KeyEvent.KEYCODE_BUTTON_X,
+                KeyEvent.KEYCODE_BUTTON_Y -> {
+                    if (tag is HackLibraryEntry) {
+                        menuController.openMenu(tag)
                         return true
                     }
-                    KeyEvent.KEYCODE_BUTTON_SELECT,
-                    KeyEvent.KEYCODE_BUTTON_X,
-                    KeyEvent.KEYCODE_BUTTON_Y -> {
-                        menuController.openMenu(entry)
+                }
+                // Gamepad HOME / guide button toggles the quick-options side
+                // panel. The physical button is delivered as KEYCODE_GUIDE
+                // (value 172, API 11) — the Android SDK has no KEYCODE_BUTTON_HOME
+                // or KEYCODE_HOMEPAGE constant; KEY_HOMEPAGE is translated by the
+                // framework into the system-reserved KEYCODE_HOME (3), which is
+                // never delivered to apps. The repeat guard prevents holding the
+                // button from spamming open/close toggles.
+                KeyEvent.KEYCODE_GUIDE -> {
+                    if (event.repeatCount == 0) {
+                        openOptionsPanel()
                         return true
                     }
                 }
@@ -315,7 +370,7 @@ class LibraryActivity : AppCompatActivity(), LibraryMenuHost {
     }
 
     private fun registerInputListener() {
-        val inputManager = getSystemService(Service.INPUT_SERVICE) as InputManager
+        val inputManager = getSystemService(INPUT_SERVICE) as InputManager
         inputManager.registerInputDeviceListener(
             object : InputManager.InputDeviceListener {
                 override fun onInputDeviceAdded(deviceId: Int) {
@@ -330,87 +385,5 @@ class LibraryActivity : AppCompatActivity(), LibraryMenuHost {
             },
             null
         )
-    }
-
-    /** Hide the system bars when the config permits it (mirrors GameActivity). */
-    @Suppress("DEPRECATION")
-    private fun immersive(window: Window) {
-        if (!resources.getBoolean(R.bool.config_fullscreen))
-            return
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.apply {
-                hide(WindowInsets.Type.systemBars())
-                systemBarsBehavior =
-                    android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-            }
-        } else {
-            window.decorView.systemUiVisibility =
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_FULLSCREEN
-        }
-    }
-
-    private class LibraryAdapter(
-        private var items: List<HackLibraryEntry>,
-        private val onItemClick: (HackLibraryEntry) -> Unit,
-        private val onItemLongClick: (HackLibraryEntry) -> Unit
-    ) : RecyclerView.Adapter<LibraryAdapter.ViewHolder>() {
-
-        fun update(newItems: List<HackLibraryEntry>) {
-            items = newItems
-            notifyDataSetChanged()
-        }
-
-        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val title: TextView = view.findViewById(R.id.tile_title)
-            val cover: ImageView = view.findViewById(R.id.tile_cover)
-            val badge: TextView = view.findViewById(R.id.tile_badge)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.library_tile, parent, false)
-            return ViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            val item = items[position]
-            holder.title.text = item.title
-            if (item.badgeText != null) {
-                holder.badge.visibility = View.VISIBLE
-                holder.badge.text = item.badgeText
-            } else {
-                holder.badge.visibility = View.GONE
-            }
-            if (item.coverUrl != null) {
-                holder.cover.load(item.coverUrl) {
-                    placeholder(R.drawable.placeholder_cover)
-                    error(R.drawable.placeholder_cover)
-                    crossfade(true)
-                }
-            } else {
-                holder.cover.setImageResource(R.drawable.placeholder_cover)
-            }
-            /* Tag the tile root with its entry so physical-key handling in
-               dispatchKeyEvent can identify the focused tile. */
-            holder.itemView.tag = item
-            holder.itemView.setOnClickListener { onItemClick(item) }
-            holder.itemView.setOnLongClickListener {
-                onItemLongClick(item)
-                true
-            }
-            /* Overflow button opens the context menu for this tile. It is NOT
-               focusable (so D-pad grid navigation is undisturbed) and consumes
-               its own click so the tile's click never fires. */
-            holder.itemView.findViewById<View>(R.id.tile_overflow)
-                .setOnClickListener { onItemLongClick(item) }
-        }
-
-        override fun getItemCount() = items.size
     }
 }

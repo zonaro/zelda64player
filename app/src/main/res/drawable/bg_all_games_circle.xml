@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- Charcoal fill for the circular "Todos os Jogos" card. -->
+    <solid android:color="@color/switch_all_games_bg" />
+</shape>

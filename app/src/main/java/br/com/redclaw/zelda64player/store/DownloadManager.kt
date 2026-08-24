@@ -20,12 +20,6 @@ import okhttp3.Request
 import java.io.File
 
 /**
- * Phases reported while installing a hack. [DOWNLOADING] streams the patch from
- * the network; [PATCHING] applies it against the base ROM (no byte progress).
- */
-enum class InstallPhase { DOWNLOADING, PATCHING }
-
-/**
  * Streaming download + apply of a hack's patch (BPS, possibly inside a `.zip`)
  * with checksum validation. On success the patched ROM is written to
  * [Storage.rom] and the installed state is recorded in [installedRepository];
@@ -53,7 +47,8 @@ class DownloadManager(
      */
     suspend fun download(
         hack: HackEntry,
-        onProgress: (phase: InstallPhase, bytesDownloaded: Long, totalBytes: Long) -> Unit
+        onProgress: (phase: InstallPhase, bytesDownloaded: Long, totalBytes: Long) -> Unit,
+        cancelSignal: CancelSignal? = null
     ): Result<File> = withContext(Dispatchers.IO) {
         val patch = hack.patch
         val tempArchive = File(patchRepository.directory, "${hack.id}.tmp")
@@ -74,6 +69,9 @@ class DownloadManager(
                             val buf = ByteArray(64 * 1024)
                             var read: Int
                             while (input.read(buf).also { read = it } != -1) {
+                                if (cancelSignal?.isCancelled == true) {
+                                    throw StoreException.Cancelled()
+                                }
                                 output.write(buf, 0, read)
                                 downloaded += read
                                 onProgress(InstallPhase.DOWNLOADING, downloaded, total)
@@ -98,6 +96,9 @@ class DownloadManager(
                     val baseFile = resolveBaseFile(bpsTemp)
 
                     // 5. Apply the patch to a temp ROM on the SAME filesystem as the final target.
+                    if (cancelSignal?.isCancelled == true) {
+                        throw StoreException.Cancelled()
+                    }
                     onProgress(InstallPhase.PATCHING, 0, 0)
                     PatcherFacade.applyPatchBlocking(baseFile, bpsTemp, romTemp)
                         .getOrElse { throw mapPatcherException(it) }
@@ -116,11 +117,24 @@ class DownloadManager(
                     // 7. RetroAchievements identity: hash the FINAL patched ROM
                     //    (never the base ROM or an intermediate) and resolve its
                     //    game id. Best-effort: failures leave a placeholder entry
-                    //    that is retried on a later install/launch.
+                    //    that is retried on a later install/launch. A catalog
+                    //    provided retroAchievements.gameId seeds the identity so
+                    //    the library screens work even before/offline resolution.
                     runCatching {
+                        val metadataStore = RaInstallMetadataStore(context)
+                        hack.retroAchievements?.takeIf { it.gameId != 0L }?.let { ref ->
+                            metadataStore.put(
+                                hack.id,
+                                br.com.redclaw.zelda64player.retroachievements.data.RaGameIdentity(
+                                    raHash = "",
+                                    gameId = ref.gameId,
+                                    title = ref.title
+                                )
+                            )
+                        }
                         RaHashService(
                             http = RaHttpClient(RaUserAgent.build(context)),
-                            metadataStore = RaInstallMetadataStore(context)
+                            metadataStore = metadataStore
                         ).computeAndResolve(hack.id, finalRom)
                     }
 

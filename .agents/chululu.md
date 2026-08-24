@@ -12,57 +12,74 @@ Bruce or Lobby provides screenshots/recordings when:
 
 ## Analysis Checklist per Screen
 
-### Material 3 Expressive Compliance (All Screens)
-- [ ] **Theme parent**: `Theme.Material3.Expressive.DayNight` (or `NoActionBar`) applied app-wide
-- [ ] **Expressive shapes**: Cards, sheets, buttons use `ShapeAppearance`/`MaterialShapes` (cookie, scallop, extra-large corners) — no hand-rolled drawables for standard components
-- [ ] **Typography hierarchy**: Emphasized typescale used (`TextAppearance.Material3.TitleLarge.Emphasized`, `BodyLarge.Emphasized`, etc.) — clear visual hierarchy
-- [ ] **Motion**: Spring-based transitions (expressive `MotionSpec`) on primary navigation/dialogs — no linear easing for main flows
-- [ ] **Action emphasis**: Clear primary (filled) / secondary (tonal) / tertiary (outlined) button distinction
-- [ ] **Component sizing**: Generous touch targets (≥48×48 dp), expressive defaults respected
-- [ ] **Color**: Expressive palette via theme; CSS variables (`color_primary`, `color_surface`) still functional for customization
-- [ ] **No legacy styles**: No `Widget.MaterialComponents.*` or plain `AppCompat` widgets in new code
-- [ ] **Exemption respected**: Gamepad overlay + in-game menu card style unchanged (frozen per Rule 14)
+### Nintendo Switch UI Compliance (All Screens)
+- [ ] **Design tokens**: Dark bg `#2D2D2D`, Light bg `#F0F0F0`, panel `#1E1E1E`–`#2A2A2A`/`#FFFFFF`, focus cyan `#00BCD4`, amber `#FFA000`, text `#FFFFFF`/`#333333`, secondary `#9E9E9E`/`#666666`, scrim `rgba(0,0,0,0.5-0.6)`, dock circles `#555555`/`#FFFFFF`
+- [ ] **Focus system**: Cyan 2-3dp border on focused element + label above focused card in cyan 18sp medium; unfocused cards have 10% black overlay dimming; side-panel rows get full-width focus border (cyan default, amber for theme/appearance); circular "All Games" card has cyan border when focused; dock buttons have focus ring + glyph highlight
+- [ ] **Card shapes**: 1:1 square aspect, near-square corners (4-6dp radius) — home row ~220dp@1080p, grid ~170dp@1080p
+- [ ] **Dock buttons**: Circular ~50dp diameter, colored glyphs, focus ring
+- [ ] **Side panel**: Right slide-in, ~50% width, sharp edges (0dp radius), header with teal badge icon + bold title 20-22sp + separator, numbered rows with gray circle 24dp badges, labels 16sp, "(default)" suffix 14sp gray, chevron right, thin line separators
+- [ ] **Dialogs**: Centered modal, scrim, box ~40% width, radius 12-16dp, bg `#3A3A3C`, header icon+title 18sp, rows 48-52dp with icon+text, focused row = cyan border outline
+- [ ] **Typography**: Sizes per spec (footer hints 11-12sp, side panel labels 16sp, card focus label 18sp, dialog header 18sp, grid header 20sp bold)
+- [ ] **Light/dark parity**: All tokens work in both modes; instant switch via ThemeManager; no hardcoded colors
+- [ ] **No M3 Expressive remnants**: No `Theme.Material3.Expressive.*` parent, no expressive ShapeAppearance/MaterialShapes, no emphasized typescale, no spring MotionSpec — all custom hand-styled
 
-### LibraryActivity (Hack Grid)
-- [ ] Grid spans: 2 cols portrait, 3+ cols landscape/TV (per `library_span_count` + `values-land`)
-- [ ] Cover images: correct aspect (16:9), no stretching, placeholder shown if missing
-- [ ] Text: hack name truncates with ellipsis, readable at min font size
-- [ ] Touch targets: >=48x48 dp per item
-- [ ] Empty state: "No hacks installed" illustration + CTA to Store
-- [ ] RTL: not required (pt-BR/en/es LTR) but verify no hardcoded left/right
+### LibraryActivity (Home Row + Grid)
+- [ ] `SwitchHomeRow`: horizontal scrollable row of square game cards + circular "Todos os Jogos" card at end
+- [ ] `SwitchGameCard`: square (1:1), cover image, game title overlay on focus, cyan focus border, 10% dimming on unfocused
+- [ ] `SwitchAllGamesCard`: circular, charcoal fill, cyan 2x2 grid icon, cyan border when focused
+- [ ] `SwitchDock`: 4 circular buttons (Loja, Randomizador, RetroAchievements, Sobre/Licenças), ~50dp, colored glyphs, focus ring
+- [ ] `SwitchFooterHints`: left TV+gamepad indicators, right "(i) Sobre" and "+ Opções" gray 11-12sp
+- [ ] Grid order: vanilla games first, then store hacks, then randomizer seeds
+- [ ] `SwitchGridScreen` ("Todos os Jogos"): header icon+title "Todos os Jogos" 20sp bold + thin separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders, all entries together
 
-### StoreActivity (Catalog Grid + Detail)
-- [ ] Grid same as Library but with download state badges (downloaded, downloading, update available)
+### StoreActivity
+- [ ] Store hacks as Switch cards in grid; detail bottom sheet → SwitchDialog style
+- [ ] Download state badges (downloaded, downloading, update available) styled per Switch tokens
 - [ ] Progress indicator: circular determinate during download
-- [ ] Detail bottom sheet: cover hero, name, author, version, description, base ROM requirement, download button
-- [ ] Error states: network error, checksum mismatch, no base ROM -> clear messaging
-- [ ] Pull-to-refresh: functional, shows last-updated timestamp
 
-### SettingsActivity
-- [ ] BaseRomImportFragment: file picker launches, shows only .z64/.n64/.v64/.rom, validation feedback immediate
-- [ ] BaseRomListFragment: each row shows game name, version, checksums (copyable), delete action
-- [ ] CatalogUrlFragment: add/remove URLs, validation (HTTP/HTTPS, reachable), duplicate prevention
-- [ ] Core selector: shows compatible cores per hack, persists selection
+### Settings
+- [ ] Quick settings side panel (`SwitchSidePanel`): theme toggle (dark/light), RA profile status, link to full Settings
+- [ ] Full SettingsActivity restyled entirely (SwitchGridScreen or fullscreen SwitchSidePanel)
+- [ ] SFX mute toggle in side panel
 
-### GameActivity (Emulation + Gamepad Overlay)
-- [ ] Fullscreen immersive: system bars hidden, swipe to reveal
-- [ ] Gamepad overlay: RadialGamePad positions match GamePadConfig (referencia.png parity)
-- [ ] FloatingJoystick: hint circle visible, drag area correct, double-tap Z works
-- [ ] ButtonStick: mode indicator (C-Right/C-Left/C-Down/A/B/Auto), visibility toggle
-- [ ] Menu dialog: all options functional (reset, save/load state, mute, fast forward, button stick, auto-Z, sensitivity)
-- [ ] Orientation: locked landscape (config_orientation=2), no rotation glitches
+### Randomizer
+- [ ] Schema-driven form in SwitchDialog rows
+- [ ] Plandomizer editor/builder in SwitchDialog
+
+### RetroAchievements
+- [ ] `SwitchGridScreen` for games with RA
+- [ ] `SwitchDialog` for achievement detail
+- [ ] `SwitchDialog` for leaderboards
+- [ ] In-game overlay = custom Switch-style toast (not system Toast)
+
+### GameActivity In-Game Menu / Overlays
+- [ ] Pause menu → `SwitchDialog`
+- [ ] Leaderboards → `SwitchDialog`
+- [ ] Achievement unlock overlay → custom Switch-style toast
+- [ ] Ocarina HUD → Switch-style overlay
+- [ ] **RadialGamePad touch layout FROZEN** — only chrome restyled (verify no layout regression)
+
+### Splash
+- [ ] Zelda gold/green palette (Dolfi original art)
+- [ ] Same structural layout as NS Launcher splash (flanking iconic shapes + two-line logo "Zelda 64" / "PLAYER")
+- [ ] No Nintendo IP (no Joy-Con shapes, no Nintendo logos)
+
+### Sound
+- [ ] SFX present: focus-move ("toc"), select, back, panel open, panel close
+- [ ] Stored in `res/raw/sfx_focus_move.ogg`, `sfx_select.ogg`, `sfx_back.ogg`, `sfx_panel_open.ogg`, `sfx_panel_close.ogg`
+- [ ] CC0/generated only — never extracted from NS_Launcher APK
+- [ ] Volume respects system media volume; mute toggle functional in settings
 
 ### General Visual Quality
-- [ ] Color scheme: CSS variables applied, dark/light theme consistent
-- [ ] Typography: Roboto, correct sizes (sp), no hardcoded px
+- [ ] Color scheme: tokens applied consistently, dark/light theme consistent
 - [ ] Icons: Dolfi's SVGs render crisp at all densities, tint correctly
-- [ ] Animations: 60fps, no jank (RecyclerView scroll, bottom sheet, dialog transitions)
+- [ ] Animations: 60fps, no jank (RecyclerView scroll, bottom sheet, dialog transitions, side panel slide)
 - [ ] Safe areas: notch/cutout handled, no content obscured
 
 ## Accessibility Audit (Per Screen)
 - [ ] TalkBack: all interactive elements announced (name, role, state)
-- [ ] Content descriptions: all ImageViews, IconButtons, decorative images marked importantForAccessibility="no"
-- [ ] Touch target size: >=48x48 dp (Material guideline)
+- [ ] Content descriptions: all ImageViews, IconButtons, decorative images marked `importantForAccessibility="no"`
+- [ ] Touch target size: >=48x48 dp
 - [ ] Color contrast: >=4.5:1 text, >=3:1 UI elements (WCAG AA)
 - [ ] Font scaling: supports up to 200% system font size without truncation/overlap
 - [ ] Focus order: logical (top-left -> bottom-right), no trapped focus
@@ -80,16 +97,17 @@ Bruce or Lobby provides screenshots/recordings when:
 ## Pass/Fail Summary
 | Check | Status | Notes |
 |-------|--------|-------|
-| Grid span count | PASS | 2 portrait, 4 landscape |
-| Cover aspect ratio | WARN | 1 hack shows 4:3 -- coverImageUrl wrong |
-| Touch targets | PASS | All >=48dp |
-| TalkBack labels | FAIL | Download button missing contentDescription |
-| Color contrast | PASS | All text >=4.5:1 |
+| Focus border cyan 2-3dp | PASS | All focused elements |
+| Card aspect 1:1 | PASS | Home row and grid |
+| Dock buttons circular 50dp | PASS | 4 buttons, colored glyphs |
+| Side panel sharp edges | PASS | 0dp radius, right slide-in |
+| Light/dark parity | PASS | All tokens switch correctly |
+| SFX on focus move | PASS | "toc" sound, volume respected |
 
 ## Issues (Actionable)
-1. HIGH: Store detail sheet download button missing android:contentDescription -> Bruce fix
-2. MEDIUM: Hack "ultimate_trial" cover image 4:3 not 16:9 -> Dolfi regenerate / catalog fix
-3. LOW: Settings fragment title truncated at 200% font -> Bruce adjust layout
+1. HIGH: SwitchGameCard focus label missing on TV layout -> Bruce fix
+2. MEDIUM: Side panel "(default)" suffix wrong color in light mode -> Bruce fix
+3. LOW: Splash art not centered on foldable -> Dolfi adjust
 
 ## Approved for Release: <Yes/No>
 ```

@@ -1,25 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material 3 Expressive design tokens (night) -->
-    <color name="color_background">#141218</color>
-    <color name="color_surface">#141218</color>
-    <color name="color_surface_container">#211F26</color>
-    <color name="color_surface_container_high">#2B2930</color>
-    <color name="color_surface_variant">#49454F</color>
-    <color name="color_primary">#D0BCFF</color>
-    <color name="color_on_primary">#381E72</color>
-    <color name="color_primary_container">#4F378B</color>
-    <color name="color_on_primary_container">#EADDFF</color>
-    <color name="color_on_surface">#E6E0E9</color>
-    <color name="color_on_surface_variant">#CAC4D0</color>
-    <color name="color_secondary">#CCC2DC</color>
-    <color name="color_on_secondary">#332D41</color>
+    <!-- ===== Nintendo Switch UI design tokens ===== -->
+    <!-- Explicit dark/light variants (constant across configs). -->
+    <color name="switch_bg_dark">#2D2D2D</color>
+    <color name="switch_bg_light">#F0F0F0</color>
+    <color name="switch_panel_dark">#1E1E1E</color>
+    <color name="switch_panel_dark_alt">#2A2A2A</color>
+    <color name="switch_panel_light">#FFFFFF</color>
+    <color name="switch_dialog_bg_dark">#3A3A3C</color>
+    <color name="switch_dialog_bg_light">#FFFFFF</color>
+    <color name="switch_accent">#02830c</color>
+    <color name="switch_accent_amber">#FFA000</color>
+    <color name="switch_text_primary_dark">#FFFFFF</color>
+    <color name="switch_text_primary_light">#333333</color>
+    <color name="switch_text_secondary_dark">#9E9E9E</color>
+    <color name="switch_text_secondary_light">#666666</color>
+    <color name="switch_scrim_dark">#99000000</color>
+    <color name="switch_scrim_light">#66000000</color>
+    <color name="switch_dock_circle_dark">#555555</color>
+    <color name="switch_dock_circle_light">#FFFFFF</color>
+    <color name="switch_card_dim">#1A000000</color>
+
+    <!-- Active (mode-resolved) Switch tokens. values-night/ = dark appearance
+         (this is the app's default theme per ThemeManager). -->
+    <color name="switch_bg">#2D2D2D</color>
+    <color name="switch_panel">#1E1E1E</color>
+    <color name="switch_dialog_bg">#3A3A3C</color>
+    <color name="switch_text_primary">#FFFFFF</color>
+    <color name="switch_text_secondary">#9E9E9E</color>
+    <color name="switch_scrim">#99000000</color>
+    <color name="switch_dock_circle">#555555</color>
+    <color name="switch_dock_icon">#FFFFFF</color>
+    <!-- Charcoal fill for the circular "Todos os Jogos" card (NS Launcher style). -->
+    <color name="switch_all_games_bg">#424242</color>
+
+    <!-- Legacy Material 3 token names remapped to Switch equivalents (dark).
+         See values/colors.xml for the rationale. -->
+    <color name="color_background">#2D2D2D</color>
+    <color name="color_surface">#1E1E1E</color>
+    <color name="color_surface_container">#1E1E1E</color>
+    <color name="color_surface_container_high">#2A2A2A</color>
+    <color name="color_surface_variant">#1E1E1E</color>
+    <color name="color_primary">#02830c</color>
+    <color name="color_on_primary">#FFFFFF</color>
+    <color name="color_primary_container">#02830c</color>
+    <color name="color_on_primary_container">#FFFFFF</color>
+    <color name="color_on_surface">#FFFFFF</color>
+    <color name="color_on_surface_variant">#9E9E9E</color>
+    <color name="color_secondary">#FFA000</color>
+    <color name="color_on_secondary">#FFFFFF</color>
     <color name="color_error">#F2B8B5</color>
     <color name="color_on_error">#601410</color>
 
-    <!-- Pill input background: surfaceVariant at ~50% alpha -->
-    <color name="color_input_background">#8049454F</color>
+    <!-- Pill input background: panel at ~50% alpha -->
+    <color name="color_input_background">#801E1E1E</color>
 
     <!-- Neutral cover backdrop (blends with the card surface) -->
-    <color name="color_cover_background">#211F26</color>
+    <color name="color_cover_background">#1E1E1E</color>
 </resources>

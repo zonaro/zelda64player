@@ -1,0 +1,103 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="1080dp"
+    android:height="1920dp"
+    android:viewportWidth="1080"
+    android:viewportHeight="1920">
+    <!-- Zelda 64 Player splash artwork (original, no Nintendo IP).
+         Deep forest-green vertical gradient field, ornamental golden "relic"
+         abstractions flanking a central safe area reserved for the wordmark
+         overlay ("Zelda 64" / "PLAYER"), which the app draws as a TextView
+         on top of this drawable for crisp typography.
+         Composition is aspect-safe (9:16 to 21:9): preserveAspectRatio slice
+         keeps the vertical-center content visible; only top/bottom may crop. -->
+
+    <!-- Background: deep forest green vertical gradient -->
+    <path android:pathData="M0,0 H1080 V1920 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="0"
+                android:endY="1920">
+                <item android:name="c0" android:offset="0" android:color="#0D1A0F" />
+                <item android:name="c1" android:offset="0.55" android:color="#0F2016" />
+                <item android:name="c2" android:offset="1" android:color="#12241A" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Subtle radial gold glow behind the logo safe area -->
+    <path android:pathData="M540,960 m-470,0 a470,470 0 1 0 940,0 a470,470 0 1 0 -940,0 z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="540"
+                android:centerY="960"
+                android:gradientRadius="470">
+                <item android:name="g0" android:offset="0" android:color="#1AE0B84C" />
+                <item android:name="g1" android:offset="1" android:color="#00E0B84C" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Inner relic frame (thin, low-alpha gold border) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#47C9A227"
+        android:strokeWidth="3"
+        android:pathData="M60,60 H1020 V1860 H60 Z" />
+
+    <!-- LEFT ornamental relic (gold filigree: lozenge + inner diamond + wing chevrons + accent studs) -->
+    <group>
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#D9B24A"
+            android:strokeWidth="6"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M270,700 L330,960 L270,1220 L210,960 Z M270,820 L300,960 L270,1100 L240,960 Z M330,780 L392,820 L330,860 M330,920 L392,960 L330,1000 M330,1060 L392,1100 L330,1140" />
+        <path
+            android:fillColor="#D9B24A"
+            android:strokeColor="#00000000"
+            android:strokeWidth="0"
+            android:pathData="M261,700 a9,9 0 1 0 18,0 a9,9 0 1 0 -18,0 z M261,1220 a9,9 0 1 0 18,0 a9,9 0 1 0 -18,0 z" />
+    </group>
+
+    <!-- RIGHT ornamental relic (mirror of left about x=540) -->
+    <group android:translateX="1080" android:scaleX="-1">
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#D9B24A"
+            android:strokeWidth="6"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M270,700 L330,960 L270,1220 L210,960 Z M270,820 L300,960 L270,1100 L240,960 Z M330,780 L392,820 L330,860 M330,920 L392,960 L330,1000 M330,1060 L392,1100 L330,1140" />
+        <path
+            android:fillColor="#D9B24A"
+            android:strokeColor="#00000000"
+            android:strokeWidth="0"
+            android:pathData="M261,700 a9,9 0 1 0 18,0 a9,9 0 1 0 -18,0 z M261,1220 a9,9 0 1 0 18,0 a9,9 0 1 0 -18,0 z" />
+    </group>
+
+    <!-- CENTRAL crest above the wordmark safe area (original abstract golden mark) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#E8C766"
+        android:strokeWidth="5"
+        android:strokeLineJoin="round"
+        android:pathData="M540,690 L582,760 L540,830 L498,760 Z" />
+    <path
+        android:fillColor="#C9A227"
+        android:strokeColor="#00000000"
+        android:strokeWidth="0"
+        android:pathData="M540,722 L562,760 L540,798 L518,760 Z" />
+    <!-- Thin anchor divider beneath the wordmark zone -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#66C9A227"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M400,1200 H680" />
+</vector>

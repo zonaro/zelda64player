@@ -68,7 +68,11 @@ data class HackEntry(
     val tags: List<String> = emptyList(),
     val compatibleCores: List<String> = emptyList(),
     /** Optional Ocarina songs contributed by a downloaded hack (catalog extension). */
-    val ocarinaSongs: List<OcarinaSong> = emptyList()
+    val ocarinaSongs: List<OcarinaSong> = emptyList(),
+    /** Optional RetroAchievements metadata (catalog extension): known RA game
+     *  id for this hack, letting the app pre-resolve achievements without
+     *  waiting for an install-time hash lookup. */
+    val retroAchievements: RetroAchievementsRef? = null
 ) {
     fun toJson(): JSONObject = JSONObject().apply {
         put("id", id)
@@ -82,6 +86,9 @@ data class HackEntry(
         put("tags", JSONArray(tags))
         put("compatibleCores", JSONArray(compatibleCores))
         put("ocarinaSongs", JSONArray(ocarinaSongs.map { it.toJson() }))
+        if (retroAchievements != null) {
+            put("retroAchievements", retroAchievements.toJson())
+        }
     }
 
     companion object {
@@ -107,10 +114,39 @@ data class HackEntry(
                 }
             } else {
                 emptyList()
+            },
+            retroAchievements = if (o.has("retroAchievements") && !o.isNull("retroAchievements")) {
+                runCatching { RetroAchievementsRef.fromJson(o.getJSONObject("retroAchievements")) }.getOrNull()
+            } else {
+                null
             }
         )
 
         private fun jsonToStringList(arr: JSONArray): List<String> =
             (0 until arr.length()).map { arr.getString(it) }
+    }
+}
+
+/**
+ * Optional RetroAchievements metadata attached to a catalog hack.
+ *
+ * @param gameId Known RA game id; lets the app seed the install-time identity
+ *   without waiting for a hash lookup. 0 means "tracked, id unknown".
+ * @param title RA game title when known (informational).
+ */
+data class RetroAchievementsRef(
+    val gameId: Long = 0,
+    val title: String? = null
+) {
+    fun toJson(): JSONObject = JSONObject().apply {
+        put("gameId", gameId)
+        put("title", title ?: JSONObject.NULL)
+    }
+
+    companion object {
+        fun fromJson(o: JSONObject): RetroAchievementsRef = RetroAchievementsRef(
+            gameId = o.optLong("gameId", 0),
+            title = if (o.isNull("title")) null else o.optString("title")
+        )
     }
 }

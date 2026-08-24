@@ -5,26 +5,75 @@
     <color name="gamepad_button_color">#88ffffff</color>
     <color name="gamepad_pressed_color">#66ffffff</color>
 
-    <!-- Material 3 Expressive design tokens (light) -->
-    <color name="color_background">#F9F9FF</color>
-    <color name="color_surface">#F9F9FF</color>
-    <color name="color_surface_container">#E7E0EC</color>
-    <color name="color_surface_container_high">#F3EDF7</color>
-    <color name="color_surface_variant">#E7E0EC</color>
-    <color name="color_primary">#6750A4</color>
+    <!-- ===== Nintendo Switch UI design tokens ===== -->
+    <!-- Explicit dark/light variants (constant across configs). -->
+    <color name="switch_bg_dark">#2D2D2D</color>
+    <color name="switch_bg_light">#F0F0F0</color>
+    <color name="switch_panel_dark">#1E1E1E</color>
+    <color name="switch_panel_dark_alt">#2A2A2A</color>
+    <color name="switch_panel_light">#FFFFFF</color>
+    <color name="switch_dialog_bg_dark">#3A3A3C</color>
+    <color name="switch_dialog_bg_light">#FFFFFF</color>
+    <color name="switch_accent">#02830c</color>
+    <color name="switch_accent_amber">#FFA000</color>
+    <color name="switch_text_primary_dark">#FFFFFF</color>
+    <color name="switch_text_primary_light">#333333</color>
+    <color name="switch_text_secondary_dark">#9E9E9E</color>
+    <color name="switch_text_secondary_light">#666666</color>
+    <color name="switch_scrim_dark">#99000000</color>
+    <color name="switch_scrim_light">#66000000</color>
+    <color name="switch_dock_circle_dark">#555555</color>
+    <color name="switch_dock_circle_light">#FFFFFF</color>
+    <color name="switch_card_dim">#1A000000</color>
+
+    <!-- Active (mode-resolved) Switch tokens. values/ = light appearance. -->
+    <color name="switch_bg">#F0F0F0</color>
+    <color name="switch_panel">#FFFFFF</color>
+    <color name="switch_dialog_bg">#FFFFFF</color>
+    <color name="switch_text_primary">#333333</color>
+    <color name="switch_text_secondary">#666666</color>
+    <color name="switch_scrim">#66000000</color>
+    <color name="switch_dock_circle">#FFFFFF</color>
+    <!-- Dock glyphs: dark green on the white light-mode circles. -->
+    <color name="switch_dock_icon">#02830c</color>
+    <!-- Charcoal fill for the circular "Todos os Jogos" card (NS Launcher style). -->
+    <color name="switch_all_games_bg">#BDBDBD</color>
+
+    <!-- Splash wordmark text (warm white/gold). Constant across night mode
+         because the splash artwork is a fixed drawable in both themes. -->
+    <color name="splash_text">#F5E9C8</color>
+
+    <!-- Legacy Material 3 token names remapped to Switch equivalents so
+         existing layouts/themes keep compiling (full visual restyle continues
+         in later Switch UI phases). Mapping: background->switch_bg,
+         surface->panel, primary->accent cyan, secondary->accent amber. -->
+    <color name="color_background">#F0F0F0</color>
+    <color name="color_surface">#FFFFFF</color>
+    <color name="color_surface_container">#FFFFFF</color>
+    <color name="color_surface_container_high">#F0F0F0</color>
+    <color name="color_surface_variant">#FFFFFF</color>
+    <color name="color_primary">#02830c</color>
     <color name="color_on_primary">#FFFFFF</color>
-    <color name="color_primary_container">#EADDFF</color>
-    <color name="color_on_primary_container">#21005D</color>
-    <color name="color_on_surface">#1D1B20</color>
-    <color name="color_on_surface_variant">#49454F</color>
-    <color name="color_secondary">#625B71</color>
+    <color name="color_primary_container">#02830c</color>
+    <color name="color_on_primary_container">#FFFFFF</color>
+    <color name="color_on_surface">#333333</color>
+    <color name="color_on_surface_variant">#666666</color>
+    <color name="color_secondary">#FFA000</color>
     <color name="color_on_secondary">#FFFFFF</color>
     <color name="color_error">#B3261E</color>
     <color name="color_on_error">#FFFFFF</color>
 
-    <!-- Pill input background: surfaceVariant at ~50% alpha -->
-    <color name="color_input_background">#80E7E0EC</color>
+    <!-- Pill input background: panel at ~50% alpha -->
+    <color name="color_input_background">#80FFFFFF</color>
 
     <!-- Neutral cover backdrop (blends with the card surface) -->
-    <color name="color_cover_background">#E7E0EC</color>
+    <color name="color_cover_background">#FFFFFF</color>
+
+    <!-- Library tile badge colors, keyed by game family (NOT in values-night so
+         dark theme cannot override them). OoT = yellow bg / black icon,
+         MM = purple bg / white icon. -->
+    <color name="color_badge_oot_background">#FFEB3B</color>
+    <color name="color_badge_oot_icon">#000000</color>
+    <color name="color_badge_mm_background">#7B1FA2</color>
+    <color name="color_badge_mm_icon">#FFFFFF</color>
 </resources>

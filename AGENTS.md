@@ -16,6 +16,12 @@ This is a **native Android (Kotlin)** application derived from the existing Lude
 
 **New Feature — OoT Randomizer Generator**: Integrated Ocarina of Time randomizer/plandomizer using the official OoTR API (`https://ootrandomizer.com/api/docs`). User provides their own API key (obtained via OoTR Discord). Schema-driven settings UI (~200 options from asset JSON), plandomizer support (text editor + JSON import + visual builder), ZPF/ZPFZ patch application on compressed ROM, N64 boot CRC (CIC 6105) recomputation. Generated seeds appear in a dedicated "Randomizadores" Library section, separate from Store hacks. Unlimited seeds per user.
 
+**New Feature — Auto-Ocarina**: In-game HUD to auto-play Ocarina songs in OoT/MM from the pause menu. Built-in song catalog (OoT: 12, MM: 11) + optional per-hack custom songs via catalog `ocarinaSongs` field. Coroutine sequencer sends key events to GLRetroView (~330ms/note), cancellable by any user input/menu open/lifecycle. Game detection at `launchHack` via `RomHeader.gameCode` prefix: `CZL*` = OoT family (incl. randomizer seeds), `NZL*`/`NSM*` = MM family. Unknown games hide the menu item.
+
+**New Feature — Vanilla Games in Library**: User-imported base ROMs (OoT, MM) are now playable directly from the main Library screen. New `views/BaseRomLibrarySource.kt` exposes `BaseRomRepository` entries as playable tiles with `vanilla_<crc32>` IDs (prefix `BaseRomLibrarySource.PREFIX` / `GameRomResolver.VANILLA_PREFIX`). Grid order: vanilla games first, then store hacks, then randomizer seeds. Single ROM resolver `repositories/GameRomResolver.kt` is the only resolution point for any Library entry: `vanilla_*` resolves via `BaseRomRepository`; everything else falls back to `Storage.rom(hackId)`. All launch paths (RetroView, GameActivityViewModel.launchHack/prepareOcarinaDetection/startRaSessionIfNeeded, LibraryActivity.requestImportSaves) now route through it. Rule 10 unchanged: RetroView remains the only place bytes reach the core. Covers fetched at runtime from Libretro thumbnails CDN (Named_Boxarts, USA art) by game family via `OcarinaSongCatalog.detectGame` (CZL* → OoT, NZL*/NSM* → MM); unknown families fall back to placeholder. No copyrighted artwork committed (Rule 2). Library tiles carry an icon badge (VANILLA = ice-cream, RANDOMIZER = shuffle, HACK = robot) whose chip background and icon tint are colored by game family: OoT = yellow background / black icon, MM = purple background / white icon, unknown family = neutral chip (color_primary background / white icon). The family is `HackLibraryEntry.family` (OcarinaGame?), set per source: BaseRomLibrarySource reuses its detectGame result, RandomizerLibrarySource is always OoT (Rule 17), CatalogBackedLibrarySource reads the installed patched ROM header, LocalPatchesSource leaves it null. Vanilla tiles use the VANILLA badge via `HackLibraryEntry.isVanilla`. Context menu omits management section (uninstall/delete-seed) for vanilla entries — base ROMs managed in Settings. RetroAchievements: vanilla games have no install step; RA identity (rhash + game id) computed lazily on first play (fire-and-forget in GameActivityViewModel after session start), consistent with Rule 21 (hash always from final playable ROM — for vanilla that IS the normalized base ROM). Tests: `BaseRomLibrarySourceTest` + `GameRomResolverTest` (JVM unit tests).
+
+**UI Revamp — Nintendo Switch Style**: Complete visual overhaul replacing Material 3 Expressive with a custom native implementation of the Nintendo Switch HOME menu aesthetic (NS_Launcher / FLauncher reference). All screens (Library, Store, Randomizer, Settings, RetroAchievements, in-game menus/overlays, splash) follow Switch design tokens, focus system, and component inventory. RadialGamePad touch-control LAYOUT remains frozen (Rule 14); only chrome restyled.
+
 ---
 
 ## Stack Decisions (Final)
@@ -25,7 +31,7 @@ This is a **native Android (Kotlin)** application derived from the existing Lude
 | Language | Kotlin | 1.9+ | JVM target 1.8 |
 | Min SDK | Android API | 24 (Nougat) | Raised from 21; <1% API 21-23 share |
 | Target SDK | Android API | 35 | Play Store requirement (Aug 2025+) |
-| Compile SDK | Android API | 35 | Required for Material Components 1.14.0 (M3 Expressive) |
+| Compile SDK | Android API | 35 | Required for Material Components 1.14.0 (technical base only) |
 | Build System | Gradle | 8.x | Kotlin DSL (`build.gradle.kts`) |
 | Architecture | MVC-ish | — | View (Activity+ViewBinding) → ViewModel (AndroidViewModel) → Model (Repository+UseCase) |
 | DI | Manual Service Locator | — | `AppContainer` in `Application` subclass; no Dagger/Hilt |
@@ -38,34 +44,86 @@ This is a **native Android (Kotlin)** application derived from the existing Lude
 | Reactive | RxJava/RxAndroid | 2.x | KEPT as-is: frozen `gamepad/` package depends on it (`CompositeDisposable`, `pad.events()`). New code (store, settings, randomizer, retroachievements) uses coroutines/Flow; do NOT refactor gamepad to Flow |
 | Native | CMake + NDK | r26+ | `externalNativeBuild` for rcheevos (MIT) + JNI bridge; ABIs: x86, x86_64, armeabi-v7a, arm64-v8a |
 | RetroAchievements | rcheevos | ~12.x (master tag) | MIT licensed, ANSI C; git subtree in `app/src/main/cpp/rcheevos/`; provides `rc_client_t` high-level API + `rapi` standalone |
-| Material Components | material3 | 1.14.0 | **M3 Expressive** — minSdk 23 (our 24 OK); requires compileSdk 35; theme parent `Theme.Material3.Expressive.*` |
+| Material Components | material3 | 1.14.0 | **Technical base only — visual standard is custom Switch skin (this overrides M3 Expressive)** |
 | Testing | JUnit 5, MockK, Turbine | — | Unit + Instrumented |
 
 **Why NOT Flutter?** This is a direct derivative of an existing native Kotlin app (Ludere) with years of tuning on LibretroDroid integration, RadialGamePad touch controls, GL lifecycle handling, and core configuration. Rewriting in Flutter would discard all that work and introduce regression risk. The global rule "cross-platform apps use Flutter" does not apply to native derivatives.
 
 ---
 
-## Visual Standard — Material 3 Expressive (MANDATORY)
+## Visual Standard — Nintendo Switch UI (MANDATORY)
 
-**Material 3 Expressive is the mandatory visual standard for ALL screens** (existing and future). No exceptions except the frozen gamepad overlay and in-game menu chrome (Rule 14).
+**Nintendo Switch UI is the mandatory visual standard for ALL screens** (existing and future). This is a custom native implementation inspired by the Nintendo Switch HOME menu aesthetic (as seen in NS_Launcher / FLauncher). No Material 3 Expressive requirements remain. The only exemption is the **RadialGamePad touch-control LAYOUT** (Rule 14 — control placement, button-stick modes, floating joystick, auto-Z, physical-controller mirroring remain frozen). In-game menu chrome, overlays, pause menu, achievement overlay, leaderboard dialog, ocarina HUD, and all other UI MUST follow the Switch style.
 
-### Key Rules
-| Rule | Requirement |
-|------|-------------|
-| **Theme parent** | Must be `Theme.Material3.Expressive.DayNight` (or `NoActionBar` variant) in `res/values/themes.xml` |
-| **Components** | Use Material components (`MaterialButton`, `MaterialCardView`, `TextInputLayout`, `SwitchMaterial`, `Slider`, `TabLayout`, `BottomSheet`, `NavigationBarView`, etc.) — never plain `AppCompat` widgets or legacy `Widget.MaterialComponents.*` styles in new code |
-| **Shape tokens** | Prefer expressive `ShapeAppearance` / `MaterialShapes` (cookie, scallop, extra-large corners) over hand-rolled drawables; use `shapeAppearanceCorner*` attributes |
-| **Motion** | Use spring-based motion defaults (expressive `MotionSpec`); avoid linear easing for primary transitions |
-| **Typography** | Use emphasized typescale text appearances (`TextAppearance.Material3.TitleLarge.Emphasized`, `BodyLarge.Emphasized`, etc.) for hierarchy |
-| **Color** | Expressive color palettes via theme; CSS variables (`color_primary`, `color_surface`, etc.) still apply for customization |
-| **Sizing** | Generous component sizing; clear primary/secondary action emphasis (filled vs tonal vs outlined buttons) |
-| **i18n / no-emoji** | Hard rules (Rules 7–8) still apply to all UI work |
-| **Exemption** | **Gamepad overlay + in-game menu card style** (frozen RadialGamePad layout per Rule 14) are EXEMPT from restyling — they keep their current look |
+### Design Tokens
 
-### Migration Notes
-- Dependency: `implementation(libs.material3)` → version catalog entry `material3 = "androidx.compose.material3:material3:1.14.0"` (or `com.google.android.material:material:1.14.0` for Views)
-- Compile SDK **must be 35** (already in Stack Decisions)
-- Verify exact style/attribute names against the **1.14.0 AAR** during implementation — research summary paraphrased some names; do not trust docs blindly
+| Token | Dark Mode | Light Mode | Usage |
+|-------|-----------|------------|-------|
+| `bg_primary` | `#2D2D2D` | `#F0F0F0` | Main background (Library Home, grid screens) |
+| `bg_panel` | `#1E1E1E` – `#2A2A2A` | `#FFFFFF` | Side panels, dialogs, cards |
+| `accent_focus` | `#00BCD4` (cyan) | `#00BCD4` (cyan) | Focus borders, focused labels, primary actions |
+| `accent_amber` | `#FFA000` (amber) | `#FFA000` (amber) | Appearance/theme actions, warnings |
+| `text_primary` | `#FFFFFF` | `#333333` | Primary text (titles, labels) |
+| `text_secondary` | `#9E9E9E` | `#666666` | Secondary text (hints, "(default)" suffixes, footer) |
+| `scrim` | `rgba(0,0,0,0.5–0.6)` | `rgba(0,0,0,0.3–0.4)` | Modal backdrop, panel overlays |
+| `dock_circle` | `#555555` | `#FFFFFF` (subtle shadow) | Dock button backgrounds |
+| `card_radius` | `4–6 dp` (near-square) | `4–6 dp` | Game cards (home row, grid) |
+| `dialog_radius` | `12–16 dp` | `12–16 dp` | Dialogs, controllers modal |
+| `panel_edges` | Sharp (0 dp) | Sharp (0 dp) | Side panel (right slide-in) |
+| `card_aspect` | 1:1 (square) | 1:1 (square) | Home row ~220dp@1080p, grid ~170dp@1080p |
+| `dock_button_diameter` | `~50 dp` | `~50 dp` | Circular dock icons |
+
+### Focus System
+- **D-pad / click focus** drives a **cyan 2–3 dp border** on the focused element + **label above the focused card** in cyan 18sp medium.
+- **Unfocused cards**: 10% black overlay dimming.
+- **Side-panel rows**: full-width focus border (cyan default, amber for theme/appearance actions).
+- **Circular "All Games" card**: cyan border when focused, opens fullscreen grid.
+- **Dock buttons**: focus ring (cyan) + glyph highlight.
+
+### Component Inventory to Build (Native Kotlin, Hand-Styled)
+| Component | Description |
+|-----------|-------------|
+| `SwitchHomeRow` | Horizontal scrollable row of square game cards + circular "Todos os Jogos" card at end |
+| `SwitchGameCard` | Square card (1:1), cover image, game title overlay on focus, focus border, dimming overlay |
+| `SwitchAllGamesCard` | Circular card (charcoal fill, cyan 2×2 grid icon, cyan border on focus) |
+| `SwitchGridScreen` | Fullscreen grid ("Todos os Jogos"): header icon+title "Todos os Jogos" 20sp bold + thin separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders |
+| `SwitchDock` | Fixed bottom dock: 4 circular buttons (Loja, Randomizador, RetroAchievements, Sobre/Licenças), ~50dp diameter, colored glyphs, focus ring |
+| `SwitchFooterHints` | Bottom bar: left TV+gamepad indicators, right "(i) Sobre" and "+ Opções" gray hints 11–12sp |
+| `SwitchSidePanel` | Right slide-in panel (~50% width), sharp edges, header (teal badge icon + bold title 20–22sp + separator), numbered rows (gray circle 24dp badges), labels 16sp, "(default)" suffix 14sp gray, chevron right, thin line separators |
+| `SwitchDialog` | Centered modal, scrim, box ~40% width, radius 12–16dp, bg `#3A3A3C`, header icon+title 18sp, rows 48–52dp with icon+text, focused row = cyan border outline |
+| `SwitchFocusBorder` | Drawable: cyan 2–3dp stroke, transparent fill, for focus indication |
+| `SfxManager` | SoundPool wrapper: focus-move tick, select, back, panel open/close; CC0/generated only; volume respect; toggle in settings |
+| `ThemeManager` | Runtime dark/light switch, persists preference, applies tokens above |
+
+### Screen-by-Screen Mapping
+
+| Screen | Switch Style Applied | Notes |
+|--------|---------------------|-------|
+| Splash | **Zelda gold/green palette** (Dolfi original art), same structural layout as NS Launcher splash (flanking iconic shapes + two-line logo "Zelda 64" / "PLAYER") | No Nintendo IP (no Joy-Con shapes, no Nintendo logos) |
+| Library Home | `SwitchHomeRow` + `SwitchAllGamesCard` + `SwitchDock` + `SwitchFooterHints` | Vanilla games first, then store hacks, then randomizer seeds |
+| Todos os Jogos (Grid) | `SwitchGridScreen` | All entries together (vanilla + hacks + seeds), search/filter |
+| Store | `SwitchSidePanel` for filters/sort? Or fullscreen grid with Switch cards | Store hacks as Switch cards; detail bottom sheet → SwitchDialog style |
+| Randomizer | `SwitchSidePanel` for settings form? Schema-driven form in SwitchDialog rows | Plandomizer editor/builder in SwitchDialog |
+| Settings (Quick) | `SwitchSidePanel` (right slide-in) | Quick shortcuts: theme toggle, RA profile status, link to full Settings |
+| Settings (Full) | `SwitchGridScreen` or `SwitchSidePanel` fullscreen | Existing SettingsActivity restyled entirely |
+| RetroAchievements | `SwitchGridScreen` (games with RA), `SwitchDialog` (detail), `SwitchDialog` (leaderboards) | In-game overlay = custom Switch-style toast |
+| GameActivity In-Game Menu | `SwitchDialog` (pause menu), `SwitchDialog` (leaderboards), custom Switch-style overlay (achievement unlock, ocarina HUD) | **RadialGamePad touch layout FROZEN (Rule 14)** — only chrome restyled |
+
+### Sound Rules
+- **Required SFX**: focus-move ("toc"), select, back, panel open, panel close.
+- **Source**: CC0 or synthesized only. **NEVER extract from NS_Launcher APK** (copyright).
+- **Storage**: `res/raw/sfx_focus_move.ogg`, `sfx_select.ogg`, `sfx_back.ogg`, `sfx_panel_open.ogg`, `sfx_panel_close.ogg`.
+- **Volume**: Respects system media volume; mute toggle in Settings side panel.
+- **Implementation**: `SfxManager` (SoundPool) — low latency, preloaded.
+
+### Licensing Guard
+- UI is an **original native implementation** inspired by the Switch aesthetic.
+- **NEVER commit Nintendo assets/fonts/sounds** or files extracted from the NS_Launcher APK (extends Hard Rule 2).
+- FLauncher is GPLv3 — consulting its code is allowed; this project stays GPLv3.
+- All generated assets (Dolfi) are original, CC0/public domain or GPL-3.0 compatible.
+
+### i18n / No-Emoji
+- Hard Rules 7–8 still apply: every user-facing string in `strings.xml` (pt-BR default `values/`, `values-en/`, `values-es/`), zero hardcoded strings, no emojis in code/resources.
 
 ---
 
@@ -88,13 +146,15 @@ br.com.redclaw.zelda64player
 │   ├── ui/              # SettingsActivity, Fragments (BaseRomImport, BaseRomList, CatalogUrl, RandomizerApiKey, RetroAchievements)
 │   └── SettingsViewModel.kt
 ├── repositories/
-│   └── Storage.kt       # Paths per hackId: rom_<id>, sram_<id>, state_<id>
+│   ├── Storage.kt       # Paths per hackId: rom_<id>, sram_<id>, state_<id>
+│   └── GameRomResolver.kt  # Single ROM resolver: vanilla_* via BaseRomRepository; else Storage.rom(hackId)
 ├── retroview/           # Emulation (adapted from Ludere)
 │   ├── RetroView.kt     # INTERCEPTION POINT: loads patched ROM from cache
 │   └── RetroViewUtils.kt
 ├── views/
 │   ├── LibraryActivity.kt
 │   ├── GameActivity.kt
+│   ├── BaseRomLibrarySource.kt
 │   └── viewmodels/GameActivityViewModel.kt
 ├── gamepad/             # RadialGamePad — UNCHANGED from Ludere
 ├── input/               # ControllerInput, InputMapper — UNCHANGED
@@ -114,7 +174,25 @@ br.com.redclaw.zelda64player
 │   ├── ui/              # AchievementsActivity, AchievementDetailActivity, InGameAchievementOverlay, LeaderboardDialog
 │   ├── viewmodel/       # AchievementsViewModel, InGameRaViewModel
 │   └── install/         # RaHashService, RaInstallRepository
-└── libretrodroid/       # LOCAL GRADLE MODULE (vendor LibretroDroid 0.13.2 + 2 JNI passthroughs)
+├── ocarina/             # Auto-Ocarina feature
+│   ├── OcarinaNote.kt           # Enum A/C_UP/C_DOWN/C_LEFT/C_RIGHT → raw keycodes
+│   ├── OcarinaSong.kt           # Song model + tolerant JSON parsing
+│   ├── OcarinaSongCatalog.kt    # Built-in songs (OoT: 12, MM: 11) + catalog custom merge
+│   ├── OcarinaMacroPlayer.kt    # Coroutine sequencer → GLRetroView key events (~330ms/note)
+│   └── ui/OcarinaHudView.kt     # Overlay: song name + highlighted note chips during playback
+├── ui/switchui/         # Nintendo Switch UI components (native Kotlin, hand-styled)
+│   ├── SwitchHomeRow.kt
+│   ├── SwitchGameCard.kt
+│   ├── SwitchAllGamesCard.kt
+│   ├── SwitchGridScreen.kt
+│   ├── SwitchDock.kt
+│   ├── SwitchFooterHints.kt
+│   ├── SwitchSidePanel.kt
+│   ├── SwitchDialog.kt
+│   ├── SwitchFocusBorder.kt
+│   ├── SfxManager.kt
+│   └── ThemeManager.kt
+├── libretrodroid/       # LOCAL GRADLE MODULE (vendor LibretroDroid 0.13.2 + 2 JNI passthroughs)
 ```
 
 ---
@@ -141,7 +219,7 @@ br.com.redclaw.zelda64player
 
 ### Migration Scope (Ludere extraction)
 13. **Selective migration only**: copy from Ludere exclusively `retroview/`, `views/GameActivity*` + ViewModel, `gamepad/`, `input/`, `utils/`, `config.xml`, `Storage.kt`, plus the launcher icons (`mipmap-*/ic_launcher*`, `drawable/ic_launcher_foreground.xml`, `values/ic_launcher_background.xml` — reused as-is for now per user decision; a custom Zelda-themed icon is a future task). Do NOT migrate: `data/Games.kt` (hardcoded catalog), bundled cover drawables, ROM packaging machinery (`assets/roms/`, `res/raw/rom`, `noCompress` rules), `autogen/`, the autogen GitHub workflow, the Ludere keystore, or ABI splits.
-14. **Gamepad layout is FROZEN**: the Zelda-tailored control layout (`gamepad/GamePadConfig.kt` placements, ButtonStick + Auto mode, Auto-Z double-tap, FloatingJoystick region/hint/reach, DoubleTapContainer, physical-controller mirroring, sensitivity dialogs) is measured from a reference image and tuned for OoT/MM. Migrate verbatim (package rename only). Any layout change requires explicit user approval and an update to the "Layout de Controles Sob Medida" section of `plano.md`. The integration invariants must not regress: overlay uses INVISIBLE (never GONE), pads created only after first real layout pass, GL-context recovery via full Activity recreate(), and `super.onDestroy()` called BEFORE dispose.
+14. **Gamepad layout is FROZEN**: the Zelda-tailored control layout (`gamepad/GamePadConfig.kt` placements, ButtonStick + Auto mode, Auto-Z double-tap, FloatingJoystick region/hint/reach, DoubleTapContainer, physical-controller mirroring, sensitivity dialogs) is measured from a reference image and tuned for OoT/MM. Migrate verbatim (package rename only). Any layout change requires explicit user approval and an update to the "Layout de Controles Sob Medida" section of `plano.md`. The integration invariants must not regress: overlay uses INVISIBLE (never GONE), pads created only after first real layout pass, GL-context recovery via full Activity recreate(), and `super.onDestroy()` called BEFORE dispose. **In-game menu chrome, overlays, pause menu, achievement overlay, leaderboard dialog, and ocarina HUD ARE restyled to the Nintendo Switch UI standard** — only the RadialGamePad touch-control LAYOUT (control placement, button-stick modes, floating joystick, auto-Z, physical-controller mirroring) remains frozen per this rule.
 
 ### Security / Privacy
 15. **No telemetry without opt-in**. No analytics, crash reporting, or network calls except: catalog fetch (user-initiated), patch download (user-initiated), core download (build-time only).
@@ -167,12 +245,12 @@ br.com.redclaw.zelda64player
 | Agent | Role in This Project | Delegation Trigger |
 |-------|---------------------|-------------------|
 | **Coral** 🪸 | Chief Architect — owns `plano.md`, `AGENTS.md`, `.agents/`, architecture decisions | New project setup, major arch changes, team selection |
-| **Bruce** 🦈 | **Primary Implementer** — all Kotlin/Android code (Phases 0–4 + Randomizer R1–R5 + RetroAchievements B1–B5) | All implementation tasks: patcher, store, settings, retroview, UI, randomizer, retroachievements |
-| **Dolfi** 🐬 | Icons/covers — generates SVG icons (app icon, hack category icons, RA trophy/leaderboard icons) and PNG cover placeholders for hacks without `coverImageUrl` | When UI needs icons or cover art |
+| **Bruce** 🦈 | **Primary Implementer** — all Kotlin/Android code (Phases 0–4 + Randomizer R1–R5 + RetroAchievements B1–B5 + Switch UI Revamp) | All implementation tasks: patcher, store, settings, retroview, UI, randomizer, retroachievements, Switch UI |
+| **Dolfi** 🐬 | Icons/covers — generates SVG icons (app icon, hack category icons, RA trophy/leaderboard icons, Switch dock icons, focus assets) and PNG cover placeholders for hacks without `coverImageUrl`; Zelda-gold splash artwork | When UI needs icons, cover art, or splash art |
 | **Wally** 🐋 | Documentation — finalizes `README.md`, translates `strings.xml` (pt-BR/en/es), writes code docs (KDoc) | After implementation phases, before release |
-| **Calamari** 🦑 | Fact-checking — validates known ROM checksums (No-Intro/Redump), verifies LibretroDroid/core versions, checks BPS spec details, validates OoT 1.0 checksums and N64 boot CRC algorithm, **validates rcheevos release tags and RA hash algorithm** | When Bruce needs verified data |
-| **Puffy** 🐡 | Research — up-to-date LibretroDroid releases, core buildbot URLs, Android API changes, Gradle plugin updates, OoTR API docs, **rcheevos API docs and release notes** | When Bruce needs current docs |
-| **Chululu** 🐙 | Visual QA — analyzes screenshots of Library/Store/Game/Randomizer/RetroAchievements UI for layout, alignment, accessibility | Before UI merges, release candidates |
+| **Calamari** 🦑 | Fact-checking — validates known ROM checksums (No-Intro/Redump), verifies LibretroDroid/core versions, checks BPS spec details, validates OoT 1.0 checksums and N64 boot CRC algorithm, **validates rcheevos release tags and RA hash algorithm**, validates sound asset licensing | When Bruce needs verified data |
+| **Puffy** 🐡 | Research — up-to-date LibretroDroid releases, core buildbot URLs, Android API changes, Gradle plugin updates, OoTR API docs, **rcheevos API docs and release notes**, Android TV focus handling, SoundPool latency | When Bruce needs current docs |
+| **Chululu** 🐙 | Visual QA — analyzes screenshots of Library/Store/Game/Randomizer/RetroAchievements UI for layout, alignment, accessibility; **Nintendo Switch UI compliance verification** | Before UI merges, release candidates |
 
 **Agents NOT involved**: InnerLinho (PHP), Fishie (Web frontend), Peep (Flutter), Snowflake (C#), Snuggle (Python), Nodi (Node.js), Ariel (Content), Tucso (Linux scripts).
 
@@ -184,11 +262,11 @@ br.com.redclaw.zelda64player
 |-----------|-------------|
 | Android/Kotlin implementation (all phases) | **Bruce** |
 | Architecture changes / plan updates | **Coral** |
-| App icon, hack category icons, cover placeholders, RA icons | **Dolfi** |
+| App icon, hack category icons, cover placeholders, RA icons, Switch dock icons, splash art | **Dolfi** |
 | README, strings translation, KDoc | **Wally** |
-| ROM checksum verification, core version check, rcheevos release validation | **Calamari** |
-| LibretroDroid/core/Android API research, rcheevos API docs | **Puffy** |
-| UI screenshot analysis | **Chululu** |
+| ROM checksum verification, core version check, rcheevos release validation, sound licensing | **Calamari** |
+| LibretroDroid/core/Android API research, rcheevos API docs, Android TV focus, SoundPool | **Puffy** |
+| UI screenshot analysis, Switch UI compliance | **Chululu** |
 
 ---
 

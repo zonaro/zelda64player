@@ -38,6 +38,10 @@ object AppRepositories {
         return PatchRepository(File(external, "patches"))
     }
 
+    /** Persistent store for user-imported hacks (patches dropped in via the Store). */
+    fun userHacksRepository(context: Context): UserHacksRepository =
+        UserHacksRepository(File(context.filesDir, "user_hacks.json"))
+
     /**
      * Persistent store for generated OoTRandomizer randomizer seeds. The ROM
      * directory is the app's durable external-files dir (same as

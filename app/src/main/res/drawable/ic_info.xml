@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFF">
+    <!-- Info circle glyph (i in circle) for the "Sobre e Licenças" dock entry.
+         Outline style, 2px stroke, round caps/joins, consistent with the dock set. -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M12,3 a9,9 0 1 0 0,18 a9,9 0 1 0 0,-18 z M12,8 a1.1,1.1 0 1 0 0.01,0 z M12,11 v6" />
+</vector>

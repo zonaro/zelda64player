@@ -25,4 +25,7 @@ sealed class StoreException(message: String) : Exception(message) {
 
     /** Catch-all for unexpected failures (missing zip entry, IO, etc.). */
     class GenericError(message: String = "Download failed") : StoreException(message)
+
+    /** The download/patch was cancelled via a [CancelSignal] before completion. */
+    class Cancelled : StoreException("Download cancelled")
 }

@@ -92,27 +92,68 @@
 ## Coordination
 - **Reports to**: Lobby (via Coral for architecture)
 - **Consults**: Calamari (ROM checksums, core versions, rcheevos release tags, RA hash algorithm), Puffy (LibretroDroid updates, Android API changes, rcheevos API docs)
-- **Receives assets from**: Dolfi (icons, cover placeholders, RA trophy/leaderboard icons)
+- **Receives assets from**: Dolfi (icons, cover placeholders, RA trophy/leaderboard icons, Switch dock icons, splash art, focus assets)
 - **Provides strings to**: Wally (translation)
 
-## Material 3 Expressive UI (New Responsibilities)
-- **Verify style/attr names against the 1.14.0 AAR** before using — research summary paraphrased some names; do not trust docs blindly
-- **Migrate screens incrementally** — switch theme parent first, then per-screen adopt expressive components/styles
-- **Never regress frozen gamepad/in-game-menu styling** (Rule 14 exemption) — overlay uses INVISIBLE, pads created post-layout, GL recovery via recreate(), super.onDestroy() before dispose
-- **Run `compileDebugKotlin` after layout changes** to catch missing attrs/styles early
-- **Use expressive ShapeAppearance/MaterialShapes** for cards, sheets, buttons — prefer `shapeAppearanceCorner*` over custom drawables
-- **Use emphasized typescale** (`TextAppearance.Material3.*.Emphasized`) for typographic hierarchy
-- **Use spring-based motion** (expressive `MotionSpec`) for primary transitions — avoid linear easing
-- **Clear action emphasis**: filled (primary) vs tonal (secondary) vs outlined (tertiary) buttons
-- **Generous touch targets** — minimum 48×48 dp, expressive components default larger
+## Switch UI Revamp (New Phase — Mandatory)
 
-## Definition of Done per Task
-- Code compiles (Gradle `:app:assembleDebug` success)
-- Unit tests pass (`:app:testDebugUnitTest`)
-- No new lint errors (or justified suppressions)
-- Strings externalized to `strings.xml` (all locales)
-- KDoc on public APIs
-- Updated `plano.md` milestone checkbox if applicable
+### Design Tokens (from AGENTS.md)
+| Token | Dark Mode | Light Mode | Usage |
+|-------|-----------|------------|-------|
+| `bg_primary` | `#2D2D2D` | `#F0F0F0` | Main background (Library Home, grid screens) |
+| `bg_panel` | `#1E1E1E` – `#2A2A2A` | `#FFFFFF` | Side panels, dialogs, cards |
+| `accent_focus` | `#00BCD4` (cyan) | `#00BCD4` (cyan) | Focus borders, focused labels, primary actions |
+| `accent_amber` | `#FFA000` (amber) | `#FFA000` (amber) | Appearance/theme actions, warnings |
+| `text_primary` | `#FFFFFF` | `#333333` | Primary text (titles, labels) |
+| `text_secondary` | `#9E9E9E` | `#666666` | Secondary text (hints, "(default)" suffixes, footer) |
+| `scrim` | `rgba(0,0,0,0.5–0.6)` | `rgba(0,0,0,0.3–0.4)` | Modal backdrop, panel overlays |
+| `dock_circle` | `#555555` | `#FFFFFF` (subtle shadow) | Dock button backgrounds |
+| `card_radius` | `4–6 dp` (near-square) | `4–6 dp` | Game cards (home row, grid) |
+| `dialog_radius` | `12–16 dp` | `12–16 dp` | Dialogs, controllers modal |
+| `panel_edges` | Sharp (0 dp) | Sharp (0 dp) | Side panel (right slide-in) |
+| `card_aspect` | 1:1 (square) | 1:1 (square) | Home row ~220dp@1080p, grid ~170dp@1080p |
+| `dock_button_diameter` | `~50 dp` | `~50 dp` | Circular dock icons |
+
+### Component Inventory (Native Kotlin, Hand-Styled — No M3 Expressive)
+| Component | Description |
+|-----------|-------------|
+| `SwitchHomeRow` | Horizontal scrollable row of square game cards + circular "Todos os Jogos" card at end |
+| `SwitchGameCard` | Square card (1:1), cover image, game title overlay on focus, focus border, dimming overlay |
+| `SwitchAllGamesCard` | Circular card (charcoal fill, cyan 2×2 grid icon, cyan border on focus) |
+| `SwitchGridScreen` | Fullscreen grid ("Todos os Jogos"): header icon+title "Todos os Jogos" 20sp bold + thin separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders |
+| `SwitchDock` | Fixed bottom dock: 4 circular buttons (Loja, Randomizador, RetroAchievements, Sobre/Licenças), ~50dp diameter, colored glyphs, focus ring |
+| `SwitchFooterHints` | Bottom bar: left TV+gamepad indicators, right "(i) Sobre" and "+ Opções" gray hints 11–12sp |
+| `SwitchSidePanel` | Right slide-in panel (~50% width), sharp edges, header (teal badge icon + bold title 20–22sp + separator), numbered rows (gray circle 24dp badges), labels 16sp, "(default)" suffix 14sp gray, chevron right, thin line separators |
+| `SwitchDialog` | Centered modal, scrim, box ~40% width, radius 12–16dp, bg `#3A3A3C`, header icon+title 18sp, rows 48–52dp with icon+text, focused row = cyan border outline |
+| `SwitchFocusBorder` | Drawable: cyan 2–3dp stroke, transparent fill, for focus indication |
+| `SfxManager` | SoundPool wrapper: focus-move tick, select, back, panel open/close; CC0/generated only; volume respect; toggle in settings |
+| `ThemeManager` | Runtime dark/light switch, persists preference, applies tokens above |
+
+### Implementation Order (Switch UI Revamp Phase)
+1. **Theme tokens + ThemeManager + base styles** — Define colors in `colors.xml` (CSS-variable-style names), create `ThemeManager` (runtime dark/light switch, persists to SharedPreferences), base theme in `themes.xml` (parent `Theme.Material3.DayNight.NoActionBar` — technical base only, no expressive styles).
+2. **Focus system + SwitchFocusBorder + SfxManager** — `SwitchFocusBorder` drawable, focus handling logic (D-pad/click drives cyan border + label above card), `SfxManager` (SoundPool, 5 SFX in `res/raw/`), SFX toggle in settings.
+3. **Library Home rebuild** — `SwitchHomeRow` (horizontal RecyclerView), `SwitchGameCard` (square, cover, focus label, dimming), `SwitchAllGamesCard` (circular, charcoal, cyan grid icon), `SwitchDock` (4 circular buttons), `SwitchFooterHints` (TV/gamepad + "(i) Sobre" / "+ Opções"). Vanilla games first, then store hacks, then randomizer seeds.
+4. **Todos os Jogos grid** — `SwitchGridScreen` (fullscreen): header icon+title "Todos os Jogos" 20sp bold + separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders. All entries together (vanilla + hacks + seeds).
+5. **Side panel + Settings restyle** — `SwitchSidePanel` (right slide-in, ~50% width, sharp edges). Quick settings: theme toggle, RA profile status, link to full Settings. Full SettingsActivity restyled entirely (SwitchGridScreen or fullscreen SwitchSidePanel).
+6. **Store / Randomizer / RetroAchievements screens restyle** — Store: Switch cards in grid, detail → SwitchDialog. Randomizer: schema-driven form in SwitchDialog rows, plandomizer editor/builder in SwitchDialog. RA: SwitchGridScreen (games), SwitchDialog (detail, leaderboards).
+7. **In-game menu + overlays restyle** — Pause menu → SwitchDialog, leaderboards → SwitchDialog, achievement unlock overlay → custom Switch-style toast, ocarina HUD → Switch-style overlay. **RadialGamePad touch layout FROZEN (Rule 14)** — only chrome restyled.
+8. **Splash** — `SplashActivity` or splash theme: Zelda gold/green palette (Dolfi original art), same structural layout as NS Launcher splash (flanking iconic shapes + two-line logo "Zelda 64" / "PLAYER"). No Nintendo IP.
+9. **SFX integration + polish** — Wire SFX to all focus/select/back/panel actions, volume respect, mute toggle, cross-screen consistency, visual QA (Chululu).
+
+### Screen-by-Screen Mapping
+| Screen | Switch Components | Notes |
+|--------|-------------------|-------|
+| Splash | Custom (Dolfi art) | Zelda gold/green, two-line logo |
+| Library Home | SwitchHomeRow, SwitchAllGamesCard, SwitchDock, SwitchFooterHints | Vanilla → hacks → seeds order |
+| Todos os Jogos | SwitchGridScreen | Search/filter, all entries |
+| Store | SwitchGridScreen + SwitchDialog | Cards + detail bottom sheet |
+| Randomizer | SwitchSidePanel + SwitchDialog | Schema form, plandomizer |
+| Settings (Quick) | SwitchSidePanel | Theme, RA status, link to full |
+| Settings (Full) | SwitchGridScreen / SwitchSidePanel | Full restyle |
+| RetroAchievements | SwitchGridScreen + SwitchDialog | Games, detail, leaderboards |
+| GameActivity In-Game | SwitchDialog + custom overlays | Pause, leaderboards, achievement toast, ocarina HUD |
+
+**Note**: RxJava in `gamepad/` package remains untouched. New Switch UI code uses coroutines/Flow only.
 
 ---
 

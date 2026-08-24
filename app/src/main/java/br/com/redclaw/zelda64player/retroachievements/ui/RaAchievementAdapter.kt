@@ -8,34 +8,92 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.databinding.ItemRaAchievementBinding
+import br.com.redclaw.zelda64player.databinding.ItemRaSectionHeaderBinding
 import br.com.redclaw.zelda64player.retroachievements.data.RaAchievementDef
 import coil.load
+
+/**
+ * Stable list item rendered by [RaAchievementAdapter]. Two concrete kinds exist:
+ * a per-game [RaSectionItem] header and an [RaAchievementRow] for one
+ * achievement. The [key] provides DiffUtil a stable identity so section headers
+ * and achievement rows are never confused across list updates.
+ */
+sealed interface RaListItem {
+    val key: Any
+}
 
 /** Display model: definition + live unlock state. */
 data class RaAchievementRow(
     val def: RaAchievementDef,
     val unlocked: Boolean
-)
+) : RaListItem {
+    override val key: Any get() = "ach:${def.id}"
+}
+
+/** Per-game section header shown before a game's achievement rows. */
+data class RaSectionItem(
+    val gameId: Long,
+    val title: String,
+    val unlockedCount: Int,
+    val totalCount: Int,
+    val earnedPoints: Int,
+    val totalPoints: Int
+) : RaListItem {
+    override val key: Any get() = "section:$gameId"
+}
 
 /**
- * Flat list adapter for the achievements screen. Rows are pre-sorted by the
- * producer (unlocked first, then locked, both alphabetical) so the adapter
- * stays dumb; DiffUtil keeps animations cheap on refresh.
+ * List adapter for the achievements screen. Renders two row types from a single
+ * flat [RaListItem] list: game section headers and achievement rows. The list is
+ * pre-sorted by the producer (see buildSectionedRows) so the adapter stays dumb;
+ * DiffUtil keeps animations cheap on refresh. The achievement row binding logic
+ * lives only in [AchievementViewHolder] and is never duplicated.
  */
-class RaAchievementAdapter : ListAdapter<RaAchievementRow, RaAchievementAdapter.ViewHolder>(DIFF) {
+class RaAchievementAdapter : ListAdapter<RaListItem, RecyclerView.ViewHolder>(DIFF) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemRaAchievementBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
-        )
-        return ViewHolder(binding)
+    override fun getItemViewType(position: Int): Int =
+        when (getItem(position)) {
+            is RaSectionItem -> VIEW_TYPE_SECTION
+            is RaAchievementRow -> VIEW_TYPE_ACHIEVEMENT
+        }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return when (viewType) {
+            VIEW_TYPE_SECTION -> SectionViewHolder(
+                ItemRaSectionHeaderBinding.inflate(inflater, parent, false)
+            )
+            else -> AchievementViewHolder(
+                ItemRaAchievementBinding.inflate(inflater, parent, false)
+            )
+        }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val item = getItem(position)) {
+            is RaSectionItem -> (holder as SectionViewHolder).bind(item)
+            is RaAchievementRow -> (holder as AchievementViewHolder).bind(item)
+        }
     }
 
-    class ViewHolder(private val binding: ItemRaAchievementBinding) :
+    /** Header row: game title + "x/y conquistas · p/q pontos" summary. */
+    class SectionViewHolder(private val binding: ItemRaSectionHeaderBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: RaSectionItem) {
+            binding.raSectionTitle.text = item.title
+            binding.raSectionSummary.text = binding.root.context.getString(
+                R.string.ra_progress_summary,
+                item.unlockedCount,
+                item.totalCount,
+                item.earnedPoints,
+                item.totalPoints
+            )
+        }
+    }
+
+    /** Achievement row: badge, title, description, points, unlock state. */
+    class AchievementViewHolder(private val binding: ItemRaAchievementBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(row: RaAchievementRow) {
@@ -56,11 +114,14 @@ class RaAchievementAdapter : ListAdapter<RaAchievementRow, RaAchievementAdapter.
     }
 
     private companion object {
-        val DIFF = object : DiffUtil.ItemCallback<RaAchievementRow>() {
-            override fun areItemsTheSame(old: RaAchievementRow, new: RaAchievementRow) =
-                old.def.id == new.def.id
+        private const val VIEW_TYPE_SECTION = 0
+        private const val VIEW_TYPE_ACHIEVEMENT = 1
 
-            override fun areContentsTheSame(old: RaAchievementRow, new: RaAchievementRow) =
+        val DIFF = object : DiffUtil.ItemCallback<RaListItem>() {
+            override fun areItemsTheSame(old: RaListItem, new: RaListItem) =
+                old.key == new.key
+
+            override fun areContentsTheSame(old: RaListItem, new: RaListItem) =
                 old == new
         }
     }

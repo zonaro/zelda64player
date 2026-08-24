@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Splash screen content. The Zelda-themed artwork lives in
+  @drawable/splash_artwork and is set as the window background by
+  Theme.Zelda64Player.Splash, so this layout stays transparent and only
+  overlays the crisp wordmark TextViews in the artwork's reserved safe zone
+  (roughly the vertical center, between the golden crest above and the thin
+  divider below). The box is centered so it tracks the artwork across aspect
+  ratios (the artwork uses preserveAspectRatio slice, which keeps the
+  vertical center visible on any device).
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:id="@+id/splash_wordmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/splash_wordmark_line1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/brand_zelda64"
+            android:textColor="@color/splash_text"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.02"
+            android:shadowColor="#000000"
+            android:shadowDx="0"
+            android:shadowDy="2"
+            android:shadowRadius="6" />
+
+        <TextView
+            android:id="@+id/splash_wordmark_line2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/brand_player"
+            android:textColor="@color/splash_text"
+            android:textSize="54sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15"
+            android:shadowColor="#000000"
+            android:shadowDx="0"
+            android:shadowDy="2"
+            android:shadowRadius="6" />
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import br.com.redclaw.zelda64player.databinding.ActivityGameBinding
 import br.com.redclaw.zelda64player.ocarina.ui.OcarinaHudView
+import br.com.redclaw.zelda64player.retroachievements.ui.RaOverlayView
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
 import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.viewmodels.GameActivityViewModel
@@ -65,6 +66,17 @@ class GameActivity : AppCompatActivity() {
         }
         binding.root.addView(hud, hudParams)
         viewModel.attachOcarinaHud(hud)
+
+        // Build and attach the RetroAchievements overlay (unlock popups,
+        // challenge/progress indicators). Added after the Ocarina HUD so it
+        // sits above everything; non-interactive like the HUD.
+        val raOverlay = RaOverlayView(this)
+        val raParams = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT
+        )
+        binding.root.addView(raOverlay, raParams)
+        viewModel.attachRaOverlay(raOverlay)
 
         viewModel.launchHack(
             this,
@@ -126,7 +138,7 @@ class GameActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         /* Cancel any Auto-Ocarina playback (releases the held button) before the
-           native core is torn down by super.onDestroy(). */
+            native core is torn down by super.onDestroy(). */
         viewModel.cancelOcarina()
         /* Stop the RetroAchievements session before the core dies: the RA
            client aliases the emulated memory region, which becomes invalid
@@ -146,6 +158,10 @@ class GameActivity : AppCompatActivity() {
         viewModel.preserveState()
         viewModel.cancelOcarina()
         super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

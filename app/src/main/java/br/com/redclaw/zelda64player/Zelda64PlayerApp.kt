@@ -11,15 +11,19 @@ import br.com.redclaw.zelda64player.randomizer.api.OotrApiClient
 import br.com.redclaw.zelda64player.randomizer.api.OotrApiKeyStore
 import br.com.redclaw.zelda64player.randomizer.settings.SchemaLoader
 import br.com.redclaw.zelda64player.repositories.Storage
+import br.com.redclaw.zelda64player.store.DownloadQueueManager
 import br.com.redclaw.zelda64player.retroachievements.api.RaHttpClient
 import br.com.redclaw.zelda64player.retroachievements.api.RaUserAgent
 import br.com.redclaw.zelda64player.retroachievements.auth.RaAuthService
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
 import br.com.redclaw.zelda64player.retroachievements.data.RaCatalogRepository
+import br.com.redclaw.zelda64player.retroachievements.data.RaHashService
 import br.com.redclaw.zelda64player.retroachievements.data.RaInstallMetadataStore
 import br.com.redclaw.zelda64player.retroachievements.jni.RcheevosJni
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
 import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
+import br.com.redclaw.zelda64player.ui.switchui.SfxManager
+import br.com.redclaw.zelda64player.ui.switchui.ThemeManager
 import br.com.redclaw.zelda64player.views.InstalledLibrary
 import br.com.redclaw.zelda64player.work.CatalogRefreshWorker
 import java.io.File
@@ -38,8 +42,15 @@ import java.util.concurrent.TimeUnit
  */
 class Zelda64PlayerApp : Application() {
     override fun onCreate() {
+        // Apply the persisted Switch UI theme before the first view is inflated
+        // to avoid a theme flash on cold start.
+        ThemeManager.applyAtStartup(this)
         super.onCreate()
         instance = this
+        // Initialize the Hack Store download + patch queue (process-lifetime
+        // singleton) so the Store grid badges, progress notifications and the
+        // download-queue screen share one coordinator.
+        DownloadQueueManager.init(this)
         // Relocate any patched ROMs left in the legacy cache dir by earlier
         // builds into the durable external-files store (idempotent, safe).
         Storage.getInstance(this).migrateLegacyRoms()
@@ -133,6 +144,16 @@ class Zelda64PlayerApp : Application() {
         /** RA catalog fetcher (achievement/leaderboard definitions, unlocks). */
         val raCatalogRepository: RaCatalogRepository by lazy {
             RaCatalogRepository(raHttpClient)
+        }
+
+        /** Install-time RA hash + game-id resolution service. */
+        val raHashService: RaHashService by lazy {
+            RaHashService(raHttpClient, raInstallMetadataStore)
+        }
+
+        /** Shared Switch UI sound-effects manager (preloaded, respects mute pref). */
+        val sfxManager: SfxManager by lazy {
+            SfxManager(instance.applicationContext)
         }
     }
 }

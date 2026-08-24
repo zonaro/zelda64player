@@ -39,6 +39,7 @@ catalog.json
 
 # Cache directories (runtime)
 /app/.cxx/
+/libretrodroid/.cxx/
 *.so
 
 # Keystore (release signing)

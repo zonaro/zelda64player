@@ -138,8 +138,14 @@ class RaSessionManager(
      * after the first frame rendered. [memoryRegionProvider] supplies the
      * direct ByteBuffer aliasing core SYSTEM_RAM; it is consulted lazily once
      * the game loads (the region is only valid while the core holds the ROM).
+     * [hardcoreEnabled] mirrors the user preference; hardcore stays off by
+     * default until the app's User-Agent is validated with RAdmin.
      */
-    fun start(romFile: File, memoryRegionProvider: () -> ByteBuffer?) {
+    fun start(
+        romFile: File,
+        hardcoreEnabled: Boolean = false,
+        memoryRegionProvider: () -> ByteBuffer?
+    ) {
         if (sessionActive) return
         if (!romFile.exists()) {
             _state.value = RaSessionState.Failed("ROM missing: ${romFile.name}")
@@ -157,6 +163,7 @@ class RaSessionManager(
         }
 
         RcheevosJni.nativeCreateClient(this)
+        RcheevosJni.nativeSetHardcoreEnabled(hardcoreEnabled)
         loginWithToken(username, token, romFile)
     }
 

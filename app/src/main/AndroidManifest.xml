@@ -6,6 +6,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".Zelda64PlayerApp"
@@ -19,20 +20,33 @@
         android:theme="@style/Theme.Zelda64Player"
         tools:targetApi="lollipop">
         <activity
-            android:name=".views.LibraryActivity"
-            android:exported="true">
+            android:name=".views.SplashActivity"
+            android:exported="true"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/Theme.Zelda64Player.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:name=".views.LibraryActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape" />
+        <activity
             android:name=".views.GameActivity"
             android:exported="false"
             android:launchMode="singleTop"
+            android:screenOrientation="sensorLandscape"
             android:parentActivityName=".views.LibraryActivity" />
         <activity
             android:name=".store.ui.StoreActivity"
+            android:exported="false" />
+        <activity
+            android:name=".store.ui.DownloadQueueActivity"
+            android:exported="false" />
+        <receiver
+            android:name=".store.DownloadCancelReceiver"
             android:exported="false" />
         <activity
             android:name=".settings.ui.SettingsActivity"
@@ -43,5 +57,10 @@
         <activity
             android:name=".retroachievements.ui.AchievementsActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.switchui.SwitchGridActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:parentActivityName=".views.LibraryActivity" />
     </application>
 </manifest>

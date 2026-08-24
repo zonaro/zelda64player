@@ -3,6 +3,7 @@ package br.com.redclaw.zelda64player.viewmodels
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
 import android.os.Build
@@ -20,11 +21,13 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import br.com.redclaw.zelda64player.BuildConfig
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.gamepad.ButtonStick
 import br.com.redclaw.zelda64player.gamepad.ButtonStickMode
@@ -42,28 +45,48 @@ import br.com.redclaw.zelda64player.ocarina.OcarinaSong
 import br.com.redclaw.zelda64player.ocarina.OcarinaSongCatalog
 import br.com.redclaw.zelda64player.ocarina.ui.OcarinaHudView
 import br.com.redclaw.zelda64player.patcher.n64.RomHeader
+import br.com.redclaw.zelda64player.repositories.GameRomResolver
 import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroachievements.api.RaHttpClient
 import br.com.redclaw.zelda64player.retroachievements.api.RaUserAgent
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
 import br.com.redclaw.zelda64player.retroachievements.data.RaInstallMetadataStore
+import br.com.redclaw.zelda64player.retroachievements.jni.RcheevosJni
+import br.com.redclaw.zelda64player.retroachievements.RaNotificationHelper
+import br.com.redclaw.zelda64player.retroachievements.session.RaClientEvent
+import br.com.redclaw.zelda64player.retroachievements.session.RaGameSummary
 import br.com.redclaw.zelda64player.retroachievements.session.RaSessionManager
+import br.com.redclaw.zelda64player.retroachievements.session.RaSessionState
+import br.com.redclaw.zelda64player.retroachievements.ui.AchievementsActivity
+import br.com.redclaw.zelda64player.retroachievements.ui.RaLeaderboardDialogFragment
+import br.com.redclaw.zelda64player.retroachievements.ui.RaOverlayView
 import br.com.redclaw.zelda64player.retroview.RetroView
 import br.com.redclaw.zelda64player.utils.CorePrefs
+import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.utils.MenuActionItem
 import br.com.redclaw.zelda64player.utils.MenuGridBuilder
 import br.com.redclaw.zelda64player.utils.MenuSection
 import br.com.redclaw.zelda64player.utils.MenuToggleEntry
+import br.com.redclaw.zelda64player.utils.MenuEnabledEntry
 import br.com.redclaw.zelda64player.utils.RetroViewUtils
 import com.swordfish.libretrodroid.GLRetroView
 import com.swordfish.libretrodroid.LibretroDroid
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GameActivityViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
         private const val TAG = "GameLaunch"
+
+        /** Request code for the POST_NOTIFICATIONS runtime permission ask. */
+        private const val RA_NOTIFICATION_PERMISSION_REQUEST = 51001
+
+        /** Delay between the two learning snapshots (user stores the ocarina). */
+        const val OCARINA_LEARN_SNAPSHOT_DELAY_MS = 10_000L
     }
 
     private val resources = application.resources
@@ -78,6 +101,13 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      *  GameActivity.onDestroy ahead of super.onDestroy()). */
     private var raSession: RaSessionManager? = null
     private var raFrameCollector: Job? = null
+    private var raEventCollector: Job? = null
+    private var raStateCollector: Job? = null
+
+    /** Guards the one-shot game-start RA toast across Activity recreations. */
+    private var raAnnounced = false
+    /** In-game RA overlay attached by GameActivity (null until attached). */
+    private var raOverlay: RaOverlayView? = null
 
     private var gamePads: List<GamePad> = emptyList()
     private var floatingJoystick: FloatingJoystick? = null
@@ -104,6 +134,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     // ---- Auto-Ocarina feature ----
     /** Detected Ocarina game for the running ROM, or null when unsupported. */
     private var ocarinaGame: OcarinaGame? = null
+    /** Exact ROM game code (e.g. "CZLE"), used to resolve the song catalog. */
+    private var ocarinaExactGameCode: String? = null
     /** hackId of the currently running hack (for custom-song lookup). */
     private var currentHackId: String? = null
     /** Active macro player, or null when idle. */
@@ -124,19 +156,31 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     /** Live references to badge TextViews, rebuilt every [prepareMenu]. */
     private val badgeViews = mutableListOf<TextView>()
 
+    /** Live references to non-toggle item cells, rebuilt every [prepareMenu];
+     *  used to grey out / re-enable items whose availability resolves after the
+     *  menu is first built (RetroAchievements). */
+    private val enabledEntries = mutableListOf<MenuEnabledEntry>()
+
     /** Last-built menu sections, kept so physical-key actions can reuse the same
      *  item action lambdas as tapping a cell (DRY: one code path). */
     private var menuSections: List<MenuSection>? = null
 
     /** Shared physical-controller key handler, attached to every menu dialog.
      *  Each instance is bound to its own dialog so back/close semantics know
-     *  which layer is active. */
+     *  which layer is active.
+     *
+     *  Uses [DialogInterface.OnKeyListener] (via [android.app.Dialog.setOnKeyListener])
+     *  instead of a [View.OnKeyListener] on the decor view: PhoneWindow invokes the
+     *  dialog-level listener for every key routed to the dialog's window regardless of
+     *  per-view focus state, which is the only reliable path on devices (e.g. Samsung
+     *  OneUI) where, in touch mode, no child view inside the dialog holds focus and
+     *  DecorView's View.OnKeyListener is not consistently dispatched. */
     private val menuKeyListenerMain =
-        View.OnKeyListener { _, keyCode, event -> handleMenuKey(menuDialog, keyCode, event) }
+        DialogInterface.OnKeyListener { _, keyCode, event -> handleMenuKey(menuDialog, keyCode, event) }
     private val menuKeyListenerButtonStick =
-        View.OnKeyListener { _, keyCode, event -> handleMenuKey(buttonStickDialog, keyCode, event) }
+        DialogInterface.OnKeyListener { _, keyCode, event -> handleMenuKey(buttonStickDialog, keyCode, event) }
     private val menuKeyListenerSensitivity =
-        View.OnKeyListener { _, keyCode, event -> handleMenuKey(sensitivityDialog, keyCode, event) }
+        DialogInterface.OnKeyListener { _, keyCode, event -> handleMenuKey(sensitivityDialog, keyCode, event) }
 
     private var compositeDisposable = CompositeDisposable()
     private val controllerInput = ControllerInput()
@@ -214,6 +258,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         toggleEntries.addAll(built.toggleEntries)
         badgeViews.clear()
         badgeViews.addAll(built.badgeViews)
+        enabledEntries.clear()
+        enabledEntries.addAll(built.enabledEntries)
         return built.view
     }
 
@@ -289,26 +335,56 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 }
             )
         )
-        val sections = mutableListOf(game, audioVideo, controls)
+        /* RetroAchievements: the section is ALWAYS present, but its buttons are
+           greyed / disabled until the RA session resolves for the running game
+           (the menu is built once, before the session starts, so availability is
+           evaluated live via updateItemEnabledStates). The achievements button
+           enables only when the game has core achievements; the leaderboards
+           button enables whenever the session is Running (leaderboards may exist
+           even for untracked games). Per project rules the leaderboards dialog is
+           reachable ONLY from this in-game menu, never overlaid on gameplay. */
+        val ra = MenuSection(
+            R.string.menu_category_ra,
+            listOf(
+                MenuActionItem(
+                    "ra_achievements",
+                    R.string.menu_achievements,
+                    R.drawable.ic_trophy,
+                    isEnabled = { isRaAchievementsAvailable() }
+                ) { openRaAchievements() },
+                MenuActionItem(
+                    "ra_leaderboards",
+                    R.string.menu_ra_leaderboards,
+                    R.drawable.ic_trophy,
+                    isEnabled = { isRaSessionRunning() }
+                ) { showRaLeaderboards(currentRaGame()?.id ?: 0L) }
+            )
+        )
         /* Auto-Ocarina is only meaningful for OoT / MM (the games with an
            in-game Ocarina). Hide the item entirely when detection failed. */
-        if (ocarinaGame != null) {
-            sections.add(
-                MenuSection(
-                    R.string.menu_category_ocarina,
-                    listOf(
-                        MenuActionItem(
-                            "auto_ocarina",
-                            R.string.menu_auto_ocarina,
-                            R.drawable.ic_ocarina,
-                            tintIcon = false
-                        ) {
-                            showOcarinaSongList()
-                        }
-                    )
+        val ocarina = if (ocarinaGame != null) {
+            MenuSection(
+                R.string.menu_category_ocarina,
+                listOf(
+                    MenuActionItem(
+                        "auto_ocarina",
+                        R.string.menu_auto_ocarina,
+                        R.drawable.ic_ocarina,
+                        tintIcon = false
+                    ) {
+                        showOcarinaSongList()
+                    }
                 )
             )
-        }
+        } else null
+        /* Assemble the in-game menu in the requested display order:
+           Ocarina -> Game -> RetroAchievements -> Controls -> Audio & Video. */
+        val sections = mutableListOf<MenuSection>()
+        ocarina?.let { sections.add(it) }
+        sections.add(game)
+        sections.add(ra)
+        sections.add(controls)
+        sections.add(audioVideo)
         return sections
     }
 
@@ -331,12 +407,37 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     /**
+     * Refreshes the enabled / greyed state of non-toggle menu items (the
+     * RetroAchievements buttons) so they reflect RA session state at the moment
+     * the menu opens. The menu is built once, before the session resolves, so
+     * availability must be re-evaluated every open -- and live, while the menu is
+     * showing, as the session transitions LoadingGame -> Running.
+     *
+     * Disabled cells get alpha 0.38f (dimming the icon + label together, since
+     * View.setAlpha propagates to children) and [View.isEnabled] = false, which
+     * blocks both taps and D-pad focus navigation so the controller naturally
+     * skips them. Safe no-op when [activityContext] is null.
+     */
+    private fun updateItemEnabledStates() {
+        if (activityContext == null) return
+        for (entry in enabledEntries) {
+            val enabled = entry.item.isEnabled()
+            entry.cell.isEnabled = enabled
+            entry.cell.alpha = if (enabled) 1f else 0.38f
+        }
+    }
+
+    /**
      * Physical-controller key handler shared by all three menu dialogs.
      *
-     * Wired via [View.OnKeyListener] on each dialog's decor view, so it only
-     * fires while that dialog owns input focus (when no menu is open, key events
-     * flow through GameActivity -> [processKeyEvent] -> the frozen ControllerInput
-     * instead, so there is no conflict with in-game L3/R3 functions).
+     * Wired via [DialogInterface.OnKeyListener] on each dialog (see
+     * [android.app.Dialog.setOnKeyListener]), so it fires for every key routed to
+     * that dialog's window regardless of per-view focus state -- the only reliable
+     * path on devices (e.g. Samsung OneUI) where, in touch mode, no child view
+     * inside the dialog holds focus and a DecorView [View.OnKeyListener] is not
+     * consistently dispatched. When no menu is open, key events flow through
+     * GameActivity -> [processKeyEvent] -> the frozen ControllerInput instead, so
+     * there is no conflict with in-game L3/R3 functions.
      *
      * Policy: act on ACTION_DOWN, consume (return true) on both ACTION_DOWN and
      * ACTION_UP for every mapped keycode so nothing leaks to the core while a
@@ -348,11 +449,27 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      *   close semantics for the active layer).
      */
     private fun handleMenuKey(dialog: AlertDialog?, keyCode: Int, event: KeyEvent): Boolean {
+        if (BuildConfig.DEBUG) {
+            val which = when (dialog) {
+                menuDialog -> "main"
+                buttonStickDialog -> "buttonStick"
+                sensitivityDialog -> "sensitivity"
+                else -> "unknown"
+            }
+            Log.d(
+                "MenuDebug",
+                "handleMenuKey entry: dialog=$which, keyCode=$keyCode, " +
+                    "action=${event.action}, isShowing=${dialog?.isShowing}"
+            )
+        }
         if (dialog?.isShowing != true)
             return false
 
         /* Consume ACTION_UP (and any other action) for mapped keys to avoid
-           double-fires; only ACTION_DOWN performs the action. */
+           double-fires; only ACTION_DOWN performs the action. This also swallows
+           the ACTION_UP of the very physical press that opened a sub-dialog
+           (e.g. THUMBR opening the Button Stick dialog), so that UP can never
+           reach a dismiss path. */
         when (event.action) {
             KeyEvent.ACTION_UP -> return true
             KeyEvent.ACTION_DOWN -> { /* proceed */ }
@@ -364,12 +481,19 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         when (keyCode) {
             /* Close EVERYTHING and return to game -- works from any layer. */
             KeyEvent.KEYCODE_BUTTON_MODE -> {
+                if (BuildConfig.DEBUG) Log.d("MenuDebug", "BUTTON_MODE: closeAllMenus()")
                 closeAllMenus()
                 return true
             }
             /* Back semantics: dismiss the active sub-dialog (revealing the main
                menu) or, on the main menu, dismiss it (return to game). */
             KeyEvent.KEYCODE_BUTTON_B -> {
+                if (BuildConfig.DEBUG) {
+                    Log.d(
+                        "MenuDebug",
+                        "BUTTON_B: dismissing ${if (isSub) "sub-dialog" else "main menu"}"
+                    )
+                }
                 if (isSub) dialog.dismiss() else menuDialog?.dismiss()
                 return true
             }
@@ -427,8 +551,13 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         val sections = menuSections ?: return
         for (section in sections) {
             section.items.firstOrNull { it.id == id }?.let { item ->
+                /* Disabled items (e.g. greyed RetroAchievements buttons) must not
+                   respond to direct-id activation (physical keys). Skip silently:
+                   no action, no dismiss. */
+                if (!item.isEnabled()) return
                 item.action()
                 if (item.isToggle) updateToggleStates()
+                if (BuildConfig.DEBUG) Log.d("MenuDebug", "runMenuAction('$id'): dismissing main menu")
                 menuDialog?.dismiss()
                 return
             }
@@ -437,6 +566,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
 
     /** Dismiss every menu layer and return to the game. */
     private fun closeAllMenus() {
+        if (BuildConfig.DEBUG) Log.d("MenuDebug", "closeAllMenus(): dismissing all layers")
         buttonStickDialog?.dismiss()
         sensitivityDialog?.dismiss()
         menuDialog?.dismiss()
@@ -458,19 +588,14 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      */
     fun prepareOcarinaDetection(hackId: String) {
         currentHackId = hackId
-        ocarinaGame = runCatching {
-            OcarinaSongCatalog.detectGame(
-                RomHeader.fromNormalizedZ64(Storage.getInstance(appContext).rom(hackId))
-            )
+        val romFile = GameRomResolver.resolveRomFile(appContext, hackId)
+        val header = runCatching {
+            if (romFile != null) RomHeader.fromNormalizedZ64(romFile) else null
         }.getOrNull()
+        ocarinaGame = header?.let { OcarinaSongCatalog.detectGame(it) }
+        ocarinaExactGameCode = header?.gameCode
     }
 
-    /**
-     * Show the song-list dialog for the detected game. Built-in songs are listed
-     * first, followed by any catalog-provided custom songs for this hackId.
-     * Physical-controller support: B closes, A/DPAD_CENTER selects the focused
-     * item (see [handleOcarinaKey]); dpad navigates the standard list.
-     */
     private fun showOcarinaSongList() {
         val context = activityContext ?: return
         val game = ocarinaGame ?: return
@@ -478,14 +603,14 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         val songs = OcarinaSongCatalog.getSongs(game, getCustomOcarinaSongs(hackId))
         ocarinaCurrentSongs = songs
         val titles = songs.map { it.displayName(context) }.toTypedArray()
-        ocarinaSongDialog = AlertDialog.Builder(context)
+        val builder = AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.menu_auto_ocarina))
             .setItems(titles) { dialog, which ->
                 dialog.dismiss()
                 playOcarinaSong(songs[which])
             }
             .setNegativeButton(R.string.dialog_cancel, null)
-            .create()
+        ocarinaSongDialog = builder.create()
         ocarinaSongDialog?.show()
         ocarinaSongDialog?.window?.setBackgroundDrawable(
             AppCompatResources.getDrawable(context, R.drawable.bg_menu_dialog)
@@ -620,6 +745,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         buttonStickDialog = AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.menu_button_stick))
             .setSingleChoiceItems(buttonStickOptions, buttonStickMode.ordinal) { dialog, which ->
+                if (BuildConfig.DEBUG) Log.d("MenuDebug", "buttonStick single-choice: dismissing sub-dialog")
                 prefs.edit().putInt(buttonStickPrefsKey, which).apply()
                 applyButtonStickMode(ButtonStickMode.values()[which])
                 dialog.dismiss()
@@ -630,7 +756,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         buttonStickDialog?.window?.setBackgroundDrawable(
             AppCompatResources.getDrawable(context, R.drawable.bg_menu_dialog)
         )
-        buttonStickDialog?.window?.decorView?.setOnKeyListener(menuKeyListenerButtonStick)
+        buttonStickDialog?.setOnKeyListener(menuKeyListenerButtonStick)
     }
 
     /** Applies live -- no activity recreate needed, unlike the core switch. */
@@ -720,7 +846,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         sensitivityDialog?.window?.setBackgroundDrawable(
             AppCompatResources.getDrawable(context, R.drawable.bg_menu_dialog)
         )
-        sensitivityDialog?.window?.decorView?.setOnKeyListener(menuKeyListenerSensitivity)
+        sensitivityDialog?.setOnKeyListener(menuKeyListenerSensitivity)
     }
 
     /**
@@ -765,39 +891,66 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     fun showMenu() {
         /* Opening the menu again cancels any in-progress Auto-Ocarina playback. */
         cancelOcarina()
-        if (retroView?.frameRendered?.value == true) {
-            retroView?.let { retroViewUtils?.preserveEmulatorState(it) }
-            updateToggleStates()
-
-            val dialog = menuDialog ?: return
-            val view = menuView ?: return
-            val context = activityContext ?: return
-            val metrics = context.resources.displayMetrics
-            val screenWidth = metrics.widthPixels
-            val screenHeight = metrics.heightPixels
-
-            val maxWidthPx = context.resources.getDimensionPixelSize(R.dimen.dialog_menu_max_width)
-            val dialogWidth = minOf((screenWidth * 0.92f).toInt(), maxWidthPx)
-
-            /* Measure the content at the dialog's actual width (AT_MOST) so wrapped
-               labels reflect the real height. A bare UNSPECIFIED width would let the
-               weight-based cells expand and under-report the height. */
-            val widthSpec = View.MeasureSpec.makeMeasureSpec(dialogWidth, View.MeasureSpec.AT_MOST)
-            val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            view.measure(widthSpec, heightSpec)
-            val contentHeight = view.measuredHeight
-
-            val verticalInset = context.resources.getDimensionPixelSize(R.dimen.dialog_menu_vertical_inset)
-            val maxHeight = (screenHeight * 0.90f).toInt()
-            val dialogHeight = minOf(contentHeight + verticalInset, maxHeight)
-
-            dialog.show()
-            dialog.window?.setLayout(dialogWidth, dialogHeight)
-            dialog.window?.setBackgroundDrawable(
-                AppCompatResources.getDrawable(context, R.drawable.bg_menu_dialog)
+        if (BuildConfig.DEBUG) {
+            Log.d(
+                "MenuDebug",
+                "showMenu() called; retroView=${retroView != null}, " +
+                    "frameRendered=${retroView?.frameRendered?.value}"
             )
-            dialog.window?.decorView?.setOnKeyListener(menuKeyListenerMain)
         }
+        /* Gate 1: core must have rendered at least one frame. */
+        if (retroView?.frameRendered?.value != true) {
+            if (BuildConfig.DEBUG) {
+                Log.d(
+                    "MenuDebug",
+                    "showMenu() gate FAILED: frameRendered != true " +
+                        "(retroView=${retroView != null}, " +
+                        "frameRendered=${retroView?.frameRendered?.value})"
+                )
+            }
+            return
+        }
+        retroView?.let { retroViewUtils?.preserveEmulatorState(it) }
+        updateToggleStates()
+        updateItemEnabledStates()
+
+        val dialog = menuDialog ?: run {
+            if (BuildConfig.DEBUG) Log.d("MenuDebug", "showMenu() gate FAILED: menuDialog == null")
+            return
+        }
+        val view = menuView ?: run {
+            if (BuildConfig.DEBUG) Log.d("MenuDebug", "showMenu() gate FAILED: menuView == null")
+            return
+        }
+        val context = activityContext ?: run {
+            if (BuildConfig.DEBUG) Log.d("MenuDebug", "showMenu() gate FAILED: activityContext == null")
+            return
+        }
+        val metrics = context.resources.displayMetrics
+        val screenWidth = metrics.widthPixels
+        val screenHeight = metrics.heightPixels
+
+        val maxWidthPx = context.resources.getDimensionPixelSize(R.dimen.dialog_menu_max_width)
+        val dialogWidth = minOf((screenWidth * 0.92f).toInt(), maxWidthPx)
+
+        /* Measure the content at the dialog's actual width (AT_MOST) so wrapped
+           labels reflect the real height. A bare UNSPECIFIED width would let the
+           weight-based cells expand and under-report the height. */
+        val widthSpec = View.MeasureSpec.makeMeasureSpec(dialogWidth, View.MeasureSpec.AT_MOST)
+        val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        view.measure(widthSpec, heightSpec)
+        val contentHeight = view.measuredHeight
+
+        val verticalInset = context.resources.getDimensionPixelSize(R.dimen.dialog_menu_vertical_inset)
+        val maxHeight = (screenHeight * 0.90f).toInt()
+        val dialogHeight = minOf(contentHeight + verticalInset, maxHeight)
+
+        dialog.show()
+        dialog.window?.setLayout(dialogWidth, dialogHeight)
+        dialog.window?.setBackgroundDrawable(
+            AppCompatResources.getDrawable(context, R.drawable.bg_menu_dialog)
+        )
+        dialog.setOnKeyListener(menuKeyListenerMain)
     }
 
     /**
@@ -879,11 +1032,18 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      * game-load time (it is only valid while the core holds the ROM).
      */
     private fun startRaSessionIfNeeded(hackId: String) {
-        if (!CorePrefs.getRetroAchievementsEnabled(appContext)) return
+        if (!CorePrefs.getRetroAchievementsEnabled(appContext)) {
+            announceRaStatus(R.string.ra_toast_disabled)
+            return
+        }
         if (raSession != null) return
 
         val view = retroView?.view ?: return
-        val romFile = Storage.getInstance(appContext).rom(hackId)
+        val romFile = GameRomResolver.resolveRomFile(appContext, hackId)
+            ?: run {
+                Log.w(TAG, "startRaSessionIfNeeded: no playable ROM for $hackId")
+                return
+            }
         val app = getApplication<Application>()
 
         val session = RaSessionManager(
@@ -905,8 +1065,176 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
             }
         }
 
-        session.start(romFile) {
+        /* Client events (unlocks, indicators, leaderboards) drive the overlay
+           and system notifications. */
+        raEventCollector = viewModelScope.launch {
+            session.events.collect { event ->
+                handleRaEvent(event)
+            }
+        }
+
+        /* One-shot startup announcement: as soon as the session reaches a
+           terminal-enough state, toast whether achievements are tracked for
+           this game (with the user's progress when available). */
+        raStateCollector = viewModelScope.launch {
+            session.state.collect { state ->
+                /* Live refresh: while the menu is open, flip the RA buttons'
+                   enabled state as the session resolves (LoadingGame -> Running)
+                   so a button greyed during load becomes enabled without forcing
+                   the user to reopen the menu. */
+                if (menuDialog?.isShowing == true) updateItemEnabledStates()
+                if (raAnnounced) return@collect
+                when (state) {
+                    is RaSessionState.Running -> {
+                        val total = state.game.numCoreAchievements
+                        announceRaStatus(
+                            if (total > 0) R.string.ra_toast_progress else R.string.ra_toast_untracked,
+                            state.game.numUnlockedAchievements, total
+                        )
+                    }
+                    is RaSessionState.NotLoggedIn ->
+                        announceRaStatus(R.string.ra_toast_not_logged_in)
+                    is RaSessionState.Failed -> {
+                        val tracked = runCatching {
+                            Zelda64PlayerApp.raInstallMetadataStore.get(hackId)?.isResolved == true
+                        }.getOrDefault(false)
+                        announceRaStatus(
+                            if (tracked) R.string.ra_toast_connect_failed else R.string.ra_toast_untracked
+                        )
+                    }
+                    else -> Unit
+                }
+            }
+        }
+
+        session.start(
+            romFile,
+            hardcoreEnabled = CorePrefs.getRaHardcore(appContext)
+        ) {
             view.getMemoryRegion(LibretroDroid.MEMORY_SYSTEM_RAM)
+        }
+
+        /* Vanilla base ROMs have no install step, so their RetroAchievements
+            identity (hash + game id) is computed lazily on first play. Store hacks
+            already get it at install time via DownloadManager, so we skip them here.
+
+            Per project Rule 21 the RA hash is computed ONLY from the final playable
+            ROM. For vanilla games that final ROM IS the normalized base ROM file
+            resolved above (no patch is applied), so hashing it directly is correct. */
+        if (hackId.startsWith(GameRomResolver.VANILLA_PREFIX)) {
+            viewModelScope.launch {
+                runCatching {
+                    Zelda64PlayerApp.raHashService.computeAndResolve(hackId, romFile)
+                }.onFailure { e ->
+                    Log.w(TAG, "RA identity computation failed for vanilla $hackId", e)
+                }
+            }
+        }
+
+        // System notifications are opt-in default ON; on API 33+ they need
+        // the POST_NOTIFICATIONS runtime permission. Ask once as soon as the
+        // session goes live so the first unlock is never lost.
+        RaNotificationHelper.ensureChannel(appContext)
+        ensureNotificationPermission()
+    }
+
+    /** Requests POST_NOTIFICATIONS on API 33+ when missing. No-op otherwise. */
+    private fun ensureNotificationPermission() {        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val activity = activityContext ?: return
+        val granted = ContextCompat.checkSelfPermission(
+            activity, android.Manifest.permission.POST_NOTIFICATIONS
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        if (!granted) {
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                RA_NOTIFICATION_PERMISSION_REQUEST
+            )
+        }
+    }
+
+    /** Attaches the in-game RA overlay created by GameActivity. */
+    fun attachRaOverlay(overlay: RaOverlayView) {
+        raOverlay = overlay
+    }
+
+    /**
+     * Returns the currently running RetroAchievements game summary, or null when
+     * the session has not yet identified a game (Idle / NotLoggedIn / LoggingIn /
+     * LoadingGame / Failed). The menu buttons read this to decide their enabled
+     * state, so it must reflect the live session state at evaluation time.
+     */
+    private fun currentRaGame(): RaGameSummary? =
+        (raSession?.state?.value as? RaSessionState.Running)?.game
+
+    /**
+     * True iff the RA session has identified the running game (Running state).
+     * Leaderboards may exist even for untracked games, so this gates the
+     * leaderboards button independently of achievement availability.
+     */
+    private fun isRaSessionRunning(): Boolean = currentRaGame() != null
+
+    /**
+     * True iff the RA session is Running AND the game exposes at least one core
+     * achievement. Used to grey out the achievements button for untracked games
+     * (identified but with numCoreAchievements == 0).
+     */
+    private fun isRaAchievementsAvailable(): Boolean {
+        val game = currentRaGame() ?: return false
+        return game.numCoreAchievements > 0
+    }
+
+    /** Opens the leaderboards dialog for [gameId] (in-game menu only). No-op when
+     *  [gameId] is 0L (session not running / game not identified yet). */
+    private fun showRaLeaderboards(gameId: Long) {
+        if (gameId == 0L) return
+        val activity = activityContext as? androidx.fragment.app.FragmentActivity ?: return
+        RaLeaderboardDialogFragment.newInstance(gameId)
+            .show(activity.supportFragmentManager, "ra_leaderboards")
+    }
+
+    /** Opens the achievements list for the running game. */
+    private fun openRaAchievements() {
+        val hackId = currentHackId ?: return
+        val activity = activityContext ?: return
+        activity.startActivity(
+            android.content.Intent(activity, AchievementsActivity::class.java)
+                .putExtra(AchievementsActivity.EXTRA_HACK_ID, hackId)
+        )
+    }
+
+    /** Routes one client event to the overlay and/or a system notification. */
+    private fun handleRaEvent(event: RaClientEvent) {
+        val overlay = raOverlay
+        when (event.eventType) {
+            RcheevosJni.Events.ACHIEVEMENT_TRIGGERED -> {
+                overlay?.showUnlock(event.payloadJson)
+                val gameTitle =
+                    (raSession?.state?.value as? RaSessionState.Running)?.game?.title.orEmpty()
+                RaNotificationHelper.postUnlock(appContext, event.payloadJson, gameTitle)
+            }
+            RcheevosJni.Events.CHALLENGE_INDICATOR_SHOW ->
+                overlay?.showChallengeIndicator(event.payloadJson)
+            RcheevosJni.Events.CHALLENGE_INDICATOR_HIDE ->
+                overlay?.hideChallengeIndicator(event.payloadJson)
+            RcheevosJni.Events.PROGRESS_INDICATOR_SHOW,
+            RcheevosJni.Events.PROGRESS_INDICATOR_UPDATE ->
+                overlay?.updateProgressIndicator(event.payloadJson, visible = true)
+            RcheevosJni.Events.PROGRESS_INDICATOR_HIDE ->
+                overlay?.updateProgressIndicator(event.payloadJson, visible = false)
+            RcheevosJni.Events.LEADERBOARD_STARTED -> {
+                if (CorePrefs.getRaShowChallengeIndicators(appContext)) {
+                    overlay?.showMessage(
+                        appContext.getString(R.string.ra_leaderboard_started)
+                    )
+                }
+            }
+            RcheevosJni.Events.LEADERBOARD_SUBMITTED -> {
+                overlay?.showMessage(
+                    appContext.getString(R.string.ra_leaderboard_submitted)
+                )
+            }
+            else -> Unit
         }
     }
 
@@ -918,8 +1246,23 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     fun stopRaSession() {
         raFrameCollector?.cancel()
         raFrameCollector = null
+        raEventCollector?.cancel()
+        raEventCollector = null
+        raStateCollector?.cancel()
+        raStateCollector = null
+        raOverlay?.clearAll()
         raSession?.stop()
         raSession = null
+    }
+
+    /**
+     * Shows the one-shot game-start RetroAchievements toast. Safe to call
+     * repeatedly; only the first call per game session takes effect.
+     */
+    private fun announceRaStatus(messageRes: Int, arg1: Int = 0, arg2: Int = 0) {
+        if (raAnnounced) return
+        raAnnounced = true
+        Toast.makeText(appContext, appContext.getString(messageRes, arg1, arg2), Toast.LENGTH_LONG).show()
     }
 
     /**
@@ -1163,8 +1506,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         progress: View,
         hackId: String
     ) {
-        val romFile = Storage.getInstance(appContext).rom(hackId)
-        if (romFile.exists() && romFile.length() > 0) {
+        val romFile = GameRomResolver.resolveRomFile(appContext, hackId)
+        if (romFile != null && romFile.exists() && romFile.length() > 0) {
             currentHackId = hackId
             if (ocarinaGame == null) {
                 ocarinaGame = runCatching {
@@ -1175,7 +1518,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
             setupRetroView(activity, container, hackId)
             setupGamePads(overlay)
         } else {
-            Log.e(TAG, "launchHack: patched ROM not installed for $hackId (expected ${romFile.absolutePath})")
+            Log.e(TAG, "launchHack: playable ROM not found for $hackId")
             progress.visibility = View.GONE
             showError(R.string.error_rom_not_installed)
         }

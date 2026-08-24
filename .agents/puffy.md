@@ -25,6 +25,8 @@ Bruce or Coral requests research when:
 - FileProvider configuration for sharing ROMs/patches (if needed)
 - Activity recreation on config change (orientation) — best practices for GL apps
 - Memory limits: `dalvik.vm.heapsize` vs `largeHeap` for 64 MB ROMs
+- **Android TV focus handling best practices** (D-pad navigation, focus search, focus order, leanback library patterns) — for Switch UI focus system on TV
+- **SoundPool latency and best practices** (preloading, stream limits, audio focus, OGG vs WAV, low-latency playback for UI SFX) — for `SfxManager` implementation
 
 ### 3. Libraries & Tools
 - OkHttp: interceptors, caching, conditional requests (ETag/Last-Modified)
@@ -79,3 +81,5 @@ Bruce or Coral requests research when:
 3. OkHttp conditional GET + cache control for catalog.json
 4. GPL-3.0 derivative work compliance checklist for Android app
 5. Coil 2.x migration from Glide (if migrating) or optimization tips
+6. **Android TV focus handling best practices** (for Switch UI focus system)
+7. **SoundPool latency optimization for UI navigation sounds** (for SfxManager)

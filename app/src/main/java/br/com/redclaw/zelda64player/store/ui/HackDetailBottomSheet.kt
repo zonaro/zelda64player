@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.core.content.ContextCompat
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.databinding.FragmentHackDetailBinding
-import br.com.redclaw.zelda64player.store.InstallPhase
+import br.com.redclaw.zelda64player.store.DownloadPhase
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -49,8 +49,8 @@ class HackDetailBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         populate()
-        observeInstall()
-        binding.detailDownload.setOnClickListener { viewModel.install(hack) }
+        observeQueue()
+        binding.detailDownload.setOnClickListener { viewModel.enqueue(hack) }
     }
 
     override fun onDestroyView() {
@@ -97,6 +97,12 @@ class HackDetailBottomSheet : BottomSheetDialogFragment() {
         } else {
             getString(R.string.detail_base_no_match)
         }
+        binding.detailBaseMatch.setTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                if (matches) R.color.switch_accent else R.color.switch_text_secondary
+            )
+        )
 
         if (hack.coverImageUrl != null) {
             binding.detailCover.load(hack.coverImageUrl) {
@@ -126,49 +132,59 @@ class HackDetailBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun observeInstall() {
-        viewModel.install.observe(viewLifecycleOwner) { state ->
-            if (state.hackId != hack.id) return@observe
-            when (state) {
-                is StoreViewModel.InstallUiState.Progress -> {
+    private fun observeQueue() {
+        viewModel.queueStateFor(hack.id).observe(viewLifecycleOwner) { ui ->
+            // No entry yet (not queued): leave the button as populate() set it.
+            if (ui == null) return@observe
+            when (ui.phase) {
+                DownloadPhase.QUEUED, DownloadPhase.DOWNLOADING, DownloadPhase.PATCHING -> {
                     binding.detailProgress.visibility = View.VISIBLE
                     binding.detailError.visibility = View.GONE
                     binding.detailDownload.isEnabled = false
-                    if (state.phase == InstallPhase.PATCHING) {
-                        // No byte progress while applying the patch; show an
-                        // indeterminate bar with a dedicated message.
-                        binding.detailProgress.isIndeterminate = true
-                        binding.detailProgressText.visibility = View.VISIBLE
-                        binding.detailProgressText.text = getString(R.string.detail_patching)
-                    } else {
-                        binding.detailProgress.isIndeterminate = false
-                        val percent = if (state.total > 0) {
-                            (state.downloaded * 100 / state.total).toInt()
-                        } else 0
-                        binding.detailProgress.progress = percent
-                        binding.detailProgressText.visibility = View.VISIBLE
-                        binding.detailProgressText.text =
-                            getString(R.string.detail_installing, percent)
+                    when (ui.phase) {
+                        DownloadPhase.PATCHING -> {
+                            // No byte progress while applying the patch; show an
+                            // indeterminate bar with a dedicated message.
+                            binding.detailProgress.isIndeterminate = true
+                            binding.detailProgressText.visibility = View.VISIBLE
+                            binding.detailProgressText.text = getString(R.string.detail_patching)
+                        }
+                        DownloadPhase.DOWNLOADING -> {
+                            binding.detailProgress.isIndeterminate = false
+                            binding.detailProgress.progress = ui.progressPercent
+                            binding.detailProgressText.visibility = View.VISIBLE
+                            binding.detailProgressText.text =
+                                getString(R.string.detail_installing, ui.progressPercent)
+                        }
+                        else -> {
+                            // QUEUED: show a neutral "in queue" message.
+                            binding.detailProgress.isIndeterminate = false
+                            binding.detailProgress.progress = 0
+                            binding.detailProgressText.visibility = View.VISIBLE
+                            binding.detailProgressText.text =
+                                getString(R.string.store_status_queued)
+                        }
                     }
                 }
-                is StoreViewModel.InstallUiState.Success -> {
+                DownloadPhase.SUCCESS -> {
                     binding.detailProgress.visibility = View.GONE
                     binding.detailProgressText.visibility = View.GONE
                     binding.detailError.visibility = View.GONE
                     binding.detailDownload.setText(R.string.store_status_installed)
                     binding.detailDownload.isEnabled = false
-                    Toast.makeText(
-                        requireContext(),
-                        R.string.detail_installed_toast,
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
-                is StoreViewModel.InstallUiState.Error -> {
+                DownloadPhase.ERROR -> {
                     binding.detailProgress.visibility = View.GONE
                     binding.detailProgressText.visibility = View.GONE
                     binding.detailDownload.isEnabled = true
-                    binding.detailError.text = state.message
+                    binding.detailError.text = ui.error
                     binding.detailError.visibility = View.VISIBLE
+                }
+                DownloadPhase.CANCELLED -> {
+                    binding.detailProgress.visibility = View.GONE
+                    binding.detailProgressText.visibility = View.GONE
+                    binding.detailDownload.isEnabled = true
+                    binding.detailError.visibility = View.GONE
                 }
             }
         }

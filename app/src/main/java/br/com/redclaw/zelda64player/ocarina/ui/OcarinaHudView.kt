@@ -21,7 +21,7 @@ import br.com.redclaw.zelda64player.ocarina.OcarinaSong
  * The view is non-interactive (clickable/focusable = false) so it never steals
  * touches from the gamepad overlay beneath it; cancellation is driven globally
  * by any physical input (see GameActivityViewModel). The background mirrors the
- * app's dialog surface (bg_menu_dialog) for visual consistency.
+ * app's Switch dialog surface (bg_switch_dialog) for visual consistency.
  */
 class OcarinaHudView(context: Context) : LinearLayout(context) {
 
@@ -34,7 +34,7 @@ class OcarinaHudView(context: Context) : LinearLayout(context) {
     init {
         orientation = VERTICAL
         gravity = Gravity.CENTER_HORIZONTAL
-        setBackgroundResource(R.drawable.bg_menu_dialog)
+        setBackgroundResource(R.drawable.bg_switch_dialog)
         val pad = (12 * resources.displayMetrics.density).toInt()
         setPadding(pad, pad, pad, pad)
         // Never intercept touches: let them fall through to the gamepad overlay.

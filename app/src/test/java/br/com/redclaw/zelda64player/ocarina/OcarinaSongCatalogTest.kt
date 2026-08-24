@@ -26,9 +26,42 @@ class OcarinaSongCatalogTest {
     }
 
     @Test
+    fun detectGame_nzsVariantIsMM() {
+        // Real-world Majora's Mask dump with gameCode "NZSE" (title "ZELDA MAJORA'S MASK").
+        assertEquals(OcarinaGame.MM, OcarinaSongCatalog.detectGame(RomHeader("NZSE", 0, "ZELDA MAJORA'S MASK")))
+    }
+
+    @Test
+    fun detectGame_titleFallbackMajora() {
+        // Unknown code + title containing "Majora" (any casing) -> MM.
+        assertEquals(OcarinaGame.MM, OcarinaSongCatalog.detectGame(RomHeader("ZZZZ", 0, "ZELDA MAJORA'S MASK")))
+        assertEquals(OcarinaGame.MM, OcarinaSongCatalog.detectGame(RomHeader("ZZZZ", 0, "zelda majora's mask")))
+    }
+
+    @Test
+    fun detectGame_titleFallbackOcarina() {
+        // Unknown code + title containing "Ocarina" -> OoT.
+        assertEquals(OcarinaGame.OOT, OcarinaSongCatalog.detectGame(RomHeader("ZZZZ", 0, "ZELDA OCARINA OF TIME")))
+        assertEquals(OcarinaGame.OOT, OcarinaSongCatalog.detectGame(RomHeader("ZZZZ", 0, "zelda ocarina of time")))
+    }
+
+    @Test
+    fun detectGame_titleFallbackUnrelatedIsNull() {
+        // Unknown code + unrelated title -> null.
+        assertNull(OcarinaSongCatalog.detectGame(RomHeader("ZZZZ", 0, "SUPER MARIO 64")))
+    }
+
+    @Test
+    fun detectGame_canonicalWinsOverMisleadingTitle() {
+        // Canonical codes always win even with a misleading title.
+        assertEquals(OcarinaGame.OOT, OcarinaSongCatalog.detectGame(RomHeader("CZLE", 0, "ZELDA MAJORA'S MASK")))
+        assertEquals(OcarinaGame.MM, OcarinaSongCatalog.detectGame(RomHeader("NZLE", 0, "ZELDA OCARINA OF TIME")))
+    }
+
+    @Test
     fun builtInSongs_counts() {
         assertEquals(12, OcarinaSongCatalog.builtInSongs(OcarinaGame.OOT).size)
-        assertEquals(11, OcarinaSongCatalog.builtInSongs(OcarinaGame.MM).size)
+        assertEquals(12, OcarinaSongCatalog.builtInSongs(OcarinaGame.MM).size)
     }
 
     @Test
@@ -48,7 +81,34 @@ class OcarinaSongCatalogTest {
     @Test
     fun getSongs_noCustomEqualsBuiltIns() {
         val songs = OcarinaSongCatalog.getSongs(OcarinaGame.MM, emptyList())
-        assertEquals(11, songs.size)
+        assertEquals(12, songs.size)
         assertEquals("mm_song_of_time", songs[0].id)
+    }
+
+    @Test
+    fun sunsSong_usesAuthoritativeSequence() {
+        // Verified against Wikibooks/ZeldaDungeon: C-Right, C-Down, C-Up x2.
+        val suns = OcarinaSongCatalog.builtInSongs(OcarinaGame.OOT)
+            .first { it.id == "oot_suns_song" }
+        assertEquals(
+            listOf(
+                OcarinaNote.C_RIGHT, OcarinaNote.C_DOWN, OcarinaNote.C_UP,
+                OcarinaNote.C_RIGHT, OcarinaNote.C_DOWN, OcarinaNote.C_UP
+            ),
+            suns.notes
+        )
+    }
+
+    @Test
+    fun mm_includesEponasSong() {
+        val epona = OcarinaSongCatalog.builtInSongs(OcarinaGame.MM)
+            .firstOrNull { it.id == "mm_eponas_song" }
+        assertEquals(
+            listOf(
+                OcarinaNote.C_UP, OcarinaNote.C_LEFT, OcarinaNote.C_RIGHT,
+                OcarinaNote.C_UP, OcarinaNote.C_LEFT, OcarinaNote.C_RIGHT
+            ),
+            epona?.notes
+        )
     }
 }

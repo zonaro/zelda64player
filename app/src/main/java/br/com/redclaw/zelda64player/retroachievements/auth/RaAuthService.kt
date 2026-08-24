@@ -9,6 +9,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.withTimeout
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -48,14 +50,28 @@ class RaAuthService(
             val deferred = CompletableDeferred<RaLoginResult>()
             pending[opId] = deferred
             RcheevosJni.nativeBeginLoginWithPassword(username, password, opId)
-            val result = deferred.await()
-            return if (result.success) {
-                // Persist for silent token re-login during gameplay sessions.
-                // The token is secret: stored encrypted, never logged.
-                credentials.setCredentials(username, result.token.orEmpty())
-                Result.success(Unit)
-            } else {
-                Result.failure(RaAuthException(result.error ?: "login failed"))
+            // Hard ceiling so a wedged bridge can never leave the settings
+            // button disabled forever.
+            val result = try {
+                withTimeout(LOGIN_TIMEOUT_MS) { deferred.await() }
+            } catch (e: TimeoutCancellationException) {
+                null
+            }
+            return when {
+                result == null ->
+                    Result.failure(RaAuthException("login timed out"))
+                !result.success ->
+                    Result.failure(RaAuthException(result.error ?: "login failed"))
+                // Defensive: a successful exchange without a token would store
+                // credentials that can never re-login; surface it instead.
+                result.token.isNullOrBlank() ->
+                    Result.failure(RaAuthException("no token in login response"))
+                else -> {
+                    // Persist for silent token re-login during gameplay sessions.
+                    // The token is secret: stored encrypted, never logged.
+                    credentials.setCredentials(username, result.token)
+                    Result.success(Unit)
+                }
             }
         } catch (e: CancellationException) {
             throw e
@@ -103,6 +119,9 @@ class RaAuthService(
 
     private companion object {
         const val RC_OK = 0
+
+        /** Hard ceiling for the credential exchange round trip. */
+        const val LOGIN_TIMEOUT_MS = 30_000L
     }
 }
 

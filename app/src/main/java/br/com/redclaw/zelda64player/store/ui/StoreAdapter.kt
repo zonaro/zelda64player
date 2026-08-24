@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.databinding.StoreGridItemBinding
+import br.com.redclaw.zelda64player.store.DownloadPhase
 import coil.load
 
 /**
@@ -66,6 +67,21 @@ class StoreAdapter(
                 }
                 is StoreStatus.UpdateAvailable -> {
                     binding.itemStatus.setText(R.string.store_status_update)
+                    binding.itemStatus.setBackgroundResource(R.drawable.store_badge_update)
+                }
+            }
+
+            // While a download/patch is in flight for this hack, override the
+            // install-status badge with a transient progress badge.
+            if (item.downloadPhase != null && item.downloadPhase != DownloadPhase.SUCCESS) {
+                val text = when (item.downloadPhase) {
+                    DownloadPhase.QUEUED -> R.string.store_status_queued
+                    DownloadPhase.DOWNLOADING -> R.string.store_status_downloading
+                    DownloadPhase.PATCHING -> R.string.store_status_patching
+                    else -> null
+                }
+                if (text != null) {
+                    binding.itemStatus.setText(text)
                     binding.itemStatus.setBackgroundResource(R.drawable.store_badge_update)
                 }
             }

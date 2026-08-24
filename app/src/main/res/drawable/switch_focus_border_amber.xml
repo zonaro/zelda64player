@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Amber variant for appearance/theme/warning focus states. -->
+    <solid android:color="@android:color/transparent" />
+    <stroke
+        android:width="@dimen/switch_focus_border_width"
+        android:color="@color/switch_accent_amber" />
+    <corners android:radius="@dimen/switch_card_corner_radius" />
+</shape>

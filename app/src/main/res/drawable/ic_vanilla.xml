@@ -1,0 +1,11 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFF">
+    <!-- Vanilla game badge: 6-petal flower rosette with center -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M14,12 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 z M11.5,7.67 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 z M6.5,7.67 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 z M4,12 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 z M6.5,16.33 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 z M11.5,16.33 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 z M8.5,12 a3.5,3.5 0 1,0 7,0 a3.5,3.5 0 1,0 -7,0 z" />
+</vector>

@@ -182,7 +182,14 @@ class LibraryMenuController(private val host: LibraryMenuHost) {
                 )
             }
         )
-        return listOf(game, saves, management)
+        /* Vanilla base ROMs are managed in Settings, not the Library context menu,
+            so the management section (uninstall / delete-seed) is omitted entirely.
+            Start, achievements, pin, and saves export/import stay available. */
+        return if (entry.isVanilla) {
+            listOf(game, saves)
+        } else {
+            listOf(game, saves, management)
+        }
     }
 
     /**

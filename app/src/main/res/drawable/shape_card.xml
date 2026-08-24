@@ -2,5 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <solid android:color="@color/color_surface_container" />
-    <corners android:radius="@dimen/card_radius" />
+    <!-- Same radius as the focus border so the selection outline follows the
+         card silhouette exactly (Switch near-square tiles). -->
+    <corners android:radius="@dimen/switch_card_corner_radius" />
 </shape>

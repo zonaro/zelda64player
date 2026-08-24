@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Decorative ghost card silhouette for the "Todos os Jogos" grid. Rendered at
+     ~12% opacity below the last real row, purely as visual filler (NS Launcher
+     style). Not focusable or clickable. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/shape_card" />

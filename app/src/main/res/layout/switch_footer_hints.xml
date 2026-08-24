@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Switch footer hints bar: left side shows the connected-gamepad indicator,
+     right side shows the "(i) Sobre" and "+ Opções" hints. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:id="@+id/footer_left"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="start|center_vertical"
+        android:paddingStart="@dimen/switch_screen_margin">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_gamepad"
+            android:tint="@color/switch_text_secondary"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/footer_gamepad_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="@string/footer_gamepad"
+            android:textColor="@color/switch_text_secondary"
+            android:textSize="@dimen/switch_hint_text" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/footer_right"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="end|center_vertical"
+        android:paddingEnd="@dimen/switch_screen_margin">
+
+        <TextView
+            android:id="@+id/footer_about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="false"
+            android:text="@string/footer_about"
+            android:textColor="@color/switch_text_secondary"
+            android:textSize="@dimen/switch_hint_text" />
+
+        <TextView
+            android:id="@+id/footer_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="false"
+            android:text="@string/footer_options"
+            android:textColor="@color/switch_text_secondary"
+            android:textSize="@dimen/switch_hint_text" />
+    </LinearLayout>
+
+</merge>

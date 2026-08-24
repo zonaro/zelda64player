@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +24,8 @@ import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
 import br.com.redclaw.zelda64player.settings.SettingsViewModel
 import br.com.redclaw.zelda64player.store.CatalogFetcher
+import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
+import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import br.com.redclaw.zelda64player.utils.CorePrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,6 +39,9 @@ import java.util.Locale
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
     private lateinit var viewModel: SettingsViewModel
+
+    /** Shared Switch UI sound-effects manager (null-safe if not yet ready). */
+    private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
 
     private lateinit var baseRomAdapter: BaseRomAdapter
     private lateinit var catalogUrlAdapter: CatalogUrlAdapter
@@ -71,6 +75,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        SwitchImmersive.enterFullscreen(this)
 
         setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -87,15 +92,51 @@ class SettingsActivity : AppCompatActivity() {
         setupCoreSection()
         setupBackupSection()
         setupAboutSection()
+        wireSettingsSfx()
         observeImport()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) SwitchImmersive.enterFullscreen(this)
+    }
+
+    /**
+     * Wires the Switch UI sound effects to the primary Settings controls so the
+     * screen stays consistent with the other Switch-style surfaces (home row,
+     * dock, grid, side panel). Focus traversal plays the focus-move "toc" and
+     * activation plays the select blip. This is additive only — no control flow
+     * is changed.
+     */
+    private fun wireSettingsSfx() {
+        val focusViews = listOf(
+            binding.settingsImportButton,
+            binding.settingsBackupExport,
+            binding.settingsBackupImport,
+            binding.settingsCatalogAdd,
+            binding.settingsRandomizerSave,
+            binding.settingsRandomizerClear,
+            binding.settingsRaLogin,
+            binding.settingsRaLogout,
+            binding.settingsCoreButton,
+            binding.settingsAboutRepo,
+            binding.settingsAboutCatalog
+        )
+        for (view in focusViews) {
+            view.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                if (hasFocus) sfx?.focusMove()
+            }
+        }
     }
 
     private fun setupBackupSection() {
         binding.settingsBackupExport.setOnClickListener {
+            sfx?.select()
             val name = "zelda64_saves_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.zip"
             exportBackupLauncher.launch(name)
         }
         binding.settingsBackupImport.setOnClickListener {
+            sfx?.select()
             importBackupLauncher.launch(arrayOf("application/zip"))
         }
     }
@@ -160,15 +201,16 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun showBackupResult(message: String) {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.backup_title)
-            .setMessage(message)
-            .setPositiveButton(android.R.string.ok, null)
+        SwitchDialog(this)
+            .title(getString(R.string.backup_title))
+            .message(message)
+            .positiveButton(getString(android.R.string.ok))
             .show()
     }
 
     private fun setupImportSection() {
         binding.settingsImportButton.setOnClickListener {
+            sfx?.select()
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 // .z64 has no registered MIME type, so accept everything and let
@@ -218,10 +260,10 @@ class SettingsActivity : AppCompatActivity() {
             R.string.settings_import_summary,
             result.successes.size, result.duplicates.size, result.invalids.size
         )
-        AlertDialog.Builder(this)
-            .setTitle(R.string.settings_import_result_title)
-            .setMessage("$summary\n\n${lines.joinToString("\n")}")
-            .setPositiveButton(android.R.string.ok, null)
+        SwitchDialog(this)
+            .title(getString(R.string.settings_import_result_title))
+            .message("$summary\n\n${lines.joinToString("\n")}")
+            .positiveButton(getString(android.R.string.ok))
             .show()
     }
 
@@ -242,19 +284,19 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun confirmDeleteBaseRom(rom: BaseRom) {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.settings_baserom_delete_confirm_title)
-            .setMessage(
+        SwitchDialog(this)
+            .title(getString(R.string.settings_baserom_delete_confirm_title))
+            .message(
                 getString(
                     R.string.settings_baserom_delete_confirm_message,
                     rom.displayName, rom.crc32
                 )
             )
-            .setPositiveButton(android.R.string.ok) { _, _ ->
+            .positiveButton(getString(android.R.string.ok)) {
                 viewModel.deleteBaseRom(rom.id)
                 refreshBaseRomList()
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            .negativeButton(getString(android.R.string.cancel))
             .show()
     }
 
@@ -267,6 +309,7 @@ class SettingsActivity : AppCompatActivity() {
         refreshCatalogList()
 
         binding.settingsCatalogAdd.setOnClickListener {
+            sfx?.select()
             val url = binding.settingsCatalogInput.text.toString()
             binding.settingsCatalogError.visibility = View.GONE
             if (viewModel.addCatalogUrl(url)) {
@@ -287,14 +330,14 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun confirmDeleteCatalogUrl(url: String) {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.settings_catalog_remove_confirm_title)
-            .setMessage(url)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
+        SwitchDialog(this)
+            .title(getString(R.string.settings_catalog_remove_confirm_title))
+            .message(url)
+            .positiveButton(getString(android.R.string.ok)) {
                 viewModel.removeCatalogUrl(url)
                 refreshCatalogList()
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            .negativeButton(getString(android.R.string.cancel))
             .show()
     }
 
@@ -303,6 +346,7 @@ class SettingsActivity : AppCompatActivity() {
         updateRandomizerStatus(keyStore)
 
         binding.settingsRandomizerSave.setOnClickListener {
+            sfx?.select()
             val key = binding.settingsRandomizerInput.text.toString().trim()
             if (key.isEmpty()) {
                 binding.settingsRandomizerStatus.setText(R.string.settings_randomizer_empty)
@@ -315,6 +359,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.settingsRandomizerClear.setOnClickListener {
+            sfx?.select()
             keyStore.clear()
             binding.settingsRandomizerInput.text.clear()
             updateRandomizerStatus(keyStore)
@@ -347,6 +392,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.settingsRaLogin.setOnClickListener {
+            sfx?.select()
             val username = binding.settingsRaUsername.text.toString().trim()
             val password = binding.settingsRaPassword.text.toString()
             if (username.isEmpty() || password.isEmpty()) {
@@ -363,17 +409,24 @@ class SettingsActivity : AppCompatActivity() {
                 result.fold(
                     onSuccess = {
                         binding.settingsRaUsername.text.clear()
-                        binding.settingsRaStatus.setText(R.string.settings_ra_status_logged_in)
+                        updateRaStatus(credentials)
                     },
-                    onFailure = {
-                        binding.settingsRaStatus.setText(R.string.settings_ra_status_failed)
+                    onFailure = { e ->
+                        // Surface the sanitized server detail; do NOT call
+                        // updateRaStatus here or it would overwrite the error.
+                        val detail = e.message?.takeIf { it.isNotBlank() }
+                        binding.settingsRaStatus.text = if (detail != null) {
+                            getString(R.string.settings_ra_status_failed_detail, detail)
+                        } else {
+                            getString(R.string.settings_ra_status_failed)
+                        }
                     }
                 )
-                updateRaStatus(credentials)
             }
         }
 
         binding.settingsRaLogout.setOnClickListener {
+            sfx?.select()
             authService.logout()
             updateRaStatus(credentials)
         }
@@ -396,7 +449,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupCoreSection() {
         updateCoreLabel()
-        binding.settingsCoreButton.setOnClickListener { showCoreDialog() }
+        binding.settingsCoreButton.setOnClickListener { sfx?.select(); showCoreDialog() }
     }
 
     private fun updateCoreLabel() {
@@ -407,14 +460,13 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun showCoreDialog() {
         val currentIndex = CorePrefs.getSelectedCoreIndex(this)
-        AlertDialog.Builder(this)
-            .setTitle(R.string.settings_core_change)
-            .setSingleChoiceItems(CorePrefs.options, currentIndex) { dialog, which ->
+        SwitchDialog(this)
+            .title(getString(R.string.settings_core_change))
+            .singleChoice(CorePrefs.options.toList(), currentIndex) { which ->
                 CorePrefs.setSelectedCoreIndex(this, which)
                 updateCoreLabel()
-                dialog.dismiss()
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            .negativeButton(getString(android.R.string.cancel))
             .show()
     }
 
@@ -425,9 +477,11 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsAboutVersion.text =
             getString(R.string.settings_about_version, versionName)
         binding.settingsAboutRepo.setOnClickListener {
+            sfx?.select()
             openLink("https://github.com/zonaro/zelda64player")
         }
         binding.settingsAboutCatalog.setOnClickListener {
+            sfx?.select()
             openLink(CatalogFetcher.DEFAULT_CATALOG_URL)
         }
     }
@@ -468,7 +522,10 @@ class SettingsActivity : AppCompatActivity() {
                 formatSize(rom.sizeBytes),
                 rom.sourceName ?: rom.displayName
             )
-            holder.binding.itemBaseromDelete.setOnClickListener { onDelete(rom) }
+            holder.binding.itemBaseromDelete.setOnClickListener {
+                runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()?.select()
+                onDelete(rom)
+            }
         }
 
         override fun getItemCount() = items.size
@@ -503,7 +560,10 @@ class SettingsActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val url = items[position]
             holder.binding.itemCatalogUrl.text = url
-            holder.binding.itemCatalogDelete.setOnClickListener { onDelete(url) }
+            holder.binding.itemCatalogDelete.setOnClickListener {
+                runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()?.select()
+                onDelete(url)
+            }
         }
 
         override fun getItemCount() = items.size

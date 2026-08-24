@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Switch home row: a focused-game label above a horizontal RecyclerView of
+     square game cards followed by the circular "Todos os Jogos" card. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/home_row_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:minHeight="28dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:paddingStart="@dimen/switch_screen_margin"
+        android:paddingEnd="@dimen/switch_screen_margin"
+        android:textColor="@color/switch_accent"
+        android:textSize="@dimen/switch_label_focused_text"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/home_row_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/switch_card_size_home"
+        android:clipToPadding="false"
+        android:paddingStart="@dimen/switch_screen_margin"
+        android:paddingEnd="@dimen/switch_screen_margin"
+        android:scrollbars="none" />
+
+</merge>

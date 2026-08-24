@@ -9,5 +9,4 @@
     android:paddingEnd="16dp"
     android:paddingBottom="8dp"
     android:textColor="?attr/colorPrimary"
-    android:textSize="14sp"
-    android:textStyle="bold" />
+    android:textAppearance="?attr/textAppearanceLabelLargeEmphasized" />

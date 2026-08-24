@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/switch_bg">
+
+    <!-- Header: back button + "Todos os Jogos" icon (cyan) + title. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/switch_screen_margin">
+
+        <ImageButton
+            android:id="@+id/grid_back"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:background="@drawable/bg_icon_button"
+            android:src="@drawable/ic_close"
+            android:tint="@color/switch_text_primary"
+            android:contentDescription="@string/about_dialog_close" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_all_games"
+            android:tint="@color/switch_accent"
+            android:contentDescription="@string/all_games" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/all_games"
+            android:textColor="@color/switch_text_primary"
+            android:textSize="@dimen/switch_title_text"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Thin separator spanning the full width, below the header. -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/switch_text_secondary" />
+
+    <!-- Search / filter bar + sort button (Switch-style flat field). -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginStart="@dimen/switch_screen_margin"
+        android:layout_marginEnd="@dimen/switch_screen_margin"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+        <EditText
+            android:id="@+id/grid_search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_search_field"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:hint="@string/grid_search_hint"
+            android:textColor="@color/switch_text_primary"
+            android:textColorHint="@color/switch_text_secondary"
+            android:textSize="@dimen/switch_row_text"
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:importantForAutofill="no"
+            android:singleLine="true"
+            android:drawableStart="@android:drawable/ic_menu_search"
+            android:drawableTint="@color/switch_text_secondary" />
+
+        <ImageButton
+            android:id="@+id/grid_sort"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/bg_icon_button"
+            android:src="@drawable/ic_tune"
+            android:tint="@color/switch_accent"
+            android:contentDescription="@string/grid_sort_button" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/grid_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="@dimen/switch_grid_padding"
+            android:scrollbars="vertical" />
+
+        <LinearLayout
+            android:id="@+id/grid_empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/library_empty"
+                android:textColor="@color/switch_text_secondary"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/grid_no_results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="24dp"
+            android:visibility="gone"
+            android:text="@string/grid_no_results"
+            android:textColor="@color/switch_text_secondary"
+            android:textSize="16sp" />
+    </FrameLayout>
+</LinearLayout>

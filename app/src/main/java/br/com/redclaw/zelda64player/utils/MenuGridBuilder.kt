@@ -29,6 +29,11 @@ import br.com.redclaw.zelda64player.gamepad.GamePad
  * @param tintIcon when true (default) the icon is tinted to the menu's
  *   on-surface-variant color; set false for self-colored drawables (e.g. the
  *   Auto-Ocarina icon) that must keep their own palette.
+ * @param isEnabled returns whether the cell is currently interactive. Disabled
+ *   cells are greyed (alpha 0.38f) and excluded from click / focus navigation,
+ *   so a D-pad naturally skips them. Defaults to always enabled; the in-game
+ *   menu uses this to grey out RetroAchievements items until the RA session
+ *   resolves for the running game.
  * @param action invoked when the cell is tapped or activated by key.
  */
 data class MenuActionItem(
@@ -40,6 +45,7 @@ data class MenuActionItem(
     val isActive: () -> Boolean = { false },
     @StringRes val badgeRes: Int? = null,
     val tintIcon: Boolean = true,
+    val isEnabled: () -> Boolean = { true },
     val action: () -> Unit
 )
 
@@ -56,6 +62,16 @@ data class MenuToggleEntry(
     val icon: ImageView
 )
 
+/** Live references to a non-toggle cell, used to refresh its enabled / greyed
+ *  state (e.g. RetroAchievements items whose availability resolves after the
+ *  menu is first built). Toggles are excluded to avoid double management. */
+data class MenuEnabledEntry(
+    val item: MenuActionItem,
+    val cell: View,
+    val icon: ImageView,
+    val label: TextView
+)
+
 /**
  * Result of [MenuGridBuilder.build]: the dialog content view plus the live
  * references needed to refresh toggle state and badge visibility.
@@ -63,7 +79,8 @@ data class MenuToggleEntry(
 data class BuiltMenu(
     val view: View,
     val toggleEntries: List<MenuToggleEntry>,
-    val badgeViews: List<TextView>
+    val badgeViews: List<TextView>,
+    val enabledEntries: List<MenuEnabledEntry>
 )
 
 /**
@@ -113,6 +130,7 @@ object MenuGridBuilder {
 
         val toggleEntries = mutableListOf<MenuToggleEntry>()
         val badgeViews = mutableListOf<TextView>()
+        val enabledEntries = mutableListOf<MenuEnabledEntry>()
 
         for (section in sections) {
             val header = TextView(context).apply {
@@ -149,13 +167,18 @@ object MenuGridBuilder {
                             ContextCompat.getColor(context, R.color.color_on_surface_variant)
                         )
                     }
-                    cell.findViewById<TextView>(R.id.menu_item_label).setText(item.labelRes)
+                    val label = cell.findViewById<TextView>(R.id.menu_item_label)
+                    label.setText(item.labelRes)
                     /* Tag the cell with its item id so a physical A/DPAD_CENTER/ENTER
                        press can activate the focused cell via the same action path. */
                     cell.tag = item.id
                     cell.setOnClickListener { onItemActivated(item) }
                     if (item.isToggle) {
                         toggleEntries.add(MenuToggleEntry(item, cell, icon))
+                    } else {
+                        /* Non-toggle cells are tracked so their enabled / greyed
+                           state can be refreshed live (e.g. RetroAchievements). */
+                        enabledEntries.add(MenuEnabledEntry(item, cell, icon, label))
                     }
                     item.badgeRes?.let { badgeRes ->
                         val badge = cell.findViewById<TextView>(R.id.menu_item_badge)
@@ -184,6 +207,6 @@ object MenuGridBuilder {
                 index = end
             }
         }
-        return BuiltMenu(view, toggleEntries, badgeViews)
+        return BuiltMenu(view, toggleEntries, badgeViews, enabledEntries)
     }
 }

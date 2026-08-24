@@ -14,6 +14,7 @@ Owns all **documentation**, **translation (i18n)**, and **code documentation (KD
   - Usage: Import ROMs → Browse Store → Download hack → Play
   - **RetroAchievements integration**: login, achievements screen, in-game unlocks, leaderboards (in-game menu only)
   - **OoT Randomizer Generator**: API key, schema-driven settings, plandomizer, seed library
+  - **Nintendo Switch UI**: custom native implementation, no M3 Expressive
   - Supported hacks (from catalog.json)
   - Supported cores (mupen64plus_next_gles3, parallel_n64)
   - Building from source (Gradle, core fetch at build time, rcheevos native build)
@@ -33,9 +34,19 @@ Owns all **documentation**, **translation (i18n)**, and **code documentation (KD
   4. Special terms: "Base ROM" → "ROM Base" (pt-BR) / "Base ROM" (en) / "ROM Base" (es); "Patch" → "Patch" (all); "Hack" → "Hack" (pt-BR/en) / "Hack" (es); "Achievement" → "Conquista" (pt-BR) / "Achievement" (en) / "Logro" (es); "Leaderboard" → "Ranking" (pt-BR) / "Leaderboard" (en) / "Clasificación" (es); "Hardcore" → "Hardcore" (all); "Seed" → "Seed" (all)
 - **RetroAchievements exception**: Achievement titles/descriptions come from RA API in English — **do NOT translate** (community canonical terms). Only UI chrome (tabs, buttons, errors, placeholders) translated.
 - **Randomizer exception**: ~200 setting labels/tooltips in `assets/randomizer/oot_settings_schema.json` remain in English (canonical OoTR terminology). Only UI chrome translated.
+- **Switch UI strings scope** (NEW):
+  - Dock labels: "Loja", "Randomizador", "RetroAchievements", "Sobre/Licenças"
+  - Side panel items: "Tema", "Perfil RA", "Configurações Completas", "Efeitos Sonoros"
+  - Grid header: "Todos os Jogos"
+  - Search/filter hints: "Buscar hacks...", "Filtrar por tag..."
+  - Theme toggle: "Tema escuro" / "Tema claro"
+  - SFX toggle: "Efeitos sonoros de navegação"
+  - Footer hints: "(i) Sobre", "+ Opções"
+  - Splash: no strings (logo is artwork)
+  - In-game menu chrome: "Pausar", "Conquistas", "Rankings", "Auto-Ocarina", "Configurações de Vídeo", "Controles"
 
 ### 3. Code Documentation (KDoc)
-- **Target**: All public APIs in `patcher/`, `data/`, `store/`, `settings/`, `retroview/`, `randomizer/`, `retroachievements/`
+- **Target**: All public APIs in `patcher/`, `data/`, `store/`, `settings/`, `retroview/`, `randomizer/`, `retroachievements/`, `ui/switchui/`
 - **Standard**:
   ```kotlin
   /**

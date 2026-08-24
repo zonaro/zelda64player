@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Circular "Todos os Jogos" (All Games) card for the end of the Switch home
+     row. Charcoal fill, centered cyan grid glyph, round cyan focus border. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <View
+        android:id="@+id/circle_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_all_games_circle" />
+
+    <!-- Round glow overlay: fades in while focused/pressed so the circle itself
+         brightens (no square ripple/elevation artifacts). -->
+    <View
+        android:id="@+id/circle_glow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_circle_glow"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_all_games"
+        android:tint="@color/switch_accent"
+        android:contentDescription="@string/all_games" />
+
+    <View
+        android:id="@+id/border"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/switch_focus_border_round"
+        android:visibility="gone" />
+
+</merge>

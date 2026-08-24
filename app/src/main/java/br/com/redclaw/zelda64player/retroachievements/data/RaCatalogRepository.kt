@@ -98,7 +98,8 @@ class RaCatalogRepository(private val http: RaHttpClient) {
         }.getOrDefault(emptySet())
     }
 
-    private fun parseGameData(body: String): RaGameData? = runCatching {
+    /** Visible for unit tests; not part of the public API. */
+    internal fun parseGameData(body: String): RaGameData? = runCatching {
         if (body == "null") return null
         val root = JSONObject(body)
         val achievements = mutableListOf<RaAchievementDef>()

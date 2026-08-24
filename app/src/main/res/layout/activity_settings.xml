@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Settings screen restyled to the Nintendo Switch UI (Phase D): flat panels
+     (no M3 expressive cards/pills), section headers in secondary uppercase,
+     full-width rows, token-tinted switches and buttons. All view IDs from the
+     previous layout are preserved so SettingsActivity.kt is unchanged in wiring. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/color_background">
+    android:background="@color/switch_bg"
+    android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/settings_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/color_surface"
-        android:elevation="4dp" />
+        android:background="@color/switch_panel"
+        app:navigationIconTint="@color/switch_text_primary"
+        app:titleTextColor="@color/switch_text_primary" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -24,509 +29,458 @@
             android:padding="16dp">
 
             <!-- Section A: import base ROM -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/section_spacing"
-                app:cardBackgroundColor="@color/color_surface_container"
-                app:cardCornerRadius="@dimen/card_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:contentPadding="16dp">
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <LinearLayout
+                <TextView
+                    style="@style/SwitchSectionHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:text="@string/settings_import_title" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_import_title"
-                        android:textColor="@color/color_on_surface"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/settings_import_description"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/settings_import_description"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
+                <Button
+                    android:id="@+id/settings_import_button"
+                    style="@style/SwitchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/settings_import_button" />
 
-                    <Button
-                        android:id="@+id/settings_import_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/settings_import_button" />
-
-                    <ProgressBar
-                        android:id="@+id/settings_import_progress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:indeterminate="true"
-                        android:visibility="gone" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <ProgressBar
+                    android:id="@+id/settings_import_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:indeterminate="true"
+                    android:visibility="gone" />
+            </LinearLayout>
 
             <!-- Section B: imported base ROMs -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/section_spacing"
-                app:cardBackgroundColor="@color/color_surface_container"
-                app:cardCornerRadius="@dimen/card_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:contentPadding="16dp">
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <LinearLayout
+                <TextView
+                    style="@style/SwitchSectionHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:text="@string/settings_baseroms_title" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_baseroms_title"
-                        android:textColor="@color/color_on_surface"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/settings_baserom_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:nestedScrollingEnabled="false" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/settings_baserom_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:nestedScrollingEnabled="false" />
-
-                    <TextView
-                        android:id="@+id/settings_baserom_empty"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/settings_baseroms_empty"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:id="@+id/settings_baserom_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/settings_baseroms_empty"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
 
             <!-- Section C: custom catalog URLs -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/section_spacing"
-                app:cardBackgroundColor="@color/color_surface_container"
-                app:cardCornerRadius="@dimen/card_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:contentPadding="16dp">
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SwitchSectionHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_catalog_title" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/settings_catalog_description"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_catalog_title"
-                        android:textColor="@color/color_on_surface"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/settings_catalog_description"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:id="@+id/settings_catalog_input"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:background="@drawable/shape_pill"
-                            android:hint="@string/settings_catalog_hint"
-                            android:inputType="textUri"
-                            android:paddingStart="@dimen/input_horizontal_padding"
-                            android:paddingTop="@dimen/input_vertical_padding"
-                            android:paddingEnd="@dimen/input_horizontal_padding"
-                            android:paddingBottom="@dimen/input_vertical_padding"
-                            android:textColor="@color/color_on_surface"
-                            android:textColorHint="@color/color_on_surface_variant" />
-
-                        <Button
-                            android:id="@+id/settings_catalog_add"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/settings_catalog_add" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/settings_catalog_error"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/color_error"
-                        android:textSize="12sp"
-                        android:visibility="gone" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/settings_catalog_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:nestedScrollingEnabled="false" />
-
-                    <TextView
-                        android:id="@+id/settings_catalog_empty"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/settings_catalog_empty"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Section C2: randomizer API key -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/section_spacing"
-                app:cardBackgroundColor="@color/color_surface_container"
-                app:cardCornerRadius="@dimen/card_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:contentPadding="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_randomizer_title"
-                        android:textColor="@color/color_on_surface"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/settings_randomizer_description"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:id="@+id/settings_randomizer_input"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:background="@drawable/shape_pill"
-                            android:hint="@string/settings_randomizer_hint"
-                            android:inputType="textPassword"
-                            android:paddingStart="@dimen/input_horizontal_padding"
-                            android:paddingTop="@dimen/input_vertical_padding"
-                            android:paddingEnd="@dimen/input_horizontal_padding"
-                            android:paddingBottom="@dimen/input_vertical_padding"
-                            android:textColor="@color/color_on_surface"
-                            android:textColorHint="@color/color_on_surface_variant" />
-
-                        <Button
-                            android:id="@+id/settings_randomizer_save"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/settings_randomizer_save" />
-                    </LinearLayout>
-
-                    <Button
-                        android:id="@+id/settings_randomizer_clear"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/settings_randomizer_clear" />
-
-                    <TextView
-                        android:id="@+id/settings_randomizer_status"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Section C3: RetroAchievements -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/section_spacing"
-                app:cardBackgroundColor="@color/color_surface_container"
-                app:cardCornerRadius="@dimen/card_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:contentPadding="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_ra_title"
-                        android:textColor="@color/color_on_surface"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/settings_ra_description"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/settings_ra_enabled"
-                            android:textColor="@color/color_on_surface"
-                            android:textSize="15sp" />
-
-                        <Switch
-                            android:id="@+id/settings_ra_enabled_switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
 
                     <EditText
-                        android:id="@+id/settings_ra_username"
-                        android:layout_width="match_parent"
+                        android:id="@+id/settings_catalog_input"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/shape_pill"
-                        android:hint="@string/settings_ra_username_hint"
-                        android:inputType="text"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_field"
+                        android:hint="@string/settings_catalog_hint"
+                        android:inputType="textUri"
                         android:paddingStart="@dimen/input_horizontal_padding"
                         android:paddingTop="@dimen/input_vertical_padding"
                         android:paddingEnd="@dimen/input_horizontal_padding"
                         android:paddingBottom="@dimen/input_vertical_padding"
-                        android:textColor="@color/color_on_surface"
-                        android:textColorHint="@color/color_on_surface_variant" />
+                        android:textColor="@color/switch_text_primary"
+                        android:textColorHint="@color/switch_text_secondary" />
+
+                    <Button
+                        android:id="@+id/settings_catalog_add"
+                        style="@style/SwitchButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_catalog_add" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/settings_catalog_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_error"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/settings_catalog_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <TextView
+                    android:id="@+id/settings_catalog_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/settings_catalog_empty"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Section C2: randomizer API key -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/section_spacing"
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SwitchSectionHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_randomizer_title" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/settings_randomizer_description"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
 
                     <EditText
-                        android:id="@+id/settings_ra_password"
-                        android:layout_width="match_parent"
+                        android:id="@+id/settings_randomizer_input"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/shape_pill"
-                        android:hint="@string/settings_ra_password_hint"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_field"
+                        android:hint="@string/settings_randomizer_hint"
                         android:inputType="textPassword"
                         android:paddingStart="@dimen/input_horizontal_padding"
                         android:paddingTop="@dimen/input_vertical_padding"
                         android:paddingEnd="@dimen/input_horizontal_padding"
                         android:paddingBottom="@dimen/input_vertical_padding"
-                        android:textColor="@color/color_on_surface"
-                        android:textColorHint="@color/color_on_surface_variant" />
+                        android:textColor="@color/switch_text_primary"
+                        android:textColorHint="@color/switch_text_secondary" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <Button
+                        android:id="@+id/settings_randomizer_save"
+                        style="@style/SwitchButton"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
+                        android:text="@string/settings_randomizer_save" />
+                </LinearLayout>
 
-                        <Button
-                            android:id="@+id/settings_ra_login"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/settings_ra_login" />
+                <Button
+                    android:id="@+id/settings_randomizer_clear"
+                    style="@style/SwitchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/settings_randomizer_clear" />
 
-                        <Button
-                            android:id="@+id/settings_ra_logout"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:layout_weight="1"
-                            android:text="@string/settings_ra_logout" />
-                    </LinearLayout>
+                <TextView
+                    android:id="@+id/settings_randomizer_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Section C3: RetroAchievements -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/section_spacing"
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SwitchSectionHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_ra_title" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/settings_ra_description"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/settings_ra_status"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
+                        android:layout_weight="1"
+                        android:text="@string/settings_ra_enabled"
+                        android:textColor="@color/switch_text_primary"
+                        android:textSize="15sp" />
+
+                    <Switch
+                        android:id="@+id/settings_ra_enabled_switch"
+                        style="@style/SwitchSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+
+                <EditText
+                    android:id="@+id/settings_ra_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/shape_field"
+                    android:hint="@string/settings_ra_username_hint"
+                    android:inputType="text"
+                    android:paddingStart="@dimen/input_horizontal_padding"
+                    android:paddingTop="@dimen/input_vertical_padding"
+                    android:paddingEnd="@dimen/input_horizontal_padding"
+                    android:paddingBottom="@dimen/input_vertical_padding"
+                    android:textColor="@color/switch_text_primary"
+                    android:textColorHint="@color/switch_text_secondary" />
+
+                <EditText
+                    android:id="@+id/settings_ra_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/shape_field"
+                    android:hint="@string/settings_ra_password_hint"
+                    android:inputType="textPassword"
+                    android:paddingStart="@dimen/input_horizontal_padding"
+                    android:paddingTop="@dimen/input_vertical_padding"
+                    android:paddingEnd="@dimen/input_horizontal_padding"
+                    android:paddingBottom="@dimen/input_vertical_padding"
+                    android:textColor="@color/switch_text_primary"
+                    android:textColorHint="@color/switch_text_secondary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/settings_ra_login"
+                        style="@style/SwitchButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/settings_ra_login" />
+
+                    <Button
+                        android:id="@+id/settings_ra_logout"
+                        style="@style/SwitchButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="@string/settings_ra_logout" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/settings_ra_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
 
             <!-- Section D: emulator core -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/section_spacing"
-                app:cardBackgroundColor="@color/color_surface_container"
-                app:cardCornerRadius="@dimen/card_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:contentPadding="16dp">
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <LinearLayout
+                <TextView
+                    style="@style/SwitchSectionHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:text="@string/settings_core_title" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_core_title"
-                        android:textColor="@color/color_on_surface"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/settings_core_current"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
 
-                    <TextView
-                        android:id="@+id/settings_core_current"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
-
-                    <Button
-                        android:id="@+id/settings_core_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/settings_core_change" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <Button
+                    android:id="@+id/settings_core_button"
+                    style="@style/SwitchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/settings_core_change" />
+            </LinearLayout>
 
             <!-- Section Backups -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/section_spacing"
-                app:cardBackgroundColor="@color/color_surface_container"
-                app:cardCornerRadius="@dimen/card_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:contentPadding="16dp">
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <LinearLayout
+                <TextView
+                    style="@style/SwitchSectionHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:text="@string/backup_title" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/backup_title"
-                        android:textColor="@color/color_on_surface"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/backup_description"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/backup_description"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
+                <Button
+                    android:id="@+id/settings_backup_export"
+                    style="@style/SwitchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/backup_export" />
 
-                    <Button
-                        android:id="@+id/settings_backup_export"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/backup_export" />
+                <Button
+                    android:id="@+id/settings_backup_import"
+                    style="@style/SwitchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/backup_import" />
 
-                    <Button
-                        android:id="@+id/settings_backup_import"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/backup_import" />
-
-                    <ProgressBar
-                        android:id="@+id/settings_backup_progress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:indeterminate="true"
-                        android:visibility="gone" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <ProgressBar
+                    android:id="@+id/settings_backup_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:indeterminate="true"
+                    android:visibility="gone" />
+            </LinearLayout>
 
             <!-- Section Sobre -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/color_surface_container"
-                app:cardCornerRadius="@dimen/card_radius"
-                app:cardElevation="@dimen/card_elevation"
-                app:contentPadding="16dp">
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <LinearLayout
+                <TextView
+                    style="@style/SwitchSectionHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:text="@string/settings_about_title" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_about_title"
-                        android:textColor="@color/color_on_surface"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/settings_about_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
 
-                    <TextView
-                        android:id="@+id/settings_about_version"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@color/color_on_surface_variant"
-                        android:textSize="13sp" />
+                <Button
+                    android:id="@+id/settings_about_repo"
+                    style="@style/SwitchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/settings_about_repo" />
 
-                    <Button
-                        android:id="@+id/settings_about_repo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/settings_about_repo" />
+                <Button
+                    android:id="@+id/settings_about_catalog"
+                    style="@style/SwitchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/settings_about_catalog" />
 
-                    <Button
-                        android:id="@+id/settings_about_catalog"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="@string/settings_about_catalog" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:id="@+id/settings_about_licenses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/settings_about_licenses"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

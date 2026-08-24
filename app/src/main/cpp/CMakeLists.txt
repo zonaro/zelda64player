@@ -61,6 +61,11 @@ target_include_directories(ra_jni PRIVATE
     ${RCHEEVOS_DIR}/src
 )
 
+# Enables the rhash-backed identify/load-game paths in rc_client.c and the
+# matching block in ra_jni.c (nativeIdentifyAndLoadGame). Without this the
+# client can never load a game and achievements stay unavailable in-session.
+target_compile_definitions(ra_jni PRIVATE RC_CLIENT_SUPPORTS_HASH)
+
 target_compile_options(ra_jni PRIVATE -Wall)
 
 # Android log for later phases (rc_client logging callback).

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- Soft white glow shown inside circular buttons/cards while focused or
+         pressed (replaces the default square elevation/ripple feedback). -->
+    <solid android:color="#24FFFFFF" />
+</shape>

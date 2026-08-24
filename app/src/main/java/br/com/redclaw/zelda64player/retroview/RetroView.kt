@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.repositories.GameRomResolver
 import br.com.redclaw.zelda64player.repositories.Storage
 import com.swordfish.libretrodroid.GLRetroView
 import com.swordfish.libretrodroid.GLRetroViewData
@@ -72,15 +73,15 @@ class RetroView(
     private val retroViewData = GLRetroViewData(context).apply {
         coreFilePath = prepareCoreFile(coreLibName)
 
-        /* Load the patched ROM from the durable store (Storage.rom). It is produced at
-            install time by the DownloadManager; if the hack was never installed (or the
-            install failed) we launch the core without a ROM instead of throwing -- the
+        /* Resolve the playable ROM via the single resolver (vanilla base ROMs map to
+            the imported file; store hacks / seeds map to the patched ROM at Storage.rom).
+            If no ROM exists we launch the core without a ROM instead of throwing -- the
             user just sees an empty emulator. */
-        val romFile = storage.rom(hackId)
-        if (romFile.exists()) {
+        val romFile = GameRomResolver.resolveRomFile(context, hackId)
+        if (romFile != null && romFile.exists()) {
             gameFilePath = romFile.absolutePath
         } else {
-            Log.w("RetroView", "Patched ROM cache not found for hack: $hackId")
+            Log.w("RetroView", "Playable ROM not found for hack: $hackId")
         }
 
         shader = ShaderConfig.Sharp

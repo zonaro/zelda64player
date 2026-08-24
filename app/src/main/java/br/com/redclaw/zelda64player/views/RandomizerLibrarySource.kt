@@ -1,5 +1,6 @@
 package br.com.redclaw.zelda64player.views
 
+import br.com.redclaw.zelda64player.ocarina.OcarinaGame
 import br.com.redclaw.zelda64player.randomizer.repository.RandomizedSeedRepository
 
 /**
@@ -9,8 +10,8 @@ import br.com.redclaw.zelda64player.randomizer.repository.RandomizedSeedReposito
  * through a [CompositeLibrarySource] without touching the UI.
  *
  * Each seed tile is flagged [HackLibraryEntry.isRandomizer] (so the context menu
- * offers delete-seed instead of uninstall) and carries a short [HackLibraryEntry
- * .badgeText] badge to visually distinguish it from store hacks.
+ * offers delete-seed instead of uninstall) and carries a [HackLibraryEntry.badge]
+ * [BadgeType.RANDOMIZER] icon to visually distinguish it from store hacks.
  */
 class RandomizerLibrarySource(
     private val repository: RandomizedSeedRepository
@@ -21,13 +22,11 @@ class RandomizerLibrarySource(
                 id = entry.id,
                 title = entry.name,
                 coverUrl = null,
-                badgeText = BADGE,
-                isRandomizer = true
+                badge = BadgeType.RANDOMIZER,
+                isRandomizer = true,
+                // Seeds are always OoT: AGENTS.md Rule 17 only accepts OoT 1.0
+                // (CZLE/CZLJ) as the randomizer base ROM, so every seed is OoT.
+                family = OcarinaGame.OOT
             )
         }
-
-    companion object {
-        /** Short badge shown on randomizer seed tiles. */
-        const val BADGE = "R"
-    }
 }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Right slide-in quick options panel (NS Launcher "Options" style).
+     The host adds this overlay to its content view; the panel is pinned to the
+     end (right) edge, full height, sharp edges, with a scrim over the content
+     to the left. Width is set programmatically (~50% screen, min 320dp).
+     Root is <merge> so the children attach directly to the OverlayFrame. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Scrim over the content to the left; tapping it closes the panel. -->
+    <View
+        android:id="@+id/panel_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/switch_scrim"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <!-- The panel itself, pinned to the end edge. -->
+    <LinearLayout
+        android:id="@+id/panel_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:background="@color/switch_panel"
+        android:orientation="vertical">
+
+        <!-- Header: teal badge + icon + bold title + thin separator below. -->
+        <LinearLayout
+            android:id="@+id/panel_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <FrameLayout
+                android:id="@+id/panel_badge"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_badge_teal">
+
+                <ImageView
+                    android:id="@+id/panel_badge_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_tune"
+                    android:tint="@android:color/white" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/panel_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/switch_text_primary"
+                android:textSize="@dimen/switch_title_text"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:alpha="0.4"
+            android:background="@color/switch_text_secondary" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/panel_rows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
+    </LinearLayout>
+</merge>

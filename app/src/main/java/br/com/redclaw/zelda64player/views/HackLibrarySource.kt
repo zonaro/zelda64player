@@ -1,16 +1,36 @@
 package br.com.redclaw.zelda64player.views
 
 import br.com.redclaw.zelda64player.data.local.PatchRepository
+import br.com.redclaw.zelda64player.ocarina.OcarinaGame
+
+/** Visual category of a library tile, rendered as an icon badge. */
+enum class BadgeType {
+    /** User-imported vanilla base ROM (managed in Settings). */
+    VANILLA,
+    /** Generated OoTRandomizer seed. */
+    RANDOMIZER,
+    /** Store hack or locally-placed patch. */
+    HACK
+}
 
 /** A single hack shown in the library grid. */
 data class HackLibraryEntry(
     val id: String,
     val title: String,
     val coverUrl: String? = null,
-    /** Short badge text drawn over the tile (e.g. "R" for randomizer seeds). */
-    val badgeText: String? = null,
+    /** Icon badge drawn over the tile, distinguishing tile categories. Null hides the badge. */
+    val badge: BadgeType? = null,
+    /**
+     * Game family driving the badge's chip background and icon tint. Null means
+     * the family is unknown, in which case the adapter falls back to a neutral
+     * chip (color_primary background / white icon). OoT -> yellow bg / black
+     * icon, MM -> purple bg / white icon.
+     */
+    val family: OcarinaGame? = null,
     /** True when this tile is a generated randomizer seed (not a store hack). */
-    val isRandomizer: Boolean = false
+    val isRandomizer: Boolean = false,
+    /** True when this tile is a user-imported vanilla base ROM (managed in Settings). */
+    val isVanilla: Boolean = false
 )
 
 /**
@@ -28,7 +48,9 @@ interface HackLibrarySource {
  */
 class LocalPatchesSource(private val patchRepository: PatchRepository) : HackLibrarySource {
     override fun available(): List<HackLibraryEntry> =
-        patchRepository.listHackIds().map { HackLibraryEntry(it, prettify(it)) }
+        patchRepository.listHackIds().map {
+            HackLibraryEntry(it, prettify(it), badge = BadgeType.HACK)
+        }
 
     companion object {
         /** Turn a slug like `ocarina_of_time_dx` into `Ocarina Of Time Dx`. */

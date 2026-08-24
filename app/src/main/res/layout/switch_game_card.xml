@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Square game card for the Switch home row. Cover fills the card; a small
+     family/type badge sits top-start; a 10% black dim overlay is shown when the
+     card is NOT focused; the cyan focus border is toggled by SwitchGameCard. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:id="@+id/card_cover_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_card"
+        android:clipToOutline="true">
+
+        <ImageView
+            android:id="@+id/card_cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/cover_content_description" />
+
+        <!-- Dim overlay: visible when unfocused, hidden on focus (driven in code). -->
+        <View
+            android:id="@+id/card_dim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/switch_card_dim" />
+
+        <!-- Family/type badge (top-start). Hidden when the entry has no badge. -->
+        <ImageView
+            android:id="@+id/card_badge"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="top|start"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_badge"
+            android:padding="5dp"
+            android:scaleType="centerInside"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Cyan focus border, drawn above the cover, shown only while focused. -->
+    <View
+        android:id="@+id/card_focus_border"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/switch_focus_border"
+        android:visibility="gone" />
+
+</merge>

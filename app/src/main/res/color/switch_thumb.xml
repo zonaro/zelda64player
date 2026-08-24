@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Thumb tint for the flat Switch-style toggle. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:color="@color/switch_accent" />
+    <item android:color="@color/switch_text_primary" />
+</selector>

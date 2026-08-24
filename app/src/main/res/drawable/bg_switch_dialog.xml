@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Centered Switch dialog surface: panel fill with a 12-16dp corner radius. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/switch_dialog_bg" />
+    <corners android:radius="@dimen/switch_dialog_corner_radius" />
+</shape>

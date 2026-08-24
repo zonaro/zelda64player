@@ -23,12 +23,29 @@ object OcarinaSongCatalog {
 
     /**
      * Detect the Ocarina game from a parsed [RomHeader].
-     * "CZL*" prefix -> OoT family; "NZL*"/"NSM*" prefix -> MM family.
-     * Returns null for any other (unsupported) base ROM.
+     *
+     * Canonical game codes are authoritative and checked first, in order:
+     * - "CZL*" prefix -> OoT family (e.g. CZLE, CZLJ)
+     * - "NZL*"/"NSM*" prefix -> MM family (e.g. NZLE, NSME)
+     * - "NZS*" prefix -> MM family (tolerated real-world dump variant, e.g. NZSE)
+     *
+     * When none of the known prefixes match, detection falls back to a
+     * case-insensitive scan of the ROM [RomHeader.title]:
+     * - title containing "MAJORA" -> MM
+     * - title containing "OCARINA" -> OoT
+     * - otherwise null (unsupported base ROM)
+     *
+     * The title fallback only applies after the prefix checks fail, so canonical
+     * codes always win even when a title is misleading. This tolerance does NOT
+     * relax any other eligibility logic elsewhere (e.g. randomizer base-ROM
+     * validation remains strict about CZLE/CZLJ only).
      */
     fun detectGame(header: RomHeader): OcarinaGame? = when {
         header.gameCode.startsWith("CZL") -> OcarinaGame.OOT
         header.gameCode.startsWith("NZL") || header.gameCode.startsWith("NSM") -> OcarinaGame.MM
+        header.gameCode.startsWith("NZS") -> OcarinaGame.MM
+        header.title.contains("MAJORA", ignoreCase = true) -> OcarinaGame.MM
+        header.title.contains("OCARINA", ignoreCase = true) -> OcarinaGame.OOT
         else -> null
     }
 
@@ -72,8 +89,8 @@ object OcarinaSongCatalog {
         OcarinaSong(
             "oot_suns_song", R.string.ocarina_suns_song,
             notes = listOf(
-                OcarinaNote.C_RIGHT, OcarinaNote.C_UP, OcarinaNote.C_DOWN,
-                OcarinaNote.C_RIGHT, OcarinaNote.C_UP, OcarinaNote.C_DOWN
+                OcarinaNote.C_RIGHT, OcarinaNote.C_DOWN, OcarinaNote.C_UP,
+                OcarinaNote.C_RIGHT, OcarinaNote.C_DOWN, OcarinaNote.C_UP
             )
         ),
         OcarinaSong(
@@ -135,7 +152,7 @@ object OcarinaSongCatalog {
         )
     )
 
-    // ---- Majora's Mask (11) ----
+    // ---- Majora's Mask (12) ----
     private val mmSongs: List<OcarinaSong> = listOf(
         // Song of Time and Song of Storms are shared with OoT (same sequences).
         OcarinaSong(
@@ -143,6 +160,13 @@ object OcarinaSongCatalog {
             notes = listOf(
                 OcarinaNote.C_RIGHT, OcarinaNote.A, OcarinaNote.C_DOWN,
                 OcarinaNote.C_RIGHT, OcarinaNote.A, OcarinaNote.C_DOWN
+            )
+        ),
+        OcarinaSong(
+            "mm_eponas_song", R.string.ocarina_eponas_song,
+            notes = listOf(
+                OcarinaNote.C_UP, OcarinaNote.C_LEFT, OcarinaNote.C_RIGHT,
+                OcarinaNote.C_UP, OcarinaNote.C_LEFT, OcarinaNote.C_RIGHT
             )
         ),
         OcarinaSong(

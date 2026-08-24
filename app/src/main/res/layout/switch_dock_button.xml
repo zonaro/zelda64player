@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Single circular dock button for the Switch bottom dock. White glyph on a
+     dock-circle background; round cyan focus border shown while focused. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <View
+        android:id="@+id/dock_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_dock_circle" />
+
+    <!-- Round glow overlay: shown while focused/pressed so the circle itself
+         brightens (no square ripple/elevation artifacts). -->
+    <View
+        android:id="@+id/dock_glow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_circle_glow"
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/dock_icon"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_store"
+        android:tint="@color/switch_dock_icon"
+        android:contentDescription="@null" />
+
+    <View
+        android:id="@+id/dock_border"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/switch_focus_border_round"
+        android:visibility="gone" />
+
+</merge>

@@ -36,6 +36,7 @@
 
     <!-- Library per-game context menu -->
     <string name="menu_start">Iniciar</string>
+    <string name="menu_achievements">Logros</string>
     <string name="menu_pin_shortcut">Fijar acceso</string>
     <string name="menu_category_saves">Saves</string>
     <string name="menu_category_management">Gestión</string>
@@ -77,6 +78,13 @@
     <string name="store_status_update">Actualización disponible</string>
     <string name="store_status_not_installed">No instalado</string>
 
+    <!-- Hack Store: search + pagination -->
+    <string name="store_search_hint">Buscar en la tienda...</string>
+    <string name="store_no_results">Ningún resultado para la búsqueda</string>
+    <string name="store_page_indicator">Página %1$d de %2$d</string>
+    <string name="store_page_previous">Página anterior</string>
+    <string name="store_page_next">Página siguiente</string>
+
     <!-- Hack detail sheet -->
     <string name="detail_author">Autor: %1$s</string>
     <string name="detail_version">Versión: %1$s</string>
@@ -96,6 +104,24 @@
     <string name="detail_error_generic">Error al descargar el parche.</string>
     <string name="detail_patching">Aplicando parche…</string>
     <string name="detail_installed_toast">Parche instalado. Disponible en Biblioteca.</string>
+
+    <!-- Download queue (Hack Store) -->
+    <string name="store_downloads">Descargas</string>
+    <string name="download_queue_title">Descargas</string>
+    <string name="download_queue_empty">Ninguna descarga en cola</string>
+    <string name="download_clear_finished">Limpiar terminadas</string>
+    <string name="download_cancel">Cancelar</string>
+    <string name="download_remove">Quitar</string>
+    <string name="download_channel">Descargas de la Tienda</string>
+    <string name="download_channel_description">Progreso de descarga y parcheo de hacks</string>
+    <string name="download_notif_downloading">Descargando… %1$d%%</string>
+    <string name="download_notif_patching">Aplicando parche…</string>
+    <string name="download_notif_completed">Instalado: %1$s</string>
+    <string name="download_notif_error">Error: %1$s</string>
+    <string name="download_notif_cancelled">Cancelado: %1$s</string>
+    <string name="store_status_queued">En cola</string>
+    <string name="store_status_downloading">Descargando…</string>
+    <string name="store_status_patching">Aplicando parche…</string>
 
     <!-- Patching / launch flow -->
     <string name="patching_message">Preparando ROM…</string>
@@ -158,6 +184,57 @@
     <string name="settings_about_version">Versión: %1$s</string>
     <string name="settings_about_repo">Repositorio</string>
     <string name="settings_about_catalog">Catálogo</string>
+    <string name="settings_about_licenses">Esta app usa rcheevos (MIT) para la integración RetroAchievements, además de LibretroDroid y RadialGamePad (GPL-3.0). Licencias completas en el repositorio del proyecto.</string>
+
+    <!-- Settings: RetroAchievements -->
+    <string name="settings_ra_title">RetroAchievements</string>
+    <string name="settings_ra_description">Inicia sesión con tu cuenta de RetroAchievements.org para desbloquear logros mientras juegas. Tu contraseña se usa solo una vez; guardamos únicamente el token, cifrado.</string>
+    <string name="settings_ra_enabled">Activar RetroAchievements</string>
+    <string name="settings_ra_username_hint">Usuario</string>
+    <string name="settings_ra_password_hint">Contraseña</string>
+    <string name="settings_ra_login">Iniciar sesión</string>
+    <string name="settings_ra_logout">Cerrar sesión</string>
+    <string name="settings_ra_logging_in">Iniciando sesión…</string>
+    <string name="settings_ra_error_missing">Completa usuario y contraseña.</string>
+    <string name="settings_ra_status_logged_in">Sesión iniciada. Los logros se rastrearán en tus juegos.</string>
+    <string name="settings_ra_status_logged_out">Sesión cerrada. Inicia sesión para rastrear logros.</string>
+    <string name="settings_ra_status_disabled">RetroAchievements desactivado.</string>
+    <string name="settings_ra_status_failed">Error al iniciar sesión. Verifica usuario y contraseña.</string>
+    <string name="settings_ra_status_failed_detail">Error al iniciar sesión: %1$s</string>
+
+    <!-- Achievements screen -->
+    <string name="achievements_title">Logros</string>
+    <string name="achievements_title_all">Todos los logros</string>
+    <string name="ra_achievement_points">%d pts</string>
+    <string name="ra_progress_summary">%1$d/%2$d logros · %3$d/%4$d puntos</string>
+    <string name="ra_loading">Cargando logros…</string>
+    <string name="ra_empty">Este juego aún no tiene logros registrados.</string>
+    <string name="ra_all_empty">Ningún juego instalado fue identificado en RetroAchievements.</string>
+    <string name="ra_error_untracked">No se pudo identificar este juego en RetroAchievements.</string>
+    <string name="ra_error_network">No se pudo conectar a RetroAchievements. Verifica tu conexión e inténtalo de nuevo.</string>
+
+    <!-- RetroAchievements in-game overlay and notifications -->
+    <string name="ra_unlocked_points">Desbloqueado · %d pts</string>
+    <string name="ra_leaderboard_started">¡Leaderboard activo!</string>
+    <string name="ra_leaderboard_submitted">¡Enviado al leaderboard!</string>
+    <string name="ra_notification_channel">Logros RetroAchievements</string>
+    <string name="ra_notification_channel_description">Notifica cuando un logro se desbloquea durante el juego.</string>
+    <string name="ra_notification_title">¡Logro desbloqueado!</string>
+    <string name="ra_notification_text">Sigue jugando para conseguir más.</string>
+    <string name="ra_notification_text_game">En %1$s. Sigue jugando para conseguir más.</string>
+
+    <!-- RetroAchievements leaderboards (in-game menu only) -->
+    <string name="menu_category_ra">RetroAchievements</string>
+    <string name="menu_ra_leaderboards">Leaderboards</string>
+    <string name="ra_leaderboards_empty">Este juego no tiene leaderboards visibles.</string>
+    <string name="ra_leaderboards_title">Clasificación</string>
+
+    <!-- RetroAchievements game-start announcement -->
+    <string name="ra_toast_disabled">RetroAchievements desactivado. Actívalo en los ajustes.</string>
+    <string name="ra_toast_not_logged_in">Inicia sesión con tu cuenta de RetroAchievements en los ajustes para rastrear logros.</string>
+    <string name="ra_toast_progress">RetroAchievements: %1$d de %2$d logros desbloqueados</string>
+    <string name="ra_toast_untracked">Este juego no tiene logros en RetroAchievements.</string>
+    <string name="ra_toast_connect_failed">No se pudo conectar a RetroAchievements.</string>
 
     <!-- Settings: backups (local save export/import) -->
     <string name="backup_title">Copias de seguridad</string>
@@ -259,6 +336,8 @@
     <!-- Randomizer: Library integration -->
     <string name="library_menu_randomizer">Generador de Randomizador</string>
     <string name="randomizer_badge_content_description">Seed de randomizador</string>
+    <string name="vanilla_badge_content_description">Juego original (vanilla)</string>
+    <string name="hack_badge_content_description">Hack de ROM</string>
     <string name="menu_delete_seed">Eliminar Seed</string>
     <string name="randomizer_delete_title">Eliminar seed %1$s</string>
     <string name="randomizer_delete_message">Esto eliminará permanentemente la seed y todos sus saves (SRAM y estados).</string>
@@ -270,6 +349,7 @@
     <string name="menu_category_ocarina">Ocarina</string>
     <string name="menu_auto_ocarina">Auto-Ocarina</string>
     <string name="ocarina_now_playing">Reproduciendo</string>
+    <!-- Auto-Ocarina auto-open setting -->
     <!-- Ocarina of Time songs -->
     <string name="ocarina_zeldas_lullaby">Canción de Zelda</string>
     <string name="ocarina_eponas_song">Canción de Epona</string>
@@ -293,4 +373,55 @@
     <string name="ocarina_oath_to_order">Juramento del Orden</string>
     <string name="ocarina_inverted_song_of_time">Canción del Tiempo Invertida</string>
     <string name="ocarina_song_of_double_time">Canción del Tiempo Doble</string>
+
+    <!-- ===== Nintendo Switch UI - Library Home (Phase B) ===== -->
+    <string name="all_games">Todos los Juegos</string>
+    <string name="dock_store">Tienda</string>
+    <string name="dock_randomizer">Randomizador</string>
+    <string name="dock_achievements">RetroAchievements</string>
+    <string name="dock_settings">Configuración</string>
+    <string name="footer_about">(i) Acerca de</string>
+    <string name="footer_options">+ Opciones</string>
+    <string name="footer_gamepad">Mando conectado</string>
+    <string name="options_coming_soon">Opciones próximamente</string>
+    <string name="about_dialog_title">Acerca de y Licencias</string>
+    <string name="about_dialog_close">Cerrar</string>
+
+    <!-- ===== Nintendo Switch UI - Quick Options side panel (Phase D) ===== -->
+    <string name="options_panel_title">Opciones</string>
+    <string name="options_theme_to_light">Cambiar al Tema Claro</string>
+    <string name="options_theme_to_dark">Cambiar al Tema Oscuro</string>
+    <string name="options_sfx">Sonidos de la Interfaz</string>
+    <string name="options_sfx_on">Activado</string>
+    <string name="options_sfx_off">Desactivado</string>
+    <string name="options_ra_status_connected">RetroAchievements: %1$s</string>
+    <string name="options_ra_status_disconnected">RetroAchievements: Desconectado</string>
+    <string name="options_settings_full">Configuración completa</string>
+
+    <!-- ===== Nintendo Switch UI - Todos los Juegos grid (Phase C) ===== -->
+    <string name="grid_search_hint">Buscar...</string>
+    <string name="grid_no_results">Ningún resultado encontrado</string>
+    <string name="grid_sort_button">Ordenar</string>
+    <string name="grid_sort_last_played">Última vez Jugado</string>
+    <string name="grid_sort_download_date">Fecha de Descarga</string>
+    <string name="grid_sort_alpha">Alfabético</string>
+
+    <!-- ===== Store: Import Patch (BPS/IPS) ===== -->
+    <string name="store_import_bps">Importar Parche (BPS)</string>
+    <string name="import_patch_progress">Aplicando parche…</string>
+    <string name="import_success_title">Parche instalado</string>
+    <string name="import_success_message">El hack \"%1$s\" se aplicó a la ROM %2$s y ya está disponible en la Biblioteca.</string>
+    <string name="import_no_rom_title">No se encontró ROM compatible</string>
+    <string name="import_no_rom_message">Este parche requiere %1$s (CRC32 %2$s). No se ha importado ninguna ROM base compatible. Importe la ROM base en Configuración > Importar ROM Base.</string>
+    <string name="import_no_rom_unknown_message">Este parche requiere una ROM base de Nintendo 64 (CRC32 %1$s). No se ha importado ninguna ROM base compatible. Importe la ROM base en Configuración > Importar ROM Base.</string>
+    <string name="import_invalid_title">Parche inválido</string>
+    <string name="import_invalid_message">No se pudo aplicar el parche: %1$s</string>
+    <string name="import_invalid_generic">Parche inválido</string>
+    <string name="import_unsupported_message">Formato de parche no compatible. Use un archivo BPS o IPS.</string>
+    <string name="import_author_user">Importado por el usuario</string>
+    <string name="import_description_auto">Hack importado manualmente por el usuario.</string>
+    <string name="import_unknown_base">Desconocida</string>
+    <string name="game_oot">Ocarina of Time</string>
+    <string name="game_mm">Majora\'s Mask</string>
+    <string name="game_unknown">desconocida</string>
 </resources>

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.databinding.ActivityRandomizerBinding
 import br.com.redclaw.zelda64player.randomizer.settings.RandomizerSettingsSchema
+import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -35,6 +36,7 @@ class RandomizerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRandomizerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        SwitchImmersive.enterFullscreen(this)
 
         setSupportActionBar(binding.randomizerToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -110,6 +112,11 @@ class RandomizerActivity : AppCompatActivity() {
         }
 
         binding.generateButton.setOnClickListener { onGenerateClicked() }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) SwitchImmersive.enterFullscreen(this)
     }
 
     private fun onGenerateClicked() {

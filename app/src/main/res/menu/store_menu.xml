@@ -2,8 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_downloads"
+        android:icon="@drawable/ic_download"
+        android:title="@string/store_downloads"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_refresh"
         android:icon="@drawable/ic_refresh"
         android:title="@string/store_refresh"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_import_bps"
+        android:icon="@drawable/ic_import"
+        android:title="@string/store_import_bps"
         app:showAsAction="ifRoom" />
 </menu>

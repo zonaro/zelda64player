@@ -510,7 +510,7 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeDoFram
     }
 }
 
-JNIEXPORT jstring JNICALL
+JNIEXPORT void JNICALL
 Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeCompleteServerRequest(
         JNIEnv* env, jobject thiz, jint request_id, jint status_code,
         jbyteArray body, jstring error_message) {
@@ -518,7 +518,7 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeComple
 
     pending_request_t* found = remove_pending_request((int) request_id);
     if (found == NULL) {
-        return NULL;
+        return;
     }
 
     rc_api_server_response_t response;
@@ -555,7 +555,6 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeComple
         (*env)->ReleaseStringUTFChars(env, error_message, error_cstr);
     }
     free(found);
-    return NULL;
 }
 
 /* ---------------------------------------------------------------------------
@@ -576,6 +575,11 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeGetUse
         rc_client_user_get_image_url(user, avatar, sizeof(avatar));
         strbuf_puts(&sb, "{\"username\":");
         strbuf_put_json_string(&sb, user->username);
+        /* The session token is secret; it is exposed here only for the
+           in-process credential exchange, which persists it encrypted and
+           never logs it. */
+        strbuf_puts(&sb, ",\"token\":");
+        strbuf_put_json_string(&sb, user->token != NULL ? user->token : "");
         strbuf_puts(&sb, ",\"display_name\":");
         strbuf_put_json_string(&sb, user->display_name);
         strbuf_puts(&sb, ",\"avatar_url\":");

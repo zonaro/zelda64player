@@ -46,6 +46,13 @@ Provides **instant, sourced verification** of specific factual claims needed dur
 | "BPS spec license?" | Public domain / no license (spec only) |
 | "Flips (BPS tool) license?" | GitHub (ISC for v2, GPL for v1) |
 
+### 6. Sound Asset Licensing (NEW — Switch UI Revamp)
+| Query | Source |
+|-------|--------|
+| "CC0 Switch-style UI navigation sounds (focus move, select, back, panel open/close)?" | freesound.org, opengameart.org, zapsplat.com (filter CC0) |
+| "Synthesized 'toc' focus sound generation method?" | Web Audio API / Tone.js / custom synthesis |
+| "SoundPool vs MediaPlayer latency for UI sounds on Android?" | Android developer docs / Stack Overflow |
+
 ## Response Format
 Always return:
 ```

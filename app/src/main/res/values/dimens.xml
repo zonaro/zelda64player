@@ -2,7 +2,7 @@
 <resources>
     <dimen name="gamepad_padding_vertical">20dp</dimen>
 
-    <!-- Shared shape dimensions (Material 3 Expressive) -->
+    <!-- Shared shape dimensions (Nintendo Switch UI) -->
     <dimen name="card_radius">24dp</dimen>
     <dimen name="sheet_radius">28dp</dimen>
     <dimen name="icon_button_size">44dp</dimen>
@@ -37,4 +37,28 @@
     <dimen name="menu_badge_padding_horizontal">6dp</dimen>
     <dimen name="menu_badge_padding_vertical">2dp</dimen>
     <dimen name="menu_badge_margin">4dp</dimen>
+
+    <!-- ===== Nintendo Switch UI spacing / type scale ===== -->
+    <dimen name="switch_focus_border_width">3dp</dimen>
+    <dimen name="switch_card_corner_radius">5dp</dimen>
+    <dimen name="switch_dialog_corner_radius">14dp</dimen>
+    <dimen name="switch_card_size_home">220dp</dimen>
+    <dimen name="switch_card_size_grid">170dp</dimen>
+    <dimen name="switch_dock_button_size">50dp</dimen>
+    <dimen name="switch_dock_gap">14dp</dimen>
+    <!-- Horizontal gap between home-row game cards (~50dp per NS Launcher spacing). -->
+    <dimen name="switch_home_card_gap">44dp</dimen>
+    <dimen name="switch_screen_margin">22dp</dimen>
+    <!-- Grid screen: padding around the card grid and gap between square cards. -->
+    <dimen name="switch_grid_padding">16dp</dimen>
+    <dimen name="switch_grid_card_gap">16dp</dimen>
+    <dimen name="switch_label_focused_text">18sp</dimen>
+    <dimen name="switch_title_text">20sp</dimen>
+    <dimen name="switch_row_text">16sp</dimen>
+    <dimen name="switch_hint_text">12sp</dimen>
+    <dimen name="switch_suffix_text">14sp</dimen>
+    <!-- Quick side panel: minimum width so it never gets too narrow on phones. -->
+    <dimen name="switch_side_panel_min_width">320dp</dimen>
+    <!-- Quick side panel row height. -->
+    <dimen name="switch_side_panel_row_height">52dp</dimen>
 </resources>
