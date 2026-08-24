@@ -32,13 +32,30 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            // No signing config: the release keystore is generated before the
-            // first release. Do NOT sign here (no keystore yet).
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+    }
+
+    // Release signing — only active when a local keystore.properties exists
+    // (generated for the first release; gitignored, never committed). Builds
+    // without it fall back to an unsigned release artifact.
+    val keystorePropsFile = rootProject.file("keystore.properties")
+    if (keystorePropsFile.exists()) {
+        val keystoreProps = java.util.Properties().apply {
+            keystorePropsFile.inputStream().use { load(it) }
+        }
+        signingConfigs {
+            create("release") {
+                storeFile = file(keystoreProps.getProperty("storeFile")!!)
+                storePassword = keystoreProps.getProperty("storePassword")!!
+                keyAlias = keystoreProps.getProperty("keyAlias")!!
+                keyPassword = keystoreProps.getProperty("keyPassword")!!
+            }
+        }
+        buildTypes["release"].signingConfig = signingConfigs["release"]
     }
 
     compileOptions {

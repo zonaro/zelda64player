@@ -46,6 +46,7 @@ catalog.json
 *.jks
 *.keystore
 ludere.jks
+keystore.properties
 
 # Test fixtures (synthetic only - no real ROMs)
 /app/src/test/fixtures/roms/*.z64
