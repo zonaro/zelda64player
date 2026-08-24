@@ -60,7 +60,13 @@ const I18N = {
     "f.refresh.title": "Atualização de catálogo em segundo plano",
     "f.refresh.desc": "WorkManager atualiza o catálogo a cada 12 horas, mantendo a loja sempre atualizada sem consumo manual.",
     "f.i18n.title": "Internacionalização pt-BR / en / es",
-    "f.i18n.desc": "Toda a interface do app é traduzida para português, inglês e espanhol, com detecção de idioma do sistema."
+    "f.i18n.desc": "Toda a interface do app é traduzida para português, inglês e espanhol, com detecção de idioma do sistema.",
+    "download.title": "Baixar",
+    "download.sub": "Instale o APK de release assinado",
+    "download.lead": "Baixe o Zelda 64 Player para Android. O link sempre aponta para a versão mais recente no GitHub.",
+    "download.versionLabel": "Versão mais recente:",
+    "download.button": "Baixar APK",
+    "download.note": "Você precisa fornecer suas próprias ROMs base (Ocarina of Time / Majora's Mask) de forma legal. O app nunca distribui ROMs."
   },
   en: {
     "meta.title": "Zelda 64 Player — N64 Hack Emulator for Android",
@@ -117,7 +123,13 @@ const I18N = {
     "f.refresh.title": "Background catalog refresh",
     "f.refresh.desc": "WorkManager refreshes the catalog every 12 hours, keeping the store current without manual effort.",
     "f.i18n.title": "i18n pt-BR / en / es",
-    "f.i18n.desc": "The entire app UI is translated to Portuguese, English and Spanish, with system language detection."
+    "f.i18n.desc": "The entire app UI is translated to Portuguese, English and Spanish, with system language detection.",
+    "download.title": "Download",
+    "download.sub": "Get the signed release APK",
+    "download.lead": "Download Zelda 64 Player for Android. The link always points to the latest release on GitHub.",
+    "download.versionLabel": "Latest version:",
+    "download.button": "Download APK",
+    "download.note": "You must provide your own base ROMs (Ocarina of Time / Majora's Mask) legally. The app never distributes ROMs."
   },
   es: {
     "meta.title": "Zelda 64 Player — Emulador de hacks N64 para Android",
@@ -174,7 +186,13 @@ const I18N = {
     "f.refresh.title": "Actualización de catálogo en segundo plano",
     "f.refresh.desc": "WorkManager actualiza el catálogo cada 12 horas, manteniendo la tienda al día sin esfuerzo manual.",
     "f.i18n.title": "Internacionalización pt-BR / en / es",
-    "f.i18n.desc": "Toda la interfaz de la app está traducida a portugués, inglés y español, con detección del idioma del sistema."
+    "f.i18n.desc": "Toda la interfaz de la app está traducida a portugués, inglés y español, con detección del idioma del sistema.",
+    "download.title": "Descargar",
+    "download.sub": "Obtén el APK de release firmado",
+    "download.lead": "Descarga Zelda 64 Player para Android. El enlace siempre apunta a la versión más reciente en GitHub.",
+    "download.versionLabel": "Última versión:",
+    "download.button": "Descargar APK",
+    "download.note": "Debes aportar tus propias ROMs base (Ocarina of Time / Majora's Mask) legalmente. La app nunca distribuye ROMs."
   }
 };
 
@@ -413,6 +431,24 @@ async function loadCatalog() {
   }
 }
 
+function fetchLatestRelease() {
+  const verEl = document.getElementById("download-version");
+  const dateEl = document.getElementById("download-date");
+  if (!verEl) return;
+  fetch("https://api.github.com/repos/zonaro/zelda64player/releases/latest", { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw new Error("bad"); return r.json(); })
+    .then(function (data) {
+      if (data && data.tag_name) {
+        verEl.textContent = data.tag_name;
+        if (dateEl && data.published_at) {
+          const d = new Date(data.published_at);
+          if (!isNaN(d)) dateEl.textContent = "(" + d.toISOString().slice(0, 10) + ")";
+        }
+      }
+    })
+    .catch(function () { /* keep default version text on failure */ });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   currentLang = detectLang();
   document.documentElement.lang = currentLang;
@@ -423,4 +459,5 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.addEventListener("click", function () { setLang(btn.dataset.lang); });
   });
   loadCatalog();
+  fetchLatestRelease();
 });

@@ -202,6 +202,70 @@ a:hover { text-decoration: underline; }
 .legal h3 { margin: 0 0 10px; color: var(--accent-amber); font-size: 18px; }
 .legal p { margin: 0; color: var(--text-secondary); font-size: 14px; }
 
+/* ---------- Download ---------- */
+.download-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  background: linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: 4px solid var(--accent-focus);
+  border-radius: var(--card-radius);
+  padding: 28px 30px;
+}
+.download-info { flex: 1 1 320px; }
+.download-lead {
+  margin: 0 0 10px;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+.download-meta {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.download-version {
+  color: var(--accent-focus);
+  font-weight: 700;
+}
+.download-date { color: var(--text-secondary); margin-left: 8px; }
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent-focus);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 28px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-download:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(2, 131, 12, 0.35);
+  text-decoration: none;
+}
+.btn-download-icon { font-size: 20px; line-height: 1; }
+.download-note {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border-left: 3px solid var(--accent-amber);
+  padding-left: 12px;
+}
+@media (max-width: 600px) {
+  .download-card { flex-direction: column; align-items: stretch; }
+  .btn-download { justify-content: center; }
+}
+
 /* ---------- Catalog ---------- */
 .catalog-state {
   text-align: center;
