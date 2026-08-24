@@ -5,12 +5,9 @@ import org.json.JSONArray
 import java.io.File
 
 /**
- * Persists the user-imported hacks (patches the user dropped in via the Store's
- * "Import Patch" action) as a JSON array of [HackEntry] at [file].
- *
- * Mirrors the [MergedCatalogRepository] style (explicit [File], JSON array of
- * [HackEntry]) so imported hacks surface in the Library with their proper title
- * (not a prettified id) and can be removed just like catalog hacks.
+ * Persists user-imported patch hacks (BPS/IPS imported from the Store screen)
+ * as [HackEntry] objects in `filesDir/user_hacks.json`. Kept separate from the
+ * remote merged catalog so a catalog refresh never drops a user's own hacks.
  *
  * Takes an explicit file so it is unit-testable on the JVM with a temp file.
  */
@@ -19,15 +16,28 @@ class UserHacksRepository(private val file: File) {
         file.parentFile?.mkdirs()
     }
 
-    /** Append (or replace, by id) [entry] and persist the updated list. */
+    /** Add or replace a user hack (keyed by [HackEntry.id]). */
     fun add(entry: HackEntry) {
-        val all = getAll().toMutableList()
-        val index = all.indexOfFirst { it.id == entry.id }
-        if (index >= 0) all[index] = entry else all.add(entry)
+        val all = load().toMutableList()
+        all.removeIf { it.id == entry.id }
+        all.add(entry)
         save(all)
     }
 
-    fun getAll(): List<HackEntry> {
+    fun getAll(): List<HackEntry> = load()
+
+    fun asMap(): Map<String, HackEntry> = load().associateBy { it.id }
+
+    fun getById(id: String): HackEntry? = load().firstOrNull { it.id == id }
+
+    /** Remove a user hack by id (e.g. on Library uninstall). */
+    fun remove(id: String) {
+        val all = load().toMutableList()
+        all.removeIf { it.id == id }
+        save(all)
+    }
+
+    private fun load(): List<HackEntry> {
         if (!file.exists()) return emptyList()
         return runCatching {
             val arr = JSONArray(file.readText())
@@ -35,17 +45,6 @@ class UserHacksRepository(private val file: File) {
                 runCatching { HackEntry.fromJson(arr.getJSONObject(i)) }.getOrNull()
             }
         }.getOrDefault(emptyList())
-    }
-
-    /** All entries keyed by id (last write wins on duplicate ids). */
-    fun asMap(): Map<String, HackEntry> = getAll().associateBy { it.id }
-
-    fun getById(id: String): HackEntry? = getAll().firstOrNull { it.id == id }
-
-    /** Remove [id] from the persisted set. Safe to call when absent. */
-    fun remove(id: String) {
-        val all = getAll().toMutableList()
-        if (all.removeIf { it.id == id }) save(all)
     }
 
     private fun save(all: List<HackEntry>) {

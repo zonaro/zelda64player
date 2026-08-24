@@ -38,7 +38,11 @@ object AppRepositories {
         return PatchRepository(File(external, "patches"))
     }
 
-    /** Persistent store for user-imported hacks (patches dropped in via the Store). */
+    /**
+     * Persistent store for user-imported BPS/IPS hacks (imported from the Store
+     * screen). Kept separate from the remote merged catalog so a catalog refresh
+     * never drops a user's own hacks.
+     */
     fun userHacksRepository(context: Context): UserHacksRepository =
         UserHacksRepository(File(context.filesDir, "user_hacks.json"))
 
