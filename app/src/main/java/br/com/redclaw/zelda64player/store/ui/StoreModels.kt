@@ -44,8 +44,16 @@ sealed class StoreCategory(val labelRes: Int) {
     object Mm : StoreCategory(R.string.store_cat_mm)
 
     companion object {
-        /** Stable, display-ordered list of every category. */
-        val ALL: List<StoreCategory> = listOf(All, Installed, Updates, Oot, Mm)
+        /**
+         * Stable, display-ordered list of every category.
+         *
+         * This is computed only after [StoreCategory] class initialization has
+         * completed. Eagerly creating the list here can read the nested object
+         * singletons while ART is still initializing the sealed base class,
+         * leaving a null category in the list and crashing the Store at launch.
+         */
+        val ALL: List<StoreCategory>
+            get() = listOf(All, Installed, Updates, Oot, Mm)
     }
 }
 
