@@ -1,5 +1,6 @@
 package br.com.redclaw.zelda64player.store.ui
 
+import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.store.DownloadPhase
 
@@ -13,6 +14,39 @@ sealed class StoreStatus {
 
     /** A newer version exists in the catalog than the installed one. */
     data class UpdateAvailable(val installedVersion: String, val catalogVersion: String) : StoreStatus()
+}
+
+/**
+ * Sidebar filter categories for the Hack Store. Every option is derived purely
+ * from data already present on each [HackEntry] (no new catalog fields needed):
+ *
+ * - [All] shows everything.
+ * - [Installed] / [Updates] depend on the computed install [StoreStatus].
+ * - [Oot] / [Mm] depend on the base ROM game code prefix.
+ *
+ * [labelRes] points at the localized category name shown in the sidebar and as
+ * the main-content section header.
+ */
+sealed class StoreCategory(val labelRes: Int) {
+    /** Every catalog hack. */
+    object All : StoreCategory(R.string.store_cat_all)
+
+    /** Hacks whose install status is Installed or UpdateAvailable. */
+    object Installed : StoreCategory(R.string.store_cat_installed)
+
+    /** Hacks whose install status is UpdateAvailable. */
+    object Updates : StoreCategory(R.string.store_cat_updates)
+
+    /** Hacks whose base ROM game code starts with "CZL" (Ocarina of Time). */
+    object Oot : StoreCategory(R.string.store_cat_oot)
+
+    /** Hacks whose base ROM game code starts with "NZL" or "NSM" (Majora's Mask). */
+    object Mm : StoreCategory(R.string.store_cat_mm)
+
+    companion object {
+        /** Stable, display-ordered list of every category. */
+        val ALL: List<StoreCategory> = listOf(All, Installed, Updates, Oot, Mm)
+    }
 }
 
 /** A catalog hack paired with its computed display status. */

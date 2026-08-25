@@ -26,6 +26,7 @@ import br.com.redclaw.zelda64player.store.CatalogFetcher
 import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import br.com.redclaw.zelda64player.utils.CorePrefs
+import br.com.redclaw.zelda64player.utils.LanguageManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -89,6 +90,7 @@ class SettingsActivity : AppCompatActivity() {
         setupRetroAchievementsSection()
         setupCoreSection()
         setupBackupSection()
+        setupLanguageSection()
         setupAboutSection()
         wireSettingsSfx()
         observeImport()
@@ -115,6 +117,7 @@ class SettingsActivity : AppCompatActivity() {
             binding.settingsRaLogin,
             binding.settingsRaLogout,
             binding.settingsCoreButton,
+            binding.settingsLanguageButton,
             binding.settingsAboutRepo,
             binding.settingsAboutCatalog
         )
@@ -427,6 +430,33 @@ class SettingsActivity : AppCompatActivity() {
             .singleChoice(CorePrefs.options.toList(), currentIndex) { which ->
                 CorePrefs.setSelectedCoreIndex(this, which)
                 updateCoreLabel()
+            }
+            .negativeButton(getString(android.R.string.cancel))
+            .show()
+    }
+
+    private fun setupLanguageSection() {
+        updateLanguageLabel()
+        binding.settingsLanguageButton.setOnClickListener {
+            sfx?.select()
+            showLanguageDialog()
+        }
+    }
+
+    private fun updateLanguageLabel() {
+        val code = LanguageManager.getLanguage(this)
+        binding.settingsLanguageCurrent.text = LanguageManager.labelFor(this, code)
+    }
+
+    private fun showLanguageDialog() {
+        val codes = LanguageManager.CODES
+        val currentIndex = codes.indexOf(LanguageManager.getLanguage(this)).coerceAtLeast(0)
+        val labels = codes.map { LanguageManager.labelFor(this, it) }
+        SwitchDialog(this)
+            .title(getString(R.string.settings_language_title))
+            .singleChoice(labels, currentIndex) { which ->
+                LanguageManager.setLanguage(this, codes[which])
+                updateLanguageLabel()
             }
             .negativeButton(getString(android.R.string.cancel))
             .show()

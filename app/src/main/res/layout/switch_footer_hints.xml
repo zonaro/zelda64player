@@ -13,6 +13,7 @@
         android:paddingStart="@dimen/switch_screen_margin">
 
         <ImageView
+            android:id="@+id/footer_gamepad_icon"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:src="@drawable/ic_gamepad"
@@ -24,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:text="@string/footer_gamepad"
+            android:text="@string/footer_gamepad_disconnected"
             android:textColor="@color/switch_text_secondary"
             android:textSize="@dimen/switch_hint_text" />
     </LinearLayout>

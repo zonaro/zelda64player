@@ -103,13 +103,13 @@ class RaAchievementSectionsTest {
         val entries = listOf(
             HackLibraryEntry("vanilla_aaa", "OoT Vanilla"),
             HackLibraryEntry("hack_bbb", "Some Hack"),
-            HackLibraryEntry("ootr_ccc", "A Seed"),
+            HackLibraryEntry("hack_ccc", "A Hack"),
             HackLibraryEntry("hack_ddd", "Untracked Hack")
         )
         val identities = mapOf(
             "vanilla_aaa" to RaGameIdentity("h1", 100L, "OoT"),
             "hack_bbb" to RaGameIdentity("h2", 100L, "OoT"), // same game id as above
-            "ootr_ccc" to RaGameIdentity("h3", 200L, "MM"),
+            "hack_ccc" to RaGameIdentity("h3", 200L, "MM"),
             "hack_ddd" to RaGameIdentity("h4", 0L, null) // unresolved
         )
 

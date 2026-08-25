@@ -85,14 +85,14 @@ class GameRomResolverTest {
     }
 
     @Test
-    fun ootrPrefixedSeedIsTreatedAsNonVanilla() {
-        // Randomizer seed ids start with "ootr_" and must resolve via storageRom, not the
-        // base-ROM lookup (which would strip the wrong prefix and miss).
+    fun nonVanillaPrefixedIdResolvesViaStorageRom() {
+        // Non-vanilla ids (e.g. store hacks, seeds) must resolve via storageRom, not the
+        // base-ROM lookup (which only applies to vanilla_ ids).
         val resolve = resolverWith(
             baseRomLookup = { null },
             storageRom = { File("/store/rom_$it") }
         )
-        val result = resolve("ootr_seed123")
-        assertEquals("/store/rom_ootr_seed123", result?.absolutePath)
+        val result = resolve("hack_seed123")
+        assertEquals("/store/rom_hack_seed123", result?.absolutePath)
     }
 }

@@ -3,7 +3,6 @@ package br.com.redclaw.zelda64player.views
 import br.com.redclaw.zelda64player.data.model.BaseRom
 import br.com.redclaw.zelda64player.ocarina.OcarinaGame
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -44,7 +43,6 @@ class BaseRomLibrarySourceTest {
         assertEquals("ROM ABCDEF01", entry.title)
         assertEquals(BadgeType.VANILLA, entry.badge)
         assertTrue(entry.isVanilla)
-        assertFalse(entry.isRandomizer)
     }
 
     @Test

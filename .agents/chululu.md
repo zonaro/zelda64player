@@ -27,9 +27,9 @@ Bruce or Lobby provides screenshots/recordings when:
 - [ ] `SwitchHomeRow`: horizontal scrollable row of square game cards + circular "Todos os Jogos" card at end
 - [ ] `SwitchGameCard`: square (1:1), cover image, game title overlay on focus, cyan focus border, 10% dimming on unfocused
 - [ ] `SwitchAllGamesCard`: circular, charcoal fill, cyan 2x2 grid icon, cyan border when focused
-- [ ] `SwitchDock`: 4 circular buttons (Loja, Randomizador, RetroAchievements, Sobre/Licenças), ~50dp, colored glyphs, focus ring
+- [ ] `SwitchDock`: 4 circular buttons (Loja, RetroAchievements, Sobre/Licenças), ~50dp, colored glyphs, focus ring
 - [ ] `SwitchFooterHints`: left TV+gamepad indicators, right "(i) Sobre" and "+ Opções" gray 11-12sp
-- [ ] Grid order: vanilla games first, then store hacks, then randomizer seeds
+- [ ] Grid order: vanilla games first, then store hacks
 - [ ] `SwitchGridScreen` ("Todos os Jogos"): header icon+title "Todos os Jogos" 20sp bold + thin separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders, all entries together
 
 ### StoreActivity
@@ -42,12 +42,6 @@ Bruce or Lobby provides screenshots/recordings when:
 - [ ] Full SettingsActivity restyled entirely (SwitchGridScreen or fullscreen SwitchSidePanel)
 - [ ] SFX mute toggle in side panel
 
-### Randomizer
-- [ ] Embedded OoTR WebView generator (ootrandomizer.com) styled with Switch chrome
-- [ ] ROM picker dialog (SwitchDialog) + capture progress dialog
-- [ ] Success/error dialog after patch capture
-
-### RetroAchievements
 - [ ] `SwitchGridScreen` for games with RA
 - [ ] `SwitchDialog` for achievement detail
 - [ ] `SwitchDialog` for leaderboards

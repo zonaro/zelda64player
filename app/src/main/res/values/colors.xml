@@ -16,6 +16,7 @@
     <color name="switch_dialog_bg_light">#FFFFFF</color>
     <color name="switch_accent">#02830c</color>
     <color name="switch_accent_amber">#FFA000</color>
+    <color name="switch_accent_focus">#00BCD4</color>
     <color name="switch_text_primary_dark">#FFFFFF</color>
     <color name="switch_text_primary_light">#333333</color>
     <color name="switch_text_secondary_dark">#9E9E9E</color>

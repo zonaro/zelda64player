@@ -18,11 +18,10 @@ The app **never** embeds, downloads, or distributes base ROMs. Users must legall
 - **On-the-fly patching** with triple CRC32 validation (source checksum, patch checksum, target CRC after patch application), supporting BPS and legacy IPS formats.
 - **N64 byte-order normalization** (.z64 / .v64 / .n64 → big-endian z64) via the pure Kotlin N64 normalizer module.
 - **Checksum-based base ROM matching** using gameCode + versionByte + CRC32 to validate that the user's base ROM is compatible with a given hack before applying patches.
-- **OoT Randomizer via WebView** — embeds the official OoTR generator (ootrandomizer.com) inside a native Android WebView. The user configures options on the site, generates a seed, and the app auto-fills the ROM field with the user's imported vanilla OoT ROM (extracting the .z64 from a .zip if needed) and intercepts the patched-ROM download (generated client-side via WASM) when the user clicks "Patch ROM!", adding the result to the dedicated "Randomizadores" Library section. Unlimited seeds. No API key, no local patch logic, no schema. Only OoT seeds are supported; base-ROM legality (OoT 1.0 NTSC-U/J) is enforced by ootrandomizer.com itself.
-- **Auto-Ocarina** — in-game HUD that auto-plays Ocarina songs in OoT/MM from the pause menu. Built-in song catalog (OoT: 12 songs, MM: 11) plus optional per-hack custom songs from the catalog `ocarinaSongs` field. Coroutine sequencer sends key events to GLRetroView (~330ms/note), cancellable by any user input, menu open, or lifecycle changes. Game detection at launch via `RomHeader.gameCode` prefix: `CZL*` = OoT family (incl. randomizer seeds), `NZL*`/`NSM*` = MM family. Unknown games hide the menu item.
+- **Auto-Ocarina** — in-game HUD that auto-plays Ocarina songs in OoT/MM from the pause menu. Built-in song catalog (OoT: 12 songs, MM: 11) plus optional per-hack custom songs from the catalog `ocarinaSongs` field. Coroutine sequencer sends key events to GLRetroView (~330ms/note), cancellable by any user input, menu open, or lifecycle changes. Game detection at launch via `RomHeader.gameCode` prefix: `CZL*` = OoT family, `NZL*`/`NSM*` = MM family. Unknown games hide the menu item.
 - **RetroAchievements** — sign in with your RetroAchievements.org account; achievements are tracked during play with unlock popups, challenge/progress indicators, and system notifications. Leaderboards are accessible only inside the in-game menu. The RA hash is computed exclusively from the final patched ROM at install time, never from the base ROM or uncompressed intermediates. RA credentials (username/password/token) are never logged (sanitized as `***`) and are stored only in EncryptedSharedPreferences in a separate `ra_secure_prefs` file. Hardcore mode defaults OFF (`pref_ra_hardcore = false`) until User-Agent validated with RAdmin. System notifications opt-in default ON but require `POST_NOTIFICATIONS` runtime permission on API 33+.
 - **Nintendo Switch-style UI revamp** — all screens follow a custom native implementation of the Nintendo Switch HOME menu aesthetic (inspired by NS_Launcher / FLauncher). Design tokens include dark background `#2D2D2D`, cyan accent `#00BCD4`, amber `#FFA000`, square game cards, focus borders, side panels, and dock. The RadialGamePad touch-control LAYOUT remains frozen (measured for OoT/MM control placement, ButtonStick modes, Auto-Z, FloatingJoystick, physical-controller mirroring); only chrome (menus, dialogs, overlays) is restyled to the Switch standard. Sound effects (focus-move "toc", select, back, panel open/close) are CC0/synthesized only, stored in `res/raw/`, and respect system volume with a mute toggle in Settings.
-- **Vanilla Games in Library** — user-imported base ROMs (OoT, MM) are playable directly from the main Library screen, separate from Store hacks and Randomizer seeds. New `BaseRomLibrarySource` exposes `BaseRomRepository` entries as playable tiles with `vanilla_<crc32>` IDs. Grid order: vanilla games first, then store hacks, then randomizer seeds. The single ROM resolver `GameRomResolver.kt` handles resolution: `vanilla_*` resolves via `BaseRomRepository`; everything else falls back to `Storage.rom(hackId)`. All launch paths route through the resolver. Vanilla tiles carry a VANILLA badge (ice-cream icon) with neutral chip background. Context menu omits management sections (uninstall/delete-seed) for vanilla entries — base ROMs are managed in Settings. RetroAchievements for vanilla games have no install step; RA identity (rhash + game id) is computed lazily on first play.
+- **Vanilla Games in Library** — user-imported base ROMs (OoT, MM) are playable directly from the main Library screen, separate from Store hacks. New `BaseRomLibrarySource` exposes `BaseRomRepository` entries as playable tiles with `vanilla_<crc32>` IDs. Grid order: vanilla games first, then store hacks. `GameRomResolver.kt` handles resolution: `vanilla_*` resolves via `BaseRomRepository`; everything else falls back to `Storage.rom(hackId)`. All launch paths route through the resolver. Vanilla tiles carry a VANILLA badge (ice-cream icon) with neutral chip background. Context menu omits management sections (uninstall/delete-seed) for vanilla entries — base ROMs are managed in Settings. RetroAchievements for vanilla games have no install step; RA identity (rhash + game id) is computed lazily on first play.
 - **Custom gamepad layout** (RadialGamePad) — C-button mapping, Auto-Z, ButtonStick modes, FloatingJoystick. The layout is frozen/measured from a reference image tuned for OoT/MM; the RadialGamePad package is unchanged from Ludere and must not be modified without explicit user approval and an update to the "Layout de Controles Sob Medida" section of `plano.md`.
 - **Save backup/restore** via ZIP (local, no cloud). Backups stored in `filesDir` per hackId.
 - **Background catalog refresh** via WorkManager (`CatalogRefreshWorker`, 12h periodic, CONNECTED network requirement).
@@ -50,8 +49,7 @@ The first build runs a `prepareCore` Gradle task that downloads the two Libretro
 2. Browse the **Store** → view available hacks and download one.
 3. The app validates the base ROM checksum, downloads the BPS (or ZIP) patch, applies it, and launches the game.
 4. To play a vanilla base ROM without patches, select it from the Library screen.
-5. To use the Randomizer, open the Randomizer section (dock) to launch the embedded OoTR generator WebView, generate a seed, then click "Patch ROM!" to capture it; launch from the Library.
-6. To use Auto-Ocarina, start a game and open the pause menu — the HUD will auto-play songs from the built-in catalog or per-hack custom songs.
+5. To use Auto-Ocarina, start a game and open the pause menu — the HUD will auto-play songs from the built-in catalog or per-hack custom songs.
 
 ---
 
@@ -80,7 +78,7 @@ See **docs/CATALOG.md** for the JSON catalog schema and **docs/catalog.example.j
 | Background Tasks | WorkManager 2.9.0 | `CatalogRefreshWorker` (12h periodic) |
 | RetroAchievements | rcheevos ~12.x (master tag) | MIT licensed, ANSI C; git subtree in `app/src/main/cpp/rcheevos/`; JNI bridge `libra_jni.so` |
 | UI Toolkit | Custom Nintendo Switch skin | Material Components 1.14.0 is technical base only; visual standard is custom Switch HOME menu aesthetic (dark bg #2D2D2D, cyan accent #00BCD4, amber #FFA000, square cards, focus borders, dock) |
-| Testing | JUnit 5, MockK, Turbine | Unit + Instrumented; JVM unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, randomizer WebView capture (RomZipExtractor) and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed. |
+| Testing | JUnit 5, MockK, Turbine | Unit + Instrumented; JVM unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, (RomZipExtractor) and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed.|
 
 ---
 
@@ -102,36 +100,17 @@ br.com.redclaw.zelda64player
 │   ├── CatalogFetcher.kt
 │   └── CatalogRefresher.kt # shared by ViewModel + WorkManager worker
 ├── settings/       # SettingsActivity (ROM import/list, catalog URLs, backups, RA login) + helpers
+│   ├── ui/              # SettingsActivity, Fragments (BaseRomImport, BaseRomList, CatalogUrl, RetroAchievements)
+│   └── SettingsViewModel.kt
 ├── work/           # CatalogRefreshWorker (periodic background refresh)
 ├── repositories/   # Storage (per-hack ROM/SRAM/state paths) + GameRomResolver
-├── randomizer/     # OoT Randomizer Generator feature (WebView)
-│   ├── RomZipExtractor.kt       # Extract .z64/.n64 from imported .zip (stream)
-│   ├── RomFileProvider.kt       # ContentProvider serving the ROM to the WebView
-│   ├── RandomizerWebViewModel.kt  # Selected vanilla ROM, URI, capture state
-│   ├── WebViewJsBridge.kt       # JavascriptInterface: receives patched ROM bytes
-│   ├── RandomizerJs.kt          # JS: auto-click ROM input + blob download hook
-│   ├── LocalRomServer.kt        # 127.0.0.1 server to receive the patched ROM
-│   ├── RandomizerWebActivity.kt # WebView host styled with Switch chrome
-│   └── repository/              # RandomizedSeedEntry, RandomizedSeedRepository
-├── ocarina/        # Auto-Ocarina feature
-│   ├── OcarinaNote.kt           # Enum A/C_UP/C_DOWN/C_LEFT/C_RIGHT → raw keycodes
-│   ├── OcarinaSong.kt           # Song model + tolerant JSON parsing
-│   ├── OcarinaSongCatalog.kt    # Built-in songs (OoT: 12, MM: 11) + catalog custom merge
-│   ├── OcarinaMacroPlayer.kt    # Coroutine sequencer → GLRetroView key events (~330ms/note)
-│   └── ui/OcarinaHudView.kt     # Overlay: song name + highlighted note chips during playback
-├── retroachievements/ # RetroAchievements Integration feature
-│   ├── jni/        # RcheevosJni bridge + shared HTTP dispatcher
-│   ├── api/        # RaHttpClient, RaApiModels, RaApiException
-│   ├── auth/       # RaCredentialStore, RaSessionManager, RaLoginFragment
-│   ├── data/       # RaGameMetadata, RaAchievement, RaLeaderboard, RaRepository
-│   ├── session/    # Live rc_client session state machine
-│   ├── ui/         # Achievements list, unlock overlay, leaderboards dialog
-│   └── viewmodel/  # AchievementsViewModel, InGameRaViewModel
+│   ├── Storage.kt       # Paths per hackId: rom_<id>, sram_<id>, state_<id>
+│   └── GameRomResolver.kt  # Single ROM resolver: vanilla_* via BaseRomRepository; else Storage.rom(hackId)
 ├── retroview/      # Emulation (adapted from Ludere)
 │   ├── RetroView.kt     # INTERCEPTION POINT: loads patched ROM from cache
 │   └── RetroViewUtils.kt
 ├── views/
-│   ├── LibraryActivity.kt     # Grid of installed hacks + vanilla games + randomizer seeds
+│   ├── LibraryActivity.kt     # Grid of installed hacks + vanilla games
 │   ├── GameActivity.kt        # Gameplay activity
 │   ├── BaseRomLibrarySource.kt
 │   └── viewmodels/GameActivityViewModel.kt
@@ -142,9 +121,9 @@ br.com.redclaw.zelda64player
 ├── libretrodroid/       # LOCAL GRADLE MODULE (vendor LibretroDroid 0.13.2 + 2 JNI passthroughs)
 ```
 
-**Testing:** `./gradlew :app:testDebugUnitTest` — JVM unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, randomizer WebView capture (RomZipExtractor) and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed.
+**Testing:** `./gradlew :app:testDebugUnitTest` — JVM unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed.
 
-**Roadmap:** See **plano.md** (pt-BR). Shipped: BPS + IPS patching, hack store, settings, save backup/restore, background catalog refresh, OoT Randomizer generator, Auto-Ocarina, RetroAchievements, Nintendo Switch UI revamp, Vanilla Games in Library. Remaining stretch goals (post-MVP): multiple save slots per hack, optional opt-in telemetry (privacy-first, deferred), hardcore mode enablement pending RAdmin User-Agent validation.
+**Roadmap:** See **plano.md** (pt-BR). Shipped: BPS + IPS patching, hack store, settings, save backup/restore, background catalog refresh, Auto-Ocarina, RetroAchievements, Nintendo Switch UI revamp, Vanilla Games in Library. Remaining stretch goals (post-MVP): multiple save slots per hack, optional opt-in telemetry (privacy-first, deferred), hardcore mode enablement pending RAdmin User-Agent validation.
 
 ---
 
@@ -157,7 +136,6 @@ br.com.redclaw.zelda64player
 - **LibretroDroid** — Android embedding framework
 - **rcheevos** (MIT) — RetroAchievements client library powering the achievements integration
 - **RetroAchievements.org** — achievement database and web API
-- **OoTR** (ootrandomizer.com) — official OoT Randomizer generator (embedded via WebView)
 - **BPS format** — by byuu / rombp (MIT reference implementation consulted for clean-room)
 - **Inspired by** the romhacking community and the original Ludere project (GPL-3.0)
 - **Dolfi** — SVG icon and cover art generation for the project
@@ -190,9 +168,7 @@ GPL-3.0 — See [LICENSE](LICENSE). This project is a derivative of Ludere (GPL-
 | 14 | Gamepad layout FROZEN | RadialGamePad layout measured for OoT/MM; no changes without user approval + `plano.md` update. In-game chrome restyled to Switch UI. |
 | 15 | No telemetry without opt-in | No analytics, crash reporting, or network calls except user-initiated catalog fetch, patch download, core download (build-time only). |
 | 16 | Validate all inputs | ROM checksums, patch checksums, catalog JSON schema, downloaded file sizes. |
-| 17 | Randomizer is OoT-only (WebView) | Only OoT seeds generated via the official WebView generator are added to the "Randomizadores" Library section (RandomizerLibrarySource is always OoT). The base-ROM legality check (OoT 1.0 NTSC-U/J) is enforced by ootrandomizer.com; the app only supplies the user's imported vanilla OoT ROM and never patches locally. |
-| 18 | Randomizer WebView | No API key, no local patch logic, no schema. The app supplies the user's imported vanilla OoT ROM and captures the client-side generated patch; base-ROM legality is enforced by ootrandomizer.com. |
-| 19 | i18n exception for WebView generator | The OoTR generator site renders its own English UI; only the app's native chrome uses `strings.xml`. |
+| 17 | i18n exception for WebView generator | The OoTR generator site renders its own English UI; only the app's native chrome uses `strings.xml`. |
 | 20 | RA credentials | Never logged; stored only in `EncryptedSharedPreferences` (`ra_secure_prefs`). |
 | 21 | RA hash from final patched ROM | Computed at install time after BPS/ZPF patch applied and ROM written to `Storage.rom(hackId)`. |
 | 22 | Leaderboards never overlaid on gameplay | Accessible ONLY via GameActivity in-game menu (DialogFragment). |

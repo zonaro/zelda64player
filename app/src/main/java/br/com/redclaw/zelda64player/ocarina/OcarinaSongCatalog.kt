@@ -37,7 +37,7 @@ object OcarinaSongCatalog {
      *
      * The title fallback only applies after the prefix checks fail, so canonical
      * codes always win even when a title is misleading. This tolerance does NOT
-     * relax any other eligibility logic elsewhere (e.g. randomizer base-ROM
+     * relax any other eligibility logic elsewhere (e.g. base-ROM
      * validation remains strict about CZLE/CZLJ only).
      */
     fun detectGame(header: RomHeader): OcarinaGame? = when {

@@ -7,14 +7,14 @@
 const I18N = {
   pt: {
     "meta.title": "Zelda 64 Player — Emulador de hacks N64 para Android",
-    "meta.desc": "Front-end de emulador LibretroDroid para hacks de Zelda 64 (Ocarina of Time, Majora's Mask) com patch BPS/IPS ao vivo, randomizador OoT e RetroAchievements.",
+    "meta.desc": "Front-end de emulador LibretroDroid para hacks de Zelda 64 (Ocarina of Time, Majora's Mask) with live BPS/IPS patching, OoT and RetroAchievements.",
     "nav.features": "Recursos",
     "nav.catalog": "Catálogo",
     "nav.legal": "Legal",
     "lang.label": "Idioma",
     "hero.title.pre": "Zelda 64",
     "hero.title.accent": "Player",
-    "hero.subtitle": "O emulador de hacks de Nintendo 64 para Android. Patch BPS/IPS ao vivo, randomizador OoT e RetroAchievements — com a estética da HOME do Nintendo Switch.",
+    "hero.subtitle": "O emulador de hacks de Nintendo 64 para Android. Live BPS/IPS patching, OoT and RetroAchievements — com a estética da HOME do Nintendo Switch.",
     "hero.badge1": "Android",
     "hero.badge2": "GPL-3.0",
     "hero.badge3": "Sem ROMs embutidas",
@@ -41,10 +41,8 @@ const I18N = {
     "f.patch.desc": "Aplica patches BPS/IPS em memória/cache na hora de jogar, validando CRC32 da ROM base, do patch e da ROM final.",
     "f.byteorder.title": "Normalização de byte-order N64",
     "f.byteorder.desc": "Converte automaticamente ROMs .z64/.v64/.n64 para o formato big-endian .z64 antes da emulação.",
-    "f.checksum.title": "Correspondência de ROM base por checksum",
-    "f.checksum.desc": "Identifica a ROM correta do usuário via CRC32/MD5/SHA1 do cabeçalho, evitando patches em ROM errada.",
-    "f.randomizer.title": "Gerador de Randomizer OoT",
-    "f.randomizer.desc": "Randomizador de Ocarina of Time via WebView embutindo o gerador oficial (ootrandomizer.com): sem chave de API, sem schema, sem patch local; o app pré-preenche a ROM e captura o patch gerado.",
+"f.checksum.title": "Correspondência de ROM base por checksum",
+    "f.checksum.desc": "Identifica a ROM correta do usuário via CRC32/MD5/SHA1 de a cabecera, evitando parchear a ROM equivocada.",
     "f.ocarina.title": "Auto-Ocarina",
     "f.ocarina.desc": "HUD in-game que toca automaticamente as músicas de ocarina (OoT: 12, MM: 11) a partir do menu de pausa.",
     "f.ra.title": "Integração RetroAchievements",
@@ -70,14 +68,14 @@ const I18N = {
   },
   en: {
     "meta.title": "Zelda 64 Player — N64 Hack Emulator for Android",
-    "meta.desc": "LibretroDroid emulator front-end for Zelda 64 hacks (Ocarina of Time, Majora's Mask) with live BPS/IPS patching, OoT randomizer and RetroAchievements.",
+    "meta.desc": "LibretroDroid emulator front-end for Zelda 64 hacks (Ocarina of Time, Majora's Mask) with live BPS/IPS patching, OoT  RetroAchievements.",
     "nav.features": "Features",
     "nav.catalog": "Catalog",
     "nav.legal": "Legal",
     "lang.label": "Language",
     "hero.title.pre": "Zelda 64",
     "hero.title.accent": "Player",
-    "hero.subtitle": "The Nintendo 64 hack emulator for Android. Live BPS/IPS patching, OoT randomizer and RetroAchievements — with the Nintendo Switch HOME aesthetic.",
+    "hero.subtitle": "The Nintendo 64 hack emulator for Android. Live BPS/IPS patching, OoT  RetroAchievements — with the Nintendo Switch HOME aesthetic.",
     "hero.badge1": "Android",
     "hero.badge2": "GPL-3.0",
     "hero.badge3": "No bundled ROMs",
@@ -106,8 +104,6 @@ const I18N = {
     "f.byteorder.desc": "Automatically converts .z64/.v64/.n64 ROMs to big-endian .z64 before emulation.",
     "f.checksum.title": "Checksum-based base ROM matching",
     "f.checksum.desc": "Identifies the user's correct ROM via header CRC32/MD5/SHA1, preventing patches on the wrong ROM.",
-    "f.randomizer.title": "OoT Randomizer generator",
-    "f.randomizer.desc": "Ocarina of Time randomizer via an embedded WebView of the official generator (ootrandomizer.com): no API key, no schema, no local patch; the app pre-fills the ROM and captures the generated patch.",
     "f.ocarina.title": "Auto-Ocarina",
     "f.ocarina.desc": "In-game HUD that auto-plays ocarina songs (OoT: 12, MM: 11) from the pause menu.",
     "f.ra.title": "RetroAchievements integration",
@@ -133,14 +129,14 @@ const I18N = {
   },
   es: {
     "meta.title": "Zelda 64 Player — Emulador de hacks N64 para Android",
-    "meta.desc": "Front-end de emulador LibretroDroid para hacks de Zelda 64 (Ocarina of Time, Majora's Mask) con parcheo BPS/IPS en vivo, randomizer OoT y RetroAchievements.",
+    "meta.desc": "Front-end de emulador LibretroDroid para hacks de Zelda 64 (Ocarina of Time, Majora's Mask) con parcheo BPS/IPS en vivo, y OoT y RetroAchievements.",
     "nav.features": "Funciones",
     "nav.catalog": "Catálogo",
     "nav.legal": "Legal",
     "lang.label": "Idioma",
     "hero.title.pre": "Zelda 64",
     "hero.title.accent": "Player",
-    "hero.subtitle": "El emulador de hacks de Nintendo 64 para Android. Parcheo BPS/IPS en vivo, randomizer OoT y RetroAchievements — con la estética HOME de Nintendo Switch.",
+    "hero.subtitle": "El emulador de hacks de Nintendo 64 para Android. Parcheo BPS/IPS en vivo, y OoT y RetroAchievements — con la estética HOME de Nintendo Switch.",
     "hero.badge1": "Android",
     "hero.badge2": "GPL-3.0",
     "hero.badge3": "Sin ROMs incluidas",
@@ -167,10 +163,8 @@ const I18N = {
     "f.patch.desc": "Aplica parches BPS/IPS en memoria/caché al iniciar, validando CRC32 de la ROM base, del parche y de la ROM final.",
     "f.byteorder.title": "Normalización de byte-order N64",
     "f.byteorder.desc": "Convierte automáticamente ROMs .z64/.v64/.n64 al formato big-endian .z64 antes de emular.",
-    "f.checksum.title": "Coincidencia de ROM base por checksum",
+"f.checksum.title": "Coincidencia de ROM base por checksum",
     "f.checksum.desc": "Identifica la ROM correcta del usuario vía CRC32/MD5/SHA1 de la cabecera, evitando parchear la ROM equivocada.",
-    "f.randomizer.title": "Generador de Randomizer OoT",
-    "f.randomizer.desc": "Randomizer de Ocarina of Time vía WebView con el generador oficial (ootrandomizer.com): sin clave de API, sin esquema, sin parche local; la app prellena la ROM y captura el parche generado.",
     "f.ocarina.title": "Auto-Ocarina",
     "f.ocarina.desc": "HUD en juego que reproduce automáticamente las canciones de ocarina (OoT: 12, MM: 11) desde el menú de pausa.",
     "f.ra.title": "Integración RetroAchievements",
@@ -197,14 +191,13 @@ const I18N = {
 };
 
 const FEATURE_KEYS = [
-  "store", "patch", "byteorder", "checksum", "randomizer",
+  "store", "patch", "byteorder", "checksum",
   "ocarina", "ra", "switchui", "vanilla", "gamepad",
   "backup", "refresh", "i18n"
 ];
 
 const FEATURE_ICONS = {
-  store: "S", patch: "P", byteorder: "N", checksum: "C", randomizer: "R",
-  ocarina: "O", ra: "A", switchui: "H", vanilla: "V", gamepad: "G",
+  store: "S", patch: "P", byteorder: "N", checksum: "C", ocarina: "O", ra: "A", switchui: "H", vanilla: "V", gamepad: "G",
   backup: "B", refresh: "U", i18n: "I"
 };
 

@@ -157,7 +157,7 @@ class SwitchGridActivity : AppCompatActivity() {
     private fun setupGrid() {
         binding.gridRecycler.layoutManager = GridLayoutManager(this, spanCount)
         adapter = GridAdapter(
-            onActivate = { menuHost.launchGame(it.id) },
+            onActivate = { menuHost.launchGame(it) },
             onMenu = { menuController.openMenu(it) }
         )
         binding.gridRecycler.adapter = adapter

@@ -11,8 +11,8 @@ import java.io.File
  * Project Rule 10 keeps [br.com.redclaw.zelda64player.retroview.RetroView] the
  * ONLY place ROM bytes reach the core; this resolver only decides WHICH file path
  * is used. Vanilla base-ROM entries (id prefixed with [VANILLA_PREFIX]) resolve to
- * the user's imported, normalized base ROM file, while store hacks and randomizer
- * seeds resolve to the patched ROM at [Storage.rom]. No ROM file is ever copied or
+ * the user's imported, normalized base ROM file, while store hacks resolve to the
+ * patched ROM at [Storage.rom]. No ROM file is ever copied or
  * duplicated (base ROMs are 32-64 MB; Rule 9 performance).
  *
  * The core function [resolveRomFile] is pure and JVM-testable: it takes the

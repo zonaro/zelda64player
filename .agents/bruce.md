@@ -121,7 +121,7 @@
 | `SwitchGameCard` | Square card (1:1), cover image, game title overlay on focus, focus border, dimming overlay |
 | `SwitchAllGamesCard` | Circular card (charcoal fill, cyan 2×2 grid icon, cyan border on focus) |
 | `SwitchGridScreen` | Fullscreen grid ("Todos os Jogos"): header icon+title "Todos os Jogos" 20sp bold + thin separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders |
-| `SwitchDock` | Fixed bottom dock: 4 circular buttons (Loja, Randomizador, RetroAchievements, Sobre/Licenças), ~50dp diameter, colored glyphs, focus ring |
+| `SwitchDock` | Fixed bottom dock: 4 circular buttons (Loja, RetroAchievements, Sobre/Licenças), ~50dp diameter, colored glyphs, focus ring |
 | `SwitchFooterHints` | Bottom bar: left TV+gamepad indicators, right "(i) Sobre" and "+ Opções" gray hints 11–12sp |
 | `SwitchSidePanel` | Right slide-in panel (~50% width), sharp edges, header (teal badge icon + bold title 20–22sp + separator), numbered rows (gray circle 24dp badges), labels 16sp, "(default)" suffix 14sp gray, chevron right, thin line separators |
 | `SwitchDialog` | Centered modal, scrim, box ~40% width, radius 12–16dp, bg `#3A3A3C`, header icon+title 18sp, rows 48–52dp with icon+text, focused row = cyan border outline |
@@ -132,10 +132,10 @@
 ### Implementation Order (Switch UI Revamp Phase)
 1. **Theme tokens + ThemeManager + base styles** — Define colors in `colors.xml` (CSS-variable-style names), create `ThemeManager` (runtime dark/light switch, persists to SharedPreferences), base theme in `themes.xml` (parent `Theme.Material3.DayNight.NoActionBar` — technical base only, no expressive styles).
 2. **Focus system + SwitchFocusBorder + SfxManager** — `SwitchFocusBorder` drawable, focus handling logic (D-pad/click drives cyan border + label above card), `SfxManager` (SoundPool, 5 SFX in `res/raw/`), SFX toggle in settings.
-3. **Library Home rebuild** — `SwitchHomeRow` (horizontal RecyclerView), `SwitchGameCard` (square, cover, focus label, dimming), `SwitchAllGamesCard` (circular, charcoal, cyan grid icon), `SwitchDock` (4 circular buttons), `SwitchFooterHints` (TV/gamepad + "(i) Sobre" / "+ Opções"). Vanilla games first, then store hacks, then randomizer seeds.
+3. **Library Home rebuild** — `SwitchHomeRow` (horizontal RecyclerView), `SwitchGameCard` (square, cover, focus label, dimming), `SwitchAllGamesCard` (circular, charcoal, cyan grid icon), `SwitchDock` (4 circular buttons), `SwitchFooterHints` (TV/gamepad + "(i) Sobre" / "+ Opções"). Vanilla games first, then store hacks.
 4. **Todos os Jogos grid** — `SwitchGridScreen` (fullscreen): header icon+title "Todos os Jogos" 20sp bold + separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders. All entries together (vanilla + hacks + seeds).
 5. **Side panel + Settings restyle** — `SwitchSidePanel` (right slide-in, ~50% width, sharp edges). Quick settings: theme toggle, RA profile status, link to full Settings. Full SettingsActivity restyled entirely (SwitchGridScreen or fullscreen SwitchSidePanel).
-6. **Store / Randomizer / RetroAchievements screens restyle** — Store: Switch cards in grid, detail → SwitchDialog. Randomizer: embedded OoTR WebView generator (ootrandomizer.com) styled with Switch chrome, ROM picker dialog + capture progress dialog. RA: SwitchGridScreen (games), SwitchDialog (detail, leaderboards).
+6. **Store / RetroAchievements screens restyle** — Store: Switch cards in grid, detail → SwitchDialog. RA: SwitchGridScreen (games), SwitchDialog (detail, leaderboards).
 7. **In-game menu + overlays restyle** — Pause menu → SwitchDialog, leaderboards → SwitchDialog, achievement unlock overlay → custom Switch-style toast, ocarina HUD → Switch-style overlay. **RadialGamePad touch layout FROZEN (Rule 14)** — only chrome restyled.
 8. **Splash** — `SplashActivity` or splash theme: Zelda gold/green palette (Dolfi original art), same structural layout as NS Launcher splash (flanking iconic shapes + two-line logo "Zelda 64" / "PLAYER"). No Nintendo IP.
 9. **SFX integration + polish** — Wire SFX to all focus/select/back/panel actions, volume respect, mute toggle, cross-screen consistency, visual QA (Chululu).
@@ -395,34 +395,3 @@
 - **Leaderboards never overlaid**: Only DialogFragment in GameActivity menu.
 - **RA hash from final patched ROM only**: Install-time, after BPS/ZPF applied.
 
-### Phase R: OoT Randomizer via WebView (ootrandomizer.com)
-
-The Randomizer feature embeds the **official OoTR WebView generator** (https://ootrandomizer.com/generator) inside a native Android `WebView`. No API key, no local patch logic, no schema, no ZPF. The user configures options on the site, generates a seed, and is redirected to the seed page (`/seed/get?id=<id>`). The app:
-
-1. Auto-fills the ROM field with the user's imported vanilla OoT ROM (extracting the `.z64` from a `.zip` if needed) via a JS injection that clicks the file input and supplies a `content://` URI through a `FileProvider`.
-2. Intercepts the patched-ROM download (generated client-side via WASM) when the user clicks "Patch ROM!", by hooking the blob download in JS and POSTing the bytes to a local `127.0.0.1` server (fallback: base64 chunks via a `JavascriptInterface`).
-3. Saves the captured ROM to `Storage.rom("randomizer_<seedId>")` via `RandomizedSeedRepository.add(...)`, adding it to the dedicated "Randomizadores" Library section. Unlimited seeds.
-
-**Files (created):**
-- `randomizer/RomZipExtractor.kt` — `object`; `extractZ64(zipFile, outDir): File?` streaming via `ZipInputStream` (no full-file load).
-- `randomizer/RomFileProvider.kt` — `FileProvider` subclass; authority `br.com.redclaw.zelda64player.randomizer.romfileprovider`; serves the temp ROM from `cacheDir/randomizer_rom/`.
-- `randomizer/RandomizerJs.kt` — `const val INJECT_ROM_AUTOFILL` (clicks ROM file input via MutationObserver) + `fun hookDownload(port: Int)` (POSTs blob to `http://127.0.0.1:<PORT>/patch`, fallback base64 chunks to `window.AndroidRandomizer`).
-- `randomizer/WebViewJsBridge.kt` — `@JavascriptInterface appendChunk(base64)` + `endCapture(fileName)`; accumulates decoded chunks to a temp file.
-- `randomizer/LocalRomServer.kt` — `ServerSocket` on `127.0.0.1` ephemeral port; reads headers via raw `InputStream` (NOT `BufferedReader`, to avoid consuming body bytes); streams POST `/patch` body to a temp file; calls `onCaptured(file, fileName)`.
-- `randomizer/RandomizerWebViewModel.kt` — `AndroidViewModel`; loads OoT ROMs (`gameCode.startsWith("CZL")`); `selectRom` copies/extracts to `cacheDir/randomizer_rom/oot_vanilla.z64`, builds content URI via `RomFileProvider` + grants to own package; `consumeCapture(file, fileName)` builds `RandomizedSeedEntry(id="randomizer_$seedId", ootrVersion="web", hasPlandomizer=false, romFileName="rom_$id", baseRomLabel=rom.displayName)` and saves via `seedRepository.add`.
-- `randomizer/RandomizerWebActivity.kt` — WebView host styled with Switch chrome; `GENERATOR_URL="https://ootrandomizer.com/generator"`, `SEED_PATH="/seed/get"`; `onShowFileChooser` auto-supplies `romUri` for ROM requests; `shouldOverrideUrlLoading` restricts nav to ootrandomizer.com; `onPageFinished` injects `INJECT_ROM_AUTOFILL` (delay 1200ms) on seed page and `hookDownload(port)` on all pages; captures via `onPatchCaptured` -> `viewModel.consumeCapture` -> success/error `SwitchDialog`.
-- `randomizer/repository/RandomizedSeedEntry.kt` — kept as-is (fields: id, name, ootrSeedId, ootrVersion, createdAt, hasPlandomizer, romFileName, baseRomLabel).
-- `randomizer/repository/RandomizedSeedRepository.kt` — kept; `add(entry, file)` moves file to `romsDir/rom_<id>` = `Storage.rom(id)`.
-- `views/RandomizerLibrarySource.kt` — kept; uses only id + name.
-
-**Integration points:**
-- `views/LibraryActivity.kt` — dock "Randomizador" launches `RandomizerWebActivity`.
-- `AndroidManifest.xml` — `<activity .randomizer.RandomizerWebActivity>` + `<provider .randomizer.RomFileProvider>` (authorities `br.com.redclaw.zelda64player.randomizer.romfileprovider`, `grantUriPermissions=true`, meta-data `FILE_PROVIDER_PATHS` -> `@xml/randomizer_file_paths`).
-- `repositories/GameRomResolver.kt` — resolves `randomizer_<seedId>` via `Storage.rom(hackId)` (unchanged).
-
-**Invariants:**
-- **No API key, no local patch logic** — the app only supplies the vanilla ROM and captures the client-side generated patch. Base-ROM legality (OoT 1.0 NTSC-U/J) is enforced by ootrandomizer.com itself.
-- **RetroView unchanged** — reads `Storage.rom(hackId)` where `hackId = "randomizer_<seedId>"`.
-- **SRAM/State isolation** — each seed gets own paths via `Storage`.
-- **i18n** — all native chrome strings in `strings.xml` (pt-BR/en/es); the generator site renders its own English UI.
-- **Security** — `allowFileAccess=false`, `allowContentAccess=true`, `mixedContentMode=MIXED_CONTENT_ALWAYS_ALLOW`; nav restricted to ootrandomizer.com; local server bound to `127.0.0.1` only.

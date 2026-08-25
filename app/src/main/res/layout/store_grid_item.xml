@@ -6,40 +6,51 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+    <!-- Cover frame: fixed-height, centerCrop so portrait boxart is never
+         distorted (matches the eShop card layout). The ranking badge overlays
+         the top-left corner of this frame. -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/store_cover_height">
 
-        <!-- CoverImageView derives its height from the CURRENT cover's native
-             aspect ratio (width / height of the drawable's intrinsic size), so
-             every card matches its artwork's proportion and centerCrop fills it
-             with no cropping. The ratio adapts as the drawable changes: while
-             only the portrait placeholder is shown the tile is taller, and it
-             snaps to the cover's true ratio once the image loads. -->
-        <br.com.redclaw.zelda64player.views.CoverImageView
+        <ImageView
             android:id="@+id/item_cover"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@drawable/shape_cover"
             android:clipToOutline="true"
             android:contentDescription="@string/cover_content_description"
             android:scaleType="centerCrop" />
 
         <TextView
-            android:id="@+id/item_status"
+            android:id="@+id/item_rank"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
+            android:layout_gravity="top|start"
             android:layout_margin="6dp"
-            android:background="@drawable/bg_menu_badge"
+            android:background="@drawable/store_rank_badge"
             android:paddingStart="8dp"
-            android:paddingTop="3dp"
+            android:paddingTop="2dp"
             android:paddingEnd="8dp"
-            android:paddingBottom="3dp"
-            android:textColor="@android:color/white"
-            android:textSize="11sp"
+            android:paddingBottom="2dp"
+            android:textColor="@color/switch_accent"
+            android:textSize="12sp"
             android:textStyle="bold" />
     </FrameLayout>
+
+    <!-- Install status BELOW the cover (not overlaid), per the reference layout. -->
+    <TextView
+        android:id="@+id/item_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:paddingStart="8dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="3dp"
+        android:textColor="@android:color/white"
+        android:textSize="11sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/item_name"

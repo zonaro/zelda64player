@@ -8,15 +8,14 @@ import java.io.File
 
 /**
  * Library source exposing the user's imported vanilla base ROMs (OoT / MM) as
- * playable tiles in the Library grid, alongside store hacks and randomizer
- * seeds. Implements the same [HackLibrarySource] interface as
- * [CatalogBackedLibrarySource] and [RandomizerLibrarySource] so [InstalledLibrary]
- * can merge all three through a [CompositeLibrarySource] without touching the UI.
+ * playable tiles in the Library grid, alongside store hacks. Implements the same
+ * [HackLibrarySource] interface as [CatalogBackedLibrarySource] so [InstalledLibrary]
+ * can merge all sources through a [CompositeLibrarySource] without touching the UI.
  *
  * Each vanilla tile is flagged [HackLibraryEntry.isVanilla] (so the context menu
  * omits the management section — base ROMs are managed in Settings) and carries a
  * [HackLibraryEntry.badge] [BadgeType.VANILLA] icon to visually distinguish it
- * from store hacks and randomizer seeds.
+ * from store hacks.
  *
  * The cover image is fetched at runtime from the Libretro thumbnails CDN, chosen
  * by game family via [OcarinaSongCatalog.detectGame] (reusing the existing
@@ -58,10 +57,9 @@ class BaseRomLibrarySource(
 
         /**
          * Box-art cover for OoT (USA) on the Libretro thumbnails CDN. Verified
-         * reachable (HTTP 200) — used for the whole OoT family (CZL*), including
-         * randomizer seeds, since they share the same base game art.
+         * reachable (HTTP 200) — used for the whole OoT family (CZL*).
          */
-        private const val OOT_COVER_URL =
+        const val OOT_COVER_URL =
             "https://thumbnails.libretro.com/Nintendo%20-%20Nintendo%2064/Named_Boxarts/" +
                 "Legend%20of%20Zelda%2C%20The%20-%20Ocarina%20of%20Time%20(USA).png"
 

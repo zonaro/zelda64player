@@ -41,7 +41,7 @@ import br.com.redclaw.zelda64player.views.HackLibraryEntry
  * supplies the data and the activate/menu/all-games callbacks; this component
  * stays presentation-only.
  *
- * Entry ordering (vanilla -> store hacks -> randomizer seeds) is produced
+ * Entry ordering (vanilla -> store hacks) is produced
  * upstream by [br.com.redclaw.zelda64player.views.InstalledLibrary] and passed in
  * via [submitList]; this class does not reorder or re-source the data.
  */

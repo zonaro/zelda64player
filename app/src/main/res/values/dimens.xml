@@ -61,4 +61,10 @@
     <dimen name="switch_side_panel_min_width">320dp</dimen>
     <!-- Quick side panel row height. -->
     <dimen name="switch_side_panel_row_height">52dp</dimen>
+    <!-- Size of each seed-hash item icon overlaid on a seed tile. -->
+    <dimen name="seed_hash_size">28dp</dimen>
+    <!-- Hack Store left sidebar fixed width (eShop-style split layout). -->
+    <dimen name="store_sidebar_width">220dp</dimen>
+    <!-- Hack Store grid card cover frame height (fixed; centerCrop, no distortion). -->
+    <dimen name="store_cover_height">150dp</dimen>
 </resources>

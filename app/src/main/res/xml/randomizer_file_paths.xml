@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<paths>
-    <!-- Temporary vanilla OoT ROM served to the ootrandomizer.com WebView. -->
-    <cache-path
-        name="randomizer_rom"
-        path="randomizer_rom/" />
-</paths>

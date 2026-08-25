@@ -32,7 +32,7 @@ class StoreAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(items[position], position)
     }
 
     override fun getItemCount(): Int = items.size
@@ -47,12 +47,15 @@ class StoreAdapter(
             }
         }
 
-        fun bind(item: StoreItem) {
+        fun bind(item: StoreItem, position: Int) {
             val hack = item.hack
             binding.itemName.text = hack.name
             binding.itemAuthor.text = hack.author
             binding.itemVersion.text =
                 binding.root.context.getString(R.string.store_version_format, hack.version)
+
+            // 1-based ranking number within the current page (eShop-style).
+            binding.itemRank.text = (position + 1).toString()
 
             when (val status = item.status) {
                 is StoreStatus.NotInstalled -> {

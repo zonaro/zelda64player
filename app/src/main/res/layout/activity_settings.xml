@@ -365,6 +365,38 @@
                     android:visibility="gone" />
             </LinearLayout>
 
+            <!-- Section: Language -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/section_spacing"
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SwitchSectionHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_language_title" />
+
+                <TextView
+                    android:id="@+id/settings_language_current"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/settings_language_button"
+                    style="@style/SwitchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/language_select" />
+            </LinearLayout>
+
             <!-- Section Sobre -->
             <LinearLayout
                 android:layout_width="match_parent"

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cyan focus border shown only while a view is focused (transparent otherwise).
+     Reused for the fullscreen hack-detail close button and download button. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true" android:state_enabled="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="@dimen/switch_focus_border_width"
+                android:color="@color/switch_accent" />
+            <corners android:radius="4dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</selector>

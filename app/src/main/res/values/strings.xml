@@ -78,6 +78,15 @@
     <string name="store_status_update">Atualização disponível</string>
     <string name="store_status_not_installed">Não instalado</string>
 
+    <!-- Hack Store: sidebar categories -->
+    <string name="store_cat_all">Todos</string>
+    <string name="store_cat_installed">Instalados</string>
+    <string name="store_cat_updates">Atualizações</string>
+    <string name="store_cat_oot">Ocarina of Time</string>
+    <string name="store_cat_mm">Majora\'s Mask</string>
+    <string name="store_search_icon_desc">Buscar</string>
+    <string name="detail_close_desc">Fechar</string>
+
     <!-- Hack Store: search + pagination -->
     <string name="store_search_hint">Buscar na loja...</string>
     <string name="store_no_results">Nenhum resultado para a busca</string>
@@ -164,17 +173,6 @@
     <string name="settings_catalog_delete_desc">Remover URL de catálogo</string>
     <string name="settings_catalog_remove_confirm_title">Remover URL de catálogo?</string>
 
-    <!-- Randomizer WebView (ootrandomizer.com generator) -->
-    <string name="randomizer_web_title">Randomizador</string>
-    <string name="randomizer_web_loading">Carregando…</string>
-    <string name="randomizer_web_select_rom">Selecione a ROM vanilla de OoT</string>
-    <string name="randomizer_web_no_vanilla">Nenhuma ROM vanilla de OoT importada. Importe uma ROM de OoT 1.0 NTSC-U/J em Configurações.</string>
-    <string name="randomizer_web_open_settings">Abrir Configurações</string>
-    <string name="randomizer_web_patch_captured">ROM patcheada capturada! Adicionada aos Randomizadores.</string>
-    <string name="randomizer_web_open_library">Ir para a Library</string>
-    <string name="randomizer_web_capture_failed">Falha ao capturar o patch. Tente novamente.</string>
-    <string name="randomizer_web_extract_failed">Não foi possível extrair o .z64 do ZIP.</string>
-    <string name="randomizer_web_rom_picker_title">Escolha a ROM de OoT</string>
 
     <!-- Settings: RetroAchievements -->
     <string name="settings_ra_title">RetroAchievements</string>
@@ -256,46 +254,6 @@
     <string name="shortcut_disabled_not_installed">Jogo não instalado</string>
     <string name="shortcut_pin_unsupported">Adicionar à tela inicial não é suportado nesta versão do Android.</string>
 
-    <!-- Randomizer (OoTR) -->
-    <string name="randomizer_title">Gerador de Randomizador</string>
-    <string name="randomizer_seed_name_hint">Nome da seed (obrigatório)</string>
-    <string name="randomizer_seed_name_required">Informe um nome para a seed.</string>
-    <string name="randomizer_seed_string_hint">Seed fixa (opcional, para reproduzir)</string>
-    <string name="randomizer_advanced">Avançado</string>
-    <string name="randomizer_version_hint">Versão do OoTR</string>
-    <string name="randomizer_plandomizer_title">Plandomizer</string>
-    <string name="randomizer_plandomizer_button">Abrir editor de Plandomizer</string>
-    <string name="randomizer_plandomizer_configured">Plandomizer configurado</string>
-    <string name="randomizer_generate">Gerar Seed</string>
-    <string name="randomizer_edit">Editar seleção</string>
-    <string name="randomizer_list_none">Nenhum selecionado</string>
-    <string name="randomizer_category_main">Regras</string>
-    <string name="randomizer_category_open">Mundo Aberto</string>
-    <string name="randomizer_category_shuffle">Embaralhar</string>
-    <string name="randomizer_category_dungeons">Masmorras</string>
-    <string name="randomizer_category_tricks">Truques</string>
-    <string name="randomizer_category_timesavers">Economia de Tempo</string>
-    <string name="randomizer_category_starting_items">Itens Iniciais</string>
-    <string name="randomizer_category_misc">Diversos</string>
-    <string name="randomizer_category_cosmetics">Cosméticos</string>
-    <string name="randomizer_queue_position">Fila: %1$d</string>
-    <string name="randomizer_polling">Gerando… %1$d%%</string>
-    <string name="randomizer_success">Seed gerada com sucesso.</string>
-    <string name="randomizer_success_detail">Seed %1$s pronta para jogar.</string>
-    <string name="randomizer_error_prefix">Falha:</string>
-    <string name="randomizer_error_missing_key">Chave de API não configurada. Adicione-a nas Configurações.</string>
-    <string name="randomizer_error_validation">%1$d opção(ões) inválida(s). Verifique o formulário.</string>
-    <string name="randomizer_error_no_base_rom">Nenhuma ROM base importada. Importe Ocarina of Time 1.0 NTSC-U (CZLE) ou NTSC-J (CZLJ) para usar o randomizador.</string>
-    <string name="randomizer_error_invalid_base_rom">Nenhuma ROM base compatível. O randomizador exige Ocarina of Time 1.0 NTSC-U (CZLE) ou NTSC-J (CZLJ).</string>
-    <string name="randomizer_error_network">Erro de rede. Verifique sua conexão e tente novamente.</string>
-    <string name="randomizer_error_rate_limited">Muitas requisições. Aguarde 10 segundos e tente novamente.</string>
-    <string name="randomizer_error_queue_full">Fila de geração cheia. Tente novamente em alguns minutos.</string>
-    <string name="randomizer_error_timeout">Tempo de geração esgotado. Tente novamente.</string>
-    <string name="randomizer_error_patch">Falha ao aplicar o patch: %1$s</string>
-    <string name="randomizer_status_creating">Criando seed…</string>
-    <string name="randomizer_status_downloading">Baixando patch…</string>
-    <string name="randomizer_status_applying">Aplicando patch na ROM…</string>
-    <string name="randomizer_status_working">Processando…</string>
 
     <!-- Plandomizer editor -->
     <string name="plandomizer_title">Editor de Plandomizer</string>
@@ -334,20 +292,10 @@
     <string name="plandomizer_remove_row">Remover linha</string>
     <string name="plandomizer_import_error">Não foi possível ler o arquivo: %1$s</string>
     <string name="plandomizer_import_success">Arquivo importado.</string>
-    <string name="randomizer_error_plandomizer_invalid">Plandomizer inválido: %1$s</string>
-    <string name="randomizer_success_plandomizer_rejected">Seed gerada, mas o Plandomizer NÃO foi aplicado (pode não ser suportado pela API). Use o site oficial para seeds customizadas.</string>
 
-    <!-- Randomizer: Library integration -->
-    <string name="library_menu_randomizer">Gerador de Randomizador</string>
-    <string name="randomizer_badge_content_description">Seed de randomizador</string>
     <string name="vanilla_badge_content_description">Jogo original (vanilla)</string>
     <string name="hack_badge_content_description">Hack de ROM</string>
-    <string name="menu_delete_seed">Excluir Seed</string>
-    <string name="randomizer_delete_title">Excluir seed %1$s</string>
-    <string name="randomizer_delete_message">Isso excluirá permanentemente a seed e todos os seus saves (SRAM e estados).</string>
-    <string name="randomizer_delete_button">Excluir</string>
-    <string name="randomizer_delete_done">Seed excluída</string>
-    <string name="randomizer_delete_failed">Falha ao excluir a seed</string>
+
 
     <!-- Auto-Ocarina -->
     <string name="menu_category_ocarina">Ocarina</string>
@@ -381,12 +329,13 @@
     <!-- ===== Nintendo Switch UI - Library Home (Phase B) ===== -->
     <string name="all_games">Todos os Jogos</string>
     <string name="dock_store">Loja</string>
-    <string name="dock_randomizer">Randomizador</string>
     <string name="dock_achievements">RetroAchievements</string>
     <string name="dock_settings">Configurações</string>
     <string name="footer_about">(i) Sobre</string>
     <string name="footer_options">+ Opções</string>
-    <string name="footer_gamepad">Controle conectado</string>
+    <string name="footer_gamepad_disconnected">Controle desconectado</string>
+    <string name="footer_gamepad_connected">Controle: %1$s</string>
+    <string name="footer_gamepad_connected_multiple">Controle: %1$s (+%2$d)</string>
     <string name="options_coming_soon">Opções em breve</string>
     <string name="about_dialog_title">Sobre e Licenças</string>
     <string name="about_dialog_close">Fechar</string>
@@ -432,4 +381,12 @@
     <string name="game_oot">Ocarina of Time</string>
     <string name="game_mm">Majora\'s Mask</string>
     <string name="game_unknown">desconhecida</string>
+
+    <!-- Settings: language -->
+    <string name="settings_language_title">Idioma</string>
+    <string name="language_auto">Automático (padrão do sistema)</string>
+    <string name="language_portuguese">Português (Brasil)</string>
+    <string name="language_english">Inglês</string>
+    <string name="language_spanish">Espanhol</string>
+    <string name="language_select">Selecionar idioma</string>
 </resources>

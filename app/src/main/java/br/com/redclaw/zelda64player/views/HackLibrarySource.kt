@@ -7,8 +7,6 @@ import br.com.redclaw.zelda64player.ocarina.OcarinaGame
 enum class BadgeType {
     /** User-imported vanilla base ROM (managed in Settings). */
     VANILLA,
-    /** Generated OoTRandomizer seed. */
-    RANDOMIZER,
     /** Store hack or locally-placed patch. */
     HACK
 }
@@ -27,8 +25,6 @@ data class HackLibraryEntry(
      * icon, MM -> purple bg / white icon.
      */
     val family: OcarinaGame? = null,
-    /** True when this tile is a generated randomizer seed (not a store hack). */
-    val isRandomizer: Boolean = false,
     /** True when this tile is a user-imported vanilla base ROM (managed in Settings). */
     val isVanilla: Boolean = false
 )

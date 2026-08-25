@@ -19,7 +19,6 @@ Generates all **raster images (PNG/JPG)** and **SVG icons** needed by the app. D
 |-------|----------|-------|--------|-------|
 | Splash artwork | Splash screen background | 1080×1920 px (portrait), Zelda gold/green palette | Level 1 or Level 3 | Original art — flanking iconic shapes + two-line logo "Zelda 64" / "PLAYER". **No Nintendo IP** (no Joy-Con shapes, no Nintendo logos). Same structural layout as NS Launcher splash. |
 | `ic_dock_store.svg` | Dock button "Loja" | 24×24 dp, monochrome, tintable | Level 1 (code-based) | Shopping bag/cart glyph, consistent with Switch dock style |
-| `ic_dock_randomizer.svg` | Dock button "Randomizador" | 24×24 dp, monochrome, tintable | Level 1 | Shuffle/dice glyph |
 | `ic_dock_ra.svg` | Dock button "RetroAchievements" | 24×24 dp, monochrome, tintable | Level 1 | Trophy/medal glyph |
 | `ic_dock_about.svg` | Dock button "Sobre/Licenças" | 24×24 dp, monochrome, tintable | Level 1 | Info circle glyph |
 | `ic_all_games.svg` | Circular "Todos os Jogos" card | 48×48 dp, cyan 2×2 grid icon | Level 1 | Used in `SwitchAllGamesCard` |
@@ -34,7 +33,6 @@ Generates all **raster images (PNG/JPG)** and **SVG icons** needed by the app. D
 | `ic_category_restoration.svg` | Content restoration hacks | 24×24 dp |
 | `ic_category_enhancement.svg` | Graphics/gameplay enhancement | 24×24 dp |
 | `ic_category_bugfix.svg` | Bugfix-only patches | 24×24 dp |
-| `ic_category_randomizer.svg` | Randomizer hacks (future) | 24×24 dp |
 
 ### RetroAchievements Icons (SVG → PNG for UI)
 | Icon | Use Case | Specs |

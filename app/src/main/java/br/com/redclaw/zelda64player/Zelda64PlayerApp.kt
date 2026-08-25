@@ -21,6 +21,7 @@ import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
 import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.ui.switchui.SfxManager
 import br.com.redclaw.zelda64player.ui.switchui.ThemeManager
+import br.com.redclaw.zelda64player.utils.LanguageManager
 import br.com.redclaw.zelda64player.views.InstalledLibrary
 import br.com.redclaw.zelda64player.work.CatalogRefreshWorker
 import java.io.File
@@ -37,6 +38,10 @@ import java.util.concurrent.TimeUnit
         // Apply the persisted Switch UI theme before the first view is inflated
         // to avoid a theme flash on cold start.
         ThemeManager.applyAtStartup(this)
+        // Apply the persisted display language before the first view is inflated
+        // so the locale is correct on cold start (AppCompatDelegate recreates
+        // activities as needed when the choice changes at runtime).
+        LanguageManager.applyAtStartup(this)
         super.onCreate()
         instance = this
         // Initialize the Hack Store download + patch queue (process-lifetime

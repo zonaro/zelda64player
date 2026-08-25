@@ -6,18 +6,23 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.databinding.ActivityStoreBinding
 import br.com.redclaw.zelda64player.ocarina.OcarinaGame
@@ -37,6 +42,11 @@ class StoreActivity : AppCompatActivity() {
     private lateinit var binding: ActivityStoreBinding
     internal lateinit var viewModel: StoreViewModel
     private lateinit var adapter: StoreAdapter
+
+    private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
+
+    /** Sidebar category rows, rebuilt once in [onCreate]. */
+    private val categoryRows = mutableListOf<CategoryRowUi>()
 
     private var currentPageHacks: List<HackEntry> = emptyList()
 
@@ -83,7 +93,7 @@ class StoreActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this)[StoreViewModel::class.java]
 
-        val spanCount = resources.getInteger(R.integer.library_span_count)
+        val spanCount = computeStoreSpanCount()
         binding.storeGrid.layoutManager = GridLayoutManager(this, spanCount)
         adapter = StoreAdapter { hack -> openDetail(hack) }
         binding.storeGrid.adapter = adapter
@@ -95,6 +105,9 @@ class StoreActivity : AppCompatActivity() {
                 viewModel.setQuery(s?.toString().orEmpty())
             }
         })
+
+        buildCategoryRows()
+        binding.storeSearchIcon.setOnClickListener { toggleSearch() }
 
         binding.storePrev.setOnClickListener { viewModel.prevPage() }
         binding.storeNext.setOnClickListener { viewModel.nextPage() }
@@ -126,6 +139,13 @@ class StoreActivity : AppCompatActivity() {
         viewModel.pagedItems.observe(this) { state ->
             if (state == null) return@observe
             renderPage(state)
+        }
+
+        // Keep the sidebar highlight + section header in sync with the active
+        // category (also covers programmatic category changes).
+        viewModel.category.observe(this) { cat ->
+            updateCategoryHighlight(cat)
+            binding.storeSectionTitle.text = getString(cat.labelRes)
         }
 
         // Re-render the grid badges whenever the download queue changes
@@ -192,9 +212,120 @@ class StoreActivity : AppCompatActivity() {
     }
 
     private fun openDetail(hack: HackEntry) {
-        HackDetailBottomSheet.newInstance(hack)
+        HackDetailDialog.newInstance(hack)
             .show(supportFragmentManager, "hack_detail")
     }
+
+    /**
+     * Responsive column count for the main-content grid: at least 3 columns,
+     * more on wider screens (capped so ultra-wide layouts don't shrink cards to
+     * an unreadable size). Derived from the content area width (screen minus the
+     * fixed sidebar) divided by a ~200dp target card width.
+     */
+    private fun computeStoreSpanCount(): Int {
+        val density = resources.displayMetrics.density
+        val sidebarPx = resources.getDimensionPixelSize(R.dimen.store_sidebar_width).toFloat()
+        val contentPx = resources.displayMetrics.widthPixels - sidebarPx
+        val targetCardPx = 200f * density
+        return maxOf(3, minOf(6, (contentPx / targetCardPx).toInt()))
+    }
+
+    /** Builds the sidebar category rows once and wires their click handlers. */
+    private fun buildCategoryRows() {
+        val density = resources.displayMetrics.density
+        categoryRows.clear()
+        binding.storeCategoryList.removeAllViews()
+        StoreCategory.ALL.forEach { cat ->
+            val accent = View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    (4 * density).toInt(),
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                ).apply { marginEnd = (12 * density).toInt() }
+                setBackgroundResource(R.color.switch_accent)
+                visibility = View.GONE
+            }
+            val label = TextView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                text = getString(cat.labelRes)
+                setTextColor(ContextCompat.getColor(this@StoreActivity, R.color.switch_text_primary))
+                textSize = 16f
+            }
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                isFocusable = true
+                isFocusableInTouchMode = true
+                isClickable = true
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { bottomMargin = (8 * density).toInt() }
+                setPadding(
+                    (16 * density).toInt(),
+                    (12 * density).toInt(),
+                    (16 * density).toInt(),
+                    (12 * density).toInt()
+                )
+                addView(accent)
+                addView(label)
+                setOnClickListener { onCategorySelected(cat) }
+                onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                    if (hasFocus) sfx?.focusMove()
+                }
+            }
+            binding.storeCategoryList.addView(row)
+            categoryRows.add(CategoryRowUi(cat, row, accent, label))
+        }
+        updateCategoryHighlight(viewModel.category.value ?: StoreCategory.All)
+    }
+
+    /** Highlights the active category row (accent bar + bg + accent text). */
+    private fun updateCategoryHighlight(active: StoreCategory) {
+        categoryRows.forEach { (cat, row, accent, label) ->
+            val isActive = cat == active
+            accent.visibility = if (isActive) View.VISIBLE else View.GONE
+            row.setBackgroundColor(
+                ContextCompat.getColor(
+                    this,
+                    if (isActive) R.color.switch_bg else android.R.color.transparent
+                )
+            )
+            label.setTextColor(
+                ContextCompat.getColor(
+                    this,
+                    if (isActive) R.color.switch_accent else R.color.switch_text_primary
+                )
+            )
+        }
+    }
+
+    private fun onCategorySelected(cat: StoreCategory) {
+        sfx?.select()
+        viewModel.setCategory(cat)
+    }
+
+    /** Toggles the search field: show + focus, or hide + clear the query. */
+    private fun toggleSearch() {
+        if (binding.storeSearch.visibility == View.VISIBLE) {
+            binding.storeSearch.setText("")
+            viewModel.setQuery("")
+            binding.storeSearch.visibility = View.GONE
+            binding.storeGrid.requestFocus()
+        } else {
+            binding.storeSearch.visibility = View.VISIBLE
+            binding.storeSearch.requestFocus()
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.showSoftInput(binding.storeSearch, InputMethodManager.SHOW_IMPLICIT)
+        }
+    }
+
+    /** Small tuple holding the views of a single sidebar category row. */
+    private data class CategoryRowUi(
+        val category: StoreCategory,
+        val row: LinearLayout,
+        val accent: View,
+        val label: TextView
+    )
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.store_menu, menu)

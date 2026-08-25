@@ -31,7 +31,7 @@ import br.com.redclaw.zelda64player.Zelda64PlayerApp
 
 /**
  * Bottom dock of the Switch home screen: a centered row of circular buttons
- * (Loja, Randomizador, RetroAchievements, Sobre e Licenças). Each button shows a
+ * (Loja, RetroAchievements, Sobre e Licenças). Each button shows a
  * white glyph on a dock-circle background and gains a round cyan focus border when
  * focused; the glyph brightens slightly on focus. Click plays the select sound
  * then runs the button's [DockItem.action].

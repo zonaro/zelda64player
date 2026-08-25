@@ -38,7 +38,7 @@ import br.com.redclaw.zelda64player.Zelda64PlayerApp
  * an optional header (icon + title), an optional message, an optional
  * single-choice list, and an optional positive/negative button row.
  *
- * Built for reuse across Phases D (Settings confirmations), E (Store / Randomizer)
+ * Built for reuse across Phases D (Settings confirmations), E (Store)
  * and F (RetroAchievements): every focusable element (list rows and buttons)
  * shows the cyan focus border, focus traversal plays the focus-move "toc",
  * activation plays select, and BACK plays the back sound before dismissing.

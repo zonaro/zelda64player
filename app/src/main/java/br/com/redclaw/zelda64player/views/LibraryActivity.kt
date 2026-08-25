@@ -29,7 +29,6 @@ import androidx.appcompat.app.AppCompatActivity
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.databinding.ActivityLibraryBinding
-import br.com.redclaw.zelda64player.randomizer.RandomizerWebActivity
 import br.com.redclaw.zelda64player.viewmodels.LibraryMenuHostDelegate
 import br.com.redclaw.zelda64player.retroachievements.ui.AchievementsActivity
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
@@ -61,10 +60,10 @@ import java.io.File
  * [br.com.redclaw.zelda64player.ui.switchui.SwitchGridActivity].
  *
  * All data flow is preserved from the previous grid implementation: the entry
- * list is still produced by [InstalledLibrary.entries] (which merges the vanilla,
- * store and randomizer sources in the required order), and every existing behavior
- * is kept — import/export save flows, the per-game context menu (long-press /
- * overflow / physical SELECT-X-Y), uninstall and delete-seed, RetroAchievements
+     * list is still produced by [InstalledLibrary.entries] (which merges the vanilla
+     * and store sources in the required order), and every existing behavior
+     * is kept — import/export save flows, the per-game context menu (long-press /
+     * overflow / physical SELECT-X-Y), uninstall, RetroAchievements
  * deep-link, shortcut sync, empty state, and immersive mode. Only the presentation
  * layer changed; the [LibraryMenuController] and [LibraryMenuHost] contracts are
  * untouched.
@@ -78,7 +77,7 @@ class LibraryActivity : AppCompatActivity() {
 
     private lateinit var menuController: LibraryMenuController
 
-    /* Shared host logic (launch, SAF save pickers, uninstall, delete-seed, pin,
+    /* Shared host logic (launch, SAF save pickers, uninstall, pin,
        achievements). Extracted to [LibraryMenuHostDelegate] so the full-screen
        grid screen reuses the exact same context-menu actions (DRY). */
     private lateinit var menuHost: LibraryMenuHostDelegate
@@ -140,7 +139,7 @@ class LibraryActivity : AppCompatActivity() {
      * and the trailing "Todos os Jogos" card opens the grid.
      */
     private fun setupHomeRow() {
-        binding.libraryHomeRow.setOnEntryActivate { menuHost.launchGame(it.id) }
+        binding.libraryHomeRow.setOnEntryActivate { menuHost.launchGame(it) }
         binding.libraryHomeRow.setOnEntryMenu { menuController.openMenu(it) }
         binding.libraryHomeRow.setOnAllGamesActivate {
             startActivity(Intent(this, SwitchGridActivity::class.java))
@@ -148,17 +147,13 @@ class LibraryActivity : AppCompatActivity() {
         binding.libraryHomeRow.submitList(items)
     }
 
-    /** Build the four dock destinations (Loja, Randomizador, RA, Configurações). */
+    /** Build the three dock destinations (Loja, RA, Configurações). */
     private fun setupDock() {
         val dockItems = listOf(
             SwitchDock.DockItem(
                 R.drawable.ic_store,
                 R.string.dock_store
             ) { startActivity(Intent(this, StoreActivity::class.java)) },
-            SwitchDock.DockItem(
-                R.drawable.ic_randomizer,
-                R.string.dock_randomizer
-            ) { startActivity(Intent(this, RandomizerWebActivity::class.java)) },
             SwitchDock.DockItem(
                 R.drawable.ic_trophy,
                 R.string.dock_achievements
@@ -188,8 +183,8 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     /**
-     * Rebuild the library list after a mutation performed by [menuHost] (uninstall
-     * or delete-seed) and refresh the dependent UI: the home row, the empty state
+     * Rebuild the library list after a mutation performed by [menuHost] (uninstall)
+     * and refresh the dependent UI: the home row, the empty state
      * and the dynamic shortcuts. Centralized here so the shared
      * [LibraryMenuHostDelegate] only has to invoke this single callback (DRY).
      */

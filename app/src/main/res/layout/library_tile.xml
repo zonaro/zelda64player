@@ -72,7 +72,7 @@
             android:contentDescription="@string/menu_overflow_content_description" />
 
         <!-- Badge (top-start corner): an icon chip distinguishing tile
-             categories (vanilla ROM / randomizer seed / hack). Hidden unless the
+             categories (vanilla ROM / hack). Hidden unless the
              entry provides a badge. Also inside the elevated card so it is never
              occluded by the artwork. The icon is set in the adapter; the chip is a
              28dp rounded background with a centered 18dp glyph. -->
@@ -86,7 +86,7 @@
             android:padding="5dp"
             android:scaleType="centerInside"
             android:visibility="gone"
-            android:contentDescription="@string/randomizer_badge_content_description" />
+            android:contentDescription="@null" />
 
     </FrameLayout>
 

@@ -28,8 +28,8 @@ interface LibraryMenuHost {
      */
     fun context(): Activity
 
-    /** Launch [hackId] the same way tapping its tile does (debounce included). */
-    fun launchGame(hackId: String)
+    /** Launch [entry] the same way tapping its tile does (debounce included). */
+    fun launchGame(entry: HackLibraryEntry)
 
     /** Begin exporting [entry]'s saves via the SAF document picker. */
     fun requestExportSaves(entry: HackLibraryEntry)
@@ -39,9 +39,6 @@ interface LibraryMenuHost {
 
     /** Show the uninstall confirmation dialog for [entry]. */
     fun confirmUninstall(entry: HackLibraryEntry)
-
-    /** Show the delete-seed confirmation dialog for a randomizer [entry]. */
-    fun confirmDeleteSeed(entry: HackLibraryEntry)
 
     /** Pin [entry] to the home screen (existing shortcut feature). */
     fun pinShortcut(entry: HackLibraryEntry)
@@ -142,7 +139,7 @@ class LibraryMenuController(private val host: LibraryMenuHost) {
                 MenuActionItem(
                     "start", R.string.menu_start, R.drawable.ic_play,
                     badgeRes = R.string.badge_start
-                ) { host.launchGame(entry.id) },
+                ) { host.launchGame(entry) },
                 MenuActionItem(
                     "achievements", R.string.menu_achievements, R.drawable.ic_trophy
                 ) { host.openAchievements(entry) },
@@ -166,24 +163,15 @@ class LibraryMenuController(private val host: LibraryMenuHost) {
         )
         val management = MenuSection(
             R.string.menu_category_management,
-            if (entry.isRandomizer) {
-                listOf(
-                    MenuActionItem(
-                        "delete_seed", R.string.menu_delete_seed, R.drawable.ic_uninstall,
-                        badgeRes = R.string.badge_y
-                    ) { host.confirmDeleteSeed(entry) }
-                )
-            } else {
-                listOf(
-                    MenuActionItem(
-                        "uninstall", R.string.menu_uninstall, R.drawable.ic_uninstall,
-                        badgeRes = R.string.badge_y
-                    ) { host.confirmUninstall(entry) }
-                )
-            }
+            listOf(
+                MenuActionItem(
+                    "uninstall", R.string.menu_uninstall, R.drawable.ic_uninstall,
+                    badgeRes = R.string.badge_y
+                ) { host.confirmUninstall(entry) }
+            )
         )
         /* Vanilla base ROMs are managed in Settings, not the Library context menu,
-            so the management section (uninstall / delete-seed) is omitted entirely.
+            so the management section (uninstall) is omitted entirely.
             Start, achievements, pin, and saves export/import stay available. */
         return if (entry.isVanilla) {
             listOf(game, saves)

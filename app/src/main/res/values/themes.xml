@@ -53,12 +53,13 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
-    <!-- Bottom-sheet style for the hack detail dialog: anchored to the bottom,
-         full width, with a slide-up/down animation. -->
-    <style name="StoreBottomSheet" parent="Theme.AppCompat.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
+    <!-- Fullscreen hack-detail dialog (replaces the old bottom sheet): fills the
+         screen, Switch background, fade animation. -->
+    <style name="StoreDetailFullscreen" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/switch_bg</item>
+        <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="android:windowAnimationStyle">@style/StoreBottomSheetAnimation</item>
+        <item name="android:windowAnimationStyle">@style/SwitchDialogAnimation</item>
     </style>
 
     <style name="StoreBottomSheetAnimation">
@@ -76,7 +77,7 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <!-- Shared randomizer settings row containers (DRY for row_setting_*).
+    <!-- Shared settings row containers (DRY for row_setting_*).
          An explicit parent is required: on this AAPT2 version parent="" does
          NOT suppress the implicit parent lookup that a dotted style name
          triggers, so "Widget.Zelda.SettingRow" would otherwise look up the

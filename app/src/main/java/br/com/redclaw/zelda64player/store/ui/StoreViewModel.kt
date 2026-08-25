@@ -44,6 +44,10 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     private val _query = MutableLiveData<String>("")
     val query: LiveData<String> = _query
 
+    /** Active sidebar category filter. */
+    private val _category = MutableLiveData<StoreCategory>(StoreCategory.All)
+    val category: LiveData<StoreCategory> = _category
+
     /** Current 0-based page index. */
     private val _page = MutableLiveData<Int>(0)
     val page: LiveData<Int> = _page
@@ -60,6 +64,7 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     init {
         _pagedItems.addSource(_catalog) { recomputePaged() }
         _pagedItems.addSource(_query) { recomputePaged() }
+        _pagedItems.addSource(_category) { recomputePaged() }
         _pagedItems.addSource(_page) { recomputePaged() }
     }
 
@@ -75,16 +80,38 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         val q = _query.value ?: ""
-        val filtered = StorePager.filter(state.hacks, q)
-        val result = StorePager.page(filtered, _page.value ?: 0)
+        val byQuery = StorePager.filter(state.hacks, q)
+        val byCategory = filterByCategory(byQuery, _category.value ?: StoreCategory.All)
+        val result = StorePager.page(byCategory, _page.value ?: 0)
         _pagedItems.value = StorePageState(
             items = result.items,
             pageIndex = result.pageIndex,
             totalPages = result.totalPages,
             query = q,
             catalogEmpty = state.hacks.isEmpty(),
-            filteredEmpty = filtered.isEmpty() && state.hacks.isNotEmpty()
+            filteredEmpty = byCategory.isEmpty() && state.hacks.isNotEmpty()
         )
+    }
+
+    /**
+     * Filters [hacks] by the active [StoreCategory]. The category predicates are
+     * derived from data already on each hack: install status (for [StoreCategory.Installed]
+     * and [StoreCategory.Updates]) and the base ROM game code prefix (for [StoreCategory.Oot]
+     * and [StoreCategory.Mm]).
+     */
+    private fun filterByCategory(hacks: List<HackEntry>, category: StoreCategory): List<HackEntry> {
+        return when (category) {
+            StoreCategory.All -> hacks
+            StoreCategory.Installed -> hacks.filter {
+                statusFor(it) is StoreStatus.Installed || statusFor(it) is StoreStatus.UpdateAvailable
+            }
+            StoreCategory.Updates -> hacks.filter { statusFor(it) is StoreStatus.UpdateAvailable }
+            StoreCategory.Oot -> hacks.filter { it.baseRom.gameCode.startsWith("CZL", ignoreCase = true) }
+            StoreCategory.Mm -> hacks.filter {
+                it.baseRom.gameCode.startsWith("NZL", ignoreCase = true) ||
+                    it.baseRom.gameCode.startsWith("NSM", ignoreCase = true)
+            }
+        }
     }
 
     /** Updates the search query, resetting to page 1 when it actually changes. */
@@ -92,6 +119,13 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
         val trimmed = raw.trim()
         if (_query.value == trimmed) return
         _query.value = trimmed
+        _page.value = 0
+    }
+
+    /** Switches the active sidebar category, resetting to the first page. */
+    fun setCategory(cat: StoreCategory) {
+        if (_category.value == cat) return
+        _category.value = cat
         _page.value = 0
     }
 

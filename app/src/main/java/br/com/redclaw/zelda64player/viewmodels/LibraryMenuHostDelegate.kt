@@ -26,7 +26,6 @@ import androidx.appcompat.app.AppCompatActivity
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.data.local.AppRepositories
 import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
-import br.com.redclaw.zelda64player.randomizer.repository.RandomizedSeedRepository
 import br.com.redclaw.zelda64player.repositories.GameRomResolver
 import br.com.redclaw.zelda64player.repositories.SaveBackupManager
 import br.com.redclaw.zelda64player.repositories.Storage
@@ -42,11 +41,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 /**
  * Shared [LibraryMenuHost] implementation used by both [br.com.redclaw.zelda64player.views.LibraryActivity]
  * and the full-screen [br.com.redclaw.zelda64player.ui.switchui.SwitchGridActivity] so the per-game
- * context menu actions (launch, export/import saves, uninstall, delete-seed, pin,
+ * context menu actions (launch, export/import saves, uninstall, pin,
  * achievements) are defined exactly once (DRY).
  *
- * Owns the SAF document pickers, the debounced launch, and the uninstall /
- * delete-seed flows. After a library mutation (uninstall or delete-seed) it
+ * Owns the SAF document pickers, the debounced launch, and the uninstall
+ * flow. After a library mutation (uninstall) it
  * invokes [onLibraryChanged] so the host can rebuild its grid and re-sync
  * shortcuts without this class knowing about either screen's UI.
  *
@@ -106,15 +105,15 @@ class LibraryMenuHostDelegate(
     override fun context(): Activity = activity
 
     /**
-     * Launch [hackId] the same way tapping its tile does, respecting the shared
+     * Launch [entry] the same way tapping its tile does, respecting the shared
      * debounce so a rapid repeat (e.g. physical A + tile tap) fires only once.
      */
-    override fun launchGame(hackId: String) {
+    override fun launchGame(entry: HackLibraryEntry) {
         val now = System.currentTimeMillis()
         if (now - lastLaunchClickTime < LAUNCH_CLICK_DEBOUNCE_MS) return
         lastLaunchClickTime = now
         val intent = Intent(activity, GameActivity::class.java).apply {
-            putExtra("hack_id", hackId)
+            putExtra("hack_id", entry.id)
         }
         activity.startActivity(intent)
     }
@@ -159,15 +158,6 @@ class LibraryMenuHostDelegate(
             .show()
     }
 
-    override fun confirmDeleteSeed(entry: HackLibraryEntry) {
-        AlertDialog.Builder(activity)
-            .setTitle(activity.getString(R.string.randomizer_delete_title, entry.title))
-            .setMessage(R.string.randomizer_delete_message)
-            .setPositiveButton(R.string.randomizer_delete_button) { _, _ -> performDeleteSeed(entry) }
-            .setNegativeButton(R.string.dialog_cancel, null)
-            .show()
-    }
-
     /**
      * Delete the game's files, unmark it as installed and drop its play-history
      * entry, then notify the host to rebuild its list. Orchestrated here (the
@@ -181,19 +171,6 @@ class LibraryMenuHostDelegate(
         GamePlayHistoryStore(File(activity.filesDir, "game_play_history.json")).remove(entry.id)
         onLibraryChanged()
         showToast(R.string.menu_uninstall_done)
-    }
-
-    /**
-     * Delete a generated randomizer seed: remove its index entry + ROM/SRAM/state
-     * files via [RandomizedSeedRepository.remove] (which reuses the same per-hack
-     * file cleanup as store-hack uninstall), then notify the host to rebuild.
-     */
-    private fun performDeleteSeed(entry: HackLibraryEntry) {
-        val repository: RandomizedSeedRepository = AppRepositories.randomizedSeedRepository(activity)
-        val ok = repository.remove(entry.id)
-        GamePlayHistoryStore(File(activity.filesDir, "game_play_history.json")).remove(entry.id)
-        onLibraryChanged()
-        showToast(if (ok) R.string.randomizer_delete_done else R.string.randomizer_delete_failed)
     }
 
     /** Offer to pin [entry] to the home screen, or explain if unsupported. */

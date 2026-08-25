@@ -75,7 +75,7 @@ object LibraryOrdering {
      *   a missing ROM file (0L) sorts last.
      *
      * All branches are stable sorts, so ties preserve the source order produced
-     * by [InstalledLibrary.entries] (vanilla -> store hacks -> randomizer seeds).
+     * by [InstalledLibrary.entries] (vanilla -> store hacks).
      */
     fun sortByMode(
         entries: List<HackLibraryEntry>,

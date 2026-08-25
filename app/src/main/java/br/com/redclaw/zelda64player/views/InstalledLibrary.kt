@@ -8,7 +8,6 @@ import br.com.redclaw.zelda64player.repositories.GameRomResolver
 import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
 import br.com.redclaw.zelda64player.views.BaseRomLibrarySource
-import br.com.redclaw.zelda64player.views.RandomizerLibrarySource
 import java.io.File
 
 /**
@@ -17,23 +16,20 @@ import java.io.File
  * truth is used everywhere (DRY) instead of duplicating the inline logic that
  * previously lived in `LibraryActivity.buildLibrarySource`.
  *
- * Store hacks (catalog-backed) and generated randomizer seeds are merged through
- * a [CompositeLibrarySource]. The store source is filtered so it never surfaces
- * `ootr_`-prefixed seed ROMs (those live in the same `rom_*` storage dir but are
- * owned by [RandomizerLibrarySource]); otherwise a seed would appear twice.
+ * The grid shows user-imported vanilla base ROMs ([BaseRomLibrarySource]) and
+ * store hacks (catalog-backed), merged through a [CompositeLibrarySource].
  *
+     *
+
  * User-imported vanilla base ROMs ([BaseRomLibrarySource]) are prepended so the
- * raw [entries] order is: vanilla games, then store hacks, then randomizer seeds.
- * Higher-level orderings are layered on top of this source:
+ * raw [entries] order is: vanilla games, then store hacks. Higher-level orderings
+ * are layered on top of this source:
  * - [recentEntries] powers the home row (most-recently-played first, capped at 5,
  *   with a fresh-install fallback to the default order).
  * - [sortedEntries] powers the "Todos os Jogos" grid (alphabetical by default,
  *   with last-played and download-date alternatives).
  */
 object InstalledLibrary {
-    /** Prefix used for randomizer seed ids; must match [RandomizedSeedEntry] ids. */
-    private const val RANDOMIZER_ID_PREFIX = "ootr_"
-
     /** File name of the play-history store, shared with [GamePlayHistoryStore] callers. */
     private const val HISTORY_FILE = "game_play_history.json"
 
@@ -56,14 +52,10 @@ object InstalledLibrary {
                 installedRepository,
                 catalogMap
             )
-            override fun available(): List<HackLibraryEntry> =
-                delegate.available().filterNot { it.id.startsWith(RANDOMIZER_ID_PREFIX) }
+            override fun available(): List<HackLibraryEntry> = delegate.available()
         }
-        val randomizerSource = RandomizerLibrarySource(
-            AppRepositories.randomizedSeedRepository(context)
-        )
         return CompositeLibrarySource(
-            listOf(vanillaSource, storeSource, randomizerSource)
+            listOf(vanillaSource, storeSource)
         ).available()
     }
 

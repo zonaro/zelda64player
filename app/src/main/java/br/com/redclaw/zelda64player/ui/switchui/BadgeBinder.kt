@@ -47,8 +47,6 @@ object BadgeBinder {
         val (drawableRes, contentDescriptionRes) = when (type) {
             BadgeType.VANILLA ->
                 R.drawable.ic_vanilla to R.string.vanilla_badge_content_description
-            BadgeType.RANDOMIZER ->
-                R.drawable.ic_randomizer to R.string.randomizer_badge_content_description
             BadgeType.HACK ->
                 R.drawable.ic_hack to R.string.hack_badge_content_description
         }
