@@ -277,7 +277,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/sands_of_time/screenshots/thumbnail.jpg"
     },
     {
       "id": "shadows_of_eldoria",
@@ -311,7 +312,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/shadows_of_eldoria/screenshots/thumbnail.webp"
     },
     {
       "id": "crystal_clocks",
@@ -345,7 +347,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/crystal_clocks/screenshots/VHhkwNW.jpg"
     },
     {
       "id": "fate_of_the_bombiwa",
@@ -379,7 +382,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/fate_of_the_bombiwa/screenshots/thumbnail.png"
     },
     {
       "id": "dark_hyrule_fantasy",
@@ -414,7 +418,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/dark_hyrule_fantasy/screenshots/thumbnail.jpg"
     },
     {
       "id": "zelda_birthday",
@@ -448,7 +453,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda's_birthday/screenshots/thumbnail.png"
     },
     {
       "id": "time_lost",
@@ -482,7 +488,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/time_lost/screenshots/thumbnail.jpg"
     },
     {
       "id": "child_quest",
@@ -516,7 +523,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/child_quest/screenshots/thumbnail.png"
     },
     {
       "id": "demons_quest",
@@ -550,7 +558,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/demon's_quest/screenshots/thumbnail.png"
     },
     {
       "id": "the_helix_blade",
@@ -584,7 +593,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/the_helix_blade/screenshots/thumbnail.jpg"
     },
     {
       "id": "voyager_of_time",
@@ -618,7 +628,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/voyager_of_time/screenshots/thumbnail.png"
     },
     {
       "id": "hero_of_law",
@@ -652,7 +663,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "coverImageUrl": "https://hylianmodding.com/mods/hero_of_law/screenshots/thumbnail.png"
     }
   ]
 }
