@@ -80,6 +80,9 @@ html, body {
   transform: translateY(6px) scale(0.96);
 }
 .type-zone.font-awakened {
+  --font-title: "The Wild Breath of Zelda", serif;
+  --font-heading: "Hylia Serif", serif;
+  --font-copy: "Zelda Oracles", sans-serif;
   --awake-title: "The Wild Breath of Zelda", serif;
   --awake-heading: "Hylia Serif", serif;
   --awake-copy: "Zelda Oracles", sans-serif;
