@@ -27,7 +27,8 @@ import java.io.File
 class CatalogBackedLibrarySource(
     private val storagePath: File,
     private val installedRepository: InstalledHacksRepository,
-    private val catalog: Map<String, HackEntry>
+    private val catalog: Map<String, HackEntry>,
+    private val userImportedIds: Set<String> = emptySet()
 ) : HackLibrarySource {
     override fun available(): List<HackLibraryEntry> {
         val romIds = storagePath.listFiles { f ->
@@ -41,7 +42,8 @@ class CatalogBackedLibrarySource(
                 title = entry?.name ?: LocalPatchesSource.prettify(id),
                 coverUrl = entry?.coverImageUrl,
                 badge = BadgeType.HACK,
-                family = familyFor(id)
+                family = familyFor(id),
+                isUserImported = id in userImportedIds
             )
         }
     }

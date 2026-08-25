@@ -17,6 +17,7 @@ import br.com.redclaw.zelda64player.store.CatalogRefresher
 import br.com.redclaw.zelda64player.store.DownloadPhase
 import br.com.redclaw.zelda64player.store.DownloadQueueManager
 import br.com.redclaw.zelda64player.store.ImportedPatchInstaller
+import br.com.redclaw.zelda64player.store.ImportedRomInstaller
 import br.com.redclaw.zelda64player.store.ImportPatchResult
 import br.com.redclaw.zelda64player.store.QueueItemUi
 import kotlinx.coroutines.launch
@@ -197,7 +198,13 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
      * resulting hack launches exactly like a catalog hack (same `rom_<id>` +
      * installed record), so no launch-flow changes are needed.
      */
-    suspend fun importBps(patchFile: File, displayName: String): ImportPatchResult {
+    suspend fun importFile(file: File, displayName: String): ImportPatchResult {
+        if (isDirectRomFile(displayName)) {
+            return ImportedRomInstaller(getApplication(), baseRomRepository).install(
+                file,
+                romDisplayName(displayName)
+            )
+        }
         val installer = ImportedPatchInstaller(
             getApplication(),
             AppRepositories.baseRomRepository(getApplication()),
@@ -205,12 +212,26 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
             AppRepositories.userHacksRepository(getApplication()),
             Storage.getInstance(getApplication())
         )
-        return installer.install(patchFile, displayName)
+        return installer.install(file, displayName.substringBeforeLast('.', displayName))
     }
 
     /** Synchronous current phase for [hackId], or null when not queued. */
     fun queuePhaseFor(hackId: String): DownloadPhase? =
         DownloadQueueManager.queuePhaseFor(hackId)
+
+    private fun isDirectRomFile(name: String): Boolean {
+        val lower = name.lowercase()
+        return lower.endsWith(".n64") || lower.endsWith(".z64") || lower.endsWith(".z.64")
+    }
+
+    private fun romDisplayName(name: String): String {
+        val lower = name.lowercase()
+        return when {
+            lower.endsWith(".z.64") -> name.dropLast(5)
+            lower.endsWith(".n64") || lower.endsWith(".z64") -> name.dropLast(4)
+            else -> name
+        }
+    }
 
     sealed class CatalogUiState {
         object Loading : CatalogUiState()

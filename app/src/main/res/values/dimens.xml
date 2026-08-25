@@ -65,6 +65,11 @@
     <dimen name="seed_hash_size">28dp</dimen>
     <!-- Hack Store left sidebar fixed width (eShop-style split layout). -->
     <dimen name="store_sidebar_width">220dp</dimen>
-    <!-- Hack Store grid card cover frame height (fixed; centerCrop, no distortion). -->
+    <!-- Hack Store grid card cover frame height. -->
     <dimen name="store_cover_height">150dp</dimen>
+    <!-- Compact 13:9 catalog cover in the fullscreen hack detail. Keeping the
+         image bounded prevents a wide landscape dialog from enlarging a
+         thumbnail to the screen width. -->
+    <dimen name="store_detail_cover_width">280dp</dimen>
+    <dimen name="store_detail_cover_height">194dp</dimen>
 </resources>

@@ -41,6 +41,7 @@ const I18N = {
     "f.patch.desc": "Aplica patches BPS/IPS em memória/cache na hora de jogar, validando CRC32 da ROM base, do patch e da ROM final.",
     "f.byteorder.title": "Normalização de byte-order N64",
     "f.byteorder.desc": "Converte automaticamente ROMs .z64/.v64/.n64 para o formato big-endian .z64 antes da emulação.",
+    "f.byteorder.desc": "Converte automaticamente ROMs .z64/.v64/.n64 para o formato big-endian .z64 antes da emulação.",
 "f.checksum.title": "Correspondência de ROM base por checksum",
     "f.checksum.desc": "Identifica a ROM correta do usuário via CRC32/MD5/SHA1 de a cabecera, evitando parchear a ROM equivocada.",
     "f.ocarina.title": "Auto-Ocarina",
@@ -63,6 +64,22 @@ const I18N = {
     "f.refresh.desc": "WorkManager atualiza o catálogo a cada 12 horas, mantendo a loja sempre atualizada sem consumo manual.",
     "f.i18n.title": "Internacionalização pt-BR / en / es",
     "f.i18n.desc": "Toda a interface do app é traduzida para português, inglês e espanhol, com detecção de idioma do sistema.",
+    "fPoints": {
+      "store": ["Catálogo JSON hospedado no GitHub", "Atualização em segundo plano automática", "Cache local dos hacks no dispositivo"],
+      "patch": ["Suporte a patches BPS e IPS", "Aplicação em memória/cache na hora de jogar", "Validação CRC32 tripla (base, patch, final)"],
+      "byteorder": ["Conversão automática de byte-order", "Suporta .z64, .v64 e .n64", "Normaliza para big-endian .z64"],
+      "checksum": ["Identifica a ROM base por checksum", "Usa CRC32, MD5 e SHA1 da cabecera", "Evita parchear a ROM errada"],
+      "ocarina": ["HUD in-game de ocarina", "Catálogo embutido: OoT (12) e MM (11)", "Toca a partir do menu de pausa"],
+      "ra": ["Conquistas e classificações (rcheevos)", "Modo hardcore via rcheevos", "Hash calculado da ROM final patchada"],
+      "profile": ["Perfil RA acessível pela Home", "Dados em cache no dispositivo", "Atualiza ao abrir a tela"],
+      "switchui": ["Home estilo Nintendo Switch", "Carrossel de capas e dock colorido", "Configurações com categorias laterais"],
+      "vanilla": ["ROMs base próprias na Biblioteca", "OoT e MM importados", "Jogáveis direto da tela principal"],
+      "gamepad": ["Layout RadialGamePad sob medida", "C-buttons, Auto-Z e ButtonStick", "FloatingJoystick para OoT/MM"],
+      "tester": ["Teste do controle N64 em tempo real", "Botões e analógicos físicos", "Mostra o mapeamento dos jogos"],
+      "backup": ["Exporta e restaura saves", "Arquivo ZIP local", "Armazenado no dispositivo"],
+      "refresh": ["Atualização via WorkManager", "A cada 12 horas", "Sem consumo manual"],
+      "i18n": ["Interface em pt-BR, en e es", "Detecção do idioma do sistema", "Toda a interface traduzida"]
+    },
     "download.title": "Baixar",
     "download.sub": "Instale o APK de release assinado",
     "download.lead": "Baixe o Zelda 64 Player para Android. O link sempre aponta para a versão mais recente no GitHub.",
@@ -128,6 +145,22 @@ const I18N = {
     "f.refresh.desc": "WorkManager refreshes the catalog every 12 hours, keeping the store current without manual effort.",
     "f.i18n.title": "i18n pt-BR / en / es",
     "f.i18n.desc": "The entire app UI is translated to Portuguese, English and Spanish, with system language detection.",
+    "fPoints": {
+      "store": ["GitHub-hosted JSON catalog", "Automatic background refresh", "On-device hack cache"],
+      "patch": ["BPS and IPS patch support", "Applied in memory/cache at launch", "Triple CRC32 validation (base, patch, final)"],
+      "byteorder": ["Automatic byte-order conversion", "Supports .z64, .v64 and .n64", "Normalizes to big-endian .z64"],
+      "checksum": ["Matches the correct base ROM by checksum", "Uses header CRC32, MD5 and SHA1", "Prevents patching the wrong ROM"],
+      "ocarina": ["In-game ocarina HUD", "Built-in songs: OoT (12) and MM (11)", "Plays from the pause menu"],
+      "ra": ["Achievements and leaderboards (rcheevos)", "Hardcore mode via rcheevos", "Hash from the final patched ROM"],
+      "profile": ["RA profile accessible from Home", "Cached data on device", "Refreshes when the screen opens"],
+      "switchui": ["Nintendo Switch-style Home", "Cover carousel and colored dock", "Settings with sidebar categories"],
+      "vanilla": ["Your own base ROMs in the Library", "Imported OoT and MM", "Playable right from the main screen"],
+      "gamepad": ["Tailored RadialGamePad layout", "C-buttons, Auto-Z and ButtonStick", "FloatingJoystick for OoT/MM"],
+      "tester": ["Live N64 controller test", "Physical buttons and sticks", "Shows in-game button mapping"],
+      "backup": ["Export and restore saves", "Local ZIP file", "Stored on device"],
+      "refresh": ["Refresh via WorkManager", "Every 12 hours", "No manual effort"],
+      "i18n": ["UI in pt-BR, en and es", "System language detection", "Entire interface translated"]
+    },
     "download.title": "Download",
     "download.sub": "Get the signed release APK",
     "download.lead": "Download Zelda 64 Player for Android. The link always points to the latest release on GitHub.",
@@ -193,6 +226,22 @@ const I18N = {
     "f.refresh.desc": "WorkManager actualiza el catálogo cada 12 horas, manteniendo la tienda al día sin esfuerzo manual.",
     "f.i18n.title": "Internacionalización pt-BR / en / es",
     "f.i18n.desc": "Toda la interfaz de la app está traducida a portugués, inglés y español, con detección del idioma del sistema.",
+    "fPoints": {
+      "store": ["Catálogo JSON alojado en GitHub", "Actualización en segundo plano automática", "Caché de hacks en el dispositivo"],
+      "patch": ["Soporte de parches BPS e IPS", "Aplicados en memoria/caché al iniciar", "Validación CRC32 triple (base, parche, final)"],
+      "byteorder": ["Conversión automática de byte-order", "Soporta .z64, .v64 y .n64", "Normaliza a big-endian .z64"],
+      "checksum": ["Identifica la ROM base por checksum", "Usa CRC32, MD5 y SHA1 de la cabecera", "Evita parchear la ROM equivocada"],
+      "ocarina": ["HUD de ocarina en juego", "Canciones integradas: OoT (12) y MM (11)", "Suena desde el menú de pausa"],
+      "ra": ["Logros y clasificaciones (rcheevos)", "Modo hardcore vía rcheevos", "Hash calculado de la ROM final parcheada"],
+      "profile": ["Perfil RA accesible desde Inicio", "Datos en caché en el dispositivo", "Se actualiza al abrir la pantalla"],
+      "switchui": ["Inicio estilo Nintendo Switch", "Carrusel de portadas y dock con color", "Ajustes con categorías laterales"],
+      "vanilla": ["Tus ROMs base en la Biblioteca", "OoT y MM importados", "Jugables directo desde la pantalla principal"],
+      "gamepad": ["Layout RadialGamePad a medida", "C-buttons, Auto-Z y ButtonStick", "FloatingJoystick para OoT/MM"],
+      "tester": ["Prueba del mando N64 en vivo", "Botones y analógicos físicos", "Muestra el mapeo de los juegos"],
+      "backup": ["Exporta y restaura partidas", "Archivo ZIP local", "Almacenado en el dispositivo"],
+      "refresh": ["Actualización vía WorkManager", "Cada 12 horas", "Sin esfuerzo manual"],
+      "i18n": ["Interfaz en pt-BR, en y es", "Detección del idioma del sistema", "Toda la interfaz traducida"]
+    },
     "download.title": "Descargar",
     "download.sub": "Obtén el APK de release firmado",
     "download.lead": "Descarga Zelda 64 Player para Android. El enlace siempre apunta a la versión más reciente en GitHub.",
@@ -209,8 +258,8 @@ const FEATURE_KEYS = [
 ];
 
 const FEATURE_ICONS = {
-  store: "S", patch: "P", byteorder: "N", checksum: "C", ocarina: "O", ra: "A", profile: "P", switchui: "H", vanilla: "V", gamepad: "G", tester: "T",
-  backup: "B", refresh: "U", i18n: "I"
+  store: "a", patch: "b", byteorder: "c", checksum: "d", ocarina: "e", ra: "f", profile: "g", switchui: "h", vanilla: "i", gamepad: "j", tester: "k",
+  backup: "l", refresh: "m", i18n: "n"
 };
 
 const LIVE_CATALOG_URL = "https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/catalog.json";
@@ -240,6 +289,7 @@ function setLang(lang) {
   updateLangButtons();
   // Re-render catalog labels if already loaded
   if (window.__catalogData) renderCatalog(window.__catalogData);
+  refreshGlyphs();
 }
 
 function updateLangButtons() {
@@ -267,19 +317,43 @@ function renderFeatures() {
   if (!grid) return;
   grid.innerHTML = "";
   FEATURE_KEYS.forEach(function (key) {
-    const card = document.createElement("article");
-    card.className = "feature-card";
+    const section = document.createElement("section");
+    section.className = "feature-section";
+
+    const media = document.createElement("div");
+    media.className = "feature-media";
     const icon = document.createElement("div");
     icon.className = "feature-icon";
-    icon.textContent = FEATURE_ICONS[key] || "?";
+    icon.textContent = FEATURE_ICONS[key] || "a";
+    icon.setAttribute("aria-hidden", "true");
+    media.appendChild(icon);
+
+    const body = document.createElement("div");
+    body.className = "feature-body";
+
     const h3 = document.createElement("h3");
     h3.textContent = t("f." + key + ".title");
+
     const p = document.createElement("p");
     p.textContent = t("f." + key + ".desc");
-    card.appendChild(icon);
-    card.appendChild(h3);
-    card.appendChild(p);
-    grid.appendChild(card);
+
+    const ul = document.createElement("ul");
+    ul.className = "feature-points";
+    const pointsSrc = (I18N[currentLang] && I18N[currentLang].fPoints && I18N[currentLang].fPoints[key]) ||
+      (I18N.en.fPoints && I18N.en.fPoints[key]) || [];
+    (Array.isArray(pointsSrc) ? pointsSrc : []).forEach(function (pt) {
+      const li = document.createElement("li");
+      li.textContent = pt;
+      ul.appendChild(li);
+    });
+
+    body.appendChild(h3);
+    body.appendChild(p);
+    body.appendChild(ul);
+
+    section.appendChild(media);
+    section.appendChild(body);
+    grid.appendChild(section);
   });
 }
 
@@ -288,7 +362,7 @@ function coverPlaceholder(name) {
   ph.className = "placeholder";
   const ic = document.createElement("div");
   ic.className = "ph-icon";
-  ic.textContent = "Z";
+  ic.textContent = "a";
   const nm = document.createElement("div");
   nm.className = "ph-name";
   nm.textContent = name || t("card.coverFallback");
@@ -452,6 +526,98 @@ function fetchLatestRelease() {
       }
     })
     .catch(function () { /* keep default version text on failure */ });
+  }
+
+function shouldSkipGlyphs(el) {
+  if (!el || el.nodeType !== 1) return false;
+  const tag = el.tagName.toLowerCase();
+  if (tag === "img" || tag === "svg" || tag === "br" || tag === "script" || tag === "style") return true;
+  if (el.hasAttribute("data-no-split")) return true;
+  const cls = (typeof el.className === "string") ? el.className : "";
+  if (/icon|symbol|ph-|hylian-symbol|feature-icon/i.test(cls)) return true;
+  return false;
+}
+
+function splitTextNode(node, counter) {
+  const text = node.nodeValue;
+  if (!text) return;
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < text.length; i++) {
+    const ch = text.charAt(i);
+    if (ch === " " || ch === " ") {
+      frag.appendChild(document.createTextNode(" "));
+      continue;
+    }
+    const span = document.createElement("span");
+    span.className = "glyph";
+    span.style.setProperty("--i", counter.n);
+    counter.n++;
+    span.textContent = ch;
+    frag.appendChild(span);
+  }
+  node.parentNode.replaceChild(frag, node);
+}
+
+function splitElementGlyphs(el, counter) {
+  const kids = Array.prototype.slice.call(el.childNodes);
+  for (let i = 0; i < kids.length; i++) {
+    const node = kids[i];
+    if (node.nodeType === 3) {
+      splitTextNode(node, counter);
+    } else if (node.nodeType === 1) {
+      if (shouldSkipGlyphs(node)) continue;
+      if (node.id === "catalog-grid") continue;
+      splitElementGlyphs(node, counter);
+    }
+  }
+}
+
+function splitGlyphs(zone) {
+  const counter = { n: 0 };
+  splitElementGlyphs(zone, counter);
+  const count = counter.n;
+  const step = Math.min(30, Math.floor(1200 / Math.max(1, count)));
+  zone.style.setProperty("--step", step + "ms");
+  if (zone.classList.contains("font-awakened")) {
+    const glyphs = zone.querySelectorAll(".glyph");
+    for (let i = 0; i < glyphs.length; i++) glyphs[i].classList.add("is-static");
+  }
+}
+
+function refreshGlyphs() {
+  const zones = document.querySelectorAll("[data-type-zone]");
+  for (let i = 0; i < zones.length; i++) splitGlyphs(zones[i]);
+}
+
+function setupTypographyAwakening() {
+  const zones = Array.from(document.querySelectorAll("[data-type-zone]"));
+  if (!zones.length) return;
+
+  const awaken = function (zone) {
+    zone.classList.add("font-awakened");
+  };
+
+  if (!("IntersectionObserver" in window)) {
+    const awakenVisible = function () {
+      zones.forEach(function (zone) {
+        if (zone.getBoundingClientRect().top < window.innerHeight * 0.85) awaken(zone);
+      });
+    };
+    awakenVisible();
+    window.addEventListener("scroll", awakenVisible, { passive: true });
+    return;
+  }
+
+  const observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        awaken(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  zones.forEach(function (zone) { observer.observe(zone); });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -465,4 +631,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   loadCatalog();
   fetchLatestRelease();
+  refreshGlyphs();
+  setupTypographyAwakening();
 });

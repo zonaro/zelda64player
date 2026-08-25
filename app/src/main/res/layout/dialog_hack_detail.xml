@@ -53,12 +53,13 @@
 
             <ImageView
                 android:id="@+id/detail_cover"
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_width="@dimen/store_detail_cover_width"
+                android:layout_height="@dimen/store_detail_cover_height"
+                android:layout_gravity="center_horizontal"
                 android:background="@drawable/shape_cover"
                 android:clipToOutline="true"
                 android:contentDescription="@string/cover_content_description"
-                android:scaleType="centerCrop" />
+                android:scaleType="fitCenter" />
 
             <TextView
                 android:id="@+id/detail_author"

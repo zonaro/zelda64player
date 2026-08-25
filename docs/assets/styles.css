@@ -16,7 +16,45 @@
   --dialog-radius: 14px;
   --max-width: 1280px;
   --focus-border: 3px solid var(--accent-focus);
-  --font: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  --font-title: "Ancient Hylian", serif;
+  --font-heading: "Ancient Hylian", serif;
+  --font-copy: "Hylian 64", sans-serif;
+}
+
+@font-face {
+  font-family: "The Wild Breath of Zelda";
+  src: url("./fonts/The%20Wild%20Breath%20of%20Zelda.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hylia Serif";
+  src: url("./fonts/Hylia%20Serif%20Beta%20v0-009/HyliaSerifBeta-Regular.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hylian Symbols";
+  src: url("./fonts/HylianSymbols.ttf") format("truetype");
+  font-display: block;
+}
+
+@font-face {
+  font-family: "Hylian 64";
+  src: url("./fonts/Hylian64.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Ancient Hylian";
+  src: url("./fonts/AncientHylian.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Zelda Oracles";
+  src: url("./fonts/ZeldaOracles.ttf") format("truetype");
+  font-display: swap;
 }
 
 * { box-sizing: border-box; }
@@ -26,9 +64,54 @@ html, body {
   padding: 0;
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: var(--font);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+/* The page opens in ancient script. Each zone "decodes" letter by letter into the
+   readable Zelda set, 1s after it enters the viewport. */
+.type-zone {
+  font-family: var(--font-copy);
+}
+.type-zone .glyph {
+  display: inline-block;
+  font-family: var(--font-copy);
+  opacity: 0.45;
+  transform: translateY(6px) scale(0.96);
+}
+.type-zone.font-awakened {
+  --awake-title: "The Wild Breath of Zelda", serif;
+  --awake-heading: "Hylia Serif", serif;
+  --awake-copy: "Zelda Oracles", sans-serif;
+}
+.type-zone.font-awakened { --glyph-awake-font: var(--awake-copy); }
+.type-zone.font-awakened h1 { --glyph-awake-font: var(--awake-title); }
+.type-zone.font-awakened h2,
+.type-zone.font-awakened h3,
+.type-zone.font-awakened h4 { --glyph-awake-font: var(--awake-heading); }
+.type-zone.font-awakened p,
+.type-zone.font-awakened li { --glyph-awake-font: var(--awake-copy); }
+
+.type-zone.font-awakened .glyph {
+  font-family: var(--glyph-awake-font);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition-property: font-family, opacity, transform;
+  transition-duration: 0s, 0.45s, 0.45s;
+  transition-delay: 1000ms, calc(1000ms + var(--i, 0) * var(--step, 30ms)), calc(1000ms + var(--i, 0) * var(--step, 30ms));
+  transition-timing-function: linear, ease, ease;
+}
+.type-zone.font-awakened .glyph.is-static {
+  transition: none;
+  font-family: var(--glyph-awake-font);
+  opacity: 1;
+  transform: none;
+}
+
+.hylian-symbol {
+  font-family: "Hylian Symbols", sans-serif;
+  font-weight: 400;
+  line-height: 1;
 }
 
 a { color: var(--accent-focus); text-decoration: none; }
@@ -62,6 +145,7 @@ a:hover { text-decoration: underline; }
   font-weight: 700;
   font-size: 18px;
   letter-spacing: 0.3px;
+  font-family: var(--font-heading);
 }
 .brand .logo {
   width: 34px;
@@ -83,6 +167,7 @@ a:hover { text-decoration: underline; }
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  font-family: var(--font-copy);
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 .lang-btn:hover { color: var(--text-primary); }
@@ -92,26 +177,75 @@ a:hover { text-decoration: underline; }
   background: rgba(2, 131, 12, 0.12);
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero (fullscreen video) ---------- */
 .hero {
-  padding: 64px 0 48px;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   text-align: center;
+  background: var(--bg-primary);
+  padding: 80px 0;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-bg iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 56.25vw;
+  min-width: 177.78vh;
+  min-height: 100vh;
+  border: 0;
+}
+@media (min-aspect-ratio: 16/9) {
+  .hero-bg iframe {
+    width: 177.78vh;
+    height: 100vh;
+    min-width: 0;
+    min-height: 0;
+  }
+}
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background:
-    radial-gradient(1200px 400px at 50% -10%, rgba(2, 131, 12, 0.12), transparent 70%),
-    radial-gradient(900px 360px at 80% 0%, rgba(255, 160, 0, 0.08), transparent 70%);
+    linear-gradient(180deg, rgba(45, 45, 45, 0.35) 0%, rgba(45, 45, 45, 0.55) 45%, rgba(45, 45, 45, 0.88) 100%),
+    radial-gradient(1200px 600px at 50% 38%, rgba(2, 131, 12, 0.12), transparent 70%);
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
 }
 .hero h1 {
-  font-size: clamp(32px, 6vw, 56px);
-  margin: 0 0 12px;
+  font-size: clamp(34px, 7vw, 64px);
+  margin: 0 0 14px;
   font-weight: 800;
   letter-spacing: 0.5px;
+  font-family: var(--font-title);
+  line-height: 1.04;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
 }
 .hero .accent { color: var(--accent-focus); }
 .hero p {
   font-size: clamp(15px, 2.4vw, 20px);
-  color: var(--text-secondary);
+  color: #E8E8E8;
   max-width: 720px;
   margin: 0 auto 28px;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
 }
 .hero-badges {
   display: flex;
@@ -143,52 +277,96 @@ a:hover { text-decoration: underline; }
   font-size: clamp(22px, 3.5vw, 30px);
   margin: 0;
   font-weight: 700;
+  font-family: var(--font-heading);
+  line-height: 1.14;
 }
 .section-head .sub {
   color: var(--text-secondary);
   font-size: 14px;
 }
 
-/* ---------- Feature grid ---------- */
+/* ---------- Feature sections ---------- */
 .feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 18px;
+  display: flex;
+  flex-direction: column;
 }
-.feature-card {
-  background: linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--card-radius);
-  padding: 20px;
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+.feature-section {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  padding: 44px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
-.feature-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--accent-focus);
-  box-shadow: 0 0 0 1px rgba(2, 131, 12, 0.4), 0 8px 24px rgba(0, 0, 0, 0.4);
-}
-.feature-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: rgba(2, 131, 12, 0.14);
-  color: var(--accent-focus);
+.feature-section:last-child { border-bottom: none; }
+.feature-section:nth-child(even) { flex-direction: row-reverse; }
+.feature-media {
+  flex: 0 0 130px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 14px;
-  font-weight: 800;
-  font-size: 18px;
 }
-.feature-card h3 {
-  margin: 0 0 8px;
-  font-size: 17px;
+.feature-icon {
+  width: 104px;
+  height: 104px;
+  border-radius: 24px;
+  background: rgba(2, 131, 12, 0.14);
+  color: var(--accent-focus);
+  border: 1px solid rgba(2, 131, 12, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Hylian Symbols", sans-serif;
+  font-weight: 400;
+  font-size: 54px;
+}
+.feature-body { flex: 1 1 auto; min-width: 0; }
+.feature-body h3 {
+  margin: 0 0 10px;
+  font-size: clamp(20px, 3vw, 27px);
   font-weight: 700;
+  font-family: var(--font-heading);
+  line-height: 1.18;
 }
-.feature-card p {
-  margin: 0;
+.feature-body p {
+  margin: 0 0 16px;
   color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.6;
+}
+.feature-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 9px;
+}
+.feature-points li {
+  position: relative;
+  padding-left: 26px;
+  color: var(--text-primary);
   font-size: 14px;
+  line-height: 1.5;
+}
+.feature-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--accent-focus);
+  box-shadow: 0 0 0 3px rgba(2, 131, 12, 0.18);
+}
+@media (max-width: 800px) {
+  .feature-section,
+  .feature-section:nth-child(even) {
+    flex-direction: column;
+    text-align: center;
+    gap: 18px;
+    padding: 34px 0;
+  }
+  .feature-points { text-align: left; max-width: 420px; margin: 0 auto; }
 }
 
 /* ---------- Legal note ---------- */
@@ -199,7 +377,7 @@ a:hover { text-decoration: underline; }
   border-radius: var(--card-radius);
   padding: 22px 24px;
 }
-.legal h3 { margin: 0 0 10px; color: var(--accent-amber); font-size: 18px; }
+.legal h3 { margin: 0 0 10px; color: var(--accent-amber); font-size: 18px; font-family: var(--font-heading); line-height: 1.18; }
 .legal p { margin: 0; color: var(--text-secondary); font-size: 14px; }
 
 /* ---------- Download ---------- */
@@ -243,6 +421,7 @@ a:hover { text-decoration: underline; }
   font-weight: 800;
   font-size: 16px;
   cursor: pointer;
+  font-family: var(--font-heading);
   transition: filter 0.15s, transform 0.15s, box-shadow 0.15s;
   text-decoration: none;
   white-space: nowrap;
@@ -253,7 +432,7 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 8px 24px rgba(2, 131, 12, 0.35);
   text-decoration: none;
 }
-.btn-download-icon { font-size: 20px; line-height: 1; }
+.btn-download-icon { font-size: 24px; line-height: 1; }
 .download-note {
   margin: 16px 0 0;
   font-size: 13px;
@@ -339,12 +518,13 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 20px;
+  font-family: "Hylian Symbols", sans-serif;
+  font-weight: 400;
+  font-size: 24px;
 }
 .hack-cover .placeholder .ph-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
 .hack-body { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.hack-title { font-size: 16px; font-weight: 700; line-height: 1.25; }
+.hack-title { font-size: 18px; font-weight: 700; line-height: 1.18; font-family: var(--font-heading); }
 .hack-meta { font-size: 12.5px; color: var(--text-secondary); }
 .hack-meta b { color: var(--text-primary); font-weight: 600; }
 .hack-desc {
@@ -378,6 +558,7 @@ a:hover { text-decoration: underline; }
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
+  font-family: var(--font-heading);
 }
 .btn-retry:hover { filter: brightness(1.08); }
 
@@ -406,3 +587,12 @@ a:hover { text-decoration: underline; }
 
 /* Focus visibility for keyboard users */
 :focus-visible { outline: var(--focus-border); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .type-zone .glyph {
+    transition: none !important;
+    font-family: var(--glyph-awake-font, var(--font-copy));
+    opacity: 1;
+    transform: none;
+  }
+}

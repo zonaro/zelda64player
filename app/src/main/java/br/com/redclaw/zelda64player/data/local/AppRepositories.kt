@@ -44,4 +44,7 @@ object AppRepositories {
      */
     fun userHacksRepository(context: Context): UserHacksRepository =
         UserHacksRepository(File(context.filesDir, "user_hacks.json"))
+
+    fun userHackCoverRepository(context: Context): UserHackCoverRepository =
+        UserHackCoverRepository(File(context.filesDir, "user_hack_covers"))
 }

@@ -23,6 +23,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.data.local.AppRepositories
 import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
@@ -37,6 +38,9 @@ import br.com.redclaw.zelda64player.views.GameActivity
 import br.com.redclaw.zelda64player.views.HackLibraryEntry
 import java.io.File
 import androidx.activity.result.contract.ActivityResultContracts
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Shared [LibraryMenuHost] implementation used by both [br.com.redclaw.zelda64player.views.LibraryActivity]
@@ -62,6 +66,7 @@ class LibraryMenuHostDelegate(
     /* Entry whose save operation is pending in a SAF picker (one-shot). */
     private var pendingExportEntry: HackLibraryEntry? = null
     private var pendingImportEntry: HackLibraryEntry? = null
+    private var pendingCoverEntry: HackLibraryEntry? = null
 
     private val exportLauncher = activity.registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/zip")
@@ -99,6 +104,31 @@ class LibraryMenuHostDelegate(
         } catch (e: Exception) {
             Log.e(TAG, "importSaves failed for ${entry.id}", e)
             showToast(R.string.menu_import_failure)
+        }
+    }
+
+    private val coverLauncher = activity.registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        val entry = pendingCoverEntry ?: return@registerForActivityResult
+        pendingCoverEntry = null
+        if (uri == null || !entry.isUserImported) return@registerForActivityResult
+        activity.lifecycleScope.launch(Dispatchers.IO) {
+            val saved = runCatching {
+                activity.contentResolver.openInputStream(uri)?.use { input ->
+                    AppRepositories.userHackCoverRepository(activity).replace(entry.id, input).getOrThrow()
+                } ?: error("Unable to open selected image")
+            }.getOrNull()
+            val updated = saved != null && AppRepositories.userHacksRepository(activity)
+                .updateCover(entry.id, saved)
+            withContext(Dispatchers.Main) {
+                if (updated) {
+                    onLibraryChanged()
+                    showToast(R.string.manual_cover_success)
+                } else {
+                    showToast(R.string.manual_cover_invalid)
+                }
+            }
         }
     }
 
@@ -149,6 +179,12 @@ class LibraryMenuHostDelegate(
         importLauncher.launch(arrayOf("application/zip"))
     }
 
+    override fun requestChangeCover(entry: HackLibraryEntry) {
+        if (!entry.isUserImported) return
+        pendingCoverEntry = entry
+        coverLauncher.launch(arrayOf("image/*"))
+    }
+
     override fun confirmUninstall(entry: HackLibraryEntry) {
         AlertDialog.Builder(activity)
             .setTitle(activity.getString(R.string.menu_uninstall_title, entry.title))
@@ -168,6 +204,10 @@ class LibraryMenuHostDelegate(
         val storage = Storage.getInstance(activity)
         uninstallHackFiles(File(storage.storagePath), entry.id)
         InstalledHacksRepository(File(activity.filesDir, "installed_hacks.json")).unmarkInstalled(entry.id)
+        if (entry.isUserImported) {
+            AppRepositories.userHacksRepository(activity).remove(entry.id)
+            AppRepositories.userHackCoverRepository(activity).remove(entry.id)
+        }
         GamePlayHistoryStore(File(activity.filesDir, "game_play_history.json")).remove(entry.id)
         onLibraryChanged()
         showToast(R.string.menu_uninstall_done)

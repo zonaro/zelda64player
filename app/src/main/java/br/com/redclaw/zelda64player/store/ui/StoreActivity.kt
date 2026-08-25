@@ -33,6 +33,9 @@ import br.com.redclaw.zelda64player.store.ImportPatchNoCompatibleRom
 import br.com.redclaw.zelda64player.store.ImportPatchResult
 import br.com.redclaw.zelda64player.store.ImportPatchSuccess
 import br.com.redclaw.zelda64player.store.ImportPatchUnsupported
+import br.com.redclaw.zelda64player.store.ImportRomDuplicate
+import br.com.redclaw.zelda64player.store.ImportRomInvalid
+import br.com.redclaw.zelda64player.store.ImportRomSuccess
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,14 +53,14 @@ class StoreActivity : AppCompatActivity() {
 
     private var currentPageHacks: List<HackEntry> = emptyList()
 
-    /** Picks a patch file (BPS/IPS) from the document provider for import. */
+    /** Picks a BPS/IPS patch or .n64/.z64/.z.64 base ROM from the document provider. */
     private val importLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
         if (uri == null) return@registerForActivityResult
         val rawName = queryDisplayName(uri) ?: "hack"
-        val suggestedName = rawName.substringBeforeLast('.', missingDelimiterValue = rawName)
-        val temp = File(cacheDir, "import_${System.currentTimeMillis()}.bps.tmp")
+        val extension = rawName.substringAfterLast('.', "bin").lowercase()
+        val temp = File(cacheDir, "import_${System.currentTimeMillis()}.$extension.tmp")
         try {
             contentResolver.openInputStream(uri)?.use { input ->
                 temp.outputStream().use { out -> input.copyTo(out) }
@@ -70,10 +73,10 @@ class StoreActivity : AppCompatActivity() {
             return@registerForActivityResult
         }
 
-        val progress = showProgressDialog()
+        val progress = showProgressDialog(isDirectRomFile(rawName))
         progress.show()
         lifecycleScope.launch(Dispatchers.Main) {
-            val result = viewModel.importBps(temp, suggestedName)
+            val result = viewModel.importFile(temp, rawName)
             temp.delete()
             progress.dismiss()
             showResultDialog(result)
@@ -217,17 +220,18 @@ class StoreActivity : AppCompatActivity() {
     }
 
     /**
-     * Responsive column count for the main-content grid: at least 3 columns,
+     * Responsive column count for the main-content grid: at least 4 columns,
      * more on wider screens (capped so ultra-wide layouts don't shrink cards to
      * an unreadable size). Derived from the content area width (screen minus the
-     * fixed sidebar) divided by a ~200dp target card width.
+     * fixed sidebar) divided by a ~170dp target card width. This keeps Store
+     * thumbnails compact when the activity has a wide content area.
      */
     private fun computeStoreSpanCount(): Int {
         val density = resources.displayMetrics.density
         val sidebarPx = resources.getDimensionPixelSize(R.dimen.store_sidebar_width).toFloat()
         val contentPx = resources.displayMetrics.widthPixels - sidebarPx
-        val targetCardPx = 200f * density
-        return maxOf(3, minOf(6, (contentPx / targetCardPx).toInt()))
+        val targetCardPx = 170f * density
+        return maxOf(4, minOf(6, (contentPx / targetCardPx).toInt()))
     }
 
     /** Builds the sidebar category rows once and wires their click handlers. */
@@ -350,8 +354,8 @@ class StoreActivity : AppCompatActivity() {
         }
     }
 
-    /** Indeterminate spinner shown while the patch is being applied. */
-    private fun showProgressDialog(): AlertDialog {
+    /** Indeterminate spinner shown while a patch is applied or a ROM is normalized. */
+    private fun showProgressDialog(importingRom: Boolean): AlertDialog {
         val size = (48 * resources.displayMetrics.density).toInt()
         val progressBar = ProgressBar(this).apply {
             isIndeterminate = true
@@ -359,7 +363,7 @@ class StoreActivity : AppCompatActivity() {
         }
         return AlertDialog.Builder(this)
             .setTitle(R.string.store_import_bps)
-            .setMessage(R.string.import_patch_progress)
+            .setMessage(if (importingRom) R.string.import_rom_progress else R.string.import_patch_progress)
             .setView(progressBar)
             .setCancelable(false)
             .create()
@@ -398,6 +402,18 @@ class StoreActivity : AppCompatActivity() {
                 titleRes = R.string.import_invalid_title
                 message = getString(R.string.import_unsupported_message)
             }
+            is ImportRomSuccess -> {
+                titleRes = R.string.import_rom_success_title
+                message = getString(R.string.import_rom_success_message, result.title)
+            }
+            is ImportRomDuplicate -> {
+                titleRes = R.string.import_rom_success_title
+                message = getString(R.string.import_rom_success_message, result.title)
+            }
+            is ImportRomInvalid -> {
+                titleRes = R.string.import_invalid_rom_title
+                message = result.message
+            }
         }
         AlertDialog.Builder(this)
             .setTitle(titleRes)
@@ -433,5 +449,10 @@ class StoreActivity : AppCompatActivity() {
             // Ignore; fall back to the default name below.
         }
         return name
+    }
+
+    private fun isDirectRomFile(name: String): Boolean {
+        val lower = name.lowercase()
+        return lower.endsWith(".n64") || lower.endsWith(".z64") || lower.endsWith(".z.64")
     }
 }

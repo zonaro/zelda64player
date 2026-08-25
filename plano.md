@@ -481,7 +481,7 @@ Complete visual overhaul replacing Material 3 Expressive with a custom native im
 ## User Decisions (Final)
 1. **Library Home** = ONE main horizontal row of game cards (vanilla first, then hacks) + circular "Todos os Jogos" card at end opening fullscreen grid.
 2. **Fullscreen grid ("Todos os Jogos")** = EVERYTHING together: vanilla games + store hacks, with search/filter.
-3. **Dock (fixed, circular buttons)**: Loja (Store), RetroAchievements, Sobre/Licenças. Fixed set, no configurable slots.
+3. **Dock (fixed, circular buttons)**: Loja (Store), RetroAchievements, Galeria (Gallery), Teste de Controle (Gamepad Tester), Configurações (Settings). Fixed set, no configurable slots. **Galeria added 2026-08** for the screen-capture / recording gallery feature (see "Captura de Tela, Gravação e Galeria" section).
 4. **Settings** = side panel (right slide-in, NS Launcher "Options" style) with QUICK shortcuts (theme toggle dark/light, RA profile status, link to full settings) + the existing full SettingsActivity remains as a separate Switch-styled fullscreen screen.
 5. **Status bar** = NONE. Clean screen (no clock/wifi).
 6. **Themes** = Dark (`#2D2D2D` family) + Light (`#F0F0F0` family), runtime switchable from side panel.
@@ -526,7 +526,7 @@ Complete visual overhaul replacing Material 3 Expressive with a custom native im
 | `SwitchGameCard` | Square card (1:1), cover image, game title overlay on focus, focus border, dimming overlay |
 | `SwitchAllGamesCard` | Circular card (charcoal fill, cyan 2×2 grid icon, cyan border on focus) |
 | `SwitchGridScreen` | Fullscreen grid ("Todos os Jogos"): header icon+title "Todos os Jogos" 20sp bold + thin separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders |
-| `SwitchDock` | Fixed bottom dock: 4 circular buttons (Loja, RetroAchievements, Sobre/Licenças), ~50dp diameter, colored glyphs, focus ring |
+| `SwitchDock` | Fixed bottom dock: 5 circular buttons (Loja, RetroAchievements, Galeria, Teste de Controle, Configurações), ~50dp diameter, colored glyphs, focus ring |
 | `SwitchFooterHints` | Bottom bar: left TV+gamepad indicators, right "(i) Sobre" and "+ Opções" gray hints 11–12sp |
 | `SwitchSidePanel` | Right slide-in panel (~50% width), sharp edges, header (teal badge icon + bold title 20–22sp + separator), numbered rows (gray circle 24dp badges), labels 16sp, "(default)" suffix 14sp gray, chevron right, thin line separators |
 | `SwitchDialog` | Centered modal, scrim, box ~40% width, radius 12–16dp, bg `#3A3A3C`, header icon+title 18sp, rows 48–52dp with icon+text, focused row = cyan border outline |
@@ -557,3 +557,186 @@ Complete visual overhaul replacing Material 3 Expressive with a custom native im
 
 ## Superseded Notice
 **Material 3 Expressive requirements are superseded by this section.** All references to M3 Expressive in this document (theme parent, expressive shapes, motion, typography, component sizing, action emphasis) are **no longer applicable**. The `com.google.android.material:material:1.14.0` dependency may remain as a technical base (for `MaterialButton`, `MaterialCardView`, `TabLayout`, etc.) but MUST NOT be used for expressive styling. All visual standards now derive from the Nintendo Switch UI tokens and components defined above.
+
+---
+
+# Captura de Tela, Gravação e Galeria (2026-08)
+
+## Visão Geral
+
+Adicionar ao emulador a capacidade de **capturar tela** e **gravar a tela** durante as gameplays, persistindo imagens (PNG) e vídeos (MP4) em uma **nova tela de Galeria** estilo Nintendo Switch, onde o usuário pode **visualizar, compartilhar e excluir** cada item.
+
+Regras de comportamento (definidas pelo usuário):
+1. **Captura de tela**: sempre gera **2 imagens** por captura — uma **COM** o overlay dos controles e outra **SEM** o overlay dos controles.
+2. **Gravação de tela**: gera **1 vídeo**; pode ou não incluir o overlay dos controles conforme **toggle nas Configurações** (`pref_capture_include_overlay`, default `true` = incluir).
+3. **Controles no menu do emulador** (pause menu in-game): itens para "Capturar tela" e "Iniciar/Parar gravação".
+4. **Galeria na tela principal**: novo botão circular **Galeria** no `SwitchDock` (5º botão), abrindo a `GalleryActivity`.
+
+### Decisões do Usuário (Finais)
+1. Captura de tela sempre dupla (com/sem overlay). Sem escolha por captura — é automático.
+2. Gravação respeita o toggle global de overlay (configurações). Não há escolha por gravação.
+3. Galeria é tela dedicada (não dialog), estilo Switch, com compartilhar/excluir.
+4. Sem upload automático / sem telemetria (Regra 15). Mídia fica apenas no dispositivo; compartilhamento é via `ACTION_SEND` do usuário.
+
+---
+
+## Arquitetura
+
+### Pacote novo: `capture/` (lógica de captura/gravação)
+```
+br.com.redclaw.zelda64player
+├── capture/
+│   ├── CaptureManager.kt        # Orquestra screenshot (PixelCopy + compositing) e ponte com o serviço de gravação
+│   ├── CaptureService.kt        # Foreground Service: MediaProjection + MediaRecorder (gravação)
+│   ├── RecordingIndicatorView.kt# Indicador visual Switch-style (dot/ícone) de gravação ativa
+│   └── CapturePreferences.kt    # Helper de leitura de pref_capture_include_overlay
+├── gallery/
+│   ├── GalleryRepository.kt     # Lista/exclui itens da galleryDir; scan de arquivos
+│   ├── GalleryItem.kt           # Model: tipo (image/video), path, hackId, timestamp, withOverlay
+│   ├── GalleryActivity.kt       # Tela Switch UI (grid de itens + ações)
+│   ├── GalleryAdapter.kt        # RecyclerView adapter (reutiliza padrão SwitchGameCard/Grid)
+│   └── GalleryViewModel.kt      # StateFlow: itens, loading, ação delete/share
+└── (modificações em): views/GameActivity.kt, viewmodels/GameActivityViewModel.kt,
+    ui/switchui/SwitchDock.kt (via LibraryActivity.setupDock), settings/ui/SettingsActivity.kt,
+    repositories/Storage.kt, AndroidManifest.xml, res/xml/file_paths.xml
+```
+
+### Mecanismo de CAPTURA DE TELA
+- **Sem overlay**: `PixelCopy.request(SurfaceView, Bitmap, OnPixelCopyFinishedListener, Handler)` (API 24+) captura a `Surface` da `GLRetroView` (o `retroviewContainer`). O overlay (RadialGamePad, HUDs) NÃO é capturado porque vive em Views separadas sobre a Surface.
+- **Com overlay**: compor a imagem do jogo (acima) + desenhar as Views de overlay por cima num `Canvas` (`overlayView.draw(canvas)`), escaladas para o bitmap. Overlays candidatos: `binding.gamepadOverlay` (RadialGamePad), `OcarinaHudView`, `RaOverlayView`.
+  - **RISCO**: se o `gamepadOverlay` (RadialGamePad) renderizar para uma `SurfaceView` própria, `draw()` não o captura. Mitigação: verificar em tempo de implementação (Bruce) se o RadialGamePad é `View` ou `SurfaceView`. Se for `SurfaceView`, a versão "com overlay" usa `PixelCopy.request(Window, ...)` (API 26+) ou um snapshot via `MediaProjection` pontual; para API 24–25, fallback documentado (captura "com overlay" pode ficar indisponível ou usar compositing parcial). Decisão de implementação registrada em KDoc.
+- Ambas as imagens são salvas por captura (`screenshotFile(hackId, ts, withOverlay=true/false)`). Feedback ao usuário via toast Switch-style ("Captura salva").
+
+### Mecanismo de GRAVAÇÃO DE TELA
+- **Abordagem recomendada**: `MediaProjection` (via `MediaProjectionManager.createScreenCaptureIntent()` → consentimento do usuário) + `MediaRecorder` gravando a `VirtualDisplay` da janela do app, em um **Foreground Service** (`CaptureService`).
+- **Toggle de overlay**: ao iniciar a gravação, se `pref_capture_include_overlay == false`, ocultar temporariamente as Views de overlay (`gamepadOverlay`, `OcarinaHudView`, `RaOverlayView`) com `visibility = INVISIBLE` durante a gravação e restaurar (`VISIBLE`) ao parar. `INVISIBLE` mantém o layout/touch mas não é desenhado → não aparece na gravação do `MediaProjection`. Isso **não viola a Regra 14** (que governa posicionamento/modos do gamepad, não visibilidade temporária para captura).
+  - **Tradeoff UX**: durante gravação "sem overlay" o usuário não vê os controles na tela (mas continua controlando). Aceitável conforme requisito; exibir um hint Switch-style pequeno ("Controles ocultos na gravação").
+- **Permissões**: `FOREGROUND_SERVICE`; `FOREGROUND_SERVICE_MEDIA_PROJECTION` (API 29+); `POST_NOTIFICATIONS` (API 33+, solicitado no primeiro uso). O `MediaProjection` exige consentimento explícito do usuário a cada sessão.
+- Vídeo salvo em `recordingFile(hackId, ts)` (MP4).
+
+### STORAGE (reutiliza Storage.kt)
+Novos métodos (keyed by hackId, fora do cacheDir para não ser evictado):
+```kotlin
+fun galleryDir(): File = File(storagePath, "gallery").apply { mkdirs() }
+fun screenshotFile(hackId: String, timestamp: Long, withOverlay: Boolean): File =
+    File(galleryDir(), "screenshot_${hackId}_${timestamp}_${if (withOverlay) "overlay" else "clean" }.png")
+fun recordingFile(hackId: String, timestamp: Long): File =
+    File(galleryDir(), "recording_${hackId}_${timestamp}.mp4")
+```
+Compartilhamento usa `FileProvider` (autoridade `br.com.redclaw.zelda64player.fileprovider`) com `res/xml/file_paths.xml` expondo `galleryDir`.
+
+### MODELO + REPOSITORY
+- `GalleryItem(tipo: MediaType, path: File, hackId: String?, timestamp: Long, withOverlay: Boolean)`.
+- `GalleryRepository`: `suspend fun list(): List<GalleryItem>` (scan de `galleryDir()`, parse de nome), `fun delete(item): Boolean`, `fun shareUri(item): Uri` (via FileProvider).
+
+### GALLERYACTIVITY (Switch UI)
+- Reutiliza o padrão `SwitchGridScreen` (header "Galeria" + grid de cards). Cada card: thumbnail (Coil para imagens; `MediaMetadataRetriever` para frame de vídeo), badge de tipo (ícone vídeo/câmera), badge "overlay/clean" quando aplicável.
+- Ações por item (via `SwitchDialog` ou menu de card): **Visualizar** (abre viewer/player nativo via `ACTION_VIEW` + FileProvider), **Compartilhar** (`ACTION_SEND` + URI FileProvider, tipo `image/png` ou `video/mp4`), **Excluir** (confirmação `SwitchDialog` → `GalleryRepository.delete` → refresh).
+- Empty state: "Nenhuma captura ainda. Use o menu do emulador para capturar."
+- Acessibilidade: contentDescription, TalkBack, touch targets ≥48dp.
+
+### CONTROLES NO MENU DO EMULADOR
+Em `GameActivityViewModel.buildMenuSections()`, adicionar nova `MenuSection` (ex: `R.string.menu_category_capture`) com:
+- `MenuActionItem("screenshot", R.string.menu_screenshot, R.drawable.ic_screenshot)` → `captureManager.captureScreenshot(context, hackId)` (gera 2 arquivos).
+- `MenuActionItem("record", R.string.menu_record_start / menu_record_stop, R.drawable.ic_record / ic_stop, isToggle=true, isActive={ isRecording })` → inicia/para `CaptureService` (respeitando `pref_capture_include_overlay`).
+- Indicador de gravação ativa: `RecordingIndicatorView` (dot/ícone ciano/vermelho, estilo Switch) adicionado ao `binding.root` do `GameActivity` quando gravando.
+
+### TOGGLE NAS CONFIGURAÇÕES
+- Chave: `pref_capture_include_overlay` (Boolean, default `true`).
+- Em `SettingsActivity` (estilo Switch): nova seção "Captura" com `SwitchPreference`-like row (ou linha Switch UI custom) "Incluir controles na gravação". Lida em `GameActivityViewModel` na hora de iniciar a gravação via `CapturePreferences`.
+
+### DOCK (Tela Principal)
+Em `LibraryActivity.setupDock()`, adicionar 5º `SwitchDock.DockItem`:
+```kotlin
+SwitchDock.DockItem(
+    R.drawable.ic_gallery, R.string.dock_gallery, R.color.switch_accent_focus
+) { startActivity(Intent(this, GalleryActivity::class.java)) }
+```
+Ícone `ic_gallery` (SVG) gerado por **Dolfi**.
+
+### i18n (obrigatório)
+Strings novas em `values/strings.xml` (pt-BR), `values-en/`, `values-es/`:
+`menu_category_capture`, `menu_screenshot`, `menu_record_start`, `menu_record_stop`, `dock_gallery`, `gallery_title`, `gallery_empty`, `gallery_share`, `gallery_delete`, `gallery_delete_confirm`, `gallery_view`, `settings_capture_include_overlay`, `capture_saved`, `recording_started`, `recording_stopped`, `capture_overlay_hidden_hint`. Zero hardcoded.
+
+### Mudanças no Manifest
+```xml
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" /> <!-- API 29+ -->
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- API 33+ -->
+
+<service android:name=".capture.CaptureService"
+    android:exported="false"
+    android:foregroundServiceType="mediaProjection" />
+
+<provider android:name="androidx.core.content.FileProvider"
+    android:authorities="br.com.redclaw.zelda64player.fileprovider"
+    android:exported="false"
+    android:grantUriPermissions="true">
+    <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/file_paths" />
+</provider>
+```
+`res/xml/file_paths.xml`: `<files-path name="gallery" path="gallery/" />` (ou `external-files-path` conforme `storagePath`).
+
+---
+
+## Plano de Implementação em Fases (C1–C4)
+
+### Fase C1: Foundation — Storage + Repository + Screenshot + Manifest (Semana 1)
+- [ ] `Storage.kt`: `galleryDir()`, `screenshotFile()`, `recordingFile()`.
+- [ ] `GalleryRepository.kt` + `GalleryItem.kt`.
+- [ ] `CaptureManager.kt`: `captureScreenshot(context, hackId)` via PixelCopy (sem overlay) + compositing (com overlay); salva 2 arquivos; toast feedback.
+- [ ] `AndroidManifest.xml`: permissões + `FileProvider` + `file_paths.xml`.
+- [ ] Verificar se `gamepadOverlay` (RadialGamePad) é `View` ou `SurfaceView` (Bruce) → decidir compositing vs PixelCopy de Window.
+- [ ] **Build**: `./gradlew :app:assembleDebug` ✓.
+
+### Fase C2: Menu Controls + Recording Service (Semana 2)
+- [ ] `CaptureService.kt`: MediaProjection + MediaRecorder (foreground service, consent flow).
+- [ ] `CapturePreferences.kt` + leitura de `pref_capture_include_overlay`.
+- [ ] `GameActivityViewModel`: novos itens no menu (screenshot + record toggle); ocultar/restaurar overlays na gravação; `RecordingIndicatorView`.
+- [ ] `GameActivity.kt`: anexar `RecordingIndicatorView` ao `binding.root`.
+- [ ] **Build + runtime**: capturar gera 2 PNG; gravar gera MP4; toggle oculta overlay. ✓
+
+### Fase C3: Gallery Screen + Dock + Settings UI (Semana 3)
+- [ ] `GalleryActivity.kt` + `GalleryAdapter.kt` + `GalleryViewModel.kt` (estilo SwitchGridScreen).
+- [ ] Ações: visualizar (ACTION_VIEW), compartilhar (ACTION_SEND + FileProvider), excluir (SwitchDialog confirm → repo.delete).
+- [ ] `LibraryActivity.setupDock()`: 5º DockItem "Galeria" → GalleryActivity.
+- [ ] `SettingsActivity`: seção "Captura" com toggle `pref_capture_include_overlay`.
+- [ ] **Visual QA** (Chululu): GalleryActivity (vazio/populado), menu in-game captura, indicador de gravação, dock com Galeria.
+
+### Fase C4: i18n + Icons + Polish (Semana 4)
+- [ ] **Dolfi**: ícones SVG `ic_gallery`, `ic_screenshot`, `ic_record`, `ic_stop` (consistentes com estilo Switch/dock).
+- [ ] **Wally**: strings pt-BR/en/es completas; nota no README.
+- [ ] **Chululu**: QA visual Switch (dark/light) das telas novas.
+- [ ] **Build**: `./gradlew :app:assembleRelease :app:testDebugUnitTest`.
+
+---
+
+## Registro de Riscos (Captura/Gravação)
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|-------|---------------|---------|-----------|
+| **RadialGamePad é SurfaceView** (não capturável via `draw()`) | Média | "Com overlay" incompleto em API 24–25 | Verificar em C1; se SurfaceView, usar PixelCopy de Window (API 26+) ou MediaProjection snapshot; documentar fallback para 24–25 |
+| **PixelCopy timing** (frame não pronto) | Baixa | Imagem preta/parcial | PixelCopy já entrega o frame mais recente da Surface; retry/timeout curto se necessário |
+| **Permissões MediaProjection** (consentimento, foreground service API 29+) | Média | Gravação não inicia | Fluxo de consentimento explícito; tratar negação com toast; `foregroundServiceType=mediaProjection` |
+| **Overlay oculto durante gravação "sem overlay"** (usuário não vê controles) | Alta (UX) | Confusão ao jogar | Hint Switch-style "Controles ocultos na gravação"; controles continuam funcionando (touch/INVISIBLE) |
+| **Tamanho de arquivos de vídeo** | Média | Storage cheio | Sem upload (privacidade); opcional: limite de duração/config de qualidade futura; excluir pela Galeria |
+| **GPL-3.0 / privacidade** | — | Compliance | Mídia 100% local; sem telemetria; FileProvider com `grantUriPermissions` temporário |
+| **Regra 14 (gamepad frozen)** | — | — | Ocultar overlay via visibility NÃO altera layout/modos do RadialGamePad; ao parar, restaurado integralmente |
+
+---
+
+## Checklist de Milestones (Fases C1–C4)
+- [ ] **C1**: Storage + GalleryRepository + CaptureManager (screenshot duplo) + Manifest/FileProvider + verificação RadialGamePad render target. **Build debug** ✓
+- [ ] **C2**: CaptureService (MediaProjection+MediaRecorder) + menu (screenshot/record) + toggle overlay + indicador. **Runtime: 2 PNG + MP4** ✓
+- [ ] **C3**: GalleryActivity (ver/compartilhar/excluir) + Dock 5º botão + Settings toggle. **Visual QA Chululu** ✓
+- [ ] **C4**: Ícones Dolfi + i18n Wally + QA final + **Release build** ✓
+
+## Delegação de Agentes (esta funcionalidade)
+| Agente | Responsabilidade |
+|--------|------------------|
+| **Bruce** 🦈 | Kotlin/XML: CaptureManager, CaptureService, GalleryRepository/Activity/Adapter/ViewModel, menu items, Storage methods, manifest, settings toggle |
+| **Dolfi** 🐬 | Ícones SVG: `ic_gallery`, `ic_screenshot`, `ic_record`, `ic_stop` (estilo Switch/dock) |
+| **Wally** 🐋 | Strings pt-BR/en/es + nota README |
+| **Chululu** 🐙 | QA visual Switch (dark/light) das telas novas |
+| **Puffy** 🐡 | (consulta) APIs PixelCopy/MediaProjection/MediaRecorder API 24+ e permissões |

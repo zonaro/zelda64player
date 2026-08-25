@@ -372,6 +372,8 @@
     <string name="gamepad_tester_title">Prueba de Mando</string>
     <string name="gamepad_tester_back">Volver</string>
     <string name="gamepad_tester_disconnected">No hay mando conectado</string>
+    <string name="gamepad_tester_connect_controller">Conecte un mando</string>
+    <string name="gamepad_tester_controller_disconnected">Mando desconectado</string>
     <string name="gamepad_tester_connected">Mando: %1$s</string>
     <string name="gamepad_tester_mode_physical">Mando físico</string>
     <string name="gamepad_tester_mode_n64">Mapeo Nintendo 64</string>
@@ -424,8 +426,8 @@
     <string name="grid_sort_download_date">Fecha de Descarga</string>
     <string name="grid_sort_alpha">Alfabético</string>
 
-    <!-- ===== Store: Import Patch (BPS/IPS) ===== -->
-    <string name="store_import_bps">Importar Parche (BPS)</string>
+    <!-- ===== Store: Importar juego o parche manual ===== -->
+    <string name="store_import_bps">Importar juego o parche</string>
     <string name="import_patch_progress">Aplicando parche…</string>
     <string name="import_success_title">Parche instalado</string>
     <string name="import_success_message">El hack \"%1$s\" se aplicó a la ROM %2$s y ya está disponible en la Biblioteca.</string>
@@ -435,10 +437,25 @@
     <string name="import_invalid_title">Parche inválido</string>
     <string name="import_invalid_message">No se pudo aplicar el parche: %1$s</string>
     <string name="import_invalid_generic">Parche inválido</string>
-    <string name="import_unsupported_message">Formato de parche no compatible. Use un archivo BPS o IPS.</string>
+    <string name="import_unsupported_message">Formato no compatible. Use un archivo BPS, IPS, N64 o Z64.</string>
     <string name="import_author_user">Importado por el usuario</string>
     <string name="import_description_auto">Hack importado manualmente por el usuario.</string>
     <string name="import_unknown_base">Desconocida</string>
+    <string name="import_rom_progress">Importando ROM…</string>
+    <string name="import_rom_success_title">Juego importado</string>
+    <string name="import_rom_success_message">El juego "%1$s" ya está disponible en la Biblioteca.</string>
+    <string name="import_invalid_rom_title">ROM inválida</string>
+    <string name="import_invalid_rom_message">No se pudo importar la ROM: %1$s</string>
+    <string name="import_file_picker_title">Seleccionar juego o parche</string>
+
+    <!-- ===== Portada de juego manual ===== -->
+    <string name="manual_cover_change">Cambiar portada</string>
+    <string name="manual_cover_remove">Eliminar portada personalizada</string>
+    <string name="manual_cover_picker_title">Seleccionar portada</string>
+    <string name="manual_cover_content_description">Portada personalizada del juego</string>
+    <string name="manual_cover_success">Portada personalizada actualizada.</string>
+    <string name="manual_cover_remove_success">Portada personalizada eliminada.</string>
+    <string name="manual_cover_invalid">No se pudo usar esta imagen como portada.</string>
     <string name="game_oot">Ocarina of Time</string>
     <string name="game_mm">Majora\'s Mask</string>
     <string name="game_unknown">desconocida</string>

@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="./assets/app-icon.png" />
 </head>
 <body>
-  <header class="topbar">
+  <header class="topbar type-zone" data-type-zone>
     <div class="container topbar-inner">
       <div class="brand">
         <img class="logo" src="./assets/app-icon.png" alt="Zelda 64 Player" />
@@ -28,8 +28,12 @@
   </header>
 
   <main>
-    <section class="hero">
-      <div class="container">
+    <section class="hero type-zone" data-type-zone>
+      <div class="hero-bg" aria-hidden="true">
+        <iframe src="https://www.youtube.com/embed/CtMllWsML5M?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=CtMllWsML5M&amp;controls=0&amp;showinfo=0&amp;rel=0&amp;modestbranding=1&amp;playsinline=1&amp;disablekb=1&amp;fs=0" title="Zelda 64 Player background video" frameborder="0" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" loading="eager"></iframe>
+      </div>
+      <div class="hero-scrim" aria-hidden="true"></div>
+      <div class="container hero-content">
         <h1><span data-i18n="hero.title.pre"></span> <span class="accent" data-i18n="hero.title.accent"></span></h1>
         <p data-i18n="hero.subtitle"></p>
         <div class="hero-badges">
@@ -40,7 +44,7 @@
       </div>
     </section>
 
-    <section class="section" id="features">
+    <section class="section type-zone" id="features" data-type-zone>
       <div class="container">
         <div class="section-head">
           <h2 data-i18n="features.title"></h2>
@@ -50,7 +54,7 @@
       </div>
     </section>
 
-    <section class="section" id="catalog">
+    <section class="section type-zone" id="catalog" data-type-zone>
       <div class="container">
         <div class="section-head">
           <h2 data-i18n="catalog.title"></h2>
@@ -62,7 +66,7 @@
       </div>
     </section>
 
-    <section class="section" id="download">
+    <section class="section type-zone" id="download" data-type-zone>
       <div class="container">
         <div class="section-head">
           <h2 data-i18n="download.title"></h2>
@@ -80,7 +84,7 @@
           <a class="btn-download" id="download-btn"
              href="https://github.com/zonaro/zelda64player/releases/latest/download/Zelda64Player.apk"
              target="_blank" rel="noopener">
-            <span class="btn-download-icon" aria-hidden="true">&#8595;</span>
+            <span class="btn-download-icon hylian-symbol" aria-hidden="true">a</span>
             <span data-i18n="download.button"></span>
           </a>
         </div>
@@ -88,7 +92,7 @@
       </div>
     </section>
 
-    <section class="section" id="legal">
+    <section class="section type-zone" id="legal" data-type-zone>
       <div class="container">
         <div class="legal">
           <h3 data-i18n="legal.title"></h3>
@@ -98,7 +102,7 @@
     </section>
   </main>
 
-  <footer class="footer">
+  <footer class="footer type-zone" data-type-zone>
     <div class="container">
       <p data-i18n="footer.text"></p>
       <p><a href="https://github.com/zonaro/zelda64player" target="_blank" rel="noopener" data-i18n="footer.source"></a></p>

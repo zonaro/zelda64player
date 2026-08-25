@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowInsets
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import br.com.redclaw.zelda64player.R
@@ -171,7 +172,13 @@ class LibraryActivity : AppCompatActivity() {
                 R.drawable.ic_gamepad,
                 R.string.dock_gamepad_tester,
                 R.color.switch_accent_focus
-            ) { startActivity(Intent(this, GamepadTesterActivity::class.java)) },
+            ) {
+                if (GamepadTesterActivity.hasConnectedController()) {
+                    startActivity(Intent(this, GamepadTesterActivity::class.java))
+                } else {
+                    Toast.makeText(this, R.string.gamepad_tester_connect_controller, Toast.LENGTH_SHORT).show()
+                }
+            },
             SwitchDock.DockItem(
                 R.drawable.ic_settings,
                 R.string.dock_settings,

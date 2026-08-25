@@ -36,3 +36,11 @@ data class ImportPatchNoCompatibleRom(
 data class ImportPatchInvalid(val message: String) : ImportPatchResult
 
 data class ImportPatchUnsupported(val message: String) : ImportPatchResult
+
+/** Result of importing a .n64/.z64 file as a vanilla base ROM. */
+data class ImportRomSuccess(val title: String, val family: OcarinaGame?) : ImportPatchResult
+
+/** The selected ROM was already registered by its normalized checksum. */
+data class ImportRomDuplicate(val title: String) : ImportPatchResult
+
+data class ImportRomInvalid(val message: String) : ImportPatchResult

@@ -372,6 +372,8 @@
     <string name="gamepad_tester_title">Gamepad Tester</string>
     <string name="gamepad_tester_back">Back</string>
     <string name="gamepad_tester_disconnected">No controller connected</string>
+    <string name="gamepad_tester_connect_controller">Connect a controller</string>
+    <string name="gamepad_tester_controller_disconnected">Controller disconnected</string>
     <string name="gamepad_tester_connected">Controller: %1$s</string>
     <string name="gamepad_tester_mode_physical">Physical controller</string>
     <string name="gamepad_tester_mode_n64">Nintendo 64 mapping</string>
@@ -424,8 +426,8 @@
     <string name="grid_sort_download_date">Download Date</string>
     <string name="grid_sort_alpha">Alphabetical</string>
 
-    <!-- ===== Store: Import Patch (BPS/IPS) ===== -->
-    <string name="store_import_bps">Import Patch (BPS)</string>
+    <!-- ===== Store: Import manual game or patch ===== -->
+    <string name="store_import_bps">Import game or patch</string>
     <string name="import_patch_progress">Applying patch…</string>
     <string name="import_success_title">Patch installed</string>
     <string name="import_success_message">The hack \"%1$s\" was applied to the %2$s ROM and is now available in the Library.</string>
@@ -435,10 +437,25 @@
     <string name="import_invalid_title">Invalid patch</string>
     <string name="import_invalid_message">Could not apply the patch: %1$s</string>
     <string name="import_invalid_generic">Invalid patch</string>
-    <string name="import_unsupported_message">Unsupported patch format. Use a BPS or IPS file.</string>
+    <string name="import_unsupported_message">Unsupported format. Use a BPS, IPS, N64, or Z64 file.</string>
     <string name="import_author_user">Imported by user</string>
     <string name="import_description_auto">Hack manually imported by the user.</string>
     <string name="import_unknown_base">Unknown</string>
+    <string name="import_rom_progress">Importing ROM…</string>
+    <string name="import_rom_success_title">Game imported</string>
+    <string name="import_rom_success_message">The game "%1$s" is now available in the Library.</string>
+    <string name="import_invalid_rom_title">Invalid ROM</string>
+    <string name="import_invalid_rom_message">Could not import the ROM: %1$s</string>
+    <string name="import_file_picker_title">Select game or patch</string>
+
+    <!-- ===== Manual game cover ===== -->
+    <string name="manual_cover_change">Change cover</string>
+    <string name="manual_cover_remove">Remove custom cover</string>
+    <string name="manual_cover_picker_title">Select cover</string>
+    <string name="manual_cover_content_description">Custom game cover</string>
+    <string name="manual_cover_success">Custom cover updated.</string>
+    <string name="manual_cover_remove_success">Custom cover removed.</string>
+    <string name="manual_cover_invalid">Could not use this image as a cover.</string>
     <string name="game_oot">Ocarina of Time</string>
     <string name="game_mm">Majora\'s Mask</string>
     <string name="game_unknown">unknown</string>

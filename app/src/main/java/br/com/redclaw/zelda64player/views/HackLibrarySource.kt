@@ -26,7 +26,9 @@ data class HackLibraryEntry(
      */
     val family: OcarinaGame? = null,
     /** True when this tile is a user-imported vanilla base ROM (managed in Settings). */
-    val isVanilla: Boolean = false
+    val isVanilla: Boolean = false,
+    /** True only for hacks installed from a file chosen by the user (not Store catalog entries). */
+    val isUserImported: Boolean = false
 )
 
 /**

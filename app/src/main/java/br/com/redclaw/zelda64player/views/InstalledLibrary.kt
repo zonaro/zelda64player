@@ -50,7 +50,8 @@ object InstalledLibrary {
             private val delegate = CatalogBackedLibrarySource(
                 storagePath,
                 installedRepository,
-                catalogMap
+                catalogMap,
+                userHacks.keys
             )
             override fun available(): List<HackLibraryEntry> = delegate.available()
         }

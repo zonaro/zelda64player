@@ -46,6 +46,9 @@ interface LibraryMenuHost {
     /** Open the RetroAchievements screen for [entry]. */
     fun openAchievements(entry: HackLibraryEntry)
 
+    /** Pick and persist a custom cover for a manually imported hack. */
+    fun requestChangeCover(entry: HackLibraryEntry)
+
     /** Show a short localized toast by string resource id. */
     fun showToast(resId: Int)
 }
@@ -163,12 +166,21 @@ class LibraryMenuController(private val host: LibraryMenuHost) {
         )
         val management = MenuSection(
             R.string.menu_category_management,
-            listOf(
+            buildList {
+                if (entry.isUserImported) {
+                    add(
+                        MenuActionItem(
+                            "change_cover", R.string.manual_cover_change, R.drawable.ic_edit_cover
+                        ) { host.requestChangeCover(entry) }
+                    )
+                }
+                add(
                 MenuActionItem(
                     "uninstall", R.string.menu_uninstall, R.drawable.ic_uninstall,
                     badgeRes = R.string.badge_y
                 ) { host.confirmUninstall(entry) }
-            )
+                )
+            }
         )
         /* Vanilla base ROMs are managed in Settings, not the Library context menu,
             so the management section (uninstall) is omitted entirely.

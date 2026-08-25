@@ -30,6 +30,16 @@ class UserHacksRepository(private val file: File) {
 
     fun getById(id: String): HackEntry? = load().firstOrNull { it.id == id }
 
+    /** Persist a local cover URI for a manually imported hack. Returns false when unknown. */
+    fun updateCover(id: String, coverUri: String): Boolean {
+        val all = load().toMutableList()
+        val index = all.indexOfFirst { it.id == id }
+        if (index < 0) return false
+        all[index] = all[index].copy(coverImageUrl = coverUri)
+        save(all)
+        return true
+    }
+
     /** Remove a user hack by id (e.g. on Library uninstall). */
     fun remove(id: String) {
         val all = load().toMutableList()
