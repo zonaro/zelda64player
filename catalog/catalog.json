@@ -619,6 +619,40 @@
         "mupen64plus_next_gles3",
         "parallel_n64"
       ]
+    },
+    {
+      "id": "hero_of_law",
+      "name": "Hero of Law",
+      "description": "A courtroom-drama Ocarina of Time hack by Newer Team. Link becomes a defense attorney in Hyrule, cross-examining witnesses and presenting evidence across a multi-chapter mystery. Requires the Expansion Pak. Includes an in-game English/French language selector.",
+      "author": "Newer Team",
+      "version": "1.0",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://github.com/zonaro/zelda64player/releases/download/catalog-patches-v1/CZLE_1.0.xdelta",
+        "filename": "CZLE_1.0.xdelta",
+        "size": 5009414,
+        "checksums": {
+          "crc32": "f26683b0",
+          "md5": "0bd312ecc7a587c3848e3ea62d2e75f1"
+        }
+      },
+      "tags": [
+        "story",
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
     }
   ]
 }
