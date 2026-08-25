@@ -4,8 +4,10 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
+import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.util.Log
 import android.view.*
@@ -62,6 +64,9 @@ import br.com.redclaw.zelda64player.retroachievements.ui.AchievementsActivity
 import br.com.redclaw.zelda64player.retroachievements.ui.RaLeaderboardDialogFragment
 import br.com.redclaw.zelda64player.retroachievements.ui.RaOverlayView
 import br.com.redclaw.zelda64player.retroview.RetroView
+import br.com.redclaw.zelda64player.capture.CaptureManager
+import br.com.redclaw.zelda64player.capture.CapturePreferences
+import br.com.redclaw.zelda64player.capture.CaptureService
 import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.utils.MenuActionItem
@@ -86,6 +91,9 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         /** Request code for the POST_NOTIFICATIONS runtime permission ask. */
         private const val RA_NOTIFICATION_PERMISSION_REQUEST = 51001
 
+        /** Request code for the MediaProjection consent intent (screen recording). */
+        private const val REQUEST_MEDIA_PROJECTION = 52001
+
         /** Delay between the two learning snapshots (user stores the ocarina). */
         const val OCARINA_LEARN_SNAPSHOT_DELAY_MS = 10_000L
     }
@@ -109,6 +117,18 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     private var raAnnounced = false
     /** In-game RA overlay attached by GameActivity (null until attached). */
     private var raOverlay: RaOverlayView? = null
+
+    /** On-screen gamepad overlay (FrameLayout) attached by GameActivity, used as
+     *  one of the overlay Views composited into the "with controls" screenshot. */
+    private var gamepadOverlayView: View? = null
+
+    /** True while a screen recording is active. Drives the in-game recording
+     *  indicator and the record menu item's toggle state. */
+    private val _isRecording = MutableLiveData(false)
+    val isRecording: LiveData<Boolean> = _isRecording
+
+    /** hackId stashed while the MediaProjection consent dialog is open. */
+    private var pendingRecordHackId: String? = null
 
     private var gamePads: List<GamePad> = emptyList()
     private var floatingJoystick: FloatingJoystick? = null
@@ -378,14 +398,41 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 )
             )
         } else null
+        /* Screen capture / recording controls. Always present in the in-game
+            menu: a one-shot screenshot (produces both clean + with-controls PNGs)
+            and a record toggle that drives the MediaProjection consent flow. */
+        val capture = MenuSection(
+            R.string.menu_category_capture,
+            listOf(
+                MenuActionItem(
+                    "screenshot",
+                    R.string.menu_screenshot,
+                    R.drawable.ic_screenshot,
+                    badgeRes = R.string.badge_lb
+                ) { captureScreenshotAction() },
+                MenuActionItem(
+                    "record",
+                    R.string.menu_record_start,
+                    R.drawable.ic_record,
+                    R.drawable.ic_stop,
+                    isToggle = true,
+                    isActive = { _isRecording.value == true },
+                    activeLabelRes = R.string.menu_record_stop,
+                    badgeRes = R.string.badge_rb
+                ) { toggleRecording() }
+            )
+        )
+
         /* Assemble the in-game menu in the requested display order:
-           Ocarina -> Game -> RetroAchievements -> Controls -> Audio & Video. */
+            Ocarina -> Game -> RetroAchievements -> Controls -> Audio & Video ->
+            Capture. */
         val sections = mutableListOf<MenuSection>()
         ocarina?.let { sections.add(it) }
         sections.add(game)
         sections.add(ra)
         sections.add(controls)
         sections.add(audioVideo)
+        sections.add(capture)
         return sections
     }
 
@@ -396,7 +443,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         val context = activityContext ?: return
         val primary = ContextCompat.getColor(context, R.color.color_primary)
         val onSurfaceVariant = ContextCompat.getColor(context, R.color.color_on_surface_variant)
-        for ((item, cell, icon) in toggleEntries) {
+        for ((item, cell, icon, label) in toggleEntries) {
             val active = item.isActive()
             icon.setImageResource(if (active) item.activeIconRes else item.iconRes)
             icon.imageTintList = ColorStateList.valueOf(if (active) primary else onSurfaceVariant)
@@ -404,6 +451,12 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 context,
                 if (active) R.drawable.bg_menu_item_active else R.drawable.bg_menu_item
             )
+            val activeLabel = item.activeLabelRes
+            if (activeLabel != null) {
+                label.setText(activeLabel)
+            } else if (label.text != context.getString(item.labelRes)) {
+                label.setText(item.labelRes)
+            }
         }
     }
 
@@ -1157,6 +1210,91 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     /** Attaches the in-game RA overlay created by GameActivity. */
     fun attachRaOverlay(overlay: RaOverlayView) {
         raOverlay = overlay
+    }
+
+    /** Attaches the on-screen gamepad overlay (FrameLayout) created by
+     *  GameActivity, so it can be composited into the "with controls" screenshot. */
+    fun attachGamepadOverlay(overlay: View) {
+        gamepadOverlayView = overlay
+    }
+
+    /**
+     * Capture a screenshot of the running game (both clean and with-controls
+     * variants) via [CaptureManager], then toast the result. No-op when the core
+     * is not ready or no game id is known.
+     */
+    private fun captureScreenshotAction() {
+        val context = activityContext ?: return
+        val surface = retroView?.view ?: run {
+            Toast.makeText(context, R.string.capture_failed, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val hackId = currentHackId ?: return
+        val overlays = listOfNotNull(gamepadOverlayView, ocarinaHud, raOverlay)
+        CaptureManager.captureScreenshot(context, hackId, surface, overlays) { success ->
+            Toast.makeText(
+                context,
+                if (success) R.string.capture_saved else R.string.capture_failed,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    /**
+     * Toggle screen recording. When not recording, launches the MediaProjection
+     * consent intent (requires an Activity, hence [activityContext]); the consent
+     * result is delegated back via [handleRecordingResult]. When already
+     * recording, stops the [CaptureService].
+     */
+    private fun toggleRecording() {
+        if (_isRecording.value == true) stopRecording() else startRecordingFlow()
+    }
+
+    /** Launch the MediaProjection consent flow. The result is delivered to
+     *  GameActivity, which forwards it to [handleRecordingResult]. */
+    private fun startRecordingFlow() {
+        val context = activityContext ?: return
+        val hackId = currentHackId ?: return
+        pendingRecordHackId = hackId
+        val manager =
+            context.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        val intent = manager.createScreenCaptureIntent()
+        @Suppress("DEPRECATION")
+        context.startActivityForResult(intent, REQUEST_MEDIA_PROJECTION)
+    }
+
+    /**
+     * Handle the MediaProjection consent result forwarded from GameActivity's
+     * onActivityResult. On success, starts [CaptureService] with the consent
+     * data and the global overlay preference; on denial, toasts and resets.
+     */
+    fun handleRecordingResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode != REQUEST_MEDIA_PROJECTION) return
+        val context = activityContext ?: return
+        val hackId = pendingRecordHackId ?: return
+        pendingRecordHackId = null
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            Toast.makeText(context, R.string.recording_permission_denied, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val includeOverlay = CapturePreferences.getIncludeOverlay(context)
+        val serviceIntent = Intent(context, CaptureService::class.java).apply {
+            putExtra(CaptureService.EXTRA_RESULT_CODE, resultCode)
+            putExtra(CaptureService.EXTRA_RESULT_DATA, data)
+            putExtra(CaptureService.EXTRA_HACK_ID, hackId)
+            putExtra(CaptureService.EXTRA_INCLUDE_OVERLAY, includeOverlay)
+        }
+        androidx.core.content.ContextCompat.startForegroundService(context, serviceIntent)
+        _isRecording.value = true
+        Toast.makeText(context, R.string.recording_started, Toast.LENGTH_SHORT).show()
+    }
+
+    /** Stop an active screen recording and reset the recording state. */
+    fun stopRecording() {
+        val context = activityContext ?: return
+        context.stopService(Intent(context, CaptureService::class.java))
+        _isRecording.value = false
+        Toast.makeText(context, R.string.recording_stopped, Toast.LENGTH_SHORT).show()
     }
 
     /**

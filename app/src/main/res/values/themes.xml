@@ -112,6 +112,7 @@
     <!-- Flat Switch-style button (replaces the expressive M3 pill button). -->
     <style name="SwitchButton" parent="android:Widget.Button">
         <item name="android:background">@drawable/bg_switch_button_focus</item>
+        <item name="android:backgroundTint">@null</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:minHeight">40dp</item>
@@ -139,9 +140,9 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">52dp</item>
         <item name="android:background">@drawable/bg_settings_nav_row</item>
+        <item name="android:backgroundTint">@null</item>
         <item name="android:ellipsize">end</item>
         <item name="android:focusable">true</item>
-        <item name="android:focusableInTouchMode">true</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:maxLines">1</item>
         <item name="android:paddingStart">24dp</item>

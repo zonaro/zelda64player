@@ -32,14 +32,18 @@
 
             <!-- Fixed category navigation in landscape. SettingsActivity turns this
                  into a conventional hamburger drawer in portrait. -->
-            <LinearLayout
-                android:id="@+id/settings_navigation"
+            <ScrollView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.34"
-                android:background="@color/switch_panel"
-                android:orientation="vertical"
-                android:paddingTop="12dp">
+                android:layout_weight="0.34">
+
+                <LinearLayout
+                    android:id="@+id/settings_navigation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/switch_panel"
+                    android:orientation="vertical"
+                    android:paddingTop="12dp">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -100,7 +104,13 @@
                     android:id="@+id/settings_nav_about"
                     style="@style/SwitchSettingsNavigationRow"
                     android:text="@string/settings_about_title" />
-            </LinearLayout>
+
+                <TextView
+                    android:id="@+id/settings_nav_capture"
+                    style="@style/SwitchSettingsNavigationRow"
+                    android:text="@string/settings_capture_category" />
+                </LinearLayout>
+            </ScrollView>
 
             <View
                 android:id="@+id/settings_navigation_divider"
@@ -113,8 +123,7 @@
                 android:id="@+id/settings_scroll"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.66"
-                android:fillViewport="true">
+                android:layout_weight="0.66">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -545,6 +554,52 @@
                     android:text="@string/settings_about_licenses"
                     android:textColor="@color/switch_text_secondary"
                     android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- Section: Captura (screenshot / recording) -->
+            <LinearLayout
+                android:id="@+id/settings_section_capture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_settings_section"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SwitchSectionHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_capture_category" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/settings_capture_description"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/settings_capture_include_overlay"
+                        android:textColor="@color/switch_text_primary"
+                        android:textSize="15sp" />
+
+                    <Switch
+                        android:id="@+id/settings_capture_include_overlay_switch"
+                        style="@style/SwitchSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>

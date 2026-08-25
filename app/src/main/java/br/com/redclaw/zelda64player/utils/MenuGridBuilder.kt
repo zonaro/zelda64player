@@ -34,6 +34,9 @@ import br.com.redclaw.zelda64player.gamepad.GamePad
  *   so a D-pad naturally skips them. Defaults to always enabled; the in-game
  *   menu uses this to grey out RetroAchievements items until the RA session
  *   resolves for the running game.
+ * @param activeLabelRes optional label shown when [isActive] is true (toggles
+ *   only). Used by the recording item to swap "Start" / "Stop" text with state.
+ *   When null the base [labelRes] is always shown.
  * @param action invoked when the cell is tapped or activated by key.
  */
 data class MenuActionItem(
@@ -46,6 +49,7 @@ data class MenuActionItem(
     @StringRes val badgeRes: Int? = null,
     val tintIcon: Boolean = true,
     val isEnabled: () -> Boolean = { true },
+    @StringRes val activeLabelRes: Int? = null,
     val action: () -> Unit
 )
 
@@ -55,11 +59,12 @@ data class MenuSection(
     val items: List<MenuActionItem>
 )
 
-/** Live references to a toggle cell, used to refresh its icon/background. */
+/** Live references to a toggle cell, used to refresh its icon/background/label. */
 data class MenuToggleEntry(
     val item: MenuActionItem,
     val cell: View,
-    val icon: ImageView
+    val icon: ImageView,
+    val label: TextView
 )
 
 /** Live references to a non-toggle cell, used to refresh its enabled / greyed
@@ -174,7 +179,7 @@ object MenuGridBuilder {
                     cell.tag = item.id
                     cell.setOnClickListener { onItemActivated(item) }
                     if (item.isToggle) {
-                        toggleEntries.add(MenuToggleEntry(item, cell, icon))
+                        toggleEntries.add(MenuToggleEntry(item, cell, icon, label))
                     } else {
                         /* Non-toggle cells are tracked so their enabled / greyed
                            state can be refreshed live (e.g. RetroAchievements). */

@@ -27,6 +27,11 @@ The app **never** embeds, downloads, or distributes base ROMs. Users must legall
 - **Background catalog refresh** via WorkManager (`CatalogRefreshWorker`, 12h periodic, CONNECTED network requirement).
 - **i18n** (pt-BR default, English, Spanish) — all user-facing strings are externalized to `strings.xml` (pt-BR in `values/`, en in `values-en/`, es in `values-es/`), with zero hardcoded strings in Kotlin/XML layouts.
 
+- **Screen Capture, Recording & Gallery**
+  *What it does:* Capturing screen (always 2 images: with/without overlay of controls), recording screen (video; includes or not the overlay according to the "Include controls in recording" toggle in Settings), and Gallery (view, share, and delete captures).
+  *How to use:* Via emulator menu (press Back button to open menu → "Captura" section); the Gallery is in the dock of the main screen (5th circular button); the toggle "Include controls in recording" is in Settings → Captura.
+  *Technical notes:* Media saved locally on the device only (no upload or telemetry), recording permissions (MediaProjection) requested from the user the first time, compatible with Android API 24+.
+
 ---
 
 ## Build Instructions

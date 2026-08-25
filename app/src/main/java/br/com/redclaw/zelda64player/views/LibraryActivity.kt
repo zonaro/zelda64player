@@ -34,6 +34,7 @@ import br.com.redclaw.zelda64player.databinding.ActivityLibraryBinding
 import br.com.redclaw.zelda64player.viewmodels.LibraryMenuHostDelegate
 import br.com.redclaw.zelda64player.retroachievements.ui.AchievementsActivity
 import br.com.redclaw.zelda64player.retroachievements.ui.RaProfileActivity
+import br.com.redclaw.zelda64player.gallery.GalleryActivity
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
 import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.store.ui.StoreActivity
@@ -183,7 +184,12 @@ class LibraryActivity : AppCompatActivity() {
                 R.drawable.ic_settings,
                 R.string.dock_settings,
                 R.color.switch_text_primary
-            ) { startActivity(Intent(this, SettingsActivity::class.java)) }
+            ) { startActivity(Intent(this, SettingsActivity::class.java)) },
+            SwitchDock.DockItem(
+                R.drawable.ic_gallery,
+                R.string.dock_gallery,
+                R.color.switch_accent_focus
+            ) { startActivity(Intent(this, GalleryActivity::class.java)) }
         )
         binding.libraryDock.setItems(dockItems)
     }

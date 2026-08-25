@@ -35,6 +35,28 @@ class Storage(context: Context) {
     fun state(hackId: String) = File("$storagePath/state_$hackId")
 
     /**
+     * Directory holding all captured screenshots and screen recordings. Lives
+     * under [storagePath] (durable external files dir, not the cache) so captures
+     * survive cache eviction and process death. Created on first access.
+     */
+    fun galleryDir(): File = File(storagePath, "gallery").apply { mkdirs() }
+
+    /**
+     * Path of a screenshot PNG for [hackId] taken at [timestamp]. [withOverlay]
+     * selects the "overlay" (controls drawn) or "clean" (game only) variant; the
+     * two are always produced together by [br.com.redclaw.zelda64player.capture.CaptureManager].
+     */
+    fun screenshotFile(hackId: String, timestamp: Long, withOverlay: Boolean): File =
+        File(
+            galleryDir(),
+            "screenshot_${hackId}_${timestamp}_${if (withOverlay) "overlay" else "clean"}.png"
+        )
+
+    /** Path of a screen-recording MP4 for [hackId] taken at [timestamp]. */
+    fun recordingFile(hackId: String, timestamp: Long): File =
+        File(galleryDir(), "recording_${hackId}_${timestamp}.mp4")
+
+    /**
      * One-time relocation of patched ROMs left in the legacy cache directory by
      * earlier builds. For every `rom_<id>` file found in [cachePath] that is not
      * already present under [storagePath], it is moved (or copied+deleted as a

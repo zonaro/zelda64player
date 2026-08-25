@@ -1,13 +1,20 @@
 package br.com.redclaw.zelda64player.views
 
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.hardware.input.InputManager
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.view.View
 import android.widget.RelativeLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import br.com.redclaw.zelda64player.capture.CaptureService
+import br.com.redclaw.zelda64player.capture.RecordingIndicatorView
 import br.com.redclaw.zelda64player.databinding.ActivityGameBinding
 import br.com.redclaw.zelda64player.ocarina.ui.OcarinaHudView
 import br.com.redclaw.zelda64player.retroachievements.ui.RaOverlayView
@@ -20,6 +27,23 @@ import java.io.File
 class GameActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGameBinding
     private val viewModel: GameActivityViewModel by viewModels()
+
+    /** Overlay views whose visibility is toggled during a "no overlay" recording. */
+    private var ocarinaHudView: OcarinaHudView? = null
+    private var raOverlayView: RaOverlayView? = null
+
+    /** Records each overlay's visibility before a "hide" so it can be restored. */
+    private val overlayVisibilityBackup = mutableMapOf<View, Int>()
+
+    /** Receives hide/show requests from [CaptureService] during recording. */
+    private val overlayToggleReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                CaptureService.ACTION_HIDE_OVERLAYS -> hideOverlaysForRecording()
+                CaptureService.ACTION_SHOW_OVERLAYS -> showOverlaysAfterRecording()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +89,7 @@ class GameActivity : AppCompatActivity() {
             bottomMargin = margin
         }
         binding.root.addView(hud, hudParams)
+        ocarinaHudView = hud
         viewModel.attachOcarinaHud(hud)
 
         // Build and attach the RetroAchievements overlay (unlock popups,
@@ -76,7 +101,18 @@ class GameActivity : AppCompatActivity() {
             RelativeLayout.LayoutParams.MATCH_PARENT
         )
         binding.root.addView(raOverlay, raParams)
+        raOverlayView = raOverlay
         viewModel.attachRaOverlay(raOverlay)
+
+        // Attach the on-screen gamepad overlay so it can be composited into the
+        // "with controls" screenshot.
+        viewModel.attachGamepadOverlay(binding.gamepadOverlay)
+
+        // Recording indicator (Switch-style), shown while a capture is active.
+        setupRecordingIndicator()
+
+        // Listen for overlay hide/show broadcasts from CaptureService.
+        registerOverlayToggleReceiver()
 
         viewModel.launchHack(
             this,
@@ -85,6 +121,56 @@ class GameActivity : AppCompatActivity() {
             binding.patchingProgress,
             hackId
         )
+    }
+
+    /** Add the [RecordingIndicatorView] to the root and observe recording state. */
+    private fun setupRecordingIndicator() {
+        val indicator = RecordingIndicatorView(this)
+        val size = RelativeLayout.LayoutParams.WRAP_CONTENT
+        val params = RelativeLayout.LayoutParams(size, size).apply {
+            addRule(RelativeLayout.ALIGN_PARENT_TOP)
+            addRule(RelativeLayout.ALIGN_PARENT_END)
+            val margin = (12 * resources.displayMetrics.density).toInt()
+            topMargin = margin
+            marginEnd = margin
+        }
+        binding.root.addView(indicator, params)
+        viewModel.isRecording.observe(this) { recording ->
+            if (recording) indicator.show() else indicator.hide()
+        }
+    }
+
+    /** Register the receiver that hides/restores overlays during recording. */
+    private fun registerOverlayToggleReceiver() {
+        val filter = IntentFilter().apply {
+            addAction(CaptureService.ACTION_HIDE_OVERLAYS)
+            addAction(CaptureService.ACTION_SHOW_OVERLAYS)
+        }
+        registerReceiver(overlayToggleReceiver, filter)
+    }
+
+    /**
+     * Temporarily hide the control overlays (gamepad, Ocarina HUD, RA overlay)
+     * so they are excluded from a "no overlay" screen recording. Each view's
+     * current visibility is backed up and restored on [showOverlaysAfterRecording].
+     * Uses INVISIBLE (never GONE) so the gamepad keeps its layout/measure — this
+     * does not violate Rule 14 (frozen gamepad placement/modes).
+     */
+    private fun hideOverlaysForRecording() {
+        val views = listOfNotNull(binding.gamepadOverlay, ocarinaHudView, raOverlayView)
+        overlayVisibilityBackup.clear()
+        for (view in views) {
+            overlayVisibilityBackup[view] = view.visibility
+            view.visibility = View.INVISIBLE
+        }
+    }
+
+    /** Restore overlay visibility to the values captured before recording. */
+    private fun showOverlaysAfterRecording() {
+        for ((view, visibility) in overlayVisibilityBackup) {
+            view.visibility = visibility
+        }
+        overlayVisibilityBackup.clear()
     }
 
     private fun registerInputListener() {
@@ -141,17 +227,33 @@ class GameActivity : AppCompatActivity() {
             native core is torn down by super.onDestroy(). */
         viewModel.cancelOcarina()
         /* Stop the RetroAchievements session before the core dies: the RA
-           client aliases the emulated memory region, which becomes invalid
-           once super.onDestroy() releases the native core. */
+            client aliases the emulated memory region, which becomes invalid
+            once super.onDestroy() releases the native core. */
         viewModel.stopRaSession()
+        /* Leaving the game (not a GL-context recreate) stops any active
+            recording so we never keep capturing a dead surface. */
+        if (isFinishing) viewModel.stopRecording()
+        /* Unregister the overlay toggle receiver (best-effort). */
+        runCatching { unregisterReceiver(overlayToggleReceiver) }
         /* super.onDestroy() dispatches ON_DESTROY to the still-registered
-           RetroView observer, releasing its native core (~90MB+). Cleaning up
-           the observer beforehand (as this used to) skips that dispatch
-           entirely, leaking native memory on every recreate(). */
+            RetroView observer, releasing its native core (~90MB+). Cleaning up
+            the observer beforehand (as this used to) skips that dispatch
+            entirely, leaking native memory on every recreate(). */
         super.onDestroy()
         viewModel.dismissMenu()
         viewModel.dispose()
         viewModel.detachRetroView(this)
+    }
+
+    /**
+     * Forward the MediaProjection consent result to the ViewModel, which starts
+     * the [br.com.redclaw.zelda64player.capture.CaptureService] with the granted
+     * consent data.
+     */
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        viewModel.handleRecordingResult(requestCode, resultCode, data)
     }
 
     override fun onPause() {

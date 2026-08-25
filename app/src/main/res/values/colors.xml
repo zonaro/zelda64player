@@ -14,7 +14,7 @@
     <color name="switch_panel_light">#FFFFFF</color>
     <color name="switch_dialog_bg_dark">#3A3A3C</color>
     <color name="switch_dialog_bg_light">#FFFFFF</color>
-    <color name="switch_accent">#02830c</color>
+    <color name="switch_accent">#00BCD4</color>
     <color name="switch_accent_amber">#FFA000</color>
     <color name="switch_accent_focus">#00BCD4</color>
     <color name="switch_text_primary_dark">#FFFFFF</color>
@@ -53,9 +53,9 @@
     <color name="color_surface_container">#FFFFFF</color>
     <color name="color_surface_container_high">#F0F0F0</color>
     <color name="color_surface_variant">#FFFFFF</color>
-    <color name="color_primary">#02830c</color>
+    <color name="color_primary">#00BCD4</color>
     <color name="color_on_primary">#FFFFFF</color>
-    <color name="color_primary_container">#02830c</color>
+    <color name="color_primary_container">#00BCD4</color>
     <color name="color_on_primary_container">#FFFFFF</color>
     <color name="color_on_surface">#333333</color>
     <color name="color_on_surface_variant">#666666</color>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FileProvider paths for sharing captured media (screenshots / recordings)
+     from the gallery directory with other apps via ACTION_VIEW / ACTION_SEND.
+
+     Storage.galleryDir() resolves under getExternalFilesDir(null) (see
+     Storage.storagePath), so the gallery lives under the app's external files
+     root. The external-files-path "gallery" entry exposes exactly that
+     directory; the authority matches AndroidManifest.xml. -->
+<paths>
+    <external-files-path
+        name="gallery"
+        path="gallery/" />
+</paths>

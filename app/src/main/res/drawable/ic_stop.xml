@@ -2,27 +2,6 @@
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
-    android:viewportHeight="24"
-    android:tint="#FFFFFF">
-    <!-- Stop recording glyph (stop button) for the capture feature.
-         Outline style, 2px stroke, round caps/joins, consistent with the dock set.
-         Outer square + filled inner square. -->
-    <rect
-        android:x="5"
-        android:y="5"
-        android:width="14"
-        android:height="14"
-        android:rx="2"
-        android:fillColor="#00000000"
-        android:strokeColor="#FF000000"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
-    <rect
-        android:x="8"
-        android:y="8"
-        android:width="8"
-        android:height="8"
-        android:rx="1"
-        android:fillColor="#FF000000" />
+    android:viewportHeight="24">
+    <path android:fillColor="#FFFFFF" android:pathData="M6,6h12v12h-12z" />
 </vector>

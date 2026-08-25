@@ -2,21 +2,8 @@
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
-    android:viewportHeight="24"
-    android:tint="#FFFFFF">
-    <!-- Start recording glyph (record button) for the capture feature.
-         Outline style, 2px stroke, round caps/joins, consistent with the dock set.
-         Outer ring + filled center dot. -->
-    <circle
-        android:cx="12"
-        android:cy="12"
-        android:r="9"
-        android:fillColor="#00000000"
-        android:strokeColor="#FF000000"
-        android:strokeWidth="2" />
-    <circle
-        android:cx="12"
-        android:cy="12"
-        android:r="4"
-        android:fillColor="#FF000000" />
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,4a8,8 0 1,0 0,16a8,8 0 1,0 0,-16z" />
 </vector>

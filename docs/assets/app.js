@@ -64,6 +64,8 @@ const I18N = {
     "f.refresh.desc": "WorkManager atualiza o catálogo a cada 12 horas, mantendo a loja sempre atualizada sem consumo manual.",
     "f.i18n.title": "Internacionalização pt-BR / en / es",
     "f.i18n.desc": "Toda a interface do app é traduzida para português, inglês e espanhol, com detecção de idioma do sistema.",
+    "f.capture.title": "Captura de tela, gravação e galeria",
+    "f.capture.desc": "Faça screenshots e grave o gameplay em MP4 com ou sem os controles na tela, e veja tudo numa galeria estilo Switch.",
     "fPoints": {
       "store": ["Catálogo JSON hospedado no GitHub", "Atualização em segundo plano automática", "Cache local dos hacks no dispositivo"],
       "patch": ["Suporte a patches BPS e IPS", "Aplicação em memória/cache na hora de jogar", "Validação CRC32 tripla (base, patch, final)"],
@@ -78,7 +80,8 @@ const I18N = {
       "tester": ["Teste do controle N64 em tempo real", "Botões e analógicos físicos", "Mostra o mapeamento dos jogos"],
       "backup": ["Exporta e restaura saves", "Arquivo ZIP local", "Armazenado no dispositivo"],
       "refresh": ["Atualização via WorkManager", "A cada 12 horas", "Sem consumo manual"],
-      "i18n": ["Interface em pt-BR, en e es", "Detecção do idioma do sistema", "Toda a interface traduzida"]
+      "i18n": ["Interface em pt-BR, en e es", "Detecção do idioma do sistema", "Toda a interface traduzida"],
+      "capture": ["Screenshot via PixelCopy com ou sem overlay", "Gravação em MP4 via MediaProjection", "Galeria estilo Switch para ver, compartilhar e apagar"]
     },
     "download.title": "Baixar",
     "download.sub": "Instale o APK de release assinado",
@@ -145,6 +148,8 @@ const I18N = {
     "f.refresh.desc": "WorkManager refreshes the catalog every 12 hours, keeping the store current without manual effort.",
     "f.i18n.title": "i18n pt-BR / en / es",
     "f.i18n.desc": "The entire app UI is translated to Portuguese, English and Spanish, with system language detection.",
+    "f.capture.title": "Screen capture, recording and gallery",
+    "f.capture.desc": "Take screenshots and record gameplay to MP4 with or without on-screen controls, and browse everything in a Switch-style gallery.",
     "fPoints": {
       "store": ["GitHub-hosted JSON catalog", "Automatic background refresh", "On-device hack cache"],
       "patch": ["BPS and IPS patch support", "Applied in memory/cache at launch", "Triple CRC32 validation (base, patch, final)"],
@@ -159,7 +164,8 @@ const I18N = {
       "tester": ["Live N64 controller test", "Physical buttons and sticks", "Shows in-game button mapping"],
       "backup": ["Export and restore saves", "Local ZIP file", "Stored on device"],
       "refresh": ["Refresh via WorkManager", "Every 12 hours", "No manual effort"],
-      "i18n": ["UI in pt-BR, en and es", "System language detection", "Entire interface translated"]
+      "i18n": ["UI in pt-BR, en and es", "System language detection", "Entire interface translated"],
+      "capture": ["PixelCopy screenshots with/without overlay", "MP4 recording via MediaProjection", "Switch-style gallery to view, share and delete"]
     },
     "download.title": "Download",
     "download.sub": "Get the signed release APK",
@@ -226,6 +232,8 @@ const I18N = {
     "f.refresh.desc": "WorkManager actualiza el catálogo cada 12 horas, manteniendo la tienda al día sin esfuerzo manual.",
     "f.i18n.title": "Internacionalización pt-BR / en / es",
     "f.i18n.desc": "Toda la interfaz de la app está traducida a portugués, inglés y español, con detección del idioma del sistema.",
+    "f.capture.title": "Captura de pantalla, grabación y galería",
+    "f.capture.desc": "Haz capturas y graba gameplay en MP4 con o sin los controles en pantalla, y revisa todo en una galería estilo Switch.",
     "fPoints": {
       "store": ["Catálogo JSON alojado en GitHub", "Actualización en segundo plano automática", "Caché de hacks en el dispositivo"],
       "patch": ["Soporte de parches BPS e IPS", "Aplicados en memoria/caché al iniciar", "Validación CRC32 triple (base, parche, final)"],
@@ -240,7 +248,8 @@ const I18N = {
       "tester": ["Prueba del mando N64 en vivo", "Botones y analógicos físicos", "Muestra el mapeo de los juegos"],
       "backup": ["Exporta y restaura partidas", "Archivo ZIP local", "Almacenado en el dispositivo"],
       "refresh": ["Actualización vía WorkManager", "Cada 12 horas", "Sin esfuerzo manual"],
-      "i18n": ["Interfaz en pt-BR, en y es", "Detección del idioma del sistema", "Toda la interfaz traducida"]
+      "i18n": ["Interfaz en pt-BR, en y es", "Detección del idioma del sistema", "Toda la interfaz traducida"],
+      "capture": ["Capturas PixelCopy con/sin overlay", "Grabación MP4 vía MediaProjection", "Galería estilo Switch para ver, compartir y borrar"]
     },
     "download.title": "Descargar",
     "download.sub": "Obtén el APK de release firmado",
@@ -254,12 +263,12 @@ const I18N = {
 const FEATURE_KEYS = [
   "store", "patch", "byteorder", "checksum",
   "ocarina", "ra", "profile", "switchui", "vanilla", "gamepad", "tester",
-  "backup", "refresh", "i18n"
+  "backup", "refresh", "i18n", "capture"
 ];
 
 const FEATURE_ICONS = {
   store: "a", patch: "b", byteorder: "c", checksum: "d", ocarina: "e", ra: "f", profile: "g", switchui: "h", vanilla: "i", gamepad: "j", tester: "k",
-  backup: "l", refresh: "m", i18n: "n"
+  backup: "l", refresh: "m", i18n: "n", capture: "o"
 };
 
 const LIVE_CATALOG_URL = "https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/catalog.json";

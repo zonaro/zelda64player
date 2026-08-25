@@ -25,6 +25,7 @@ import br.com.redclaw.zelda64player.data.model.BaseRom
 import br.com.redclaw.zelda64player.databinding.ActivitySettingsBinding
 import br.com.redclaw.zelda64player.databinding.SettingsBaseRomItemBinding
 import br.com.redclaw.zelda64player.databinding.SettingsCatalogUrlItemBinding
+import br.com.redclaw.zelda64player.capture.CapturePreferences
 import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
 import br.com.redclaw.zelda64player.settings.SettingsViewModel
@@ -101,6 +102,7 @@ class SettingsActivity : AppCompatActivity() {
         setupBackupSection()
         setupLanguageSection()
         setupAboutSection()
+        setupCaptureSection()
         wireSettingsSfx()
         observeImport()
     }
@@ -125,16 +127,20 @@ class SettingsActivity : AppCompatActivity() {
             binding.settingsNavCore to binding.settingsSectionCore,
             binding.settingsNavBackup to binding.settingsSectionBackup,
             binding.settingsNavLanguage to binding.settingsSectionLanguage,
-            binding.settingsNavAbout to binding.settingsSectionAbout
+            binding.settingsNavAbout to binding.settingsSectionAbout,
+            binding.settingsNavCapture to binding.settingsSectionCapture
         )
 
         navigationTargets.forEach { (row, target) ->
             row.setOnClickListener {
                 sfx?.select()
                 selectSettingsSection(row)
-                binding.settingsScroll.post {
-                    binding.settingsScroll.smoothScrollTo(0, target.top)
-                }
+                // Delay until async section content (e.g. the base-ROM RecyclerView)
+                // has laid out AND settled; scrolling earlier gets reset to top when
+                // that list populates and changes the layout height.
+                binding.settingsScroll.postDelayed({
+                    binding.settingsScroll.scrollTo(0, target.top)
+                }, 600)
                 if (isPortraitSettings()) closeSettingsDrawer()
             }
             row.setOnFocusChangeListener { _, hasFocus ->
@@ -168,7 +174,8 @@ class SettingsActivity : AppCompatActivity() {
             binding.settingsNavCore,
             binding.settingsNavBackup,
             binding.settingsNavLanguage,
-            binding.settingsNavAbout
+            binding.settingsNavAbout,
+            binding.settingsNavCapture
         )
         rows.forEach { it.isSelected = it === selectedRow }
     }
@@ -639,6 +646,19 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsAboutCatalog.setOnClickListener {
             sfx?.select()
             openLink(CatalogFetcher.DEFAULT_CATALOG_URL)
+        }
+    }
+
+    /**
+     * Captura section: a single toggle controlling whether screen recordings
+     * include the on-screen control overlays. Screenshots always capture both
+     * variants regardless of this setting. Persisted via [CapturePreferences].
+     */
+    private fun setupCaptureSection() {
+        binding.settingsCaptureIncludeOverlaySwitch.isChecked =
+            CapturePreferences.getIncludeOverlay(this)
+        binding.settingsCaptureIncludeOverlaySwitch.setOnCheckedChangeListener { _, checked ->
+            CapturePreferences.setIncludeOverlay(this, checked)
         }
     }
 

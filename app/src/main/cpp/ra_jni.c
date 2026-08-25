@@ -313,6 +313,13 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return RA_JNI_VERSION;
 }
 
+JNIEXPORT jstring JNICALL
+Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_getVersion(
+        JNIEnv* env, jobject thiz) {
+    (void) thiz;
+    return (*env)->NewStringUTF(env, RCHEEVOS_VERSION_STRING);
+}
+
 JNIEXPORT void JNICALL
 Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeCreateClient(
         JNIEnv* env, jobject thiz, jobject listener) {

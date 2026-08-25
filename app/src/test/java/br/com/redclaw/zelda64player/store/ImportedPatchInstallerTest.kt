@@ -77,8 +77,7 @@ class ImportedPatchInstallerTest {
             baseRepo,
             InstalledHacksRepository(File(filesDir, "installed.json")),
             UserHacksRepository(File(filesDir, "user_hacks.json")),
-            Storage(context),
-            stringResolver = { "x" }
+            Storage(context)
         )
 
         val result = runBlocking { installer.install(patchFile, "my_hack") }
@@ -113,8 +112,7 @@ class ImportedPatchInstallerTest {
             baseRepo,
             InstalledHacksRepository(File(filesDir, "installed.json")),
             UserHacksRepository(File(filesDir, "user_hacks.json")),
-            Storage(context),
-            stringResolver = { "x" }
+            Storage(context)
         )
 
         val result = runBlocking { installer.install(patchFile, "orphan") }
@@ -142,8 +140,7 @@ class ImportedPatchInstallerTest {
             baseRepo,
             InstalledHacksRepository(File(filesDir, "installed.json")),
             UserHacksRepository(File(filesDir, "user_hacks.json")),
-            Storage(context),
-            stringResolver = { "x" }
+            Storage(context)
         )
 
         val result = runBlocking { installer.install(patchFile, "garbage") }
@@ -177,8 +174,7 @@ class ImportedPatchInstallerTest {
             baseRepo,
             InstalledHacksRepository(File(filesDir, "installed.json")),
             UserHacksRepository(File(filesDir, "user_hacks.json")),
-            Storage(context),
-            stringResolver = { "x" }
+            Storage(context)
         )
 
         val result = runBlocking { installer.install(patchFile, "corrupt") }
