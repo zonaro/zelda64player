@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The selected category is marked by the app's primary color, not a new palette. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="start" android:width="3dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/color_primary" />
+        </shape>
+    </item>
+</layer-list>

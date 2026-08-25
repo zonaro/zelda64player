@@ -19,13 +19,13 @@ The app **never** embeds, downloads, or distributes base ROMs. Users must legall
 - **N64 byte-order normalization** (.z64 / .v64 / .n64 → big-endian z64) via the pure Kotlin N64 normalizer module.
 - **Checksum-based base ROM matching** using gameCode + versionByte + CRC32 to validate that the user's base ROM is compatible with a given hack before applying patches.
 - **Auto-Ocarina** — in-game HUD that auto-plays Ocarina songs in OoT/MM from the pause menu. Built-in song catalog (OoT: 12 songs, MM: 11) plus optional per-hack custom songs from the catalog `ocarinaSongs` field. Coroutine sequencer sends key events to GLRetroView (~330ms/note), cancellable by any user input, menu open, or lifecycle changes. Game detection at launch via `RomHeader.gameCode` prefix: `CZL*` = OoT family, `NZL*`/`NSM*` = MM family. Unknown games hide the menu item.
-- **RetroAchievements** — sign in with your RetroAchievements.org account; achievements are tracked during play with unlock popups, challenge/progress indicators, and system notifications. Leaderboards are accessible only inside the in-game menu. The RA hash is computed exclusively from the final patched ROM at install time, never from the base ROM or uncompressed intermediates. RA credentials (username/password/token) are never logged (sanitized as `***`) and are stored only in EncryptedSharedPreferences in a separate `ra_secure_prefs` file. Hardcore mode defaults OFF (`pref_ra_hardcore = false`) until User-Agent validated with RAdmin. System notifications opt-in default ON but require `POST_NOTIFICATIONS` runtime permission on API 33+.
-- **Nintendo Switch-style UI revamp** — all screens follow a custom native implementation of the Nintendo Switch HOME menu aesthetic (inspired by NS_Launcher / FLauncher). Design tokens include dark background `#2D2D2D`, cyan accent `#00BCD4`, amber `#FFA000`, square game cards, focus borders, side panels, and dock. The RadialGamePad touch-control LAYOUT remains frozen (measured for OoT/MM control placement, ButtonStick modes, Auto-Z, FloatingJoystick, physical-controller mirroring); only chrome (menus, dialogs, overlays) is restyled to the Switch standard. Sound effects (focus-move "toc", select, back, panel open/close) are CC0/synthesized only, stored in `res/raw/`, and respect system volume with a mute toggle in Settings.
+- **RetroAchievements** — sign in with your RetroAchievements.org account; achievements are tracked during play with unlock popups, challenge/progress indicators, and system notifications. Leaderboards are accessible only inside the in-game menu. The RA hash is computed exclusively from the final patched ROM at install time, never from the base ROM or uncompressed intermediates. A full profile screen is available from the Library avatar; it displays the authenticated player's avatar and safe profile fields, with a short-lived local cache. Credential-like response fields are removed before display or caching. RA credentials (username/password/token) are never logged (sanitized as `***`) and are stored only in EncryptedSharedPreferences in a separate `ra_secure_prefs` file. Hardcore mode defaults OFF (`pref_ra_hardcore = false`) until User-Agent validated with RAdmin. System notifications opt-in default ON but require `POST_NOTIFICATIONS` runtime permission on API 33+.
+- **Nintendo Switch-style UI revamp** — all screens follow a custom native implementation of the Nintendo Switch HOME menu aesthetic (inspired by NS_Launcher / FLauncher), while retaining the app's green highlight color (`#02830C`), cyan focus treatment, and amber action color. The Library Home uses a selected-game label, a horizontal cover row that preserves the existing 13:9 artwork ratio, a profile entry point, a divider/footer, and a colored-icon dock for Store, RetroAchievements, Gamepad Tester, and Settings. Settings use a fixed category sidebar in landscape and a conventional hamburger drawer with scrim in portrait. The RadialGamePad touch-control LAYOUT remains frozen (measured for OoT/MM control placement, ButtonStick modes, Auto-Z, FloatingJoystick, physical-controller mirroring); only chrome (menus, dialogs, overlays) is restyled to the Switch standard. Sound effects (focus-move "toc", select, back, panel open/close) are CC0/synthesized only, stored in `res/raw/`, and respect system volume with a mute toggle in Settings.
 - **Vanilla Games in Library** — user-imported base ROMs (OoT, MM) are playable directly from the main Library screen, separate from Store hacks. New `BaseRomLibrarySource` exposes `BaseRomRepository` entries as playable tiles with `vanilla_<crc32>` IDs. Grid order: vanilla games first, then store hacks. `GameRomResolver.kt` handles resolution: `vanilla_*` resolves via `BaseRomRepository`; everything else falls back to `Storage.rom(hackId)`. All launch paths route through the resolver. Vanilla tiles carry a VANILLA badge (ice-cream icon) with neutral chip background. Context menu omits management sections (uninstall/delete-seed) for vanilla entries — base ROMs are managed in Settings. RetroAchievements for vanilla games have no install step; RA identity (rhash + game id) is computed lazily on first play.
-- **Custom gamepad layout** (RadialGamePad) — C-button mapping, Auto-Z, ButtonStick modes, FloatingJoystick. The layout is frozen/measured from a reference image tuned for OoT/MM; the RadialGamePad package is unchanged from Ludere and must not be modified without explicit user approval and an update to the "Layout de Controles Sob Medida" section of `plano.md`.
+- **Custom gamepad layout and tester** (RadialGamePad) — C-button mapping, Auto-Z, ButtonStick modes, and FloatingJoystick. The Library dock includes a full-screen Gamepad Tester that visualizes physical-controller input or its effective Nintendo 64 mapping without creating an emulation core or changing the touch layout. A shared mapping definition keeps the tester and gameplay input behavior aligned. The layout is frozen/measured from a reference image tuned for OoT/MM; the RadialGamePad package is unchanged from Ludere and must not be modified without explicit user approval and an update to the "Layout de Controles Sob Medida" section of `plano.md`.
 - **Save backup/restore** via ZIP (local, no cloud). Backups stored in `filesDir` per hackId.
 - **Background catalog refresh** via WorkManager (`CatalogRefreshWorker`, 12h periodic, CONNECTED network requirement).
-- **i18n** (pt-BR default, English, Spanish) — all user-facing strings externalized to `strings.xml` (pt-BR in `values/`, en in `values-en/`, es in `values-es/`). Zero hardcoded strings in Kotlin/XML layouts. The embedded OoTR WebView generator renders its own English UI (canonical OoTR community terminology); only the app's native chrome uses `strings.xml`.
+- **i18n** (pt-BR default, English, Spanish) — all user-facing strings are externalized to `strings.xml` (pt-BR in `values/`, en in `values-en/`, es in `values-es/`), with zero hardcoded strings in Kotlin/XML layouts.
 
 ---
 
@@ -77,8 +77,8 @@ See **docs/CATALOG.md** for the JSON catalog schema and **docs/catalog.example.j
 | Coroutines | kotlinx-coroutines 1.8+ | `lifecycle-runtime-ktx` for ViewModelScope |
 | Background Tasks | WorkManager 2.9.0 | `CatalogRefreshWorker` (12h periodic) |
 | RetroAchievements | rcheevos ~12.x (master tag) | MIT licensed, ANSI C; git subtree in `app/src/main/cpp/rcheevos/`; JNI bridge `libra_jni.so` |
-| UI Toolkit | Custom Nintendo Switch skin | Material Components 1.14.0 is technical base only; visual standard is custom Switch HOME menu aesthetic (dark bg #2D2D2D, cyan accent #00BCD4, amber #FFA000, square cards, focus borders, dock) |
-| Testing | JUnit 5, MockK, Turbine | Unit + Instrumented; JVM unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, (RomZipExtractor) and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed.|
+| UI Toolkit | Custom Nintendo Switch skin | Material Components 1.14.0 is technical base only; visual standard is a Switch-inspired HOME menu (dark bg #2D2D2D, green app accent #02830C, cyan focus, amber actions, 13:9 home covers, focus borders, dock, responsive Settings navigation). |
+| Testing | JUnit 5, MockK, Turbine | Unit + Instrumented; JVM unit tests cover patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, RetroAchievements identity/catalog parsing, and physical-controller-to-N64 mapping. Fixtures use synthetic ROMs and patches; no real ROMs are committed.|
 
 ---
 
@@ -99,7 +99,7 @@ br.com.redclaw.zelda64player
 │   ├── DownloadManager.kt
 │   ├── CatalogFetcher.kt
 │   └── CatalogRefresher.kt # shared by ViewModel + WorkManager worker
-├── settings/       # SettingsActivity (ROM import/list, catalog URLs, backups, RA login) + helpers
+├── settings/       # Responsive Switch Settings: landscape sidebar / portrait drawer; ROM import/list, URLs, backups, RA login
 │   ├── ui/              # SettingsActivity, Fragments (BaseRomImport, BaseRomList, CatalogUrl, RetroAchievements)
 │   └── SettingsViewModel.kt
 ├── work/           # CatalogRefreshWorker (periodic background refresh)
@@ -110,20 +110,25 @@ br.com.redclaw.zelda64player
 │   ├── RetroView.kt     # INTERCEPTION POINT: loads patched ROM from cache
 │   └── RetroViewUtils.kt
 ├── views/
-│   ├── LibraryActivity.kt     # Grid of installed hacks + vanilla games
+│   ├── LibraryActivity.kt     # Switch HOME row, colored dock, RA profile entry, vanilla games
 │   ├── GameActivity.kt        # Gameplay activity
+│   ├── GamepadTesterActivity.kt # Physical/N64 input visualizer; never starts a core
 │   ├── BaseRomLibrarySource.kt
 │   └── viewmodels/GameActivityViewModel.kt
 ├── gamepad/        # RadialGamePad — UNCHANGED from Ludere
-├── input/          # ControllerInput, InputMapper — UNCHANGED
+├── input/          # ControllerInput, InputMapper, N64ControllerMapping (shared gameplay/tester mapping)
 ├── utils/          # CorePrefs, RetroViewUtils — UNCHANGED
 ├── di/AppContainer.kt   # Service Locator
+├── retroachievements/
+│   ├── data/       # RA identity/catalog/install data + safe cached user profile
+│   └── ui/         # Achievements, profile, and in-game Switch-style presentation
+├── ui/switchui/     # Native Switch-inspired HOME, dock, footer, panels, dialogs, SFX and theme
 ├── libretrodroid/       # LOCAL GRADLE MODULE (vendor LibretroDroid 0.13.2 + 2 JNI passthroughs)
 ```
 
-**Testing:** `./gradlew :app:testDebugUnitTest` — JVM unit tests covering patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration and RetroAchievements identity/catalog parsing. Fixtures use synthetic ROMs and patches; no real ROMs are committed.
+**Testing:** `./gradlew :app:testDebugUnitTest` — JVM unit tests cover patcher N64 normalization, BPS parsing/validation, checksums, PatcherFacade integration, RetroAchievements identity/catalog parsing, and physical-controller-to-N64 mappings. Fixtures use synthetic ROMs and patches; no real ROMs are committed.
 
-**Roadmap:** See **plano.md** (pt-BR). Shipped: BPS + IPS patching, hack store, settings, save backup/restore, background catalog refresh, Auto-Ocarina, RetroAchievements, Nintendo Switch UI revamp, Vanilla Games in Library. Remaining stretch goals (post-MVP): multiple save slots per hack, optional opt-in telemetry (privacy-first, deferred), hardcore mode enablement pending RAdmin User-Agent validation.
+**Roadmap:** See **plano.md** (pt-BR). Shipped: BPS + IPS patching, hack store, responsive Switch-style Settings and Library Home, save backup/restore, background catalog refresh, Auto-Ocarina, RetroAchievements profile, Gamepad Tester, Nintendo Switch UI revamp, and Vanilla Games in Library. Remaining stretch goals (post-MVP): multiple save slots per hack, optional opt-in telemetry (privacy-first, deferred), hardcore mode enablement pending RAdmin User-Agent validation.
 
 ---
 
@@ -168,7 +173,6 @@ GPL-3.0 — See [LICENSE](LICENSE). This project is a derivative of Ludere (GPL-
 | 14 | Gamepad layout FROZEN | RadialGamePad layout measured for OoT/MM; no changes without user approval + `plano.md` update. In-game chrome restyled to Switch UI. |
 | 15 | No telemetry without opt-in | No analytics, crash reporting, or network calls except user-initiated catalog fetch, patch download, core download (build-time only). |
 | 16 | Validate all inputs | ROM checksums, patch checksums, catalog JSON schema, downloaded file sizes. |
-| 17 | i18n exception for WebView generator | The OoTR generator site renders its own English UI; only the app's native chrome uses `strings.xml`. |
 | 20 | RA credentials | Never logged; stored only in `EncryptedSharedPreferences` (`ra_secure_prefs`). |
 | 21 | RA hash from final patched ROM | Computed at install time after BPS/ZPF patch applied and ROM written to `Storage.rom(hackId)`. |
 | 22 | Leaderboards never overlaid on gameplay | Accessible ONLY via GameActivity in-game menu (DialogFragment). |

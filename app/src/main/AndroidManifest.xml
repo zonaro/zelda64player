@@ -34,6 +34,11 @@
             android:exported="false"
             android:screenOrientation="sensorLandscape" />
         <activity
+            android:name=".views.GamepadTesterActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:parentActivityName=".views.LibraryActivity" />
+        <activity
             android:name=".views.GameActivity"
             android:exported="false"
             android:launchMode="singleTop"
@@ -54,6 +59,11 @@
         <activity
             android:name=".retroachievements.ui.AchievementsActivity"
             android:exported="false" />
+        <activity
+            android:name=".retroachievements.ui.RaProfileActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:parentActivityName=".views.LibraryActivity" />
         <activity
             android:name=".ui.switchui.SwitchGridActivity"
             android:exported="false"

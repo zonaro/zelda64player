@@ -47,8 +47,12 @@ const I18N = {
     "f.ocarina.desc": "HUD in-game que toca automaticamente as músicas de ocarina (OoT: 12, MM: 11) a partir do menu de pausa.",
     "f.ra.title": "Integração RetroAchievements",
     "f.ra.desc": "Conquistas, classificações e hardcore mode via rcheevos, com hash calculado da ROM final patchada.",
-    "f.switchui.title": "Interface estilo Nintendo Switch",
-    "f.switchui.desc": "Estética original da HOME do Switch: cards quadrados, foco ciano, dock e painéis deslizantes — sem IP da Nintendo.",
+    "f.switchui.title": "Home e configurações estilo Nintendo Switch",
+    "f.switchui.desc": "Home com carrossel de capas 13:9, título do jogo em foco, dock colorido e rodapé de comandos; configurações com categorias laterais em paisagem e gaveta no celular — sem IP da Nintendo.",
+    "f.profile.title": "Perfil RetroAchievements na Home",
+    "f.profile.desc": "Acesse o perfil RetroAchievements pelo avatar na Home, com dados armazenados em cache e atualização ao abrir a tela.",
+    "f.tester.title": "Teste de controle Nintendo 64",
+    "f.tester.desc": "Confira em tempo real os botões e analógicos do controle físico, inclusive o mapeamento usado pelos jogos.",
     "f.vanilla.title": "Jogos Vanilla na Biblioteca",
     "f.vanilla.desc": "Jogue suas ROMs base importadas de OoT/MM diretamente da tela principal da Biblioteca.",
     "f.gamepad.title": "Layout de gamepad personalizado",
@@ -108,8 +112,12 @@ const I18N = {
     "f.ocarina.desc": "In-game HUD that auto-plays ocarina songs (OoT: 12, MM: 11) from the pause menu.",
     "f.ra.title": "RetroAchievements integration",
     "f.ra.desc": "Achievements, leaderboards and hardcore mode via rcheevos, with hash computed from the final patched ROM.",
-    "f.switchui.title": "Nintendo Switch-style UI",
-    "f.switchui.desc": "Original Switch HOME aesthetic: square cards, cyan focus, dock and slide-in panels — no Nintendo IP.",
+    "f.switchui.title": "Nintendo Switch-style Home and settings",
+    "f.switchui.desc": "Home with a 13:9 cover carousel, focused-game title, colored dock and control hints; settings with a landscape sidebar and a phone drawer — no Nintendo IP.",
+    "f.profile.title": "RetroAchievements profile on Home",
+    "f.profile.desc": "Open the RetroAchievements profile from the Home avatar, with cached information refreshed when the screen opens.",
+    "f.tester.title": "Nintendo 64 controller test",
+    "f.tester.desc": "Check physical-controller buttons and analog sticks live, including the mapping used by games.",
     "f.vanilla.title": "Vanilla Games in Library",
     "f.vanilla.desc": "Play your imported base OoT/MM ROMs directly from the main Library screen.",
     "f.gamepad.title": "Custom gamepad layout",
@@ -169,8 +177,12 @@ const I18N = {
     "f.ocarina.desc": "HUD en juego que reproduce automáticamente las canciones de ocarina (OoT: 12, MM: 11) desde el menú de pausa.",
     "f.ra.title": "Integración RetroAchievements",
     "f.ra.desc": "Logros, clasificaciones y modo hardcore vía rcheevos, con hash calculado de la ROM final parcheada.",
-    "f.switchui.title": "Interfaz estilo Nintendo Switch",
-    "f.switchui.desc": "Estética original HOME de Switch: tarjetas cuadradas, foco cian, dock y paneles deslizantes — sin IP de Nintendo.",
+    "f.switchui.title": "Inicio y configuración estilo Nintendo Switch",
+    "f.switchui.desc": "Inicio con carrusel de portadas 13:9, título del juego enfocado, dock con color y ayudas de control; configuración con barra lateral en horizontal y cajón en el móvil — sin IP de Nintendo.",
+    "f.profile.title": "Perfil RetroAchievements en Inicio",
+    "f.profile.desc": "Abre el perfil de RetroAchievements desde el avatar de Inicio, con datos en caché que se actualizan al abrir la pantalla.",
+    "f.tester.title": "Prueba de control Nintendo 64",
+    "f.tester.desc": "Comprueba en vivo los botones y analógicos del control físico, incluido el mapeo usado por los juegos.",
     "f.vanilla.title": "Juegos Vanilla en la Biblioteca",
     "f.vanilla.desc": "Juega tus ROMs base importadas de OoT/MM directamente desde la pantalla principal de la Biblioteca.",
     "f.gamepad.title": "Layout de gamepad personalizado",
@@ -192,12 +204,12 @@ const I18N = {
 
 const FEATURE_KEYS = [
   "store", "patch", "byteorder", "checksum",
-  "ocarina", "ra", "switchui", "vanilla", "gamepad",
+  "ocarina", "ra", "profile", "switchui", "vanilla", "gamepad", "tester",
   "backup", "refresh", "i18n"
 ];
 
 const FEATURE_ICONS = {
-  store: "S", patch: "P", byteorder: "N", checksum: "C", ocarina: "O", ra: "A", switchui: "H", vanilla: "V", gamepad: "G",
+  store: "S", patch: "P", byteorder: "N", checksum: "C", ocarina: "O", ra: "A", profile: "P", switchui: "H", vanilla: "V", gamepad: "G", tester: "T",
   backup: "B", refresh: "U", i18n: "I"
 };
 

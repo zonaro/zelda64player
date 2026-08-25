@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Square game card for the Switch home row. Cover fills the card; a small
      family/type badge sits top-start; a 10% black dim overlay is shown when the
-     card is NOT focused; the cyan focus border is toggled by SwitchGameCard. -->
+     card is NOT focused; the green focus border is toggled by SwitchGameCard. -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <FrameLayout

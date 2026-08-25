@@ -10,12 +10,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Flexible top space: together with the middle spacer it vertically
-             centers the game row block between screen top and dock. -->
+        <!-- Keeps the profile entry point and the selected-game title separate,
+             mirroring the compact account/status area above the HOME row. -->
         <Space
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="60dp" />
 
         <br.com.redclaw.zelda64player.ui.switchui.SwitchHomeRow
             android:id="@+id/library_home_row"
@@ -32,7 +31,17 @@
             android:id="@+id/library_dock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/switch_screen_margin" />
+            android:layout_marginBottom="16dp" />
+
+        <!-- The thin HOME-menu divider visually separates launcher actions
+             from controller/status and options hints. -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="@dimen/switch_screen_margin"
+            android:layout_marginEnd="@dimen/switch_screen_margin"
+            android:alpha="0.55"
+            android:background="@color/switch_text_secondary" />
 
         <br.com.redclaw.zelda64player.ui.switchui.SwitchFooterHints
             android:id="@+id/library_footer"
@@ -40,6 +49,22 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp" />
     </LinearLayout>
+
+    <!-- The player's RetroAchievements avatar stays reachable independently of
+         the game row, mirroring the account entry point in a console home UI. -->
+    <ImageButton
+        android:id="@+id/library_ra_avatar"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_ra_avatar"
+        android:contentDescription="@string/ra_profile_avatar_description"
+        android:focusable="true"
+        android:padding="3dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_trophy" />
 
     <!-- Empty state, toggled as a unit when no games are installed. -->
     <LinearLayout

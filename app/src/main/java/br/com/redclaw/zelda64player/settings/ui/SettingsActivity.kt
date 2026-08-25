@@ -1,13 +1,19 @@
 package br.com.redclaw.zelda64player.settings.ui
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,6 +52,10 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var baseRomAdapter: BaseRomAdapter
     private lateinit var catalogUrlAdapter: CatalogUrlAdapter
 
+    /** Portrait-only conventional navigation drawer and its tap-to-dismiss scrim. */
+    private var settingsDrawerScrim: View? = null
+    private var isSettingsDrawerOpen = false
+
     private val pickRomLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -78,9 +88,8 @@ class SettingsActivity : AppCompatActivity() {
         SwitchImmersive.enterFullscreen(this)
 
         setSupportActionBar(binding.settingsToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setTitle(R.string.settings_title)
-        binding.settingsToolbar.setNavigationOnClickListener { finish() }
+        setupSwitchNavigation()
 
         viewModel = SettingsViewModel(application)
 
@@ -99,6 +108,161 @@ class SettingsActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) SwitchImmersive.enterFullscreen(this)
+    }
+
+    /**
+     * Matches the System Settings information architecture: landscape keeps the
+     * categories permanently visible on the left, while a portrait phone gets a
+     * familiar hamburger drawer. The same navigation view is moved at runtime,
+     * so both modes always expose exactly the same localized categories.
+     */
+    private fun setupSwitchNavigation() {
+        val navigationTargets = listOf(
+            binding.settingsNavImport to binding.settingsSectionImport,
+            binding.settingsNavBaseroms to binding.settingsSectionBaseroms,
+            binding.settingsNavCatalog to binding.settingsSectionCatalog,
+            binding.settingsNavRa to binding.settingsSectionRa,
+            binding.settingsNavCore to binding.settingsSectionCore,
+            binding.settingsNavBackup to binding.settingsSectionBackup,
+            binding.settingsNavLanguage to binding.settingsSectionLanguage,
+            binding.settingsNavAbout to binding.settingsSectionAbout
+        )
+
+        navigationTargets.forEach { (row, target) ->
+            row.setOnClickListener {
+                sfx?.select()
+                selectSettingsSection(row)
+                binding.settingsScroll.post {
+                    binding.settingsScroll.smoothScrollTo(0, target.top)
+                }
+                if (isPortraitSettings()) closeSettingsDrawer()
+            }
+            row.setOnFocusChangeListener { _, hasFocus ->
+                if (hasFocus) sfx?.focusMove()
+            }
+        }
+        selectSettingsSection(binding.settingsNavImport)
+
+        if (isPortraitSettings()) {
+            installPortraitNavigationDrawer()
+        } else {
+            // A non-interactive settings glyph makes the toolbar match the
+            // System Settings header without presenting a misleading back action.
+            binding.settingsToolbar.navigationIcon = AppCompatResources.getDrawable(
+                this, R.drawable.ic_settings
+            )
+            binding.settingsToolbar.navigationContentDescription = null
+            binding.settingsToolbar.setNavigationOnClickListener(null)
+        }
+    }
+
+    private fun isPortraitSettings(): Boolean =
+        resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+    private fun selectSettingsSection(selectedRow: View) {
+        val rows = listOf(
+            binding.settingsNavImport,
+            binding.settingsNavBaseroms,
+            binding.settingsNavCatalog,
+            binding.settingsNavRa,
+            binding.settingsNavCore,
+            binding.settingsNavBackup,
+            binding.settingsNavLanguage,
+            binding.settingsNavAbout
+        )
+        rows.forEach { it.isSelected = it === selectedRow }
+    }
+
+    private fun installPortraitNavigationDrawer() {
+        val navigation = binding.settingsNavigation
+        binding.settingsBody.removeView(navigation)
+        binding.settingsNavigationDivider.visibility = View.GONE
+
+        val drawerWidth = minOf(
+            (resources.displayMetrics.widthPixels * 0.86f).toInt(),
+            (320 * resources.displayMetrics.density).toInt()
+        )
+        val scrim = View(this).apply {
+            background = ColorDrawable(Color.TRANSPARENT)
+            contentDescription = getString(R.string.settings_close_navigation)
+            isClickable = true
+            isFocusable = true
+            visibility = View.GONE
+            setOnClickListener { closeSettingsDrawer() }
+        }
+        settingsDrawerScrim = scrim
+        binding.settingsRoot.addView(
+            scrim,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+        navigation.visibility = View.GONE
+        navigation.elevation = 12f * resources.displayMetrics.density
+        binding.settingsRoot.addView(
+            navigation,
+            FrameLayout.LayoutParams(
+                drawerWidth,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                Gravity.START
+            )
+        )
+        binding.settingsToolbar.navigationIcon = AppCompatResources.getDrawable(this, R.drawable.ic_menu)
+        binding.settingsToolbar.navigationContentDescription =
+            getString(R.string.settings_open_navigation)
+        binding.settingsToolbar.setNavigationOnClickListener { openSettingsDrawer() }
+    }
+
+    private fun openSettingsDrawer() {
+        if (!isPortraitSettings() || isSettingsDrawerOpen) return
+        val navigation = binding.settingsNavigation
+        val scrim = settingsDrawerScrim ?: return
+        isSettingsDrawerOpen = true
+        scrim.apply {
+            setBackgroundColor(getColor(R.color.switch_scrim))
+            alpha = 0f
+            visibility = View.VISIBLE
+            animate().alpha(1f).setDuration(220L).start()
+        }
+        navigation.apply {
+            visibility = View.VISIBLE
+            translationX = if (width > 0) {
+                -width.toFloat()
+            } else {
+                -resources.displayMetrics.widthPixels.toFloat()
+            }
+            animate().translationX(0f).setDuration(220L).start()
+            binding.settingsNavImport.requestFocus()
+        }
+        sfx?.panelOpen()
+    }
+
+    private fun closeSettingsDrawer() {
+        if (!isSettingsDrawerOpen) return
+        val navigation = binding.settingsNavigation
+        val scrim = settingsDrawerScrim ?: return
+        isSettingsDrawerOpen = false
+        navigation.animate()
+            .translationX(-navigation.width.toFloat())
+            .setDuration(180L)
+            .withEndAction { navigation.visibility = View.GONE }
+            .start()
+        scrim.animate()
+            .alpha(0f)
+            .setDuration(180L)
+            .withEndAction { scrim.visibility = View.GONE }
+            .start()
+        sfx?.panelClose()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (isSettingsDrawerOpen) {
+            closeSettingsDrawer()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     /**

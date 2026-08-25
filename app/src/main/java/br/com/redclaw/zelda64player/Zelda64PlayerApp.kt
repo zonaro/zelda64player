@@ -16,6 +16,7 @@ import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
 import br.com.redclaw.zelda64player.retroachievements.data.RaCatalogRepository
 import br.com.redclaw.zelda64player.retroachievements.data.RaHashService
 import br.com.redclaw.zelda64player.retroachievements.data.RaInstallMetadataStore
+import br.com.redclaw.zelda64player.retroachievements.data.RaUserProfileRepository
 import br.com.redclaw.zelda64player.retroachievements.jni.RcheevosJni
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
 import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
@@ -131,6 +132,11 @@ import java.util.concurrent.TimeUnit
         /** Install-time RA hash + game-id resolution service. */
         val raHashService: RaHashService by lazy {
             RaHashService(raHttpClient, raInstallMetadataStore)
+        }
+
+        /** Cached/full profile data for the currently authenticated RA player. */
+        val raUserProfileRepository: RaUserProfileRepository by lazy {
+            RaUserProfileRepository(instance.applicationContext, raCredentialStore, raHttpClient)
         }
 
         /** Shared Switch UI sound-effects manager (preloaded, respects mute pref). */

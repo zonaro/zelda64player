@@ -26,11 +26,13 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.WindowInsets
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.databinding.ActivityLibraryBinding
 import br.com.redclaw.zelda64player.viewmodels.LibraryMenuHostDelegate
 import br.com.redclaw.zelda64player.retroachievements.ui.AchievementsActivity
+import br.com.redclaw.zelda64player.retroachievements.ui.RaProfileActivity
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
 import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.store.ui.StoreActivity
@@ -45,10 +47,13 @@ import br.com.redclaw.zelda64player.viewmodels.LibraryMenuController
 import br.com.redclaw.zelda64player.ui.switchui.SwitchGridActivity
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import java.io.File
+import coil.load
+import coil.transform.CircleCropTransformation
+import kotlinx.coroutines.launch
 
 /**
  * Library home screen, rebuilt in Phase B to match the Nintendo Switch HOME menu
- * aesthetic: a horizontal row of square game cards showing the 5 most-recently
+ * aesthetic: a horizontal row of landscape game cards showing the 5 most-recently
  * played installed entries (newest first), with a focused-game label above, a
  * circular "Todos os Jogos" card at the end of the row, a bottom dock of four
  * circular buttons, and a footer hints bar.
@@ -110,6 +115,7 @@ class LibraryActivity : AppCompatActivity() {
         setupHomeRow()
         setupDock()
         setupFooter()
+        setupProfileAvatar()
         updateEmptyState()
         syncShortcuts()
 
@@ -123,6 +129,7 @@ class LibraryActivity : AppCompatActivity() {
         // helper so the home row stays consistent with the context-menu refresh.
         items = InstalledLibrary.recentEntries(this)
         binding.libraryHomeRow.submitList(items)
+        loadProfileAvatar()
         updateEmptyState()
         syncShortcuts()
     }
@@ -147,20 +154,28 @@ class LibraryActivity : AppCompatActivity() {
         binding.libraryHomeRow.submitList(items)
     }
 
-    /** Build the three dock destinations (Loja, RA, Configurações). */
+    /** Build the dock destinations (Loja, RA, Teste de Controle, Configurações). */
     private fun setupDock() {
         val dockItems = listOf(
             SwitchDock.DockItem(
                 R.drawable.ic_store,
-                R.string.dock_store
+                R.string.dock_store,
+                R.color.switch_accent_amber
             ) { startActivity(Intent(this, StoreActivity::class.java)) },
             SwitchDock.DockItem(
                 R.drawable.ic_trophy,
-                R.string.dock_achievements
+                R.string.dock_achievements,
+                R.color.switch_accent_amber
             ) { startActivity(Intent(this, AchievementsActivity::class.java)) },
             SwitchDock.DockItem(
+                R.drawable.ic_gamepad,
+                R.string.dock_gamepad_tester,
+                R.color.switch_accent_focus
+            ) { startActivity(Intent(this, GamepadTesterActivity::class.java)) },
+            SwitchDock.DockItem(
                 R.drawable.ic_settings,
-                R.string.dock_settings
+                R.string.dock_settings,
+                R.color.switch_text_primary
             ) { startActivity(Intent(this, SettingsActivity::class.java)) }
         )
         binding.libraryDock.setItems(dockItems)
@@ -171,6 +186,46 @@ class LibraryActivity : AppCompatActivity() {
     private fun setupFooter() {
         binding.libraryFooter.setOnAbout { showAboutDialog() }
         binding.libraryFooter.setOnOptions { openOptionsPanel() }
+    }
+
+    /**
+     * Puts the signed-in RetroAchievements player at the fixed account entry
+     * point in the upper-left corner. The button remains available while logged
+     * out so its profile screen can direct the player to sign in.
+     */
+    private fun setupProfileAvatar() {
+        binding.libraryRaAvatar.setOnClickListener {
+            Zelda64PlayerApp.sfxManager.select()
+            startActivity(Intent(this, RaProfileActivity::class.java))
+        }
+        binding.libraryRaAvatar.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) Zelda64PlayerApp.sfxManager.focusMove()
+        }
+        loadProfileAvatar()
+    }
+
+    /** Loads the cached avatar immediately, then refreshes it from RA. */
+    private fun loadProfileAvatar() {
+        val credentials = Zelda64PlayerApp.raCredentialStore
+        if (!credentials.hasCredentials()) {
+            binding.libraryRaAvatar.setImageResource(R.drawable.ic_trophy)
+            return
+        }
+
+        val repository = Zelda64PlayerApp.raUserProfileRepository
+        repository.cachedAvatarUrl()?.let(::displayProfileAvatar)
+        lifecycleScope.launch {
+            repository.refreshProfile().getOrNull()?.avatarUrl?.let(::displayProfileAvatar)
+        }
+    }
+
+    private fun displayProfileAvatar(url: String) {
+        binding.libraryRaAvatar.load(url) {
+            crossfade(true)
+            placeholder(R.drawable.ic_trophy)
+            error(R.drawable.ic_trophy)
+            transformations(CircleCropTransformation())
+        }
     }
 
     /**

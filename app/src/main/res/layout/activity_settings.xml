@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Settings screen restyled to the Nintendo Switch UI (Phase D): flat panels
-     (no M3 expressive cards/pills), section headers in secondary uppercase,
-     full-width rows, token-tinted switches and buttons. All view IDs from the
-     previous layout are preserved so SettingsActivity.kt is unchanged in wiring. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Settings screen restyled to the Nintendo Switch UI: a fixed category
+     sidebar in landscape, a hamburger drawer in portrait, flat rows, and
+     theme-token colors rather than Material expressive cards or pills. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settings_root"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/switch_bg"
-    android:orientation="vertical">
+    android:background="@color/switch_bg">
+
+    <LinearLayout
+        android:id="@+id/settings_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/settings_toolbar"
@@ -18,22 +23,112 @@
         app:navigationIconTint="@color/switch_text_primary"
         app:titleTextColor="@color/switch_text_primary" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/settings_body"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <!-- Fixed category navigation in landscape. SettingsActivity turns this
+                 into a conventional hamburger drawer in portrait. -->
+            <LinearLayout
+                android:id="@+id/settings_navigation"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.34"
+                android:background="@color/switch_panel"
+                android:orientation="vertical"
+                android:paddingTop="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="24dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp"
+                    android:text="@string/settings_navigation_title"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/settings_nav_import"
+                    style="@style/SwitchSettingsNavigationRow"
+                    android:text="@string/settings_import_title" />
+
+                <TextView
+                    android:id="@+id/settings_nav_baseroms"
+                    style="@style/SwitchSettingsNavigationRow"
+                    android:text="@string/settings_baseroms_title" />
+
+                <TextView
+                    android:id="@+id/settings_nav_catalog"
+                    style="@style/SwitchSettingsNavigationRow"
+                    android:text="@string/settings_catalog_title" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:alpha="0.35"
+                    android:background="@color/switch_text_secondary" />
+
+                <TextView
+                    android:id="@+id/settings_nav_ra"
+                    style="@style/SwitchSettingsNavigationRow"
+                    android:text="@string/settings_ra_title" />
+
+                <TextView
+                    android:id="@+id/settings_nav_core"
+                    style="@style/SwitchSettingsNavigationRow"
+                    android:text="@string/settings_core_title" />
+
+                <TextView
+                    android:id="@+id/settings_nav_backup"
+                    style="@style/SwitchSettingsNavigationRow"
+                    android:text="@string/backup_title" />
+
+                <TextView
+                    android:id="@+id/settings_nav_language"
+                    style="@style/SwitchSettingsNavigationRow"
+                    android:text="@string/settings_language_title" />
+
+                <TextView
+                    android:id="@+id/settings_nav_about"
+                    style="@style/SwitchSettingsNavigationRow"
+                    android:text="@string/settings_about_title" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/settings_navigation_divider"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:alpha="0.4"
+                android:background="@color/switch_text_secondary" />
+
+            <ScrollView
+                android:id="@+id/settings_scroll"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.66"
+                android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp">
 
             <!-- Section A: import base ROM -->
             <LinearLayout
+                android:id="@+id/settings_section_import"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/section_spacing"
-                android:background="@color/switch_panel"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/bg_settings_section"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -70,10 +165,11 @@
 
             <!-- Section B: imported base ROMs -->
             <LinearLayout
+                android:id="@+id/settings_section_baseroms"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/section_spacing"
-                android:background="@color/switch_panel"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/bg_settings_section"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -102,10 +198,11 @@
 
             <!-- Section C: custom catalog URLs -->
             <LinearLayout
+                android:id="@+id/settings_section_catalog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/section_spacing"
-                android:background="@color/switch_panel"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/bg_settings_section"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -179,10 +276,11 @@
 
             <!-- Section C3: RetroAchievements -->
             <LinearLayout
+                android:id="@+id/settings_section_ra"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/section_spacing"
-                android:background="@color/switch_panel"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/bg_settings_section"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -287,10 +385,11 @@
 
             <!-- Section D: emulator core -->
             <LinearLayout
+                android:id="@+id/settings_section_core"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/section_spacing"
-                android:background="@color/switch_panel"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/bg_settings_section"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -319,10 +418,11 @@
 
             <!-- Section Backups -->
             <LinearLayout
+                android:id="@+id/settings_section_backup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/section_spacing"
-                android:background="@color/switch_panel"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/bg_settings_section"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -367,10 +467,11 @@
 
             <!-- Section: Language -->
             <LinearLayout
+                android:id="@+id/settings_section_language"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/section_spacing"
-                android:background="@color/switch_panel"
+                android:layout_marginBottom="0dp"
+                android:background="@drawable/bg_settings_section"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -399,9 +500,10 @@
 
             <!-- Section Sobre -->
             <LinearLayout
+                android:id="@+id/settings_section_about"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/switch_panel"
+                android:background="@drawable/bg_settings_section"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -446,5 +548,7 @@
             </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -37,6 +37,7 @@ import br.com.redclaw.zelda64player.gamepad.GamePad
 import br.com.redclaw.zelda64player.gamepad.GamePadConfig
 import br.com.redclaw.zelda64player.input.ControllerInput
 import br.com.redclaw.zelda64player.input.InputMapper
+import br.com.redclaw.zelda64player.input.N64ControllerMapping
 import br.com.redclaw.zelda64player.data.local.MergedCatalogRepository
 import br.com.redclaw.zelda64player.ocarina.OcarinaGame
 import br.com.redclaw.zelda64player.ocarina.OcarinaMacroCallbacks
@@ -209,8 +210,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     private var pendingRecreate = false
 
     private val buttonStickOptions = arrayOf("Off", "C-Right", "C-Left", "C-Down", "A", "B", "Auto")
-    private val buttonStickPrefsKey = "button_stick_mode"
-    private val autoZPrefsKey = "auto_z_enabled"
+    private val buttonStickPrefsKey = N64ControllerMapping.BUTTON_STICK_MODE_PREFERENCE
+    private val autoZPrefsKey = N64ControllerMapping.AUTO_Z_PREFERENCE
     private val n64StickSensitivityPrefsKey = "n64_stick_sensitivity"
     private val buttonStickSensitivityPrefsKey = "button_stick_sensitivity"
 
@@ -317,7 +318,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 MenuActionItem("auto_z", R.string.menu_auto_z, R.drawable.ic_target, badgeRes = R.string.badge_l3) {
                     autoZEnabled = !autoZEnabled
                     controllerInput.autoZEnabled = autoZEnabled
-                    appContext.getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+                    appContext.getSharedPreferences(N64ControllerMapping.PREFERENCES_NAME, Context.MODE_PRIVATE)
                         .edit().putBoolean(autoZPrefsKey, autoZEnabled).apply()
                     if (!autoZEnabled && zHeldViaDoubleTap) {
                         zHeldViaDoubleTap = false
@@ -733,14 +734,14 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     private fun getSavedButtonStickMode(): ButtonStickMode {
-        val prefs = appContext.getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+        val prefs = appContext.getSharedPreferences(N64ControllerMapping.PREFERENCES_NAME, Context.MODE_PRIVATE)
         val index = prefs.getInt(buttonStickPrefsKey, ButtonStickMode.C_RIGHT.ordinal)
         return ButtonStickMode.values().getOrElse(index) { ButtonStickMode.C_RIGHT }
     }
 
     private fun showButtonStickDialog() {
         val context = activityContext ?: return
-        val prefs = appContext.getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+        val prefs = appContext.getSharedPreferences(N64ControllerMapping.PREFERENCES_NAME, Context.MODE_PRIVATE)
 
         buttonStickDialog = AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.menu_button_stick))
@@ -774,24 +775,24 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     private fun getSavedAutoZEnabled(): Boolean {
-        val prefs = appContext.getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+        val prefs = appContext.getSharedPreferences(N64ControllerMapping.PREFERENCES_NAME, Context.MODE_PRIVATE)
         return prefs.getBoolean(autoZPrefsKey, true)
     }
 
     private fun getSavedN64StickSensitivity(): Float {
-        val prefs = appContext.getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+        val prefs = appContext.getSharedPreferences(N64ControllerMapping.PREFERENCES_NAME, Context.MODE_PRIVATE)
         return prefs.getFloat(n64StickSensitivityPrefsKey, 1f)
     }
 
     private fun getSavedButtonStickSensitivity(): Float {
-        val prefs = appContext.getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+        val prefs = appContext.getSharedPreferences(N64ControllerMapping.PREFERENCES_NAME, Context.MODE_PRIVATE)
         return prefs.getFloat(buttonStickSensitivityPrefsKey, 0.5f)
     }
 
     /** A slider (0%-200%) per stick, persisted and applied live to the running controls. */
     private fun showSensitivityDialog() {
         val context = activityContext ?: return
-        val prefs = appContext.getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+        val prefs = appContext.getSharedPreferences(N64ControllerMapping.PREFERENCES_NAME, Context.MODE_PRIVATE)
         val density = context.resources.displayMetrics.density
         val padding = (16 * density).toInt()
 

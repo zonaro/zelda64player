@@ -36,16 +36,6 @@ class ControllerInput {
             KeyEvent.KEYCODE_BUTTON_L2
         )
 
-        /** Physical-controller-only C-button layout, different from the touch buttons' own
-         *  (LB=C-Left/Y=C-Up/RB=C-Right) -- LB=C-Up/Y=C-Right/RB=C-Left instead. Each value is
-         *  the raw keycode that already produces the desired N64 button via the existing
-         *  InputMapper + core alt-map chain, so pressing e.g. LB is handled as if it *were* a
-         *  raw Y press. Touch is untouched since GamePad.eventHandler never consults this map. */
-        private val PHYSICAL_C_BUTTON_REMAP = mapOf(
-            KeyEvent.KEYCODE_BUTTON_L1 to KeyEvent.KEYCODE_BUTTON_Y,
-            KeyEvent.KEYCODE_BUTTON_Y to KeyEvent.KEYCODE_BUTTON_R1,
-            KeyEvent.KEYCODE_BUTTON_R1 to KeyEvent.KEYCODE_BUTTON_L1,
-        )
     }
     /**
      * Set of keys currently being held by the user
@@ -141,7 +131,7 @@ class ControllerInput {
             return true
         }
 
-        val effectiveKeyCode = PHYSICAL_C_BUTTON_REMAP[keyCode] ?: keyCode
+        val effectiveKeyCode = N64ControllerMapping.effectivePhysicalKeyCode(keyCode)
         val port = getPort(event)
         retroView.view.sendKeyEvent(event.action, InputMapper.mapKeyCode(effectiveKeyCode), port)
 

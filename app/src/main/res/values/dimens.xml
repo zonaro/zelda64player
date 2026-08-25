@@ -46,8 +46,8 @@
     <dimen name="switch_card_size_grid">170dp</dimen>
     <dimen name="switch_dock_button_size">50dp</dimen>
     <dimen name="switch_dock_gap">14dp</dimen>
-    <!-- Horizontal gap between home-row game cards (~50dp per NS Launcher spacing). -->
-    <dimen name="switch_home_card_gap">44dp</dimen>
+    <!-- Compact gap between home-row cards, matching the original HOME carousel. -->
+    <dimen name="switch_home_card_gap">16dp</dimen>
     <dimen name="switch_screen_margin">22dp</dimen>
     <!-- Grid screen: padding around the card grid and gap between square cards. -->
     <dimen name="switch_grid_padding">16dp</dimen>

@@ -32,7 +32,7 @@ import br.com.redclaw.zelda64player.views.HackLibraryEntry
 
 /**
  * Switch-style home row: a focused-game label above a horizontal RecyclerView of
- * square [SwitchGameCard]s followed by the circular [SwitchAllGamesCard].
+ * landscape [SwitchGameCard]s followed by the circular [SwitchAllGamesCard].
  *
  * Owns the focus traversal and sound-effect wiring for the row: when a child card
  * gains focus the label above the row is updated with that entry's title and the
@@ -72,6 +72,17 @@ class SwitchHomeRow @JvmOverloads constructor(
         // rectangular cards are not clipped. The ratio lives in SwitchGameCard (DRY).
         val homeSize = resources.getDimensionPixelSize(R.dimen.switch_card_size_home)
         recycler.layoutParams.height = SwitchGameCard.coverHeight(homeSize)
+        // A card's half-gap is part of its layout params. Offset RecyclerView
+        // padding by that amount so the selected-title baseline and first cover
+        // align, as they do on the Switch HOME row.
+        val screenMargin = resources.getDimensionPixelSize(R.dimen.switch_screen_margin)
+        val halfGap = resources.getDimensionPixelSize(R.dimen.switch_home_card_gap) / 2
+        recycler.setPadding(
+            screenMargin - halfGap,
+            recycler.paddingTop,
+            screenMargin - halfGap,
+            recycler.paddingBottom
+        )
         recycler.adapter = HomeAdapter()
     }
 
@@ -92,6 +103,9 @@ class SwitchHomeRow @JvmOverloads constructor(
         entries = list
         recycler.adapter?.notifyDataSetChanged()
         if (list.isNotEmpty()) {
+            // Make the first title visible before RecyclerView finishes its
+            // first focus pass; the focus callback keeps it current afterwards.
+            label.text = list.first().title
             recycler.post {
                 val vh = recycler.findViewHolderForAdapterPosition(0)
                 vh?.itemView?.requestFocus()

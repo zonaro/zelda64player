@@ -105,7 +105,7 @@ class SwitchFooterHints @JvmOverloads constructor(
         val tint = if (names.isEmpty()) {
             R.color.switch_text_secondary
         } else {
-            R.color.switch_accent_focus
+            R.color.switch_accent
         }
         gamepadIcon.setColorFilter(context.getColor(tint))
     }

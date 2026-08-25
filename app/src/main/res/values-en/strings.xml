@@ -143,6 +143,9 @@
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
+    <string name="settings_navigation_title">CATEGORIES</string>
+    <string name="settings_open_navigation">Open settings categories</string>
+    <string name="settings_close_navigation">Close settings categories</string>
     <string name="cover_content_description">Hack cover</string>
 
     <!-- Settings: import base ROM -->
@@ -212,6 +215,32 @@
     <string name="ra_all_empty">No installed game was identified on RetroAchievements.</string>
     <string name="ra_error_untracked">This game could not be identified on RetroAchievements.</string>
     <string name="ra_error_network">Could not reach RetroAchievements. Check your connection and try again.</string>
+
+    <!-- RetroAchievements player profile -->
+    <string name="ra_profile_title">RetroAchievements Profile</string>
+    <string name="ra_profile_avatar_description">RetroAchievements player avatar</string>
+    <string name="ra_profile_loading">Loading profile…</string>
+    <string name="ra_profile_signed_out">Sign in to your RetroAchievements account in Settings to view your profile.</string>
+    <string name="ra_profile_error">Could not load the RetroAchievements profile.</string>
+    <string name="ra_profile_retry">Try again</string>
+    <string name="ra_profile_details">Profile details</string>
+    <string name="ra_profile_not_available">Not provided</string>
+    <string name="ra_profile_field_user">Username</string>
+    <string name="ra_profile_field_display_name">Display name</string>
+    <string name="ra_profile_field_id">ID</string>
+    <string name="ra_profile_field_ulid">Permanent ID</string>
+    <string name="ra_profile_field_avatar">Avatar</string>
+    <string name="ra_profile_field_motto">Motto</string>
+    <string name="ra_profile_field_rich_presence">Current status</string>
+    <string name="ra_profile_field_last_game_id">Last game ID</string>
+    <string name="ra_profile_field_contribution_count">Contributions</string>
+    <string name="ra_profile_field_contribution_yield">Contribution score</string>
+    <string name="ra_profile_field_total_points">Points</string>
+    <string name="ra_profile_field_softcore_points">Softcore points</string>
+    <string name="ra_profile_field_true_points">True points</string>
+    <string name="ra_profile_field_permissions">Permissions</string>
+    <string name="ra_profile_field_untracked">Untracked account</string>
+    <string name="ra_profile_field_user_wall_active">User wall active</string>
 
     <!-- RetroAchievements in-game overlay and notifications -->
     <string name="ra_unlocked_points">Unlocked · %d pts</string>
@@ -329,6 +358,7 @@
     <string name="dock_store">Store</string>
     <string name="dock_achievements">RetroAchievements</string>
     <string name="dock_settings">Settings</string>
+    <string name="dock_gamepad_tester">Gamepad Tester</string>
     <string name="footer_about">(i) About</string>
     <string name="footer_options">+ Options</string>
     <string name="footer_gamepad_disconnected">Gamepad disconnected</string>
@@ -337,6 +367,43 @@
     <string name="options_coming_soon">Options coming soon</string>
     <string name="about_dialog_title">About &amp; Licenses</string>
     <string name="about_dialog_close">Close</string>
+
+    <!-- ===== Gamepad Tester ===== -->
+    <string name="gamepad_tester_title">Gamepad Tester</string>
+    <string name="gamepad_tester_back">Back</string>
+    <string name="gamepad_tester_disconnected">No controller connected</string>
+    <string name="gamepad_tester_connected">Controller: %1$s</string>
+    <string name="gamepad_tester_mode_physical">Physical controller</string>
+    <string name="gamepad_tester_mode_n64">Nintendo 64 mapping</string>
+    <string name="gamepad_tester_hint">Press buttons or move the sticks. Nintendo 64 mode shows the exact mapping used by games.</string>
+    <string name="gamepad_tester_surface_description">Live controller visualizer</string>
+    <string name="tester_lb" translatable="false">LB</string>
+    <string name="tester_rb" translatable="false">RB</string>
+    <string name="tester_lt" translatable="false">LT</string>
+    <string name="tester_rt" translatable="false">RT</string>
+    <string name="tester_l3" translatable="false">L3</string>
+    <string name="tester_r3" translatable="false">R3</string>
+    <string name="tester_select" translatable="false">SELECT</string>
+    <string name="tester_start" translatable="false">START</string>
+    <string name="tester_a" translatable="false">A</string>
+    <string name="tester_b" translatable="false">B</string>
+    <string name="tester_x" translatable="false">X</string>
+    <string name="tester_y" translatable="false">Y</string>
+    <string name="tester_dpad_up" translatable="false">↑</string>
+    <string name="tester_dpad_down" translatable="false">↓</string>
+    <string name="tester_dpad_left" translatable="false">←</string>
+    <string name="tester_dpad_right" translatable="false">→</string>
+    <string name="tester_n64_l" translatable="false">L</string>
+    <string name="tester_n64_r" translatable="false">R</string>
+    <string name="tester_n64_z" translatable="false">Z</string>
+    <string name="tester_n64_stick">ANALOG STICK</string>
+    <string name="tester_n64_start" translatable="false">START</string>
+    <string name="tester_n64_a" translatable="false">A</string>
+    <string name="tester_n64_b" translatable="false">B</string>
+    <string name="tester_n64_c_up" translatable="false">C↑</string>
+    <string name="tester_n64_c_down" translatable="false">C↓</string>
+    <string name="tester_n64_c_left" translatable="false">C←</string>
+    <string name="tester_n64_c_right" translatable="false">C→</string>
 
     <!-- ===== Nintendo Switch UI - Quick Options side panel (Phase D) ===== -->
     <string name="options_panel_title">Options</string>

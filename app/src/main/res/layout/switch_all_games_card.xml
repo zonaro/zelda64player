@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Circular "Todos os Jogos" (All Games) card for the end of the Switch home
-     row. Charcoal fill, centered cyan grid glyph, round cyan focus border. -->
+     row. Charcoal fill, centered green grid glyph, round green focus border. -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <View

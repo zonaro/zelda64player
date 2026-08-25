@@ -134,6 +134,22 @@
         <item name="android:letterSpacing">0.02</item>
     </style>
 
+    <!-- Fixed sidebar / portrait drawer category rows for Settings. -->
+    <style name="SwitchSettingsNavigationRow" parent="android:Widget.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:background">@drawable/bg_settings_nav_row</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textColor">@color/switch_text_primary</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <!-- Flat Switch-style text field (replaces the expressive M3 outlined box). -->
     <style name="SwitchTextField" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/switch_text_field_stroke</item>

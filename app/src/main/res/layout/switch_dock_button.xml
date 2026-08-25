@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Single circular dock button for the Switch bottom dock. White glyph on a
-     dock-circle background; round cyan focus border shown while focused. -->
+<!-- Single circular dock button for the Switch bottom dock. Colored glyph on a
+     dock-circle background; round green focus border shown while focused. -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
     <View

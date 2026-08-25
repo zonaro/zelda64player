@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/switch_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:padding="@dimen/switch_screen_margin">
+
+        <ImageButton
+            android:id="@+id/tester_back"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:background="@drawable/bg_icon_button"
+            android:contentDescription="@string/gamepad_tester_back"
+            android:src="@drawable/ic_close"
+            android:tint="@color/switch_text_primary" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            android:contentDescription="@string/gamepad_tester_title"
+            android:src="@drawable/ic_gamepad"
+            android:tint="@color/switch_accent_focus" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gamepad_tester_title"
+                android:textColor="@color/switch_text_primary"
+                android:textSize="@dimen/switch_title_text"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tester_device"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/gamepad_tester_disconnected"
+                android:textColor="@color/switch_text_secondary"
+                android:textSize="@dimen/switch_hint_text" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/tester_physical"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_gamepad_tester_mode"
+            android:contentDescription="@string/gamepad_tester_mode_physical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/gamepad_tester_mode_physical"
+            android:textAllCaps="false"
+            android:textColor="@color/switch_text_primary"
+            android:textSize="@dimen/switch_hint_text" />
+
+        <Button
+            android:id="@+id/tester_n64"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:background="@drawable/bg_gamepad_tester_mode"
+            android:contentDescription="@string/gamepad_tester_mode_n64"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/gamepad_tester_mode_n64"
+            android:textAllCaps="false"
+            android:textColor="@color/switch_text_primary"
+            android:textSize="@dimen/switch_hint_text" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/switch_text_secondary" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/switch_screen_margin"
+        android:paddingTop="8dp"
+        android:paddingEnd="@dimen/switch_screen_margin"
+        android:paddingBottom="8dp"
+        android:text="@string/gamepad_tester_hint"
+        android:textColor="@color/switch_text_secondary"
+        android:textSize="@dimen/switch_hint_text" />
+
+    <br.com.redclaw.zelda64player.views.GamepadTesterView
+        android:id="@+id/tester_surface"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/switch_screen_margin"
+        android:layout_marginEnd="@dimen/switch_screen_margin"
+        android:layout_marginBottom="@dimen/switch_screen_margin"
+        android:layout_weight="1"
+        android:contentDescription="@string/gamepad_tester_surface_description" />
+
+</LinearLayout>
