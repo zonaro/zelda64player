@@ -112,8 +112,8 @@ class RaCatalogRepository(private val http: RaHttpClient) {
                     title = a.optString("title"),
                     description = a.optString("description"),
                     points = a.optInt("points"),
-                    badgeUrl = a.optString("badge_url").takeIf { it.isNotBlank() },
-                    badgeLockedUrl = a.optString("badge_locked_url").takeIf { it.isNotBlank() },
+                    badgeUrl = mediaUrl(a.optString("badge_url")),
+                    badgeLockedUrl = mediaUrl(a.optString("badge_locked_url")),
                     category = a.optInt("category"),
                     type = a.optInt("type")
                 )
@@ -137,9 +137,28 @@ class RaCatalogRepository(private val http: RaHttpClient) {
         RaGameData(
             id = root.getLong("id"),
             title = root.optString("title"),
-            imageUrl = root.optString("image_url").takeIf { it.isNotBlank() },
+            imageUrl = mediaUrl(root.optString("image_url")),
             achievements = achievements,
             leaderboards = leaderboards
         )
     }.getOrNull()
+
+    /**
+     * rcheevos normally returns absolute image URLs, but some API responses
+     * contain media-host paths. Coil requires a complete URL in either case.
+     */
+    private fun mediaUrl(value: String): String? {
+        val trimmed = value.trim()
+        if (trimmed.isBlank()) return null
+        return when {
+            trimmed.startsWith("https://", ignoreCase = true) ||
+                trimmed.startsWith("http://", ignoreCase = true) -> trimmed
+            trimmed.startsWith('/') -> "$MEDIA_HOST$trimmed"
+            else -> "$MEDIA_HOST/$trimmed"
+        }
+    }
+
+    private companion object {
+        const val MEDIA_HOST = "https://media.retroachievements.org"
+    }
 }

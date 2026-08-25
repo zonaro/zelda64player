@@ -98,6 +98,26 @@ class RaCatalogParsingTest {
     }
 
     @Test
+    fun `normalizes relative RetroAchievements media paths`() {
+        val game = repository.parseGameData(
+            """{"id":7,"image_url":"Images/000007.png","achievements":[
+                {"id":1,"badge_url":"/Badge/00001.png","badge_locked_url":"Badge/00001_lock.png"}
+            ]}"""
+        )
+
+        assertNotNull(game)
+        assertEquals("https://media.retroachievements.org/Images/000007.png", game!!.imageUrl)
+        assertEquals(
+            "https://media.retroachievements.org/Badge/00001.png",
+            game.achievements.single().badgeUrl
+        )
+        assertEquals(
+            "https://media.retroachievements.org/Badge/00001_lock.png",
+            game.achievements.single().badgeLockedUrl
+        )
+    }
+
+    @Test
     fun `literal null body yields null`() {
         assertNull(repository.parseGameData("null"))
     }

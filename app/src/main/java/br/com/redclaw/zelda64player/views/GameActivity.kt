@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import br.com.redclaw.zelda64player.capture.CaptureService
 import br.com.redclaw.zelda64player.capture.RecordingIndicatorView
 import br.com.redclaw.zelda64player.databinding.ActivityGameBinding
@@ -146,7 +147,12 @@ class GameActivity : AppCompatActivity() {
             addAction(CaptureService.ACTION_HIDE_OVERLAYS)
             addAction(CaptureService.ACTION_SHOW_OVERLAYS)
         }
-        registerReceiver(overlayToggleReceiver, filter)
+        ContextCompat.registerReceiver(
+            this,
+            overlayToggleReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     /**

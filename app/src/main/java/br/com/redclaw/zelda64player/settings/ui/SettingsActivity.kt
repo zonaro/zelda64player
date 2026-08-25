@@ -55,6 +55,7 @@ class SettingsActivity : AppCompatActivity() {
 
     /** Portrait-only conventional navigation drawer and its tap-to-dismiss scrim. */
     private var settingsDrawerScrim: View? = null
+    private var settingsDrawer: View? = null
     private var isSettingsDrawerOpen = false
 
     private val pickRomLauncher = registerForActivityResult(
@@ -182,7 +183,11 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun installPortraitNavigationDrawer() {
         val navigation = binding.settingsNavigation
-        binding.settingsBody.removeView(navigation)
+        // The navigation itself is inside a ScrollView. Move that container to
+        // the overlay root so the drawer keeps its scrolling behavior and the
+        // child is detached before it is re-parented.
+        val drawer = navigation.parent as? ViewGroup ?: return
+        binding.settingsBody.removeView(drawer)
         binding.settingsNavigationDivider.visibility = View.GONE
 
         val drawerWidth = minOf(
@@ -205,10 +210,11 @@ class SettingsActivity : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         )
-        navigation.visibility = View.GONE
-        navigation.elevation = 12f * resources.displayMetrics.density
+        drawer.visibility = View.GONE
+        drawer.elevation = 12f * resources.displayMetrics.density
+        settingsDrawer = drawer
         binding.settingsRoot.addView(
-            navigation,
+            drawer,
             FrameLayout.LayoutParams(
                 drawerWidth,
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -223,7 +229,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun openSettingsDrawer() {
         if (!isPortraitSettings() || isSettingsDrawerOpen) return
-        val navigation = binding.settingsNavigation
+        val drawer = settingsDrawer ?: return
         val scrim = settingsDrawerScrim ?: return
         isSettingsDrawerOpen = true
         scrim.apply {
@@ -232,7 +238,7 @@ class SettingsActivity : AppCompatActivity() {
             visibility = View.VISIBLE
             animate().alpha(1f).setDuration(220L).start()
         }
-        navigation.apply {
+        drawer.apply {
             visibility = View.VISIBLE
             translationX = if (width > 0) {
                 -width.toFloat()
@@ -247,13 +253,13 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun closeSettingsDrawer() {
         if (!isSettingsDrawerOpen) return
-        val navigation = binding.settingsNavigation
+        val drawer = settingsDrawer ?: return
         val scrim = settingsDrawerScrim ?: return
         isSettingsDrawerOpen = false
-        navigation.animate()
-            .translationX(-navigation.width.toFloat())
+        drawer.animate()
+            .translationX(-drawer.width.toFloat())
             .setDuration(180L)
-            .withEndAction { navigation.visibility = View.GONE }
+            .withEndAction { drawer.visibility = View.GONE }
             .start()
         scrim.animate()
             .alpha(0f)

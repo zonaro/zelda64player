@@ -14,6 +14,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
+import android.util.AttributeSet
 import android.view.InputDevice
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -29,7 +30,11 @@ import kotlin.math.min
  * It deliberately observes Android events only: no event is forwarded to a
  * core, and it never changes the frozen touch-control layout.
  */
-class GamepadTesterView(context: Context) : View(context) {
+class GamepadTesterView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr) {
 
     enum class Mode { PHYSICAL, N64 }
 
