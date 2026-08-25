@@ -4,6 +4,7 @@ import br.com.redclaw.zelda64player.patcher.bps.BpsApplier
 import br.com.redclaw.zelda64player.patcher.bps.BpsValidator
 import br.com.redclaw.zelda64player.patcher.ips.IpsApplier
 import br.com.redclaw.zelda64player.patcher.n64.ChecksumCalculator
+import br.com.redclaw.zelda64player.patcher.xdelta.XdeltaApplier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -25,7 +26,7 @@ import java.io.RandomAccessFile
 object PatcherFacade {
 
     /** Detected patch container format. */
-    enum class PatchFormat { BPS, IPS, UNKNOWN }
+    enum class PatchFormat { BPS, IPS, XDELTA, UNKNOWN }
 
     /**
      * Apply [patch] onto [baseRom], writing the patched ROM to [output].
@@ -46,6 +47,7 @@ object PatcherFacade {
                 onFailure = { e -> Result.failure(e) }
             )
             PatchFormat.IPS -> IpsApplier.apply(baseRom, patch, output)
+            PatchFormat.XDELTA -> XdeltaApplier.apply(baseRom, patch, output)
             PatchFormat.UNKNOWN -> Result.failure(
                 PatcherException.PatchFormatError(
                     "Unrecognized patch format (expected 'BPS1' or 'PATCH')"
@@ -68,6 +70,13 @@ object PatcherFacade {
             }
             if (n >= 4 && buf.copyOf(4).contentEquals("BPS1".toByteArray(Charsets.US_ASCII))) {
                 return PatchFormat.BPS
+            }
+            // VCDIFF / xdelta3 magic: 0xD6 0xC3 0xC4 0x00 (RFC 3284 / xdelta3).
+            if (n >= 4 &&
+                buf[0] == 0xD6.toByte() && buf[1] == 0xC3.toByte() &&
+                buf[2] == 0xC4.toByte() && buf[3] == 0x00.toByte()
+            ) {
+                return PatchFormat.XDELTA
             }
             return PatchFormat.UNKNOWN
         }
@@ -102,6 +111,8 @@ object PatcherFacade {
             }
             PatchFormat.IPS ->
                 throw PatcherException.PatchFormatError("IPS patches do not carry a source CRC32")
+            PatchFormat.XDELTA ->
+                throw PatcherException.PatchFormatError("xdelta3 (VCDIFF) patches do not carry a source CRC32")
             PatchFormat.UNKNOWN ->
                 throw PatcherException.PatchFormatError("Unrecognized patch format")
         }

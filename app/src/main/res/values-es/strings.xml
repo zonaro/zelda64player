@@ -187,7 +187,7 @@
     <string name="settings_about_version">Versión: %1$s</string>
     <string name="settings_about_repo">Repositorio</string>
     <string name="settings_about_catalog">Catálogo</string>
-    <string name="settings_about_licenses">Esta app usa rcheevos (MIT) para la integración RetroAchievements, además de LibretroDroid y RadialGamePad (GPL-3.0). Licencias completas en el repositorio del proyecto.</string>
+    <string name="settings_about_licenses">Esta app usa rcheevos (MIT) para la integración RetroAchievements, xdelta3 (Apache-2.0) para la decodificación de parches VCDIFF, además de LibretroDroid y RadialGamePad (GPL-3.0). Licencias completas en el repositorio del proyecto.</string>
 
     <!-- Settings: RetroAchievements -->
     <string name="settings_ra_title">RetroAchievements</string>
@@ -467,4 +467,29 @@
     <string name="language_english">Inglés</string>
     <string name="language_spanish">Español</string>
     <string name="language_select">Seleccionar idioma</string>
+
+    <!-- Captura, Grabación y Galería -->
+    <string name="menu_category_capture">Captura</string>
+    <string name="menu_screenshot">Capturar Pantalla</string>
+    <string name="menu_record_start">Iniciar Grabación</string>
+    <string name="menu_record_stop">Detener Grabación</string>
+    <string name="dock_gallery">Galería</string>
+    <string name="gallery_title">Galería</string>
+    <string name="gallery_empty">Aún no hay capturas. Usa el menú del emulador para capturar.</string>
+    <string name="gallery_share">Compartir</string>
+    <string name="gallery_delete">Eliminar</string>
+    <string name="gallery_delete_confirm">¿Eliminar esta captura? Esta acción no se puede deshacer.</string>
+    <string name="gallery_view">Ver</string>
+    <string name="gallery_record_badge">Vídeo</string>
+    <string name="gallery_overlay_badge">Con Controles</string>
+    <string name="settings_capture_category">Captura</string>
+    <string name="settings_capture_description">Las capturas y grabaciones se guardan solo en el dispositivo.</string>
+    <string name="settings_capture_include_overlay">Incluir controles en la grabación</string>
+    <string name="capture_saved">Captura guardada</string>
+    <string name="capture_failed">Error al capturar</string>
+    <string name="recording_started">Grabación iniciada</string>
+    <string name="recording_stopped">Grabación detenida</string>
+    <string name="recording_permission_denied">Permiso de grabación denegado</string>
+    <string name="capture_overlay_hidden_hint">Controles ocultos en la grabación</string>
+    <string name="recording_label">REC</string>
 </resources>

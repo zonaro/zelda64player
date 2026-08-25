@@ -187,7 +187,7 @@
     <string name="settings_about_version">Version: %1$s</string>
     <string name="settings_about_repo">Repository</string>
     <string name="settings_about_catalog">Catalog</string>
-    <string name="settings_about_licenses">This app uses rcheevos (MIT) for the RetroAchievements integration, plus LibretroDroid and RadialGamePad (GPL-3.0). Full licenses in the project repository.</string>
+    <string name="settings_about_licenses">This app uses rcheevos (MIT) for the RetroAchievements integration, xdelta3 (Apache-2.0) for VCDIFF patch decoding, plus LibretroDroid and RadialGamePad (GPL-3.0). Full licenses in the project repository.</string>
 
     <!-- Settings: RetroAchievements -->
     <string name="settings_ra_title">RetroAchievements</string>
@@ -467,4 +467,29 @@
     <string name="language_english">English</string>
     <string name="language_spanish">Spanish</string>
     <string name="language_select">Select language</string>
+
+    <!-- Capture, Recording and Gallery -->
+    <string name="menu_category_capture">Capture</string>
+    <string name="menu_screenshot">Screenshot</string>
+    <string name="menu_record_start">Start Recording</string>
+    <string name="menu_record_stop">Stop Recording</string>
+    <string name="dock_gallery">Gallery</string>
+    <string name="gallery_title">Gallery</string>
+    <string name="gallery_empty">No captures yet. Use the emulator menu to capture.</string>
+    <string name="gallery_share">Share</string>
+    <string name="gallery_delete">Delete</string>
+    <string name="gallery_delete_confirm">Delete this capture? This cannot be undone.</string>
+    <string name="gallery_view">View</string>
+    <string name="gallery_record_badge">Video</string>
+    <string name="gallery_overlay_badge">With Controls</string>
+    <string name="settings_capture_category">Capture</string>
+    <string name="settings_capture_description">Screenshots and gameplay recordings stay on the device only.</string>
+    <string name="settings_capture_include_overlay">Include controls in recording</string>
+    <string name="capture_saved">Capture saved</string>
+    <string name="capture_failed">Capture failed</string>
+    <string name="recording_started">Recording started</string>
+    <string name="recording_stopped">Recording stopped</string>
+    <string name="recording_permission_denied">Recording permission denied</string>
+    <string name="capture_overlay_hidden_hint">Controls hidden in recording</string>
+    <string name="recording_label">REC</string>
 </resources>

@@ -199,6 +199,52 @@ val prepareCore by tasks.registering {
 }
 tasks.named("preBuild") { dependsOn(prepareCore) }
 
+// Builds a host (linux x86_64) copy of the xdelta3 native decoder + CLI so the
+// JVM unit tests can exercise XdeltaApplier end-to-end without the Android
+// toolchain. The artifacts live under build/xdeltaHost and are never committed.
+// The SIZEOF_* values match a 64-bit linux host (int=4, long/long-long/void*/size_t=8).
+val xdeltaHostOut = layout.buildDirectory.dir("xdeltaHost")
+val buildXdeltaHost by tasks.registering(Exec::class) {
+    group = "native"
+    description = "Build host xdelta3 .so + CLI for JVM unit tests"
+    val srcDir = file("src/main/cpp/xdelta3")
+    val jniFile = file("src/main/cpp/xdelta_jni.c")
+    val javaHome = System.getProperty("java.home")
+    val out = xdeltaHostOut.get().asFile
+    inputs.files(jniFile, fileTree(srcDir))
+    outputs.files(File(out, "libxdelta_jni.so"), File(out, "xdelta3"))
+    commandLine(
+        "bash", "-c",
+        "set -e; " +
+            "mkdir -p ${out.absolutePath}; " +
+            "gcc -shared -fPIC ${jniFile.absolutePath} ${srcDir.absolutePath}/xdelta3.c " +
+            "-DXD3_MAIN=1 -DSIZEOF_INT=4 -DSIZEOF_LONG=8 -DSIZEOF_LONG_LONG=8 " +
+            "-DSIZEOF_VOID_P=8 -DSIZEOF_SIZE_T=8 -DSIZEOF_UNSIGNED_INT=4 " +
+            "-DSIZEOF_UNSIGNED_LONG=8 -DSIZEOF_UNSIGNED_LONG_LONG=8 " +
+            "-DXD3_USE_LARGESIZET=1 -DXD3_USE_LARGEFILE64=0 -D_FILE_OFFSET_BITS=64 " +
+            "-I${javaHome}/include -I${javaHome}/include/linux " +
+            "-o ${out.absolutePath}/libxdelta_jni.so; " +
+            "gcc ${srcDir.absolutePath}/xdelta3.c " +
+            "-DXD3_MAIN=1 -DSIZEOF_INT=4 -DSIZEOF_LONG=8 -DSIZEOF_LONG_LONG=8 " +
+            "-DSIZEOF_VOID_P=8 -DSIZEOF_SIZE_T=8 -DSIZEOF_UNSIGNED_INT=4 " +
+            "-DSIZEOF_UNSIGNED_LONG=8 -DSIZEOF_UNSIGNED_LONG_LONG=8 " +
+            "-DXD3_USE_LARGESIZET=1 -DXD3_USE_LARGEFILE64=0 -D_FILE_OFFSET_BITS=64 " +
+            "-o ${out.absolutePath}/xdelta3"
+    )
+}
+
+tasks.withType<Test>().configureEach {
+    dependsOn(buildXdeltaHost)
+    systemProperty(
+        "zelda64.xdelta.jni.path",
+        File(xdeltaHostOut.get().asFile, "libxdelta_jni.so").absolutePath
+    )
+    systemProperty(
+        "zelda64.xdelta.cli.path",
+        File(xdeltaHostOut.get().asFile, "xdelta3").absolutePath
+    )
+}
+
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")

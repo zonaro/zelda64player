@@ -585,6 +585,40 @@
         "mupen64plus_next_gles3",
         "parallel_n64"
       ]
+    },
+    {
+      "id": "voyager_of_time",
+      "name": "Voyager of Time",
+      "description": "A story-driven Ocarina of Time hack set after Majora's Mask. Link returns to Kokiri Forest and is sent by the Deku Tree Sprout to stop Ganondorf, who has broken the Door of Time again. Features heavy time travel, reworked villages and environments, and new sidequests.",
+      "author": "Brynna Giadrosich",
+      "version": "1.0",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/voyager_of_time/downloads/Voyager of Time.zip",
+        "filename": "The Legend of Zelda - Voyager of Time.xdelta",
+        "size": 6244082,
+        "checksums": {
+          "crc32": "31f28588",
+          "md5": "94090e39643648fd83fea605ab3f3cc6"
+        }
+      },
+      "tags": [
+        "story",
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
     }
   ]
 }

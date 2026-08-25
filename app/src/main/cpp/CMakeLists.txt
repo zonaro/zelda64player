@@ -71,3 +71,53 @@ target_compile_options(ra_jni PRIVATE -Wall)
 # Android log for later phases (rc_client logging callback).
 find_library(log-lib log)
 target_link_libraries(ra_jni ${log-lib})
+
+# ---------------------------------------------------------------------------
+# xdelta3 (VCDIFF) patch decoder — Apache 2.0, vendored unmodified from
+# jmacd/xdelta tag release3_2_apl (https://github.com/jmacd/xdelta). Do not
+# edit the vendored C sources locally; upgrade by replacing the snapshot with a
+# newer release tag. The JNI bridge (xdelta_jni.c) drives xdelta3's
+# command-line entry point to decode VCDIFF patches onto a base ROM.
+# ---------------------------------------------------------------------------
+
+set(XDELTA3_DIR xdelta3)
+
+add_library(xdelta_jni SHARED
+    xdelta_jni.c
+    ${XDELTA3_DIR}/xdelta3.c
+)
+
+target_include_directories(xdelta_jni PRIVATE
+    ${XDELTA3_DIR}
+)
+
+# XD3_MAIN=1 compiles the command-line `main()` that the JNI bridge calls.
+# Secondary LZMA compression is disabled (no liblzma dependency); external
+# compression subprocess support is left off (EXTERNAL_COMPRESSION undefined),
+# which also keeps the _exit() paths out of the decode flow.
+#
+# xdelta3.h needs the SIZEOF_* configuration macros that autotools would
+# normally generate into config.h. We compute them per-ABI with check_type_size
+# (correctly 4 on 32-bit ABIs and 8 on 64-bit ABIs) and feed them as compile
+# definitions.
+include(CheckTypeSize)
+check_type_size("unsigned int" SIZEOF_UNSIGNED_INT)
+check_type_size("unsigned long" SIZEOF_UNSIGNED_LONG)
+check_type_size("unsigned long long" SIZEOF_UNSIGNED_LONG_LONG)
+check_type_size("size_t" SIZEOF_SIZE_T)
+
+target_compile_definitions(xdelta_jni PRIVATE
+    XD3_MAIN=1
+    SIZEOF_UNSIGNED_INT=${SIZEOF_UNSIGNED_INT}
+    SIZEOF_UNSIGNED_LONG=${SIZEOF_UNSIGNED_LONG}
+    SIZEOF_UNSIGNED_LONG_LONG=${SIZEOF_UNSIGNED_LONG_LONG}
+    SIZEOF_SIZE_T=${SIZEOF_SIZE_T}
+    XD3_USE_LARGESIZET=1
+    XD3_USE_LARGEFILE64=0
+    _FILE_OFFSET_BITS=64
+)
+
+target_compile_options(xdelta_jni PRIVATE -Wall)
+
+find_library(log-lib log)
+target_link_libraries(xdelta_jni ${log-lib})

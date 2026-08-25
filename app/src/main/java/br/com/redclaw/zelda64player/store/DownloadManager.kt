@@ -93,7 +93,7 @@ class DownloadManager(
 
                     // 4. Resolve the base ROM (BPS needs a matching one; IPS is self-contained).
                     baseRomRepository.scanAndRegister()
-                    val baseFile = resolveBaseFile(bpsTemp)
+                    val baseFile = resolveBaseFile(bpsTemp, hack.baseRom.checksums.crc32)
 
                     // 5. Apply the patch to a temp ROM on the SAME filesystem as the final target.
                     if (cancelSignal?.isCancelled == true) {
@@ -154,17 +154,25 @@ class DownloadManager(
     /**
      * Pick the base ROM file to apply [patchFile] against. For IPS patches a
      * zero-length placeholder is returned (the applier ignores it). For BPS the
-     * patch's expected source CRC32 is matched against imported base ROMs; if
-     * none match, [StoreException.BaseRomMissing] is thrown so the hack is not
-     * installed.
+     * patch's expected source CRC32 is matched against imported base ROMs. For
+     * xdelta3 (VCDIFF) the patch carries no source CRC, so [expectedBaseCrc]
+     * (the catalog-declared base ROM CRC) drives resolution instead. If no
+     * imported base ROM matches, [StoreException.BaseRomMissing] is thrown so
+     * the hack is not installed.
      */
-    private fun resolveBaseFile(patchFile: File): File {
+    private fun resolveBaseFile(patchFile: File, expectedBaseCrc: String?): File {
         val format = PatcherFacade.detectPatchFormat(patchFile)
         if (format == PatcherFacade.PatchFormat.IPS) {
             return emptyBaseFile()
         }
-        val expectedCrc = PatcherFacade.expectedSourceCrc32(patchFile).getOrElse {
-            throw StoreException.InvalidPatch("Cannot read BPS source CRC32: ${it.message}")
+        val expectedCrc = if (format == PatcherFacade.PatchFormat.XDELTA) {
+            expectedBaseCrc ?: throw StoreException.InvalidPatch(
+                "xdelta3 patch requires a catalog-declared base ROM CRC"
+            )
+        } else {
+            PatcherFacade.expectedSourceCrc32(patchFile).getOrElse {
+                throw StoreException.InvalidPatch("Cannot read BPS source CRC32: ${it.message}")
+            }
         }
         val baseRom = findBaseRomByCrc(baseRomRepository.getAll(), expectedCrc)
             ?: throw StoreException.BaseRomMissing(

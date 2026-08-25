@@ -254,7 +254,7 @@
     <string name="ra_toast_connect_failed">Não foi possível conectar ao RetroAchievements.</string>
 
     <!-- Settings: about / licenses -->
-    <string name="settings_about_licenses">Este app usa rcheevos (MIT) para a integração RetroAchievements, LibretroDroid e RadialGamePad (GPL-3.0). Licenças completas no repositório do projeto.</string>
+    <string name="settings_about_licenses">Este app usa rcheevos (MIT) para a integração RetroAchievements, xdelta3 (Apache-2.0) para decodificação de patches VCDIFF, além de LibretroDroid e RadialGamePad (GPL-3.0). Licenças completas no repositório do projeto.</string>
 
     <!-- Settings: emulator core -->
     <string name="settings_core_title">Core emulador</string>
@@ -473,4 +473,29 @@
     <string name="language_english">Inglês</string>
     <string name="language_spanish">Espanhol</string>
     <string name="language_select">Selecionar idioma</string>
+
+    <!-- Captura de Tela, Gravação e Galeria -->
+    <string name="menu_category_capture">Captura</string>
+    <string name="menu_screenshot">Capturar Tela</string>
+    <string name="menu_record_start">Iniciar Gravação</string>
+    <string name="menu_record_stop">Parar Gravação</string>
+    <string name="dock_gallery">Galeria</string>
+    <string name="gallery_title">Galeria</string>
+    <string name="gallery_empty">Nenhuma captura ainda. Use o menu do emulador para capturar.</string>
+    <string name="gallery_share">Compartilhar</string>
+    <string name="gallery_delete">Excluir</string>
+    <string name="gallery_delete_confirm">Excluir esta captura? Esta ação não pode ser desfeita.</string>
+    <string name="gallery_view">Visualizar</string>
+    <string name="gallery_record_badge">Vídeo</string>
+    <string name="gallery_overlay_badge">Com Controles</string>
+    <string name="settings_capture_category">Captura</string>
+    <string name="settings_capture_description">Capturas de tela e gravação de gameplay ficam apenas no dispositivo.</string>
+    <string name="settings_capture_include_overlay">Incluir controles na gravação</string>
+    <string name="capture_saved">Captura salva</string>
+    <string name="capture_failed">Falha ao capturar</string>
+    <string name="recording_started">Gravação iniciada</string>
+    <string name="recording_stopped">Gravação parada</string>
+    <string name="recording_permission_denied">Permissão de gravação negada</string>
+    <string name="capture_overlay_hidden_hint">Controles ocultos na gravação</string>
+    <string name="recording_label">REC</string>
 </resources>
