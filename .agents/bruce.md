@@ -121,7 +121,7 @@
 | `SwitchGameCard` | Square card (1:1), cover image, game title overlay on focus, focus border, dimming overlay |
 | `SwitchAllGamesCard` | Circular card (charcoal fill, cyan 2×2 grid icon, cyan border on focus) |
 | `SwitchGridScreen` | Fullscreen grid ("Todos os Jogos"): header icon+title "Todos os Jogos" 20sp bold + thin separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders |
-| `SwitchDock` | Fixed bottom dock: 4 circular buttons (Loja, RetroAchievements, Sobre/Licenças), ~50dp diameter, colored glyphs, focus ring |
+| `SwitchDock` | Fixed bottom dock: 5 circular buttons (Loja, RetroAchievements, Galeria, Teste de Controle, Configurações), ~50dp diameter, colored glyphs, focus ring |
 | `SwitchFooterHints` | Bottom bar: left TV+gamepad indicators, right "(i) Sobre" and "+ Opções" gray hints 11–12sp |
 | `SwitchSidePanel` | Right slide-in panel (~50% width), sharp edges, header (teal badge icon + bold title 20–22sp + separator), numbered rows (gray circle 24dp badges), labels 16sp, "(default)" suffix 14sp gray, chevron right, thin line separators |
 | `SwitchDialog` | Centered modal, scrim, box ~40% width, radius 12–16dp, bg `#3A3A3C`, header icon+title 18sp, rows 48–52dp with icon+text, focused row = cyan border outline |

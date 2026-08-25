@@ -28,8 +28,15 @@
           "md5": "8a9d60aaac244132b0c3c0870a9107c3"
         }
       },
-      "tags": ["quality-of-life", "restoration", "enhancement"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": [
+        "quality-of-life",
+        "restoration",
+        "enhancement"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
     },
     {
       "id": "ultimate_trial",
@@ -57,8 +64,14 @@
           "md5": "db9a3c0d7fc56882e3bfa0a55cbf8617"
         }
       },
-      "tags": ["new-content", "achievements"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": [
+        "new-content",
+        "achievements"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
     },
     {
       "id": "majoras_mask_redux",
@@ -85,8 +98,13 @@
           "md5": "6fd6497916f5de2e6c25b9033eb30a7d"
         }
       },
-      "tags": ["quality-of-life"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": [
+        "quality-of-life"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
     },
     {
       "id": "master_of_time_revisited",
@@ -114,8 +132,14 @@
           "md5": "0fba9af90d86a1e86ff0c0bc77ba321f"
         }
       },
-      "tags": ["bugfix", "enhancement"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": [
+        "bugfix",
+        "enhancement"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
     },
     {
       "id": "the_missing_link",
@@ -143,8 +167,14 @@
           "md5": "c8edf8ceed18d88be468569adbe7d0cd"
         }
       },
-      "tags": ["story", "new-content"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": [
+        "story",
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
     },
     {
       "id": "sealed_palace",
@@ -172,8 +202,14 @@
           "md5": "dffcbfee4df85d8b842529bb407f9732"
         }
       },
-      "tags": ["story", "new-content"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": [
+        "story",
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
     },
     {
       "id": "dawn_and_dusk",
@@ -201,8 +237,320 @@
           "md5": "9d2cf32790dd79d9a259423dbb38b500"
         }
       },
-      "tags": ["new-content"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": [
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
+    },
+    {
+      "id": "sands_of_time",
+      "name": "Sands of Time",
+      "description": "After the Hero of Time fell, Ganon ruled Hyrule as a tyrant, abusing the Triforce to scorch the land into a wasteland. When Ganon finally dies of old age, survivors rebuild amid the ruins. In the secluded Steel Town, a young adventurer sets out in search of fortune and the truth.",
+      "author": "Debuglog & Woon",
+      "version": "1.22",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/sands_of_time/downloads/SoT1.22.bps",
+        "filename": "SoT1.22.bps",
+        "size": 38657165,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "e7661d62ede15fb0034f496360a818ef"
+        }
+      },
+      "tags": [
+        "story",
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
+    },
+    {
+      "id": "shadows_of_eldoria",
+      "name": "Shadows of Eldoria",
+      "description": "Shadows of Eldoria is a ROM hack created by Stonee Bad Luck - an original story-driven adventure in the world of Ocarina of Time.",
+      "author": "Stonee Bad Luck",
+      "version": "Demo",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/shadows_of_eldoria/downloads/Shadows of Eldoria DEMO z64.bps",
+        "filename": "Shadows of Eldoria DEMO z64.bps",
+        "size": 10178467,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "5fe3d5f872e92951de8fc6f221d0427b"
+        }
+      },
+      "tags": [
+        "demo",
+        "story"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
+    },
+    {
+      "id": "crystal_clocks",
+      "name": "Crystal Clocks",
+      "description": "A calm night stargazing with Saria and Mido turns into a puzzle quest. Use the Dragshot to solve 11 time-based puzzle rooms, manage platform switches and crystal activation sequences, and hunt four optional Pieces of Heart.",
+      "author": "SuperZambezi",
+      "version": "2.0",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/crystal_clocks/downloads/crystal-clocks-2.0.bps",
+        "filename": "crystal-clocks-2.0.bps",
+        "size": 45417290,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "4fd652302c61e5850ffa4859786fdfda"
+        }
+      },
+      "tags": [
+        "puzzle",
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
+    },
+    {
+      "id": "fate_of_the_bombiwa",
+      "name": "Fate of the Bombiwa",
+      "description": "A young adventurer sails the open sea looking for a quest and finds a town inhabited by the Bombiwa Tribe. When the king's daughter and others go missing, he takes on the task to save them and the fate of the Bombiwa rests in his hands.",
+      "author": "DezZival",
+      "version": "1.0",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/fate_of_the_bombiwa/downloads/TFOTB Patch.bps",
+        "filename": "TFOTB Patch.bps",
+        "size": 27340964,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "dabb85c6d6af1782a0fb4d6456b30a28"
+        }
+      },
+      "tags": [
+        "story",
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
+    },
+    {
+      "id": "dark_hyrule_fantasy",
+      "name": "Dark Hyrule Fantasy",
+      "description": "Dark Hyrule Fantasy is a full Ocarina of Time conversion mod introducing a new world, story and characters built within the framework of the original N64 classic. (Demo / development later moved to the Godot engine.)",
+      "author": "E-gor & Spire",
+      "version": "1.0",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/dark_hyrule_fantasy/downloads/DHF1_0_FIX.bps",
+        "filename": "DHF1_0_FIX.bps",
+        "size": 45944944,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "1b96b4fc6f9cb1c74f45bbe7fe1181bf"
+        }
+      },
+      "tags": [
+        "demo",
+        "story",
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
+    },
+    {
+      "id": "zelda_birthday",
+      "name": "Zelda's Birthday",
+      "description": "Features all-new actor arrangements, a new text and storyline, three redesigned dungeons, an optional side quest, multiple endings and hidden goodies.",
+      "author": "jsa",
+      "version": "1.0",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/zelda's_birthday/downloads/Zeldas_Birthday_Hardware_1.0.bps",
+        "filename": "Zeldas_Birthday_Hardware_1.0.bps",
+        "size": 22657709,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "11f30238b9cad79f33a9f8a41eec41bb"
+        }
+      },
+      "tags": [
+        "new-content",
+        "dungeon"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
+    },
+    {
+      "id": "time_lost",
+      "name": "Time Lost",
+      "description": "A sequel to Master of Time, taking place four years after Abello. Link finds himself on a new adventure in the country of Finlay, uncovering the worship of Majora, the mystery of Jabu milk and more. Tested on Mupen core, Wii VC, Dolphin and Project 64.",
+      "author": "Stonee Bad Luck",
+      "version": "1.02",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/time_lost/downloads/Legend of Zelda - Time Lost.zip",
+        "filename": "Legend of Zelda - Time Lost/Time Lost N64 1.02.bps",
+        "size": 73077451,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "fa11384572acf26621a15c8d3c06b054"
+        }
+      },
+      "tags": [
+        "story",
+        "sequel"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
+    },
+    {
+      "id": "child_quest",
+      "name": "Child Quest",
+      "description": "Experience the story of Ocarina of Time without ever reaching adulthood. All items are usable and every collectable can be acquired, including riding Epona, both trading quests, pulling the Master Sword and hidden surprises.",
+      "author": "Admentus & GhostlyDark",
+      "version": "3.0.1",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/child_quest/downloads/LoZOoT-ChildQuest.zip",
+        "filename": "Legend of Zelda, The - OoT - Child Quest (v3.0.1) (Admentus, GhostlyDark).bps",
+        "size": 8472968,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "93c282bb6adda0b8b1608ea10aebbbc5"
+        }
+      },
+      "tags": [
+        "new-content",
+        "quality-of-life"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
+    },
+    {
+      "id": "demons_quest",
+      "name": "Demon's Quest",
+      "description": "A gameplay mod that makes Ocarina of Time more challenging: new enemy attacks, a Trial of Courage gauntlet, RPG-style leveling, Hero Mode, shield durability, perfect block, stamina, life drain, double damage and re-buyable potions.",
+      "author": "thinedave and Aegiker",
+      "version": "final9001",
+      "baseRom": {
+        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "gameCode": "CZLE",
+        "versionByte": 0,
+        "checksums": {
+          "crc32": "cd16c529",
+          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
+          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+        }
+      },
+      "patch": {
+        "url": "https://github.com/thinedave/ocarina-demonsquest/releases/download/final9001/demonsquest_9001.bps",
+        "filename": "demonsquest_9001.bps",
+        "size": 5643037,
+        "checksums": {
+          "crc32": "2144df1c",
+          "md5": "49e4ccf9961912c09e2cb1c3adb429fd"
+        }
+      },
+      "tags": [
+        "difficulty",
+        "new-content"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ]
     }
   ]
 }

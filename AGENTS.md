@@ -85,7 +85,7 @@ This is a **native Android (Kotlin)** application derived from the existing Lude
 | `SwitchGameCard` | Square card (1:1), cover image, game title overlay on focus, focus border, dimming overlay |
 | `SwitchAllGamesCard` | Circular card (charcoal fill, cyan 2×2 grid icon, cyan border on focus) |
 | `SwitchGridScreen` | Fullscreen grid ("Todos os Jogos"): header icon+title "Todos os Jogos" 20sp bold + thin separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders |
-| `SwitchDock` | Fixed bottom dock: 4 circular buttons (Loja, RetroAchievements, Sobre/Licenças), ~50dp diameter, colored glyphs, focus ring |
+| `SwitchDock` | Fixed bottom dock: 5 circular buttons (Loja, RetroAchievements, Galeria, Teste de Controle, Configurações), ~50dp diameter, colored glyphs, focus ring |
 | `SwitchFooterHints` | Bottom bar: left TV+gamepad indicators, right "(i) Sobre" and "+ Opções" gray hints 11–12sp |
 | `SwitchSidePanel` | Right slide-in panel (~50% width), sharp edges, header (teal badge icon + bold title 20–22sp + separator), numbered rows (gray circle 24dp badges), labels 16sp, "(default)" suffix 14sp gray, chevron right, thin line separators |
 | `SwitchDialog` | Centered modal, scrim, box ~40% width, radius 12–16dp, bg `#3A3A3C`, header icon+title 18sp, rows 48–52dp with icon+text, focused row = cyan border outline |
@@ -171,6 +171,17 @@ br.com.redclaw.zelda64player
 │   ├── OcarinaSongCatalog.kt    # Built-in songs (OoT: 12, MM: 11) + catalog custom merge
 │   ├── OcarinaMacroPlayer.kt    # Coroutine sequencer → GLRetroView key events (~330ms/note)
 │   └── ui/OcarinaHudView.kt     # Overlay: song name + highlighted note chips during playback
+├── capture/             # Screen capture + screen recording (see plano.md "Captura de Tela, Gravação e Galeria")
+│   ├── CaptureManager.kt        # PixelCopy screenshot (with/without overlay compositing) + bridge to recording
+│   ├── CaptureService.kt        # Foreground Service: MediaProjection + MediaRecorder
+│   ├── RecordingIndicatorView.kt# Switch-style recording-active indicator
+│   └── CapturePreferences.kt    # Reads pref_capture_include_overlay
+├── gallery/             # Gallery screen (Switch UI): view / share / delete captures
+│   ├── GalleryRepository.kt     # List/delete items in galleryDir; FileProvider share URI
+│   ├── GalleryItem.kt           # Model: type, path, hackId, timestamp, withOverlay
+│   ├── GalleryActivity.kt       # SwitchGridScreen-style gallery
+│   ├── GalleryAdapter.kt        # RecyclerView adapter for gallery items
+│   └── GalleryViewModel.kt      # StateFlow of gallery items + actions
 ├── ui/switchui/         # Nintendo Switch UI components (native Kotlin, hand-styled)
 │   ├── SwitchHomeRow.kt
 │   ├── SwitchGameCard.kt
@@ -232,7 +243,7 @@ br.com.redclaw.zelda64player
 |-------|---------------------|-------------------|
 | **Coral** 🪸 | Chief Architect — owns `plano.md`, `AGENTS.md`, `.agents/`, architecture decisions | New project setup, major arch changes, team selection |
 | **Bruce** 🦈 | **Primary Implementer** — all Kotlin/Android code (Phases 0–4 + RetroAchievements B1–B5 + Switch UI Revamp) | All implementation tasks: patcher, store, settings, retroview, UI, retroachievements, Switch UI |
-| **Dolfi** 🐬 | Icons/covers — generates SVG icons (app icon, hack category icons, RA trophy/leaderboard icons, Switch dock icons, focus assets) and PNG cover placeholders for hacks without `coverImageUrl`; Zelda-gold splash artwork | When UI needs icons, cover art, or splash art |
+| **Dolfi** 🐬 | Icons/covers — generates SVG icons (app icon, hack category icons, RA trophy/leaderboard icons, Switch dock icons, focus assets) and PNG cover placeholders for hacks without `coverImageUrl`; Zelda-gold splash artwork; **Gallery/capture icons** (`ic_gallery`, `ic_screenshot`, `ic_record`, `ic_stop`) | When UI needs icons, cover art, or splash art |
 | **Wally** 🐋 | Documentation — finalizes `README.md`, translates `strings.xml` (pt-BR/en/es), writes code docs (KDoc) | After implementation phases, before release |
 | **Calamari** 🦑 | Fact-checking — validates known ROM checksums (No-Intro/Redump), verifies LibretroDroid/core versions, checks BPS spec details, validates OoT 1.0 checksums and N64 boot CRC algorithm, validates sound asset licensing | When Bruce needs verified data |
 | **Puffy** 🐡 | Research — up-to-date LibretroDroid releases, core buildbot URLs, Android API changes, Gradle plugin updates, Android TV focus handling, SoundPool latency | When Bruce needs current docs |
@@ -248,7 +259,7 @@ br.com.redclaw.zelda64player
 |-----------|-------------|
 | Android/Kotlin implementation (all phases) | **Bruce** |
 | Architecture changes / plan updates | **Coral** |
-| App icon, hack category icons, cover placeholders, RA icons, Switch dock icons, splash art | **Dolfi** |
+| App icon, hack category icons, cover placeholders, RA icons, Switch dock icons, splash art, **Gallery/capture icons** (`ic_gallery`, `ic_screenshot`, `ic_record`, `ic_stop`) | **Dolfi** |
 | README, strings translation, KDoc | **Wally** |
 | ROM checksum verification, core version check, rcheevos release validation, sound licensing | **Calamari** |
 | LibretroDroid/core/Android API research, rcheevos API docs, Android TV focus, SoundPool | **Puffy** |

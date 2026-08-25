@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFF">
+    <!-- Screenshot glyph (camera) for the capture feature.
+         Outline style, 2px stroke, round caps/joins, consistent with the dock set. -->
+    <rect
+        android:x="3"
+        android:y="7"
+        android:width="18"
+        android:height="13"
+        android:rx="2.5"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <rect
+        android:x="9"
+        android:y="4"
+        android:width="6"
+        android:height="3"
+        android:rx="1"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <circle
+        android:cx="12"
+        android:cy="13.5"
+        android:r="4"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2" />
+</vector>

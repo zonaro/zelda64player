@@ -27,7 +27,7 @@ Bruce or Lobby provides screenshots/recordings when:
 - [ ] `SwitchHomeRow`: horizontal scrollable row of square game cards + circular "Todos os Jogos" card at end
 - [ ] `SwitchGameCard`: square (1:1), cover image, game title overlay on focus, cyan focus border, 10% dimming on unfocused
 - [ ] `SwitchAllGamesCard`: circular, charcoal fill, cyan 2x2 grid icon, cyan border when focused
-- [ ] `SwitchDock`: 4 circular buttons (Loja, RetroAchievements, Sobre/Licenças), ~50dp, colored glyphs, focus ring
+- [ ] `SwitchDock`: 5 circular buttons (Loja, RetroAchievements, Galeria, Teste de Controle, Configurações), ~50dp, colored glyphs, focus ring
 - [ ] `SwitchFooterHints`: left TV+gamepad indicators, right "(i) Sobre" and "+ Opções" gray 11-12sp
 - [ ] Grid order: vanilla games first, then store hacks
 - [ ] `SwitchGridScreen` ("Todos os Jogos"): header icon+title "Todos os Jogos" 20sp bold + thin separator, smaller square cards (~170dp), search/filter bar, ghosted placeholders, all entries together
