@@ -375,8 +375,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                     MenuActionItem(
                         "auto_ocarina",
                         R.string.menu_auto_ocarina,
-                        R.drawable.ic_ocarina,
-                        tintIcon = false
+                        R.drawable.ic_oot,
+                        tintIcon = true
                     ) {
                         showOcarinaSongList()
                     }

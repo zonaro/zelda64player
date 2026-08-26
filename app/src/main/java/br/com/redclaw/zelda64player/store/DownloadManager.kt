@@ -5,6 +5,7 @@ import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
 import br.com.redclaw.zelda64player.data.local.PatchRepository
 import br.com.redclaw.zelda64player.data.model.BaseRom
 import br.com.redclaw.zelda64player.data.model.HackEntry
+import br.com.redclaw.zelda64player.store.CanonicalIdResolver
 import br.com.redclaw.zelda64player.patcher.PatcherException
 import br.com.redclaw.zelda64player.patcher.PatcherFacade
 import br.com.redclaw.zelda64player.repositories.Storage
@@ -125,7 +126,14 @@ class DownloadManager(
                         }
                         romTemp.delete()
                     }
-                    installedRepository.markInstalled(hack.id, hack.version, patch.filename)
+                    val patchChecksums = CanonicalIdResolver.computePatchChecksums(bpsBytes)
+                    installedRepository.markInstalled(
+                        hack.id,
+                        hack.version,
+                        patch.filename,
+                        hack.canonicalId,
+                        patchChecksums
+                    )
                     patchRepository.delete(hack.id)
 
                     // 7. RetroAchievements identity: hash the FINAL patched ROM

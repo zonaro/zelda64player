@@ -36,6 +36,18 @@
             android:textColor="@color/switch_accent"
             android:textSize="12sp"
             android:textStyle="bold" />
+
+        <!-- Family icon badge (OoT / MM), overlaid on the cover top-end. -->
+        <ImageView
+            android:id="@+id/item_family_badge"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="6dp"
+            android:padding="5dp"
+            android:scaleType="fitCenter"
+            android:contentDescription="@string/game_unknown"
+            android:visibility="gone" />
     </FrameLayout>
 
     <!-- Install status BELOW the cover (not overlaid), per the reference layout. -->

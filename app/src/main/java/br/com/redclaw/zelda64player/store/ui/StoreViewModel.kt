@@ -201,16 +201,33 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun statusFor(hack: HackEntry): StoreStatus {
-        val installed = installedRepository.installedVersion(hack.id)
-        return when {
-            installed == null -> StoreStatus.NotInstalled
-            installed != hack.version -> StoreStatus.UpdateAvailable(installed, hack.version)
-            else -> StoreStatus.Installed(installed)
-        }
-    }
+    fun statusFor(hack: HackEntry): StoreStatus =
+        StoreStatusCalculator.statusFor(installedRepository.load(), hack)
 
-    fun isInstalled(hackId: String): Boolean = installedRepository.isInstalled(hackId)
+    fun isInstalled(hackId: String): Boolean =
+        StoreStatusCalculator.isInstalled(installedRepository.load(), hackId)
+
+    /**
+     * If [hack] is installed via a DIFFERENT store id (cross-catalog match)
+     * rather than its exact id, returns the other installed hack's display name
+     * and version so the detail dialog can show an "Installed as X" note.
+     * Returns null when the exact [hack.id] is installed or nothing matches.
+     */
+    fun installedAsOther(hack: HackEntry): Pair<String, String>? {
+        val installed = installedRepository.load()
+        val canonical = hack.canonicalId
+        val checksums = hack.patch?.checksums
+        val other = installed.values.firstOrNull { inst ->
+            inst.hackId != hack.id && (inst.canonicalId == canonical ||
+                (checksums != null && inst.patchChecksums != null &&
+                    inst.patchChecksums.crc32 == checksums.crc32 &&
+                    inst.patchChecksums.md5 == checksums.md5 &&
+                    inst.patchChecksums.sha1 == checksums.sha1))
+        } ?: return null
+        val name = mergedCatalogRepository.load().firstOrNull { it.id == other.hackId }?.name
+            ?: other.hackId
+        return name to other.version
+    }
 
     /** Whether any imported base ROM matches the hack's required CRC32. */
     fun baseRomMatches(crc32: String): Boolean =

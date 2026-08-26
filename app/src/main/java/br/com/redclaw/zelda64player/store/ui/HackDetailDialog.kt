@@ -37,6 +37,7 @@ import br.com.redclaw.zelda64player.data.model.PatchRef
 import br.com.redclaw.zelda64player.store.DownloadTarget
 import br.com.redclaw.zelda64player.store.GitHubPatchResolver
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
+import br.com.redclaw.zelda64player.ui.switchui.BadgeBinder
 import br.com.redclaw.zelda64player.databinding.DialogHackDetailBinding
 import br.com.redclaw.zelda64player.store.DownloadPhase
 import coil.load
@@ -178,6 +179,7 @@ class HackDetailDialog : DialogFragment() {
         populateChangelog()
         populateVideos()
         updateDownloadButton()
+        showInstalledAsOtherNote()
     }
 
     private fun populateScreenshots() {
@@ -192,13 +194,14 @@ class HackDetailDialog : DialogFragment() {
     private fun populateBadges() {
         val sg = hack.supportedGames
         if (!sg.isNullOrBlank()) {
-            val gameText = when {
-                sg.contains("OoT", ignoreCase = true) -> getString(R.string.game_oot)
-                sg.contains("MM", ignoreCase = true) -> getString(R.string.game_mm)
-                else -> sg
-            }
-            binding.detailGameBadge.text = gameText
-            binding.detailGameBadge.visibility = View.VISIBLE
+            // Family icon badge (OoT / MM / unknown -> generic hack icon), matching the
+            // Library tile styling. Replaces the old plain-text supported-game label.
+            BadgeBinder.bindFamily(
+                binding.detailGameBadge,
+                BadgeBinder.familyFromSupportedGames(sg)
+            )
+        } else {
+            binding.detailGameBadge.visibility = View.GONE
         }
         val completion = hack.completionStatus
         if (!completion.isNullOrBlank()) {
@@ -247,6 +250,25 @@ class HackDetailDialog : DialogFragment() {
             }
             binding.detailVideosContainer.addView(tv)
         }
+    }
+
+    /**
+     * Shows a subtle "Installed as X (version Y)" note when [hack] is installed
+     * via a different store id (cross-catalog match) rather than its exact id.
+     * Hidden otherwise.
+     */
+    private fun showInstalledAsOtherNote() {
+        val other = viewModel.installedAsOther(hack)
+        if (other == null) {
+            binding.detailInstalledAsOther.visibility = View.GONE
+            return
+        }
+        binding.detailInstalledAsOther.text = getString(
+            R.string.store_note_installed_as_other,
+            other.first,
+            other.second
+        )
+        binding.detailInstalledAsOther.visibility = View.VISIBLE
     }
 
     /** Sets the download button label/state from install status + download target. */

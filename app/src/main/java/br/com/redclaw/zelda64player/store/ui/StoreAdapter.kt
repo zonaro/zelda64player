@@ -1,12 +1,15 @@
 package br.com.redclaw.zelda64player.store.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.databinding.StoreGridItemBinding
+import br.com.redclaw.zelda64player.ocarina.OcarinaGame
 import br.com.redclaw.zelda64player.store.DownloadPhase
+import br.com.redclaw.zelda64player.ui.switchui.BadgeBinder
 import coil.load
 
 /**
@@ -94,6 +97,13 @@ class StoreAdapter(
                 }
             } else {
                 binding.itemCover.setImageResource(R.drawable.placeholder_cover)
+            }
+
+            // Family icon badge (OoT / MM) overlaid on the cover; hidden for unknown.
+            when (val family = BadgeBinder.familyFromSupportedGames(hack.supportedGames)) {
+                OcarinaGame.OOT, OcarinaGame.MM ->
+                    BadgeBinder.bindFamily(binding.itemFamilyBadge, family)
+                null -> binding.itemFamilyBadge.visibility = View.GONE
             }
         }
     }

@@ -1,6 +1,7 @@
 package br.com.redclaw.zelda64player.data.model
 
 import br.com.redclaw.zelda64player.ocarina.OcarinaSong
+import br.com.redclaw.zelda64player.store.CanonicalIdResolver
 import br.com.redclaw.zelda64player.store.DownloadTarget
 import org.json.JSONArray
 import org.json.JSONObject
@@ -120,6 +121,13 @@ data class HackEntry(
      *  entries that rely on [patch] directly. */
     val downloadTarget: DownloadTarget? = null
 ) {
+    /**
+     * Stable, store-agnostic identity for cross-catalog dedupe. Computed (not
+     * stored) by delegating to [CanonicalIdResolver]; two catalog entries that
+     * describe the same hack resolve to the same canonical id regardless of the
+     * store that published them.
+     */
+    val canonicalId: String get() = CanonicalIdResolver.resolve(id, storeId)
     fun toJson(): JSONObject = JSONObject().apply {
         put("id", id)
         put("name", name)
@@ -232,6 +240,22 @@ data class HackEntry(
 
         private fun jsonToStringList(arr: JSONArray): List<String> =
             (0 until arr.length()).map { arr.getString(it) }
+
+        /**
+         * Whether [a] and [b] describe the same hack across stores.
+         *
+         * Primary: matching [canonicalId] (covers slug normalization + alias
+         * map). Fallback: both carry non-null patch [Checksums] whose CRC32,
+         * MD5, and SHA-1 all match. A canonical match with differing checksums
+         * still counts as the same hack (a different patch version).
+         */
+        fun isSameHack(a: HackEntry, b: HackEntry): Boolean {
+            if (a.canonicalId == b.canonicalId) return true
+            val ca = a.patch?.checksums
+            val cb = b.patch?.checksums
+            return ca != null && cb != null &&
+                ca.crc32 == cb.crc32 && ca.md5 == cb.md5 && ca.sha1 == cb.sha1
+        }
     }
 }
 

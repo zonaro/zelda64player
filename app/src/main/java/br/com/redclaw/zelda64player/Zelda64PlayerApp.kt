@@ -20,6 +20,7 @@ import br.com.redclaw.zelda64player.retroachievements.data.RaInstallMetadataStor
 import br.com.redclaw.zelda64player.retroachievements.data.RaUserProfileRepository
 import br.com.redclaw.zelda64player.retroachievements.jni.RcheevosJni
 import br.com.redclaw.zelda64player.shortcuts.GamePlayHistoryStore
+import br.com.redclaw.zelda64player.store.CanonicalIdResolver
 import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.ui.switchui.SfxManager
 import br.com.redclaw.zelda64player.ui.switchui.ThemeManager
@@ -47,6 +48,9 @@ import java.util.concurrent.TimeUnit
         LanguageManager.applyAtStartup(this)
         super.onCreate()
         instance = this
+        // Load the cross-catalog alias map (catalog/aliases.json) so the same
+        // hack published under different store ids resolves to one canonical id.
+        CanonicalIdResolver.load(assets)
         // Initialize the Hack Store download + patch queue (process-lifetime
         // singleton) so the Store grid badges, progress notifications and the
         // download-queue screen share one coordinator.

@@ -321,6 +321,66 @@ br.com.redclaw.zelda64player
 
 ---
 
+## Cross-Catalog Hack Dedupe (Phase 6)
+
+### Canonical Identity (`canonicalId`)
+- **Definition**: Stable, store-agnostic hack identifier derived by slug normalization + explicit alias map.
+- **Slug Normalization**: `lowercase().removePrefix("hm_").replace(Regex("[^a-z0-9]+"), "")`.
+  - Examples: `"hm_themissinglink"` → `"themissinglink"`, `"the-missing-link"` → `"themissinglink"`.
+- **Alias Map**: `catalog/aliases.json` (separate file, versioned).
+  ```json
+  { "version": 1, "aliases": { "hm_themissinglink": "the-missing-link", "hm_ocarinaoftime3d": "ocarina-of-time-3d" } }
+  ```
+  - Keys = raw HM ids (with `hm_`); Values = PICKS bare-slug ids (canonical form).
+  - Unidirectional HM → PICKS; PICKS slugs are canonical by definition.
+- **Resolver**: `CanonicalIdResolver.resolve(rawId, storeId)` → applies alias map then normalization.
+- **HackEntry.canonicalId**: Read-only property delegating to `CanonicalIdResolver`.
+
+### Install-Time Patch Checksum Persistence
+- **Extended `InstalledHack`** (in `InstalledHacksRepository`, file `filesDir/installed_hacks.json`):
+  ```kotlin
+  data class InstalledHack(
+      val hackId: String,
+      val version: String,
+      val fileName: String,
+      val canonicalId: String,           // NEW
+      val patchChecksums: Checksums? = null  // NEW: CRC32/MD5/SHA1 of downloaded BPS
+  )
+  ```
+- **Capture point**: `DownloadManager.download` (after `PatchValidator.validate`, compute from `bpsBytes`) and `ImportedPatchInstaller.install` (from `patchFile`).
+- **Migration**: On load, missing `canonicalId` backfilled via catalog lookup (fallback `normalizeSlug(hackId)`); `patchChecksums` = `null` for legacy.
+
+### Cross-Catalog Recognition
+- **`isSameHack(a, b)`**:
+  ```kotlin
+  fun isSameHack(a: HackEntry, b: HackEntry): Boolean {
+      if (a.canonicalId == b.canonicalId) return true
+      val ca = a.patch?.checksums; val cb = b.patch?.checksums
+      return ca != null && cb != null && ca.crc32 == cb.crc32 && ca.md5 == cb.md5 && ca.sha1 == cb.sha1
+  }
+  ```
+  - Primary: `canonicalId` match.
+  - Fallback: both have non-empty checksums AND all three digests match.
+  - `canonicalId` match + checksum mismatch → same hack, different patch version (UI note).
+
+### Library Grouping
+- `CatalogBackedLibrarySource.available()` groups by `canonicalId` → one `HackLibraryEntry` per hack.
+- `HackLibraryEntry.id = canonicalId` (stable key for launch).
+- Representative picked: prefer PICKS entry, else first HM source.
+- Vanilla games (`vanilla_*`) excluded (handled by `BaseRomLibrarySource`).
+
+### Store Install-State Recognition
+- `StoreViewModel.statusFor` checks **any installed hack** with same `canonicalId` OR matching checksums.
+- "Installed" badge appears in **both stores** when hack installed from either.
+- Detail dialog shows note: `"Instalado como \"{otherName}\" (versão {otherVersion})"` when matched via canonicalId but not exact id.
+
+### Storage Path Keying
+- At install time, patched ROM written to `Storage.rom(canonicalId)` (not `hack.id`).
+- Ensures **one ROM file per hack** regardless of store origin.
+- `GameRomResolver` unchanged (receives `canonicalId` from Library).
+
+---
+
 ## References
 
 - **Master Plan**: `plano.md` (this directory) — complete architecture, milestones, JSON schema, risk register

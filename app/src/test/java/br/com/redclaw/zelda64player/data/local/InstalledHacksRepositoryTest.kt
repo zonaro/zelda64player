@@ -1,5 +1,6 @@
 package br.com.redclaw.zelda64player.data.local
 
+import br.com.redclaw.zelda64player.data.model.Checksums
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -45,5 +46,27 @@ class InstalledHacksRepositoryTest {
         val repo = InstalledHacksRepository(file)
         assertTrue(repo.load().isEmpty())
         assertFalse(repo.isInstalled("anything"))
+    }
+
+    @Test
+    fun legacyEntryBackfillsCanonicalIdAndNullChecksums() {
+        val file = tempFile()
+        // Simulate a pre-Phase-6 persisted record without canonicalId / patchChecksums.
+        file.writeText("""[{"hackId":"hm_themissinglink","version":"1.0","fileName":"x.bps"}]""")
+        val loaded = InstalledHacksRepository(file).getInstalled("hm_themissinglink")
+        // Backfill falls back to slug normalization when no alias map is loaded.
+        assertEquals("themissinglink", loaded?.canonicalId)
+        assertEquals(null, loaded?.patchChecksums)
+    }
+
+    @Test
+    fun newEntryPersistsCanonicalIdAndChecksums() {
+        val file = tempFile()
+        val repo = InstalledHacksRepository(file)
+        val checksums = Checksums("crc", "md5", "sha1")
+        repo.markInstalled("hack_a", "1.0", "hack_a.bps", "canon_a", checksums)
+        val reloaded = InstalledHacksRepository(file).getInstalled("hack_a")
+        assertEquals("canon_a", reloaded?.canonicalId)
+        assertEquals(checksums, reloaded?.patchChecksums)
     }
 }

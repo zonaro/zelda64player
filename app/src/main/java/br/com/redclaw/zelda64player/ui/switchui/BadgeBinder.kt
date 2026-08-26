@@ -37,36 +37,66 @@ import br.com.redclaw.zelda64player.views.HackLibraryEntry
  */
 object BadgeBinder {
 
-    /** Applies the badge for [entry] to [badge], or hides it when none exists. */
+    /**
+     * Applies the badge for [entry] to [badge], or hides it when none applies.
+     *
+     * Vanilla base ROMs ([BadgeType.VANILLA] or [HackLibraryEntry.isVanilla]) carry
+     * no badge by design. Store hacks ([BadgeType.HACK]) delegate to [bindFamily] so
+     * the family icon matches the rest of the app.
+     */
     fun bind(badge: ImageView, entry: HackLibraryEntry) {
-        val type = entry.badge ?: run {
+        val type = entry.badge
+        // Vanilla base ROMs must have no badge.
+        if (type == null || type == BadgeType.VANILLA || entry.isVanilla) {
             badge.visibility = View.GONE
             return
         }
+        bindFamily(badge, entry.family)
+    }
 
-        val (drawableRes, contentDescriptionRes) = when (type) {
-            BadgeType.VANILLA ->
-                R.drawable.ic_vanilla to R.string.vanilla_badge_content_description
-            BadgeType.HACK ->
-                R.drawable.ic_hack to R.string.hack_badge_content_description
+    /** Resolves the game family from a catalog `supportedGames` string (e.g. "OoT", "MM"). */
+    fun familyFromSupportedGames(supportedGames: String?): OcarinaGame? = when {
+        supportedGames?.contains("OoT", ignoreCase = true) == true -> OcarinaGame.OOT
+        supportedGames?.contains("MM", ignoreCase = true) == true -> OcarinaGame.MM
+        else -> null
+    }
+
+    /**
+     * Applies the family icon badge to [imageView]: OoT -> [R.drawable.ic_oot] on the
+     * yellow chip (black icon), MM -> [R.drawable.ic_mm] on the purple chip (white
+     * icon), and an unknown family falls back to the generic [R.drawable.ic_hack] on a
+     * neutral chip. Used by both the Library tiles and the Store (detail + grid).
+     */
+    fun bindFamily(imageView: ImageView, family: OcarinaGame?) {
+        val drawableRes: Int
+        val bgRes: Int
+        val iconTint: Int
+        val contentDescriptionRes: Int
+        when (family) {
+            OcarinaGame.OOT -> {
+                drawableRes = R.drawable.ic_oot
+                bgRes = R.drawable.bg_badge_oot
+                iconTint = R.color.color_badge_oot_icon
+                contentDescriptionRes = R.string.game_oot
+            }
+            OcarinaGame.MM -> {
+                drawableRes = R.drawable.ic_mm
+                bgRes = R.drawable.bg_badge_mm
+                iconTint = R.color.color_badge_mm_icon
+                contentDescriptionRes = R.string.game_mm
+            }
+            null -> {
+                drawableRes = R.drawable.ic_hack
+                bgRes = R.drawable.bg_badge
+                iconTint = android.R.color.white
+                contentDescriptionRes = R.string.hack_badge_content_description
+            }
         }
 
-        val (bgRes, iconTint) = when (entry.family) {
-            OcarinaGame.OOT ->
-                R.drawable.bg_badge_oot to
-                    badge.context.getColor(R.color.color_badge_oot_icon)
-            OcarinaGame.MM ->
-                R.drawable.bg_badge_mm to
-                    badge.context.getColor(R.color.color_badge_mm_icon)
-            null ->
-                R.drawable.bg_badge to
-                    badge.context.getColor(android.R.color.white)
-        }
-
-        badge.visibility = View.VISIBLE
-        badge.setImageResource(drawableRes)
-        badge.setBackgroundResource(bgRes)
-        badge.imageTintList = ColorStateList.valueOf(iconTint)
-        badge.contentDescription = badge.context.getString(contentDescriptionRes)
+        imageView.visibility = View.VISIBLE
+        imageView.setImageResource(drawableRes)
+        imageView.setBackgroundResource(bgRes)
+        imageView.imageTintList = ColorStateList.valueOf(imageView.context.getColor(iconTint))
+        imageView.contentDescription = imageView.context.getString(contentDescriptionRes)
     }
 }

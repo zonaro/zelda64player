@@ -1,5 +1,7 @@
 package br.com.redclaw.zelda64player.data.local
 
+import br.com.redclaw.zelda64player.data.model.Checksums
+import br.com.redclaw.zelda64player.store.CanonicalIdResolver
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -17,9 +19,15 @@ class InstalledHacksRepository(private val file: File) {
         file.parentFile?.mkdirs()
     }
 
-    fun markInstalled(hackId: String, version: String, fileName: String) {
+    fun markInstalled(
+        hackId: String,
+        version: String,
+        fileName: String,
+        canonicalId: String = CanonicalIdResolver.resolve(hackId, ""),
+        patchChecksums: Checksums? = null
+    ) {
         val all = load().toMutableMap()
-        all[hackId] = InstalledHack(hackId, version, fileName)
+        all[hackId] = InstalledHack(hackId, version, fileName, canonicalId, patchChecksums)
         save(all)
     }
 
@@ -58,20 +66,39 @@ class InstalledHacksRepository(private val file: File) {
     data class InstalledHack(
         val hackId: String,
         val version: String,
-        val fileName: String
+        val fileName: String,
+        val canonicalId: String,
+        val patchChecksums: Checksums? = null
     ) {
         fun toJson() = JSONObject().apply {
             put("hackId", hackId)
             put("version", version)
             put("fileName", fileName)
+            put("canonicalId", canonicalId)
+            patchChecksums?.let { put("patchChecksums", it.toJson()) }
+                ?: put("patchChecksums", JSONObject.NULL)
         }
 
         companion object {
-            fun fromJson(o: JSONObject) = InstalledHack(
-                hackId = o.getString("hackId"),
-                version = o.getString("version"),
-                fileName = o.getString("fileName")
-            )
+            fun fromJson(o: JSONObject): InstalledHack {
+                val hackId = o.getString("hackId")
+                return InstalledHack(
+                    hackId = hackId,
+                    version = o.getString("version"),
+                    fileName = o.getString("fileName"),
+                    canonicalId = if (o.has("canonicalId")) {
+                        o.getString("canonicalId")
+                    } else {
+                        // Legacy record (pre-Phase 6): backfill via slug normalization.
+                        CanonicalIdResolver.resolve(hackId, "")
+                    },
+                    patchChecksums = if (o.has("patchChecksums") && !o.isNull("patchChecksums")) {
+                        Checksums.fromJson(o.getJSONObject("patchChecksums"))
+                    } else {
+                        null
+                    }
+                )
+            }
         }
     }
 }

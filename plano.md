@@ -715,6 +715,9 @@ Add top-level `storeName` to both catalog files:
 | `detail_changelog` | Changelog | Changelog | Registro de cambios |
 | `detail_external_notice` | Este mod não tem download direto. Será aberto no navegador. | This mod has no direct download. Will open in browser. | Este mod no tiene descarga directa. Se abrirá en el navegador. |
 | `store_source_error` | Falha ao carregar catálogo da loja | Failed to load store catalog | Error al cargar catálogo de la tienda |
+| `store_note_installed_as_other` | Instalado como "%1$s" (versão %2$s) | Installed as "%1$s" (version %2$s) | Instalado como "%1$s" (versión %2$s) |
+| `store_badge_installed` | Instalado | Installed | Instalado |
+| `library_duplicate_note` | Mesmo hack de outra loja | Same hack from another store | Mismo hack de otra tienda |
 
 ---
 
@@ -783,6 +786,227 @@ Add top-level `storeName` to both catalog files:
 - **GitHub Releases API**: https://docs.github.com/en/rest/releases/releases
 - **BPS Spec**: https://github.com/blakesmith/rombp/blob/master/docs/bps_spec.md (existing)
 - **N64 ROM Header**: https://n64brew.dev/wiki/ROM_Header (existing)
+
+---
+
+# Phase 6: Cross-Catalog Hack Dedupe (Canonical Identity)
+
+## Goal
+Unify the same hack across stores (Zelda 64 Picks + Hylian Modding) so that:
+- The Library shows **one entry per hack** (not two: `the-missing-link` + `hm_themissinglink`).
+- The Store shows an **"installed" badge** on a hack if **any variant** with the same canonical identity is already installed (from any store).
+- Patch checksums are persisted at install time for future cross-catalog identity verification.
+
+## Canonical Identity (`canonicalId`)
+
+### Definition
+A stable, store-agnostic identifier for a hack, derived by **slug normalization** plus an **explicit alias map** for corrections/edge cases.
+
+### Slug Normalization Algorithm (Pure Function)
+```kotlin
+fun normalizeSlug(raw: String): String =
+    raw.lowercase()
+        .removePrefix("hm_")           // strip HM namespace prefix
+        .replace(Regex("[^a-z0-9]+"), "") // strip ALL non-alphanumeric
+        .trim()
+```
+- Input examples → Output:
+  - `"hm_themissinglink"` → `"themissinglink"`
+  - `"the-missing-link"` → `"themissinglink"`
+  - `"The_Missing.Link"` → `"themissinglink"`
+  - `"ocarina_of_time_dx"` → `"ocarinaoftimedx"`
+
+### Alias Map (Corrections / Edge Cases)
+**File**: `catalog/aliases.json` (separate file, not embedded in `catalog.json` — keeps the main catalog clean and allows updates without bumping `catalogVersion`).
+
+**Schema**:
+```json
+{
+  "version": 1,
+  "aliases": {
+    "hm_themissinglink": "the-missing-link",
+    "hm_ocarinaoftime3d": "ocarina-of-time-3d",
+    "hm_mm3d": "majoras-mask-3d"
+  }
+}
+```
+- Keys are **raw HM ids** (with `hm_` prefix).
+- Values are **PICKS bare-slug ids** (the canonical slug used in the PICKS catalog).
+- The alias map is **unidirectional**: HM → PICKS. If a PICKS slug needs correction, it is the canonical form by definition.
+- At runtime: `canonicalId = aliasMap[rawId]?.normalizeSlug() ?? rawId.normalizeSlug()`.
+
+### `HackEntry.canonicalId` Field
+- **Computed property** (not stored in JSON): `val canonicalId: String get() = CanonicalIdResolver.resolve(id, storeId)`.
+- Added to `HackEntry.kt` as a read-only property.
+- Used by Library grouping, Store install-state recognition, and `isSameHack`.
+
+## Install-Time Patch Checksum Persistence
+
+### Where Stored
+Extend the existing install metadata in `InstalledHacksRepository` (file: `filesDir/installed_hacks.json`).
+
+**Current `InstalledHack`**:
+```kotlin
+data class InstalledHack(
+    val hackId: String,
+    val version: String,
+    val fileName: String
+)
+```
+
+**Extended `InstalledHack`**:
+```kotlin
+data class InstalledHack(
+    val hackId: String,
+    val version: String,
+    val fileName: String,
+    val canonicalId: String,          // NEW: computed at install time
+    val patchChecksums: Checksums? = null  // NEW: CRC32/MD5/SHA1 of the BPS patch file
+)
+```
+- `canonicalId` is computed once at install via `CanonicalIdResolver.resolve(hack.id, hack.storeId)`.
+- `patchChecksums` is computed from the **downloaded BPS bytes** (already in memory during `DownloadManager.download` / `ImportedPatchInstaller.install`):
+  - CRC32: `ChecksumCalculator.crc32(bpsBytes)`
+  - MD5/SHA1: `MessageDigest` on the same bytes (optional but recommended).
+- For Hylian Modding (no catalog checksums), this provides the **first authoritative checksum record**.
+- For PICKS, it serves as a **verification** that the downloaded patch matches the catalog.
+
+### Migration
+- On load, missing `canonicalId`/`patchChecksums` are backfilled:
+  - `canonicalId` = `CanonicalIdResolver.resolve(hackId, storeIdFromCatalog)` (requires looking up the catalog entry; if not found, fall back to `normalizeSlug(hackId)`).
+  - `patchChecksums` = `null` (unknown for legacy installs).
+
+## Cross-Catalog Recognition Logic
+
+### `isSameHack(a: HackEntry, b: HackEntry): Boolean`
+```kotlin
+fun isSameHack(a: HackEntry, b: HackEntry): Boolean {
+    if (a.canonicalId == b.canonicalId) return true
+    val ca = a.patch?.checksums
+    val cb = b.patch?.checksums
+    return ca != null && cb != null && ca.crc32 == cb.crc32 && ca.md5 == cb.md5 && ca.sha1 == cb.sha1
+}
+```
+- **Primary**: `canonicalId` match (covers slug normalization + alias map).
+- **Fallback**: Both have non-empty patch checksums AND all three digests match (CRC32 + MD5 + SHA1).
+- If `canonicalId` matches but checksums differ → **same hack, different patch version** (surface a note in UI: "Patch version differs from installed").
+
+### Library Grouping (`HackLibrarySource` / `CatalogBackedLibrarySource`)
+- `available()` returns entries **grouped by `canonicalId`**.
+- For each `canonicalId` group: pick the "best" representative (prefer PICKS entry if present, else first HM source).
+- The resulting `HackLibraryEntry` carries:
+  - `id = canonicalId` (stable key for launch/resolution).
+  - `title` = representative's `name`.
+  - `coverUrl` = representative's `coverImageUrl`.
+  - `badge` = `BadgeType.HACK`.
+  - `family` = representative's detected family.
+  - `storeId` = representative's `storeId` (for UI context).
+  - `isVanilla` = `false`.
+- Vanilla games (`vanilla_<crc32>`) are **excluded** from this grouping (they have their own `BaseRomLibrarySource`).
+
+### Store Install-State Recognition (`StoreViewModel.statusFor`)
+- Current: `installedRepository.installedVersion(hack.id)` → exact `hackId` match.
+- New: Check if **any installed hack** has the same `canonicalId` OR matching checksums.
+```kotlin
+fun statusFor(hack: HackEntry): StoreStatus {
+    val installed = installedRepository.load() // Map<String, InstalledHack>
+    val canonical = hack.canonicalId
+    val checksums = hack.patch?.checksums
+    val match = installed.values.any { inst ->
+        inst.canonicalId == canonical ||
+        (checksums != null && inst.patchChecksums != null &&
+         inst.patchChecksums.crc32 == checksums.crc32 &&
+         inst.patchChecksums.md5 == checksums.md5 &&
+         inst.patchChecksums.sha1 == checksums.sha1)
+    }
+    return when {
+        !match -> StoreStatus.NotInstalled
+        installed[hack.id]?.version != hack.version -> StoreStatus.UpdateAvailable(...)
+        else -> StoreStatus.Installed(...)
+    }
+}
+```
+- This makes the "Installed" badge appear in **both stores** when the hack is installed from either.
+
+## UI Changes
+
+### Store Detail Dialog
+- If `statusFor(hack)` is `Installed` or `UpdateAvailable` via cross-catalog match but **not** the exact `hack.id`:
+  - Show a subtle note: `"Instalado como \"{otherHack.name}\" (versão {otherVersion})"` (i18n key: `store_note_installed_as_other`).
+
+### Library Grid
+- One tile per `canonicalId` (no duplicates).
+- Context menu: management section (uninstall) operates on the **canonicalId group** → uninstalls all variants' files (but only one `rom_<canonicalId>` exists since `Storage.rom` is keyed by the canonical id at install time — see below).
+
+## Storage Path Keying (Critical)
+
+**Current**: `Storage.rom(hackId)` uses the raw `hack.id` (e.g., `rom_the-missing-link` vs `rom_hm_themissinglink` → two files).
+
+**Required Change**: At install time (both `DownloadManager` and `ImportedPatchInstaller`), the patched ROM **must be written to `Storage.rom(canonicalId)`** (e.g., `rom_themissinglink`).
+
+- `Storage` class itself does NOT change (still `rom_<id>`).
+- Callers pass `canonicalId` instead of `hack.id`.
+- `GameRomResolver` already resolves `vanilla_*` via `BaseRomRepository`; for non-vanilla it calls `Storage.rom(hackId)`. The `hackId` passed from Library will now be the `canonicalId`.
+- This ensures **one ROM file per hack** regardless of store origin.
+
+## Implementation Checklist
+
+### Core Utilities
+- [ ] `CanonicalIdResolver.kt` (singleton/object): `resolve(rawId: String, storeId: String): String` + `normalizeSlug`, loads `catalog/aliases.json` from assets.
+- [ ] `catalog/aliases.json` (initial entries for known collisions).
+- [ ] `HackEntry.canonicalId` property (delegates to `CanonicalIdResolver`).
+- [ ] `isSameHack(a, b)` in `HackEntry.kt` companion or `store/StoreUtils.kt`.
+
+### Data Model Changes
+- [ ] `InstalledHack` + `InstalledHacksRepository` (add `canonicalId`, `patchChecksums`; migration on load).
+- [ ] `HackEntry` (add `canonicalId` property).
+
+### Install-Time Checksum Capture
+- [ ] `DownloadManager.download`: after `PatchValidator.validate(bpsBytes, ...)`, compute `Checksums(crc32, md5, sha1)` from `bpsBytes` → pass to `installedRepository.markInstalled(hack.id, hack.version, patch.filename, canonicalId, patchChecksums)`.
+- [ ] `ImportedPatchInstaller.install`: compute checksums from `patchFile` (already done for CRC32 at line 112; add MD5/SHA1) → pass to `markInstalled`.
+
+### Library Grouping
+- [ ] `CatalogBackedLibrarySource.available()`: group by `canonicalId`, pick representative, emit `HackLibraryEntry(id = canonicalId, ...)`.
+- [ ] `HackLibraryEntry` may need a `canonicalId` field (or reuse `id` as canonical).
+
+### Store Recognition
+- [ ] `StoreViewModel.statusFor`: cross-catalog match via `canonicalId` + checksums.
+- [ ] `StoreViewModel.isInstalled(hackId)`: also check cross-catalog.
+- [ ] Detail dialog: show "Installed as X" note when matched via canonicalId but not exact id.
+
+### i18n Keys (pt-BR / en / es)
+| Key | pt-BR | en | es |
+|-----|-------|----|----|
+| `store_note_installed_as_other` | Instalado como "%1$s" (versão %2$s) | Installed as "%1$s" (version %2$s) | Instalado como "%1$s" (versión %2$s) |
+| `store_badge_installed` | Instalado | Installed | Instalado |
+| `library_duplicate_note` | Mesmo hack de outra loja | Same hack from another store | Mismo hack de otra tienda |
+
+### Unit Tests
+- [ ] `CanonicalIdResolverTest`: normalization cases, alias map lookup, HM vs PICKS collision.
+- [ ] `HackEntryTest`: `canonicalId` property, `isSameHack` (canonical match, checksum match, mismatch).
+- [ ] `InstalledHacksRepositoryTest`: migration of legacy entries (missing fields → backfill).
+- [ ] `CatalogBackedLibrarySourceTest`: grouping by `canonicalId` produces single entry per hack.
+- [ ] `StoreViewModelTest`: `statusFor` returns `Installed` when other store's variant installed.
+
+### Visual QA (Chululu)
+- [ ] Store detail dialog: "Installed" badge on HM entry when PICKS variant installed (and vice versa).
+- [ ] Library grid: no duplicate tiles for same hack across stores.
+- [ ] Detail dialog note: "Installed as X" appears correctly.
+
+---
+
+## Risk Register (Phase 6 Additions)
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|-------|---------------|---------|-----------|
+| **Alias map incompleto** (colisões não cobertas) | Média | Duplicatas na Library | Iniciar com mapa vazio; adicionar entradas conforme usuários reportarem; `normalizeSlug` já cobre 90%+ dos casos. |
+| **Checksums divergentes para mesmo hack** (re-empacotamento do patch) | Baixa | `isSameHack` falha no fallback | `canonicalId` é primário; checksums são fallback. Nota "versão diferente" no UI evita confusão. |
+| **Migração `installed_hacks.json` quebrada** | Baixa | Usuários perdem estado de install | Backfill defensivo no `load()`; testes de migração cobrindo v0→v1. |
+| **`Storage.rom(canonicalId)` colide com `vanilla_*` prefix** | Baixa | ROM errada carregada | `canonicalId` nunca começa com `vanilla_` (slugs de hacks não têm esse prefixo). `GameRomResolver` trata `vanilla_*` separadamente. |
+| **HM `download_link` muda → checksum muda** | Média | Patch "diferente" detectado | Comportamento correto: patch mudou → versão diferente. Usuário decide se atualiza. |
+| **Switch UI compliance do note/badge** | Média | Inconsistência visual | Chululu QA obrigatório; usar `SwitchDialog`/`SwitchGameCard` tokens. |
+
+---
 
 (End of file)
 

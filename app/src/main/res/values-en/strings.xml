@@ -79,6 +79,9 @@
     <string name="store_status_installed">Installed v%1$s</string>
     <string name="store_status_update">Update available</string>
     <string name="store_status_not_installed">Not installed</string>
+    <string name="store_badge_installed">Installed</string>
+    <string name="store_note_installed_as_other">Installed as "%1$s" (version %2$s)</string>
+    <string name="library_duplicate_note">Same hack from another store</string>
 
     <!-- Hack Store: sidebar categories -->
     <string name="store_cat_all">All</string>
@@ -392,7 +395,6 @@
     <string name="plandomizer_import_error">Could not read the file: %1$s</string>
     <string name="plandomizer_import_success">File imported.</string>
 
-    <string name="vanilla_badge_content_description">Vanilla game</string>
     <string name="hack_badge_content_description">ROM hack</string>
 
 

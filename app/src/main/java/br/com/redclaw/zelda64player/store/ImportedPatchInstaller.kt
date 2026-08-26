@@ -10,6 +10,7 @@ import br.com.redclaw.zelda64player.data.model.BaseRomRef
 import br.com.redclaw.zelda64player.data.model.Checksums
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.data.model.PatchRef
+import br.com.redclaw.zelda64player.store.CanonicalIdResolver
 import br.com.redclaw.zelda64player.ocarina.OcarinaSongCatalog
 import br.com.redclaw.zelda64player.patcher.PatcherException
 import br.com.redclaw.zelda64player.patcher.PatcherFacade
@@ -114,7 +115,14 @@ class ImportedPatchInstaller(
                     coverImageUrl = null
                 )
                 userHacksRepository.add(entry)
-                installedRepository.markInstalled(hackId, "1.0", patchFile.name)
+                val patchChecksums = CanonicalIdResolver.computePatchChecksums(patchFile.readBytes())
+                installedRepository.markInstalled(
+                    hackId,
+                    "1.0",
+                    patchFile.name,
+                    entry.canonicalId,
+                    patchChecksums
+                )
 
                 val family = baseRom?.let {
                     OcarinaSongCatalog.detectGame(RomHeader(it.gameCode, it.versionByte, ""))

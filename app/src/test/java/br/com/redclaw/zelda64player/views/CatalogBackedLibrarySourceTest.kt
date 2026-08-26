@@ -1,7 +1,11 @@
 package br.com.redclaw.zelda64player.views
 
 import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
+import br.com.redclaw.zelda64player.data.model.BaseRomRef
+import br.com.redclaw.zelda64player.data.model.Checksums
+import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.ocarina.OcarinaGame
+import br.com.redclaw.zelda64player.store.CanonicalIdResolver
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -75,5 +79,37 @@ class CatalogBackedLibrarySourceTest {
         val entries = sourceWith(storage, romIds = listOf("orphan")).available()
         assertEquals(1, entries.size)
         assertNull(entries.first().family)
+    }
+
+    @Test
+    fun groupsCatalogEntriesByCanonicalId() {
+        CanonicalIdResolver.reset()
+        val storage = File.createTempFile("storage", "").also { it.delete(); it.mkdirs() }
+        // Same hack installed under two different store ids (PICKS + Hylian Modding).
+        writeFakeRom(storage, "the-missing-link", "CZLE")
+        writeFakeRom(storage, "hm_themissinglink", "CZLE")
+
+        val picks = HackEntry(
+            id = "the-missing-link", name = "The Missing Link", description = "", author = "x",
+            version = "1.0", baseRom = BaseRomRef("OoT", "CZLE", 0, Checksums("abc")),
+            storeId = "picks"
+        )
+        val hm = HackEntry(
+            id = "hm_themissinglink", name = "HM The Missing Link", description = "", author = "x",
+            version = "1.0", baseRom = BaseRomRef("OoT", "CZLE", 0, Checksums("abc")),
+            storeId = "hylianmodding"
+        )
+        val catalog = mapOf(picks.id to picks, hm.id to hm)
+        val installed = InstalledHacksRepository(File.createTempFile("installed", ".json"))
+        installed.markInstalled("the-missing-link", "1.0", "rom_the-missing-link")
+        installed.markInstalled("hm_themissinglink", "1.0", "rom_hm_themissinglink")
+
+        val entries = CatalogBackedLibrarySource(storage, installed, catalog).available()
+        assertEquals(1, entries.size)
+        val entry = entries.first()
+        assertEquals("themissinglink", entry.id)
+        assertEquals("The Missing Link", entry.title) // PICKS representative preferred
+        assertEquals("picks", entry.storeId)
+        assertEquals(OcarinaGame.OOT, entry.family)
     }
 }
