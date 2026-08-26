@@ -28,7 +28,9 @@ data class HackLibraryEntry(
     /** True when this tile is a user-imported vanilla base ROM (managed in Settings). */
     val isVanilla: Boolean = false,
     /** True only for hacks installed from a file chosen by the user (not Store catalog entries). */
-    val isUserImported: Boolean = false
+    val isUserImported: Boolean = false,
+    /** Store this entry originated from ("picks" | "hylianmodding"), or null for local/unknown. */
+    val storeId: String? = null
 )
 
 /**

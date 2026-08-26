@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.databinding.ActivitySwitchGridBinding
 import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.viewmodels.LibraryMenuController
@@ -104,6 +105,11 @@ class SwitchGridActivity : AppCompatActivity() {
         binding = ActivitySwitchGridBinding.inflate(layoutInflater)
         setContentView(binding.root)
         SwitchImmersive.enterFullscreen(this)
+
+        // Apply dynamic accent color to header icon and sort button
+        val accentColor = AccentManager.getAccentColor(this)
+        binding.gridHeaderIcon.setColorFilter(accentColor)
+        binding.gridSort.setColorFilter(accentColor)
 
         menuHost = LibraryMenuHostDelegate(this) { refreshGrid() }
         menuController = LibraryMenuController(menuHost)

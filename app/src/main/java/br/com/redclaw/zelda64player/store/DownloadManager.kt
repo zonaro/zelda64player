@@ -50,7 +50,9 @@ class DownloadManager(
         onProgress: (phase: InstallPhase, bytesDownloaded: Long, totalBytes: Long) -> Unit,
         cancelSignal: CancelSignal? = null
     ): Result<File> = withContext(Dispatchers.IO) {
-        val patch = hack.patch
+        val patch = hack.patch ?: return@withContext Result.failure(
+            StoreException.GenericError("No patch available for this hack")
+        )
         val tempArchive = File(patchRepository.directory, "${hack.id}.tmp")
         val bpsTemp = File(patchRepository.directory, "${hack.id}.bps.tmp")
         val romTemp = File(storage.storagePath, "rom_${hack.id}.tmp")
@@ -81,7 +83,19 @@ class DownloadManager(
 
                     // 2. Resolve the actual BPS bytes (extract from the zip if needed).
                     val bpsBytes = if (patch.url.endsWith(".zip", ignoreCase = true)) {
-                        ZipExtractor.extractEntry(tempArchive, patch.filename)
+                        val innerIsPatch = patch.filename.endsWith(".bps", ignoreCase = true) ||
+                            patch.filename.endsWith(".ips", ignoreCase = true) ||
+                            patch.filename.endsWith(".xdelta", ignoreCase = true)
+                        if (innerIsPatch) {
+                            ZipExtractor.extractEntry(tempArchive, patch.filename)
+                        } else {
+                            // Archive declared without an inner patch name: pick the
+                            // first patch-like entry inside it.
+                            ZipExtractor.extractFirstMatching(
+                                tempArchive,
+                                ".*\\.(bps|ips|xdelta)$"
+                            )
+                        }
                     } else {
                         tempArchive.readBytes()
                     }

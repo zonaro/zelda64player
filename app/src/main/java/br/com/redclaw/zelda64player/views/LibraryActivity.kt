@@ -44,6 +44,7 @@ import br.com.redclaw.zelda64player.ui.switchui.SwitchHomeRow
 import br.com.redclaw.zelda64player.ui.switchui.SwitchSidePanel
 import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
 import br.com.redclaw.zelda64player.ui.switchui.ThemeManager
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.viewmodels.LibraryMenuController
 import br.com.redclaw.zelda64player.ui.switchui.SwitchGridActivity
@@ -156,40 +157,47 @@ class LibraryActivity : AppCompatActivity() {
         binding.libraryHomeRow.submitList(items)
     }
 
-    /** Build the dock destinations (Loja, RA, Teste de Controle, Configurações). */
+    /** Build the dock destinations (Loja, Galeria, RetroAchievements, Controle, Configurações). */
     private fun setupDock() {
+        val galleryIconColor = AccentManager.getAccentColor(this)
         val dockItems = listOf(
             SwitchDock.DockItem(
                 R.drawable.ic_store,
                 R.string.dock_store,
-                R.color.switch_accent_amber
-            ) { startActivity(Intent(this, StoreActivity::class.java)) },
-            SwitchDock.DockItem(
-                R.drawable.ic_trophy,
-                R.string.dock_achievements,
-                R.color.switch_accent_amber
-            ) { startActivity(Intent(this, AchievementsActivity::class.java)) },
-            SwitchDock.DockItem(
-                R.drawable.ic_gamepad,
-                R.string.dock_gamepad_tester,
-                R.color.switch_accent_focus
-            ) {
-                if (GamepadTesterActivity.hasConnectedController()) {
-                    startActivity(Intent(this, GamepadTesterActivity::class.java))
-                } else {
-                    Toast.makeText(this, R.string.gamepad_tester_connect_controller, Toast.LENGTH_SHORT).show()
-                }
-            },
-            SwitchDock.DockItem(
-                R.drawable.ic_settings,
-                R.string.dock_settings,
-                R.color.switch_text_primary
-            ) { startActivity(Intent(this, SettingsActivity::class.java)) },
+                R.color.switch_dock_icon_store,
+                { startActivity(Intent(this, StoreActivity::class.java)) }
+            ),
             SwitchDock.DockItem(
                 R.drawable.ic_gallery,
                 R.string.dock_gallery,
-                R.color.switch_accent_focus
-            ) { startActivity(Intent(this, GalleryActivity::class.java)) }
+                R.color.switch_accent_focus, // fallback
+                { startActivity(Intent(this, GalleryActivity::class.java)) },
+                galleryIconColor // dynamic accent color
+            ),
+            SwitchDock.DockItem(
+                R.drawable.ic_trophy,
+                R.string.dock_achievements,
+                R.color.switch_accent_amber,
+                { startActivity(Intent(this, AchievementsActivity::class.java)) }
+            ),
+            SwitchDock.DockItem(
+                R.drawable.ic_gamepad,
+                R.string.dock_control,
+                R.color.switch_dock_icon_control,
+                {
+                    if (GamepadTesterActivity.hasConnectedController()) {
+                        startActivity(Intent(this, GamepadTesterActivity::class.java))
+                    } else {
+                        Toast.makeText(this, R.string.gamepad_tester_connect_controller, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            ),
+            SwitchDock.DockItem(
+                R.drawable.ic_settings,
+                R.string.dock_settings,
+                R.color.switch_text_primary,
+                { startActivity(Intent(this, SettingsActivity::class.java)) }
+            )
         )
         binding.libraryDock.setItems(dockItems)
     }
@@ -214,6 +222,11 @@ class LibraryActivity : AppCompatActivity() {
         binding.libraryRaAvatar.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) Zelda64PlayerApp.sfxManager.focusMove()
         }
+        // Apply theme-adaptive tint to the placeholder icon (user glyph).
+        // switch_text_primary resolves to dark gray in light mode, white in dark mode.
+        binding.libraryRaAvatar.setColorFilter(
+            androidx.core.content.ContextCompat.getColor(this, R.color.switch_text_primary)
+        )
         loadProfileAvatar()
     }
 
@@ -221,7 +234,7 @@ class LibraryActivity : AppCompatActivity() {
     private fun loadProfileAvatar() {
         val credentials = Zelda64PlayerApp.raCredentialStore
         if (!credentials.hasCredentials()) {
-            binding.libraryRaAvatar.setImageResource(R.drawable.ic_trophy)
+            binding.libraryRaAvatar.setImageResource(R.drawable.ic_user)
             return
         }
 
@@ -289,9 +302,9 @@ class LibraryActivity : AppCompatActivity() {
 
     /**
      * Opens the quick Options side panel (Phase D): theme toggle (amber focus
-     * border), interface-sound on/off with a live suffix, RetroAchievements
-     * login status (drills into Settings where login lives), and a link to the
-     * full Settings screen. All rows reuse the reusable [SwitchSidePanel].
+     * border), interface-sound on/off with a live suffix, accent color selector,
+     * RetroAchievements login status (drills into Settings where login lives), and
+     * a link to the full Settings screen. All rows reuse the reusable [SwitchSidePanel].
      */
     private fun openOptionsPanel() {
         // Toggle: a second tap on the footer hint closes an open panel instead
@@ -308,6 +321,7 @@ class LibraryActivity : AppCompatActivity() {
         } else {
             getString(R.string.options_ra_status_disconnected)
         }
+        val currentAccentLabel = AccentManager.getCurrentAccentLabel(this)
 
         val rows = listOf(
             SwitchSidePanel.Row(
@@ -335,6 +349,13 @@ class LibraryActivity : AppCompatActivity() {
                 }
             ),
             SwitchSidePanel.Row(
+                iconRes = R.drawable.ic_tune,
+                label = getString(R.string.options_accent_color),
+                suffix = currentAccentLabel,
+                showChevron = true,
+                onClick = { openAccentColorPicker() }
+            ),
+            SwitchSidePanel.Row(
                 iconRes = R.drawable.ic_trophy,
                 label = raLabel,
                 showChevron = true,
@@ -356,6 +377,29 @@ class LibraryActivity : AppCompatActivity() {
 
         optionsPanel = SwitchSidePanel(this)
         optionsPanel?.show(getString(R.string.options_panel_title), R.drawable.ic_tune, rows)
+    }
+
+    /**
+     * Opens a dialog to pick the accent color from the predefined palette.
+     * Updates the preference and recreates the activity to apply the new color.
+     */
+    private fun openAccentColorPicker() {
+        optionsPanel?.dismiss()
+        val options = AccentManager.options
+        val labels = options.map { getString(it.labelRes) }
+        val currentKey = AccentManager.getCurrentAccentKey(this)
+        val checkedIndex = options.indexOfFirst { it.key == currentKey }.coerceAtLeast(0)
+
+        SwitchDialog(this)
+            .title(getString(R.string.options_accent_color))
+            .icon(R.drawable.ic_palette)
+            .singleChoice(labels, checkedIndex) { index ->
+                val chosen = options[index]
+                AccentManager.setAccent(this, chosen.key)
+                // Recreate activity to apply new accent color to all UI elements
+                recreate()
+            }
+            .show()
     }
 
     private fun updateEmptyState() {
@@ -414,14 +458,14 @@ class LibraryActivity : AppCompatActivity() {
                         return true
                     }
                 }
-                // Gamepad HOME / guide button toggles the quick-options side
-                // panel. The physical button is delivered as KEYCODE_GUIDE
-                // (value 172, API 11) — the Android SDK has no KEYCODE_BUTTON_HOME
-                // or KEYCODE_HOMEPAGE constant; KEY_HOMEPAGE is translated by the
-                // framework into the system-reserved KEYCODE_HOME (3), which is
-                // never delivered to apps. The repeat guard prevents holding the
-                // button from spamming open/close toggles.
-                KeyEvent.KEYCODE_GUIDE -> {
+                // Gamepad HOME / guide button (KEYCODE_GUIDE) and MODE button
+                // (KEYCODE_BUTTON_MODE) both toggle the quick-options side panel.
+                // KEYCODE_GUIDE (value 172, API 11) is the physical gamepad "home"/
+                // "guide" button. KEYCODE_BUTTON_MODE (value 113, API 12) is the
+                // "Mode" button on gamepads. Both are guarded against key repeats
+                // so holding the button does not spam open/close toggles.
+                KeyEvent.KEYCODE_GUIDE,
+                KeyEvent.KEYCODE_BUTTON_MODE -> {
                     if (event.repeatCount == 0) {
                         openOptionsPanel()
                         return true

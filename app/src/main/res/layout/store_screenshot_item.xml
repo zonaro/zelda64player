@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="8dp">
+
+    <ImageView
+        android:id="@+id/screenshot_image"
+        android:layout_width="160dp"
+        android:layout_height="90dp"
+        android:background="@drawable/shape_cover"
+        android:clipToOutline="true"
+        android:contentDescription="@string/detail_screenshots"
+        android:scaleType="centerCrop" />
+</FrameLayout>

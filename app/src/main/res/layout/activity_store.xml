@@ -16,7 +16,17 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/switch_panel"
             app:titleTextColor="@color/switch_text_primary"
-            app:navigationIconTint="@color/switch_text_primary" />
+            app:navigationIconTint="@color/switch_text_primary">
+
+            <Spinner
+                android:id="@+id/store_selector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@string/store_selector_desc"
+                android:minWidth="160dp" />
+        </androidx.appcompat.widget.Toolbar>
 
         <!-- Two-panel split: fixed left sidebar + flexible main content. -->
         <LinearLayout
@@ -107,6 +117,17 @@
                     android:textColor="@color/switch_text_primary"
                     android:textSize="20sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/store_source_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/switch_screen_margin"
+                    android:layout_marginEnd="@dimen/switch_screen_margin"
+                    android:layout_marginBottom="6dp"
+                    android:textColor="@color/switch_text_secondary"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
 
                 <FrameLayout
                     android:layout_width="match_parent"

@@ -1,11 +1,13 @@
 package br.com.redclaw.zelda64player.settings.ui
 
+import android.accounts.AccountManager
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
-import android.os.Bundle
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
+import android.net.Uri
+import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +16,7 @@ import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,15 +28,23 @@ import br.com.redclaw.zelda64player.data.model.BaseRom
 import br.com.redclaw.zelda64player.databinding.ActivitySettingsBinding
 import br.com.redclaw.zelda64player.databinding.SettingsBaseRomItemBinding
 import br.com.redclaw.zelda64player.databinding.SettingsCatalogUrlItemBinding
-import br.com.redclaw.zelda64player.capture.CapturePreferences
+import br.com.redclaw.zelda64player.drive.BackupCategory
+import br.com.redclaw.zelda64player.drive.ConflictResolveActivity
+import br.com.redclaw.zelda64player.drive.ConflictStore
+import br.com.redclaw.zelda64player.drive.GoogleDriveAuth
+import br.com.redclaw.zelda64player.drive.GoogleDriveBackup
+import br.com.redclaw.zelda64player.drive.GoogleDriveBackupWorker
 import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
+import br.com.redclaw.zelda64player.views.InstalledLibrary
 import br.com.redclaw.zelda64player.settings.SettingsViewModel
 import br.com.redclaw.zelda64player.store.CatalogFetcher
 import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.utils.LanguageManager
+import com.google.android.gms.auth.UserRecoverableAuthException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -79,6 +90,23 @@ class SettingsActivity : AppCompatActivity() {
         ActivityResultContracts.OpenDocument()
     ) { uri -> if (uri != null) runImportBackup(uri) }
 
+    /** Google account chooser for the Drive backup feature. */
+    private val pickDriveAccountLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val name = result.data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+        if (name != null) {
+            CorePrefs.setGdriveAccountName(this, name)
+            updateGdriveAccountUi()
+        }
+    }
+
+    /** OAuth consent recovery intent launched when the token needs user approval. */
+    private val driveConsentLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { /* User can tap "Back up now" again after granting consent. */ }
+
     private val installedRepository by lazy {
         InstalledHacksRepository(File(filesDir, "installed_hacks.json"))
     }
@@ -92,6 +120,7 @@ class SettingsActivity : AppCompatActivity() {
         setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setTitle(R.string.settings_title)
         setupSwitchNavigation()
+        applyDynamicAccentToSwitches()
 
         viewModel = SettingsViewModel(application)
 
@@ -101,9 +130,10 @@ class SettingsActivity : AppCompatActivity() {
         setupRetroAchievementsSection()
         setupCoreSection()
         setupBackupSection()
+        setupGdriveSection()
+        setupCloudSyncSection()
         setupLanguageSection()
         setupAboutSection()
-        setupCaptureSection()
         wireSettingsSfx()
         observeImport()
     }
@@ -111,6 +141,13 @@ class SettingsActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) SwitchImmersive.enterFullscreen(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh the cloud-sync status (e.g. after resolving a conflict in the
+        // resolver activity) so the pending-conflict count stays accurate.
+        updateCloudSyncStatus()
     }
 
     /**
@@ -127,6 +164,7 @@ class SettingsActivity : AppCompatActivity() {
             binding.settingsNavRa to binding.settingsSectionRa,
             binding.settingsNavCore to binding.settingsSectionCore,
             binding.settingsNavBackup to binding.settingsSectionBackup,
+            binding.settingsNavCloudsync to binding.settingsSectionCloudsync,
             binding.settingsNavLanguage to binding.settingsSectionLanguage,
             binding.settingsNavAbout to binding.settingsSectionAbout,
             binding.settingsNavCapture to binding.settingsSectionCapture
@@ -174,11 +212,80 @@ class SettingsActivity : AppCompatActivity() {
             binding.settingsNavRa,
             binding.settingsNavCore,
             binding.settingsNavBackup,
+            binding.settingsNavCloudsync,
             binding.settingsNavLanguage,
             binding.settingsNavAbout,
             binding.settingsNavCapture
         )
-        rows.forEach { it.isSelected = it === selectedRow }
+        val accentColor = AccentManager.getAccentColor(this)
+        rows.forEach { row ->
+            row.isSelected = row === selectedRow
+            // Apply dynamic accent color to selected row background
+            if (row === selectedRow) {
+                row.background = createSelectedNavBackground(accentColor)
+            } else {
+                row.background = createDefaultNavBackground()
+            }
+        }
+    }
+
+    /** Creates a background drawable for the selected navigation row (left accent bar). */
+    private fun createSelectedNavBackground(accentColor: Int): android.graphics.drawable.LayerDrawable {
+        val accentBar = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(accentColor)
+        }
+        val transparent = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(android.graphics.Color.TRANSPARENT)
+        }
+        val layerDrawable = android.graphics.drawable.LayerDrawable(arrayOf(transparent, accentBar))
+        // Inset the accent bar to be a 3dp wide bar on the left
+        layerDrawable.setLayerInset(1, 0, 0, 0, 0)
+        return layerDrawable
+    }
+
+    /** Creates a default transparent background for non-selected navigation rows. */
+    private fun createDefaultNavBackground(): GradientDrawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(android.graphics.Color.TRANSPARENT)
+        }
+    }
+
+    /** Applies the dynamic accent color to all Switch widgets in the settings. */
+    private fun applyDynamicAccentToSwitches() {
+        val accentColor = AccentManager.getAccentColor(this)
+        val switches = listOf(
+            binding.settingsRaEnabledSwitch,
+            binding.settingsGdriveEnabled,
+            binding.settingsGdriveSaves,
+            binding.settingsGdriveImages,
+            binding.settingsGdriveVideos,
+            binding.settingsGdriveAuto,
+            binding.settingsCloudsyncEnabled,
+            binding.settingsCloudsyncWifi,
+            binding.settingsCloudsyncNotify
+        )
+        switches.forEach { switch ->
+            // Create dynamic thumb and track color state lists
+            val thumbStateList = android.content.res.ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf()
+                ),
+                intArrayOf(accentColor, ContextCompat.getColor(this, R.color.switch_text_primary))
+            )
+            val trackStateList = android.content.res.ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_checked),
+                    intArrayOf()
+                ),
+                intArrayOf(accentColor, ContextCompat.getColor(this, R.color.switch_text_secondary))
+            )
+            switch.thumbTintList = thumbStateList
+            switch.trackTintList = trackStateList
+        }
     }
 
     private fun installPortraitNavigationDrawer() {
@@ -294,6 +401,10 @@ class SettingsActivity : AppCompatActivity() {
             binding.settingsRaLogin,
             binding.settingsRaLogout,
             binding.settingsCoreButton,
+            binding.settingsGdriveConnect,
+            binding.settingsGdriveBackupNow,
+            binding.settingsGdriveView,
+            binding.settingsGdriveFrequency,
             binding.settingsLanguageButton,
             binding.settingsAboutRepo,
             binding.settingsAboutCatalog
@@ -383,6 +494,294 @@ class SettingsActivity : AppCompatActivity() {
             .positiveButton(getString(android.R.string.ok))
             .show()
     }
+
+    // ---- Google Drive cloud backup section ----
+
+    private fun setupGdriveSection() {
+        binding.settingsGdriveEnabled.isChecked = CorePrefs.getGdriveEnabled(this)
+        binding.settingsGdriveEnabled.setOnCheckedChangeListener { _, checked ->
+            CorePrefs.setGdriveEnabled(this, checked)
+            updateGdriveEnabledUi()
+        }
+        binding.settingsGdriveSaves.isChecked = CorePrefs.getGdriveBackupSaves(this)
+        binding.settingsGdriveSaves.setOnCheckedChangeListener { _, c ->
+            CorePrefs.setGdriveBackupSaves(this, c)
+        }
+        binding.settingsGdriveImages.isChecked = CorePrefs.getGdriveBackupImages(this)
+        binding.settingsGdriveImages.setOnCheckedChangeListener { _, c ->
+            CorePrefs.setGdriveBackupImages(this, c)
+        }
+        binding.settingsGdriveVideos.isChecked = CorePrefs.getGdriveBackupVideos(this)
+        binding.settingsGdriveVideos.setOnCheckedChangeListener { _, c ->
+            CorePrefs.setGdriveBackupVideos(this, c)
+        }
+        binding.settingsGdriveAuto.isChecked = CorePrefs.getGdriveAutoBackup(this)
+        binding.settingsGdriveAuto.setOnCheckedChangeListener { _, c ->
+            CorePrefs.setGdriveAutoBackup(this, c)
+        }
+
+        binding.settingsGdriveConnect.setOnClickListener {
+            sfx?.select()
+            val intent = GoogleDriveAuth.accountPickerIntent()
+            if (intent != null) {
+                pickDriveAccountLauncher.launch(intent)
+            } else {
+                showGdriveDialog(getString(R.string.gdrive_need_account))
+            }
+        }
+        binding.settingsGdriveBackupNow.setOnClickListener { startManualDriveBackup() }
+        binding.settingsGdriveView.setOnClickListener { viewDriveBackups() }
+        binding.settingsGdriveFrequency.setOnClickListener {
+            sfx?.select()
+            showFrequencyDialog()
+        }
+
+        updateGdriveAccountUi()
+        updateGdriveStatus()
+        updateGdriveEnabledUi()
+        updateGdriveFrequencyUi()
+    }
+
+    /** Enable/disable the dependent controls based on the master switch. */
+    private fun updateGdriveEnabledUi() {
+        val enabled = CorePrefs.getGdriveEnabled(this)
+        binding.settingsGdriveGroup.isEnabled = enabled
+        for (i in 0 until binding.settingsGdriveGroup.childCount) {
+            binding.settingsGdriveGroup.getChildAt(i).isEnabled = enabled
+        }
+    }
+
+    /** Reflect the connected account name (or the "none" hint) in the status. */
+    private fun updateGdriveAccountUi() {
+        val name = CorePrefs.getGdriveAccountName(this)
+        binding.settingsGdriveAccount.text = if (name != null) {
+            getString(R.string.gdrive_connected, name)
+        } else {
+            getString(R.string.gdrive_not_connected)
+        }
+    }
+
+    /** Show the last successful backup time, or "Nunca" when never run. */
+    private fun updateGdriveStatus() {
+        val last = CorePrefs.getGdriveLastBackup(this)
+        binding.settingsGdriveStatus.text = if (last > 0) {
+            getString(R.string.gdrive_last_backup, formatBackupDate(last))
+        } else {
+            getString(R.string.gdrive_last_backup_never)
+        }
+    }
+
+    private fun updateGdriveFrequencyUi() {
+        binding.settingsGdriveFrequency.text = frequencyLabel(
+            CorePrefs.getGdriveBackupFrequency(this)
+        )
+    }
+
+    private fun frequencyLabel(value: String): String = when (value) {
+        CorePrefs.GDRIVE_FREQ_WEEKLY -> getString(R.string.gdrive_frequency_weekly)
+        CorePrefs.GDRIVE_FREQ_MANUAL -> getString(R.string.gdrive_frequency_manual)
+        else -> getString(R.string.gdrive_frequency_daily)
+    }
+
+    /** "Back up now": runs the same orchestrator as the periodic worker, inline,
+     *  so the progress bar can reflect real upload progress. */
+    private fun startManualDriveBackup() {
+        sfx?.select()
+        if (!CorePrefs.getGdriveEnabled(this)) {
+            showGdriveDialog(getString(R.string.gdrive_need_enable))
+            return
+        }
+        val accountName = CorePrefs.getGdriveAccountName(this)
+        if (accountName == null) {
+            showGdriveDialog(getString(R.string.gdrive_need_account))
+            return
+        }
+        val categories = gdriveCategories()
+        if (categories.isEmpty()) {
+            showGdriveDialog(getString(R.string.gdrive_backup_none))
+            return
+        }
+        val storage = Storage.getInstance(this)
+        val hackIds = InstalledLibrary.entries(this).map { it.id }
+        val since = CorePrefs.getGdriveLastBackup(this)
+
+        binding.settingsGdriveProgress.visibility = View.VISIBLE
+        binding.settingsGdriveProgress.isIndeterminate = true
+        binding.settingsGdriveBackupNow.isEnabled = false
+        binding.settingsGdriveView.isEnabled = false
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val summary = try {
+                GoogleDriveBackup.run(
+                    context = this@SettingsActivity,
+                    accountName = accountName,
+                    saveDir = File(storage.storagePath),
+                    galleryDir = storage.galleryDir(),
+                    hackIds = hackIds,
+                    categories = categories,
+                    sinceMillis = since,
+                    onItemProgress = { done, total ->
+                        runOnUiThread {
+                            binding.settingsGdriveProgress.isIndeterminate = false
+                            binding.settingsGdriveProgress.max = total.coerceAtLeast(1)
+                            binding.settingsGdriveProgress.progress = done
+                        }
+                    }
+                )
+            } catch (e: UserRecoverableAuthException) {
+                runOnUiThread { driveConsentLauncher.launch(e.intent) }
+                null
+            } catch (e: Exception) {
+                runOnUiThread {
+                    showGdriveDialog(getString(R.string.gdrive_backup_failed, e.message ?: "error"))
+                }
+                null
+            }
+            withContext(Dispatchers.Main) {
+                binding.settingsGdriveProgress.visibility = View.GONE
+                binding.settingsGdriveBackupNow.isEnabled = true
+                binding.settingsGdriveView.isEnabled = true
+                if (summary != null) {
+                    CorePrefs.setGdriveLastBackup(this@SettingsActivity, System.currentTimeMillis())
+                    updateGdriveStatus()
+                    val msg = if (summary.uploaded == 0 && summary.deleted == 0) {
+                        getString(R.string.gdrive_backup_none)
+                    } else {
+                        getString(R.string.gdrive_backup_summary, summary.uploaded)
+                    }
+                    showGdriveDialog(msg)
+                }
+            }
+        }
+    }
+
+    /** Open the app backup folder in the Drive app / browser. */
+    private fun viewDriveBackups() {
+        sfx?.select()
+        val accountName = CorePrefs.getGdriveAccountName(this)
+        if (accountName == null) {
+            showGdriveDialog(getString(R.string.gdrive_need_account))
+            return
+        }
+        val service = GoogleDriveBackup.buildService(this, accountName)
+        if (service == null) {
+            showGdriveDialog(getString(R.string.gdrive_need_account))
+            return
+        }
+        binding.settingsGdriveProgress.visibility = View.VISIBLE
+        binding.settingsGdriveProgress.isIndeterminate = true
+        lifecycleScope.launch(Dispatchers.IO) {
+            val link = try {
+                val id = service.ensureAppFolder { folderId ->
+                    CorePrefs.setGdriveFolderId(this@SettingsActivity, folderId)
+                }
+                service.folderLink(id)
+            } catch (e: UserRecoverableAuthException) {
+                runOnUiThread { driveConsentLauncher.launch(e.intent) }
+                null
+            } catch (e: Exception) {
+                runOnUiThread { showGdriveDialog(getString(R.string.gdrive_open_failed)) }
+                null
+            }
+            withContext(Dispatchers.Main) {
+                binding.settingsGdriveProgress.visibility = View.GONE
+                if (link != null) {
+                    try {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(link)))
+                    } catch (_: Exception) {
+                        showGdriveDialog(getString(R.string.gdrive_open_failed))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun gdriveCategories(): Set<BackupCategory> {
+        val set = mutableSetOf<BackupCategory>()
+        if (CorePrefs.getGdriveBackupSaves(this)) set.add(BackupCategory.SAVES)
+        if (CorePrefs.getGdriveBackupImages(this)) set.add(BackupCategory.IMAGES)
+        if (CorePrefs.getGdriveBackupVideos(this)) set.add(BackupCategory.VIDEOS)
+        return set
+    }
+
+    private fun showFrequencyDialog() {
+        val values = listOf(
+            CorePrefs.GDRIVE_FREQ_DAILY,
+            CorePrefs.GDRIVE_FREQ_WEEKLY,
+            CorePrefs.GDRIVE_FREQ_MANUAL
+        )
+        val labels = values.map { frequencyLabel(it) }
+        val current = values.indexOf(CorePrefs.getGdriveBackupFrequency(this)).coerceAtLeast(0)
+        SwitchDialog(this)
+            .title(getString(R.string.gdrive_frequency))
+            .singleChoice(labels, current) { which ->
+                CorePrefs.setGdriveBackupFrequency(this, values[which])
+                updateGdriveFrequencyUi()
+            }
+            .negativeButton(getString(android.R.string.cancel))
+            .show()
+    }
+
+    private fun showGdriveDialog(message: String) {
+        SwitchDialog(this)
+            .title(getString(R.string.gdrive_subtitle))
+            .message(message)
+            .positiveButton(getString(android.R.string.ok))
+            .show()
+    }
+
+    // ---- Cloud Sync (automatic, per-save) section ----
+
+    private fun setupCloudSyncSection() {
+        binding.settingsCloudsyncEnabled.isChecked = CorePrefs.getCloudSyncEnabled(this)
+        binding.settingsCloudsyncEnabled.setOnCheckedChangeListener { _, checked ->
+            CorePrefs.setCloudSyncEnabled(this, checked)
+            updateCloudSyncStatus()
+        }
+        binding.settingsCloudsyncWifi.isChecked = CorePrefs.getCloudSyncWifiOnly(this)
+        binding.settingsCloudsyncWifi.setOnCheckedChangeListener { _, checked ->
+            CorePrefs.setCloudSyncWifiOnly(this, checked)
+        }
+        binding.settingsCloudsyncNotify.isChecked = CorePrefs.getCloudSyncNotifications(this)
+        binding.settingsCloudsyncNotify.setOnCheckedChangeListener { _, checked ->
+            CorePrefs.setCloudSyncNotifications(this, checked)
+        }
+
+        binding.settingsCloudsyncViewConflicts.setOnClickListener {
+            sfx?.select()
+            startActivity(Intent(this, ConflictResolveActivity::class.java))
+        }
+
+        updateCloudSyncStatus()
+    }
+
+    /** Reflect sync state: master switch, connected account, last sync time and
+     *  pending conflict count. Also toggles the "view conflicts" button. */
+    private fun updateCloudSyncStatus() {
+        val enabled = CorePrefs.getCloudSyncEnabled(this)
+        val account = CorePrefs.getGdriveAccountName(this)
+        val conflicts = ConflictStore(this).count()
+
+        binding.settingsCloudsyncViewConflicts.isEnabled = conflicts > 0
+
+        val text = when {
+            !enabled -> getString(R.string.cloudsync_status_disabled)
+            account == null -> getString(R.string.cloudsync_status_no_account)
+            conflicts > 0 -> getString(R.string.cloudsync_conflicts_count, conflicts)
+            else -> {
+                val last = CorePrefs.getCloudSyncLastSync(this)
+                if (last > 0) {
+                    getString(R.string.cloudsync_status_last, formatBackupDate(last))
+                } else {
+                    getString(R.string.cloudsync_status_never)
+                }
+            }
+        }
+        binding.settingsCloudsyncStatus.text = text
+    }
+
+    private fun formatBackupDate(epoch: Long): String =
+        SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US).format(Date(epoch))
 
     private fun setupImportSection() {
         binding.settingsImportButton.setOnClickListener {
@@ -652,19 +1051,6 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsAboutCatalog.setOnClickListener {
             sfx?.select()
             openLink(CatalogFetcher.DEFAULT_CATALOG_URL)
-        }
-    }
-
-    /**
-     * Captura section: a single toggle controlling whether screen recordings
-     * include the on-screen control overlays. Screenshots always capture both
-     * variants regardless of this setting. Persisted via [CapturePreferences].
-     */
-    private fun setupCaptureSection() {
-        binding.settingsCaptureIncludeOverlaySwitch.isChecked =
-            CapturePreferences.getIncludeOverlay(this)
-        binding.settingsCaptureIncludeOverlaySwitch.setOnCheckedChangeListener { _, checked ->
-            CapturePreferences.setIncludeOverlay(this, checked)
         }
     }
 

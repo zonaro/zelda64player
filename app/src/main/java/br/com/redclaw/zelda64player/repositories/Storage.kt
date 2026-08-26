@@ -42,15 +42,12 @@ class Storage(context: Context) {
     fun galleryDir(): File = File(storagePath, "gallery").apply { mkdirs() }
 
     /**
-     * Path of a screenshot PNG for [hackId] taken at [timestamp]. [withOverlay]
-     * selects the "overlay" (controls drawn) or "clean" (game only) variant; the
-     * two are always produced together by [br.com.redclaw.zelda64player.capture.CaptureManager].
+     * Path of an emulator-only screenshot PNG for [hackId] taken at [timestamp].
+     * The capture is read directly from GLRetroView's framebuffer, therefore it
+     * never contains Android controls or HUD overlays.
      */
-    fun screenshotFile(hackId: String, timestamp: Long, withOverlay: Boolean): File =
-        File(
-            galleryDir(),
-            "screenshot_${hackId}_${timestamp}_${if (withOverlay) "overlay" else "clean"}.png"
-        )
+    fun screenshotFile(hackId: String, timestamp: Long): File =
+        File(galleryDir(), "screenshot_${hackId}_${timestamp}.png")
 
     /** Path of a screen-recording MP4 for [hackId] taken at [timestamp]. */
     fun recordingFile(hackId: String, timestamp: Long): File =

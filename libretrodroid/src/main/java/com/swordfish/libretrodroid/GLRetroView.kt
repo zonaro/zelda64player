@@ -19,8 +19,10 @@ package com.swordfish.libretrodroid
 
 import android.app.ActivityManager
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.PointF
 import android.graphics.RectF
+import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.util.Log
 import android.view.InputDevice
@@ -35,8 +37,11 @@ import androidx.lifecycle.coroutineScope
 import com.swordfish.libretrodroid.KtUtils.awaitUninterruptibly
 import com.swordfish.libretrodroid.gamepad.GamepadsManager
 import java.util.*
+import java.nio.ByteBuffer
 import java.util.concurrent.CountDownLatch
 import javax.microedition.khronos.egl.EGLConfig
+import javax.microedition.khronos.egl.EGL10
+import javax.microedition.khronos.egl.EGLDisplay
 import javax.microedition.khronos.opengles.GL10
 import kotlin.properties.Delegates
 import kotlinx.coroutines.GlobalScope
@@ -72,6 +77,7 @@ class GLRetroView(
     private var isGameLoaded = false
     private var isEmulationReady = false
     private var isAborted = false
+    private var videoRecorder: EglVideoRecorder? = null
 
     private val retroGLEventsSubject = MutableSharedFlow<GLRetroEvents>(1)
     private val retroGLIssuesErrors = MutableSharedFlow<Int>(1)
@@ -84,8 +90,48 @@ class GLRetroView(
         openGLESVersion = getGLESVersion(context)
         preserveEGLContextOnPause = true
         setEGLContextClientVersion(openGLESVersion)
+        setEGLConfigChooser(RecordableEglConfigChooser())
         setRenderer(Renderer())
         keepScreenOn = true
+    }
+
+    /**
+     * Start encoding only this GL view's emulator framebuffer to [outputFile].
+     * No MediaProjection or screen-capture permission is involved.
+     */
+    fun startVideoRecording(outputFile: java.io.File, onResult: (Boolean) -> Unit) {
+        queueEvent {
+            val recorder = EglVideoRecorder()
+            val started = recorder.start(outputFile, width, height)
+            if (started) {
+                videoRecorder?.stop()
+                videoRecorder = recorder
+            }
+            KtUtils.runOnUIThread { onResult(started) }
+        }
+    }
+
+    /** Stop the emulator-only recording, if one is active. */
+    fun stopVideoRecording(onStopped: (() -> Unit)? = null) {
+        queueEvent {
+            videoRecorder?.stop()
+            videoRecorder = null
+            onStopped?.let { KtUtils.runOnUIThread(it) }
+        }
+    }
+
+    /**
+     * Capture the emulator's current GL framebuffer as a PNG-ready bitmap.
+     *
+     * This runs on the GL thread and reads only this view's framebuffer. It
+     * never traverses the Android window, so gamepad controls, HUD overlays and
+     * every other application surface are excluded just like video recording.
+     */
+    fun captureScreenshot(onResult: (Bitmap?) -> Unit) {
+        queueEvent {
+            val bitmap = captureCurrentFramebuffer()
+            KtUtils.runOnUIThread { onResult(bitmap) }
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -111,11 +157,51 @@ class GLRetroView(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() = catchExceptions {
+        videoRecorder?.stop()
+        videoRecorder = null
         LibretroDroid.destroy()
         lifecycle = null
     }
 
     private fun getDeviceLanguage() = Locale.getDefault().language
+
+    /** Called only from GLSurfaceView's GL thread while its display surface is current. */
+    private fun captureCurrentFramebuffer(): Bitmap? = runCatching {
+        val frameWidth = width
+        val frameHeight = height
+        require(frameWidth > 0 && frameHeight > 0) { "GL surface is not laid out" }
+
+        val byteCount = Math.multiplyExact(Math.multiplyExact(frameWidth, frameHeight), 4)
+        val rgba = ByteBuffer.allocateDirect(byteCount)
+        GLES30.glPixelStorei(GLES30.GL_PACK_ALIGNMENT, 1)
+        GLES30.glReadPixels(
+            0, 0, frameWidth, frameHeight,
+            GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, rgba
+        )
+        check(GLES30.glGetError() == GLES30.GL_NO_ERROR) { "glReadPixels failed" }
+
+        rgba.rewind()
+        val bytes = ByteArray(byteCount)
+        rgba.get(bytes)
+        val pixels = IntArray(frameWidth * frameHeight)
+        for (y in 0 until frameHeight) {
+            // OpenGL's origin is bottom-left; Android Bitmap's is top-left.
+            var source = (frameHeight - 1 - y) * frameWidth * 4
+            var destination = y * frameWidth
+            repeat(frameWidth) {
+                val red = bytes[source].toInt() and 0xff
+                val green = bytes[source + 1].toInt() and 0xff
+                val blue = bytes[source + 2].toInt() and 0xff
+                val alpha = bytes[source + 3].toInt() and 0xff
+                pixels[destination++] =
+                    (alpha shl 24) or (red shl 16) or (green shl 8) or blue
+                source += 4
+            }
+        }
+        Bitmap.createBitmap(pixels, frameWidth, frameHeight, Bitmap.Config.ARGB_8888)
+    }.onFailure { error ->
+        Log.w(TAG_LOG, "Unable to capture emulator framebuffer", error)
+    }.getOrNull()
 
     private fun getDefaultRefreshRate(): Float {
         return (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.refreshRate
@@ -327,6 +413,7 @@ class GLRetroView(
         override fun onDrawFrame(gl: GL10) = catchExceptions {
             if (isEmulationReady) {
                 LibretroDroid.step(this@GLRetroView)
+                videoRecorder?.recordFrame(width, height)
                 lifecycle?.coroutineScope?.launch {
                     retroGLEventsSubject.emit(GLRetroEvents.FrameRendered)
                 }
@@ -503,6 +590,38 @@ class GLRetroView(
     private fun refreshAspectRatio() {
         runOnEmulationThread(true) {
             LibretroDroid.refreshAspectRatio()
+        }
+    }
+
+    /**
+     * Selects a normal RGBA window configuration that is also recordable by a
+     * video encoder. Keeping the display and encoder surfaces on the same EGL
+     * config lets [EglVideoRecorder] share this view's GL context safely.
+     */
+    private class RecordableEglConfigChooser : GLSurfaceView.EGLConfigChooser {
+        override fun chooseConfig(egl: EGL10, display: EGLDisplay): EGLConfig {
+            val attributes = intArrayOf(
+                EGL10.EGL_RED_SIZE, 8,
+                EGL10.EGL_GREEN_SIZE, 8,
+                EGL10.EGL_BLUE_SIZE, 8,
+                EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                EGL_RECORDABLE_ANDROID, 1,
+                EGL10.EGL_NONE
+            )
+            val count = IntArray(1)
+            check(egl.eglChooseConfig(display, attributes, null, 0, count) && count[0] > 0) {
+                "No recordable EGL configuration available"
+            }
+            val configs = arrayOfNulls<EGLConfig>(count[0])
+            check(egl.eglChooseConfig(display, attributes, configs, configs.size, count)) {
+                "Unable to choose a recordable EGL configuration"
+            }
+            return configs.firstOrNull() ?: error("No recordable EGL configuration returned")
+        }
+
+        private companion object {
+            private const val EGL_OPENGL_ES2_BIT = 4
+            private const val EGL_RECORDABLE_ANDROID = 0x3142
         }
     }
 

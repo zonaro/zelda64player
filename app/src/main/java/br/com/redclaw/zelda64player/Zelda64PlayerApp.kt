@@ -8,6 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import br.com.redclaw.zelda64player.repositories.Storage
+import br.com.redclaw.zelda64player.drive.GoogleDriveBackupWorker
 import br.com.redclaw.zelda64player.store.DownloadQueueManager
 import br.com.redclaw.zelda64player.retroachievements.api.RaHttpClient
 import br.com.redclaw.zelda64player.retroachievements.api.RaUserAgent
@@ -23,6 +24,7 @@ import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.ui.switchui.SfxManager
 import br.com.redclaw.zelda64player.ui.switchui.ThemeManager
 import br.com.redclaw.zelda64player.utils.LanguageManager
+import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.views.InstalledLibrary
 import br.com.redclaw.zelda64player.work.CatalogRefreshWorker
 import java.io.File
@@ -53,6 +55,7 @@ import java.util.concurrent.TimeUnit
         // builds into the durable external-files store (idempotent, safe).
         Storage.getInstance(this).migrateLegacyRoms()
         scheduleCatalogRefresh()
+        scheduleDriveBackup()
         syncGameShortcuts()
         logRcheevosVersion()
     }
@@ -94,6 +97,42 @@ import java.util.concurrent.TimeUnit
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             CatalogRefreshWorker.WORK_NAME,
             ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
+    }
+
+    /**
+     * Schedule the periodic Google Drive backup when the user enabled it, turned
+     * on automatic backup, and connected an account. The repeat interval follows
+     * the chosen frequency (daily or weekly); "manual" disables scheduling. The
+     * work is unique (UPDATE policy) so changing the frequency replaces the
+     * existing request instead of stacking duplicates.
+     */
+    private fun scheduleDriveBackup() {
+        val enabled = CorePrefs.getGdriveEnabled(this)
+        val auto = CorePrefs.getGdriveAutoBackup(this)
+        val account = CorePrefs.getGdriveAccountName(this)
+        if (!enabled || !auto || account == null) return
+
+        // "Manual" frequency means the user triggers backups themselves; no
+        // periodic work is enqueued.
+        val frequency = CorePrefs.getGdriveBackupFrequency(this)
+        if (frequency == CorePrefs.GDRIVE_FREQ_MANUAL) return
+
+        val (interval, unit) = when (frequency) {
+            CorePrefs.GDRIVE_FREQ_WEEKLY -> 7L to TimeUnit.DAYS
+            else -> 1L to TimeUnit.DAYS
+        }
+        val request = PeriodicWorkRequestBuilder<GoogleDriveBackupWorker>(interval, unit)
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            GoogleDriveBackupWorker.WORK_NAME,
+            ExistingPeriodicWorkPolicy.UPDATE,
             request
         )
     }

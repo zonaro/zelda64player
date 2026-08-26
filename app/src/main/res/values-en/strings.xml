@@ -31,6 +31,8 @@
     <string name="badge_rb">RB</string>
     <string name="badge_l3">L3</string>
     <string name="badge_r3">R3</string>
+    <string name="badge_lt">LT</string>
+    <string name="badge_rt">RT</string>
     <string name="badge_x">X</string>
     <string name="badge_y">Y</string>
 
@@ -82,6 +84,7 @@
     <string name="store_cat_all">All</string>
     <string name="store_cat_installed">Installed</string>
     <string name="store_cat_updates">Updates</string>
+    <string name="store_cat_not_installed">Not Installed</string>
     <string name="store_cat_oot">Ocarina of Time</string>
     <string name="store_cat_mm">Majora\'s Mask</string>
     <string name="store_search_icon_desc">Search</string>
@@ -113,6 +116,20 @@
     <string name="detail_error_generic">Failed to download the patch.</string>
     <string name="detail_patching">Applying patch…</string>
     <string name="detail_installed_toast">Patch installed. Available in Library.</string>
+
+    <!-- Store: multi-store + detail enhancements -->
+    <string name="store_selector_desc">Select store</string>
+    <string name="store_selector_hylian">Hylian Modding</string>
+    <string name="store_selector_picks">Zelda 64 Picks</string>
+    <string name="store_source_error">Could not load this store.</string>
+    <string name="detail_screenshots">Screenshots</string>
+    <string name="detail_videos">Videos</string>
+    <string name="detail_open_browser">Open in browser</string>
+    <string name="detail_resolving">Resolving download...</string>
+    <string name="detail_supported_game">Supported game</string>
+    <string name="detail_completion">Status</string>
+    <string name="detail_changelog">Changelog</string>
+    <string name="detail_external_notice">This mod must be downloaded from its source.</string>
 
     <!-- Download queue (Hack Store) -->
     <string name="store_downloads">Downloads</string>
@@ -275,6 +292,61 @@
     <string name="backup_import_summary">Restored: %1$d hacks, %2$d files. Skipped: %3$d.</string>
     <string name="backup_error_stream">Could not open the file.</string>
 
+    <!-- Settings: Google Drive cloud backup -->
+    <string name="gdrive_subtitle">Cloud backup (Google Drive)</string>
+    <string name="gdrive_enable">Enable Google Drive backup</string>
+    <string name="gdrive_connect">Connect Google account</string>
+    <string name="gdrive_connected">Account: %1$s</string>
+    <string name="gdrive_not_connected">No account connected</string>
+    <string name="gdrive_backup_saves">Saves (SRAM and states)</string>
+    <string name="gdrive_backup_images">Images (screenshots)</string>
+    <string name="gdrive_backup_videos">Videos (recordings)</string>
+    <string name="gdrive_auto">Automatic backup</string>
+    <string name="gdrive_frequency">Frequency</string>
+    <string name="gdrive_frequency_daily">Daily</string>
+    <string name="gdrive_frequency_weekly">Weekly</string>
+    <string name="gdrive_frequency_manual">Manual</string>
+    <string name="gdrive_backup_now">Back up now</string>
+    <string name="gdrive_view">View backups in Drive</string>
+    <string name="gdrive_last_backup">Last backup: %1$s</string>
+    <string name="gdrive_last_backup_never">Never</string>
+    <string name="gdrive_backup_summary">Backup complete: %1$d file(s) uploaded.</string>
+    <string name="gdrive_backup_none">No new files to back up.</string>
+    <string name="gdrive_backup_failed">Backup failed: %1$s</string>
+    <string name="gdrive_need_account">Connect a Google account first.</string>
+    <string name="gdrive_need_enable">Enable Google Drive backup first.</string>
+    <string name="gdrive_consent_required">You must authorize Google Drive access.</string>
+    <string name="gdrive_open_failed">Could not open Google Drive.</string>
+
+    <!-- Cloud Sync (automatic, per-save) -->
+    <string name="cloudsync_title">Cloud Sync</string>
+    <string name="cloudsync_description">Automatically syncs SRAM and save states on every local change via Google Drive.</string>
+    <string name="cloudsync_enable">Sync saves automatically</string>
+    <string name="cloudsync_wifi_only">Wi-Fi only</string>
+    <string name="cloudsync_notify">Notify on conflicts</string>
+    <string name="cloudsync_status_in_progress">Sync in progress...</string>
+    <string name="cloudsync_status_last">Last sync: %1$s</string>
+    <string name="cloudsync_status_never">Never synced</string>
+    <string name="cloudsync_status_no_account">Connect a Google account to sync</string>
+    <string name="cloudsync_status_disabled">Cloud sync disabled</string>
+    <string name="cloudsync_view_conflicts">View pending conflicts</string>
+    <string name="cloudsync_conflicts_count">Pending conflicts: %1$d</string>
+    <string name="cloudsync_conflict_title">Save conflict</string>
+    <string name="cloudsync_conflict_notify">Save conflict detected in %1$s. Tap to resolve.</string>
+    <string name="cloudsync_conflict_message">Conflict in %1$s (%2$s). Choose which version to keep:</string>
+    <string name="cloudsync_conflict_preview">Local: %1$s | %2$d bytes | CRC %3$s\nCloud: %4$s | %5$d bytes | CRC %6$s</string>
+    <string name="cloudsync_conflict_item">%1$s — %2$s</string>
+    <string name="cloudsync_keep_local">Keep LOCAL (my current save)</string>
+    <string name="cloudsync_keep_cloud">Keep CLOUD (save from other device)</string>
+    <string name="cloudsync_keep_both">Keep BOTH (rename local)</string>
+    <string name="cloudsync_pending_title">Pending conflicts</string>
+    <string name="cloudsync_no_conflicts">No pending conflicts.</string>
+    <string name="cloudsync_resolved">Conflict resolved.</string>
+    <string name="cloudsync_resolve_failed">Failed to resolve conflict.</string>
+    <string name="cloudsync_unknown_time">unknown</string>
+    <string name="cloudsync_channel_name">Save Sync</string>
+    <string name="cloudsync_channel_desc">Save sync conflict notifications</string>
+
     <!-- App shortcuts (installed games as launcher shortcuts) -->
     <string name="shortcut_add_to_home">Add to home screen</string>
     <string name="shortcut_long_label_play">Play %1$s</string>
@@ -358,7 +430,7 @@
     <string name="dock_store">Store</string>
     <string name="dock_achievements">RetroAchievements</string>
     <string name="dock_settings">Settings</string>
-    <string name="dock_gamepad_tester">Gamepad Tester</string>
+    <string name="dock_control">Control</string>
     <string name="footer_about">(i) About</string>
     <string name="footer_options">+ Options</string>
     <string name="footer_gamepad_disconnected">Gamepad disconnected</string>
@@ -481,15 +553,13 @@
     <string name="gallery_delete_confirm">Delete this capture? This cannot be undone.</string>
     <string name="gallery_view">View</string>
     <string name="gallery_record_badge">Video</string>
+    <string name="gallery_screenshot_badge">Image</string>
     <string name="gallery_overlay_badge">With Controls</string>
     <string name="settings_capture_category">Capture</string>
     <string name="settings_capture_description">Screenshots and gameplay recordings stay on the device only.</string>
-    <string name="settings_capture_include_overlay">Include controls in recording</string>
     <string name="capture_saved">Capture saved</string>
     <string name="capture_failed">Capture failed</string>
     <string name="recording_started">Recording started</string>
     <string name="recording_stopped">Recording stopped</string>
-    <string name="recording_permission_denied">Recording permission denied</string>
-    <string name="capture_overlay_hidden_hint">Controls hidden in recording</string>
     <string name="recording_label">REC</string>
 </resources>

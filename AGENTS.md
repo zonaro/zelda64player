@@ -242,12 +242,12 @@ br.com.redclaw.zelda64player
 | Agent | Role in This Project | Delegation Trigger |
 |-------|---------------------|-------------------|
 | **Coral** 🪸 | Chief Architect — owns `plano.md`, `AGENTS.md`, `.agents/`, architecture decisions | New project setup, major arch changes, team selection |
-| **Bruce** 🦈 | **Primary Implementer** — all Kotlin/Android code (Phases 0–4 + RetroAchievements B1–B5 + Switch UI Revamp) | All implementation tasks: patcher, store, settings, retroview, UI, retroachievements, Switch UI |
+| **Bruce** 🦈 | **Primary Implementer** — all Kotlin/Android code (Phases 0–4 + RetroAchievements B1–B5 + Switch UI Revamp + **Phase 5 Multi-Store**) | All implementation tasks: patcher, store, settings, retroview, UI, retroachievements, Switch UI, multi-store catalog |
 | **Dolfi** 🐬 | Icons/covers — generates SVG icons (app icon, hack category icons, RA trophy/leaderboard icons, Switch dock icons, focus assets) and PNG cover placeholders for hacks without `coverImageUrl`; Zelda-gold splash artwork; **Gallery/capture icons** (`ic_gallery`, `ic_screenshot`, `ic_record`, `ic_stop`) | When UI needs icons, cover art, or splash art |
 | **Wally** 🐋 | Documentation — finalizes `README.md`, translates `strings.xml` (pt-BR/en/es), writes code docs (KDoc) | After implementation phases, before release |
 | **Calamari** 🦑 | Fact-checking — validates known ROM checksums (No-Intro/Redump), verifies LibretroDroid/core versions, checks BPS spec details, validates OoT 1.0 checksums and N64 boot CRC algorithm, validates sound asset licensing | When Bruce needs verified data |
 | **Puffy** 🐡 | Research — up-to-date LibretroDroid releases, core buildbot URLs, Android API changes, Gradle plugin updates, Android TV focus handling, SoundPool latency | When Bruce needs current docs |
-| **Chululu** 🐙 | Visual QA — analyzes screenshots of Library/Store/Game/RetroAchievements UI for layout, alignment, accessibility; **Nintendo Switch UI compliance verification** | Before UI merges, release candidates |
+| **Chululu** 🐙 | Visual QA — analyzes screenshots of Library/Store/Game/RetroAchievements UI for layout, alignment, accessibility; **Nintendo Switch UI compliance verification** (including new store selector + detail dialog) | Before UI merges, release candidates |
 
 **Agents NOT involved**: InnerLinho (PHP), Fishie (Web frontend), Peep (Flutter), Snowflake (C#), Snuggle (Python), Nodi (Node.js), Ariel (Content), Tucso (Linux scripts).
 
@@ -257,13 +257,67 @@ br.com.redclaw.zelda64player
 
 | Task Type | Delegate To |
 |-----------|-------------|
-| Android/Kotlin implementation (all phases) | **Bruce** |
+| Android/Kotlin implementation (all phases + Phase 5 Multi-Store) | **Bruce** |
 | Architecture changes / plan updates | **Coral** |
 | App icon, hack category icons, cover placeholders, RA icons, Switch dock icons, splash art, **Gallery/capture icons** (`ic_gallery`, `ic_screenshot`, `ic_record`, `ic_stop`) | **Dolfi** |
 | README, strings translation, KDoc | **Wally** |
 | ROM checksum verification, core version check, rcheevos release validation, sound licensing | **Calamari** |
 | LibretroDroid/core/Android API research, rcheevos API docs, Android TV focus, SoundPool | **Puffy** |
-| UI screenshot analysis, Switch UI compliance | **Chululu** |
+| UI screenshot analysis, Switch UI compliance (including new store selector + detail dialog) | **Chululu** |
+
+---
+
+## Hylian Modding Catalog Format
+
+### Endpoints (Verified)
+| Source | Endpoint |
+|--------|----------|
+| Main Index | `GET https://hylianmodding.com/mods/index.json` → `{"mods": [slugs]}` |
+| Per-Mod | `GET https://hylianmodding.com/mods/{slug}/mod.json` |
+| Competition Index | `GET https://hylianmodding.com/competitions/{slug}/index.json` → `{"mods": [slugs]}` |
+| Competition Per-Mod | `GET https://hylianmodding.com/competitions/{slug}/{mod}/mod.json` |
+
+**Corrected Competition Slugs**: `2025-crossover`, `2024-horror`, `2023-escape-room`, `hm-jam-1`.
+
+### mod.json Schema (All Optional Except id/name)
+```json
+{
+  "id": "string",
+  "name": "string",
+  "authors": ["string"],
+  "description": "string",
+  "category": "string",
+  "supported_games": ["OoT" | "MM"],
+  "compatibility": "string",
+  "completion_status": "string",
+  "thumbnail_image": "relative/path.png",
+  "screenshots": ["relative/path1.png", "relative/path2.png", ""],
+  "download_link": "string",  // relative patch path, GitHub releases URL, or HTML URL
+  "last_updated": "ISO8601",
+  "is_update": true,
+  "timestamp": 1234567890,
+  "changelog": [{"date": "ISO8601", "content": "string"}]
+}
+```
+- **NO video field** — parser tolerant if added later.
+- Relative URLs resolve against `https://hylianmodding.com`.
+- `screenshots` may contain empty strings — filter them.
+
+---
+
+## Multi-Store Architecture
+
+- **StoreDefinition**: `id`, `displayName`, `sources: List<CatalogSourceMeta>`
+- **Built-in stores** (StoreDefinitions.kt):
+  - `picks` (Zelda 64 Picks): single PICKS source = `DEFAULT_CATALOG_URL`; `storeName` from catalog.json
+  - `hylianmodding` (Hylian Modding): 5 HYLIANMODDING sources (main + 4 competitions)
+- **Custom catalog URLs** merge into PICKS store (backward compat).
+- **CatalogParser interface**: `PicksCatalogParser` (existing + storeName, stamps `storeId="picks"`), `HylianModdingParser` (tolerant, `hm_` ID prefix, builds `DownloadTarget`).
+- **DownloadTarget sealed hierarchy**: `DirectPatch(PatchRef)` | `GitHubRelease(repoUrl)` | `ExternalLink(url)`.
+- **GitHubPatchResolver**: resolves at download time via GitHub Releases API; fallback to browser.
+- **MergedCatalogRepository** preserves `storeId` + `sourceCatalogId`; Store UI filters by selected store.
+- **HackLibraryEntry** gains `storeId` field.
+- **catalog.json** gets top-level `storeName: "Zelda 64 Picks"`.
 
 ---
 
@@ -277,6 +331,8 @@ br.com.redclaw.zelda64player
 - **N64 ROM Header**: https://n64brew.dev/wiki/ROM_Header
 - **LibretroDroid**: https://github.com/Swordfish90/LibretroDroid
 - **RadialGamePad**: https://github.com/Swordfish90/RadialGamePad
+- **Hylian Modding**: https://hylianmodding.com
+- **GitHub Releases API**: https://docs.github.com/en/rest/releases/releases
 
 ---
 

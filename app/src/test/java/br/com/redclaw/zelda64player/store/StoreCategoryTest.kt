@@ -13,6 +13,7 @@ class StoreCategoryTest {
                 R.string.store_cat_all,
                 R.string.store_cat_installed,
                 R.string.store_cat_updates,
+                R.string.store_cat_not_installed,
                 R.string.store_cat_oot,
                 R.string.store_cat_mm
             ),

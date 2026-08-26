@@ -1,6 +1,7 @@
 package br.com.redclaw.zelda64player.data.model
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Test
@@ -43,12 +44,13 @@ class LiveCatalogTest {
         val catalog = HackCatalog.parse(file.readText())
 
         catalog.hacks.forEach { entry ->
-            assertTrue("patch url must be https: ${entry.id}", entry.patch.url.startsWith("https://"))
-            assertTrue("patch filename required: ${entry.id}", entry.patch.filename.isNotBlank())
-            assertTrue("patch size must be positive: ${entry.id}", entry.patch.size > 0L)
+            assertNotNull("patch required: ${entry.id}", entry.patch)
+            assertTrue("patch url must be https: ${entry.id}", entry.patch!!.url.startsWith("https://"))
+            assertTrue("patch filename required: ${entry.id}", entry.patch!!.filename.isNotBlank())
+            assertTrue("patch size must be positive: ${entry.id}", entry.patch!!.size > 0L)
             assertTrue(
                 "patch crc32 required for download validation: ${entry.id}",
-                entry.patch.checksums.crc32.isNotBlank()
+                entry.patch!!.checksums.crc32.isNotBlank()
             )
             assertTrue("base rom crc32 required: ${entry.id}", entry.baseRom.checksums.crc32.isNotBlank())
             assertTrue("gameCode must be 4 chars: ${entry.id}", entry.baseRom.gameCode.length == 4)

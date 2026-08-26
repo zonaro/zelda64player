@@ -5,6 +5,7 @@ import br.com.redclaw.zelda64player.data.local.MergedCatalogRepository
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.settings.CatalogUrlStore
 import br.com.redclaw.zelda64player.settings.SharedPreferencesStore
+import br.com.redclaw.zelda64player.store.BuiltInStores
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -32,14 +33,20 @@ class CatalogRefresher(context: Context) {
     )
 
     /**
-     * Fetch, merge, and persist the catalog.
-     * @return the merged hack list on success, or a failure carrying the error.
+     * Fetch, merge, and persist the catalog across all built-in stores (Hylian
+     * Modding + Zelda 64 Picks) plus any user-added custom catalog URLs (merged
+     * into the PICKS store for backward compatibility). Each hack is tagged with
+     * its store/source so the Store UI can filter without re-fetching.
+     *
+     * @return the merged [CatalogFetchResult] (tagged hacks + per-source status)
+     *   on success, or a failure carrying the error.
      */
-    suspend fun refresh(): Result<List<HackEntry>> = withContext(Dispatchers.IO) {
-        val urls = listOf(CatalogFetcher.DEFAULT_CATALOG_URL) + catalogUrlStore.getUrls()
-        catalogFetcher.fetch(urls).mapCatching { fetchResult ->
+    suspend fun refresh(): Result<CatalogFetchResult> = withContext(Dispatchers.IO) {
+        val customUrls = catalogUrlStore.getUrls()
+        val sources = BuiltInStores.all(customUrls).flatMap { it.sources }
+        catalogFetcher.fetchCatalogs(sources).mapCatching { fetchResult ->
             mergedCatalogRepository.save(fetchResult.hacks)
-            fetchResult.hacks
+            fetchResult
         }
     }
 }

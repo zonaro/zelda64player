@@ -20,6 +20,7 @@ package br.com.redclaw.zelda64player.ui.switchui
 
 import android.content.Context
 import android.graphics.Rect
+import android.graphics.drawable.GradientDrawable
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -30,8 +31,10 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
+import androidx.core.content.ContextCompat
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 
 /**
  * Reusable Nintendo Switch-style modal dialog: a centered box on a scrim, with
@@ -138,6 +141,14 @@ class SwitchDialog(private val context: Context) {
         // After show, constrain the box width (window is MATCH_PARENT for the
         // scrim; the box itself is centered and width-bounded via its layout).
         sizeBox(view)
+
+        // Request focus on the first list item so D-pad navigation works immediately.
+        // This is essential for controller/DPad navigation in single-choice dialogs.
+        if (choiceItems.isNotEmpty()) {
+            view.findViewById<ViewGroup>(R.id.dialog_list)
+                .getChildAt(0)?.requestFocus()
+        }
+
         return this
     }
 
@@ -155,6 +166,7 @@ class SwitchDialog(private val context: Context) {
             val icon = view.findViewById<ImageView>(R.id.dialog_icon)
             iconRes?.let {
                 icon.setImageResource(it)
+                icon.setColorFilter(AccentManager.getAccentColor(context))
                 icon.visibility = View.VISIBLE
             }
         } else {
@@ -203,9 +215,12 @@ class SwitchDialog(private val context: Context) {
             return
         }
         buttonRow.visibility = View.VISIBLE
+        val accentColor = AccentManager.getAccentColor(context)
         if (hasPositive) {
             positive.visibility = View.VISIBLE
             positive.text = positiveText
+            // Apply dynamic accent color to button background
+            positive.background = createButtonBackground(context, accentColor)
             positive.setOnClickListener {
                 sfx?.select()
                 val action = positiveAction
@@ -218,6 +233,8 @@ class SwitchDialog(private val context: Context) {
         if (hasNegative) {
             negative.visibility = View.VISIBLE
             negative.text = negativeText
+            // Apply dynamic accent color to button background
+            negative.background = createButtonBackground(context, accentColor)
             negative.setOnClickListener {
                 sfx?.select()
                 val action = negativeAction
@@ -227,6 +244,15 @@ class SwitchDialog(private val context: Context) {
         } else {
             negative.visibility = View.GONE
         }
+    }
+
+    /** Creates a button background drawable with the dynamic accent color. */
+    private fun createButtonBackground(context: Context, accentColor: Int): GradientDrawable {
+        val drawable = GradientDrawable()
+        drawable.shape = GradientDrawable.RECTANGLE
+        drawable.setColor(accentColor)
+        drawable.setCornerRadius(4f)
+        return drawable
     }
 
     private fun sizeBox(view: View) {
@@ -243,7 +269,7 @@ class SwitchDialog(private val context: Context) {
         box.isClickable = true
     }
 
-    /** A focusable, clickable single-choice row with a cyan focus border. */
+    /** A focusable, clickable single-choice row with a dynamic accent focus border. */
     private class DialogRowView(
         context: Context,
         text: String,
@@ -257,8 +283,12 @@ class SwitchDialog(private val context: Context) {
             LayoutInflater.from(context)
                 .inflate(R.layout.switch_dialog_row, this, true)
             border = findViewById(R.id.dialog_row_border)
+            // Apply dynamic accent color to focus border
+            border.background = AccentManager.createFocusBorder(context)
             findViewById<TextView>(R.id.dialog_row_text).text = text
             val check = findViewById<ImageView>(R.id.dialog_row_check)
+            // Apply dynamic accent color to check mark
+            check.setColorFilter(AccentManager.getAccentColor(context))
             if (checked) {
                 border.visibility = View.VISIBLE
                 check.visibility = View.VISIBLE

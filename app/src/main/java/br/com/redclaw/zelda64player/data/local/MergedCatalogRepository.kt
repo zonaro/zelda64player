@@ -33,4 +33,8 @@ class MergedCatalogRepository(private val file: File) {
     }
 
     fun asMap(): Map<String, HackEntry> = load().associateBy { it.id }
+
+    /** All persisted hacks belonging to a given store id (e.g. "hylianmodding"). */
+    fun getByStore(storeId: String): List<HackEntry> =
+        load().filter { it.storeId == storeId }
 }

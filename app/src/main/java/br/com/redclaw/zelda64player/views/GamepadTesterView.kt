@@ -22,6 +22,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.input.N64ControllerMapping
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -53,7 +54,7 @@ class GamepadTesterView @JvmOverloads constructor(
     private val secondaryText = ContextCompat.getColor(context, R.color.switch_text_secondary)
     private val focusColor = ContextCompat.getColor(context, R.color.switch_accent_focus)
     private val amberColor = ContextCompat.getColor(context, R.color.switch_accent_amber)
-    private val analogColor = ContextCompat.getColor(context, R.color.switch_accent)
+    private val analogColor = AccentManager.getAccentColor(context)
 
     private var mode = Mode.PHYSICAL
     private var profile = N64ControllerMapping.currentProfile(context)

@@ -43,7 +43,8 @@ class CatalogBackedLibrarySource(
                 coverUrl = entry?.coverImageUrl,
                 badge = BadgeType.HACK,
                 family = familyFor(id),
-                isUserImported = id in userImportedIds
+                isUserImported = id in userImportedIds,
+                storeId = entry?.storeId
             )
         }
     }

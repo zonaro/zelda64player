@@ -23,8 +23,10 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 
 /**
  * Circular "Todos os Jogos" (All Games) card that terminates the Switch home row.
@@ -54,6 +56,10 @@ class SwitchAllGamesCard @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.switch_all_games_card, this, true)
         border = findViewById(R.id.border)
         glow = findViewById(R.id.circle_glow)
+        val icon = findViewById<ImageView>(R.id.icon)
+        // Apply dynamic accent color to round focus border and icon
+        border.background = AccentManager.createRoundFocusBorder(context)
+        icon.setColorFilter(AccentManager.getAccentColor(context))
         // Kill the default square elevation/ripple feedback; the round glow
         // overlay below is the only selection/hover indication.
         stateListAnimator = null

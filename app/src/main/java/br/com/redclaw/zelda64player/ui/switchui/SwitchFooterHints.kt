@@ -28,6 +28,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 
 /**
  * Footer hints bar for the Switch home screen. The left side shows a live
@@ -105,9 +106,15 @@ class SwitchFooterHints @JvmOverloads constructor(
         val tint = if (names.isEmpty()) {
             R.color.switch_text_secondary
         } else {
-            R.color.switch_accent
+            // Use dynamic accent color
+            0 // placeholder, will use AccentManager.getAccentColor below
         }
-        gamepadIcon.setColorFilter(context.getColor(tint))
+        val color = if (names.isEmpty()) {
+            context.getColor(R.color.switch_text_secondary)
+        } else {
+            AccentManager.getAccentColor(context)
+        }
+        gamepadIcon.setColorFilter(color)
     }
 
     fun setOnAbout(callback: () -> Unit) {

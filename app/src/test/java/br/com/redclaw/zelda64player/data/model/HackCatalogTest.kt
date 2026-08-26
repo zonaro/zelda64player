@@ -50,7 +50,7 @@ class HackCatalogTest {
         assertEquals("hack_a", catalog.hacks[0].id)
         // crc32 is normalized: 0x prefix stripped and lowercased.
         assertEquals("abcdef12", catalog.hacks[0].baseRom.checksums.crc32)
-        assertEquals("12345678", catalog.hacks[0].patch.checksums.crc32)
+        assertEquals("12345678", catalog.hacks[0].patch!!.checksums.crc32)
     }
 
     @Test

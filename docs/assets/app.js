@@ -23,7 +23,7 @@ const I18N = {
     "legal.title": "Aviso legal",
     "legal.text": "O Zelda 64 Player NUNCA distribui, baixa ou embute ROMs (Ocarina of Time, Majora's Mask). O app é licenciado sob GPL-3.0 e apenas aplica patches BPS a ROMs que VOCÊ fornece legalmente. Você deve ser dono de uma cópia legítima de Ocarina of Time ou Majora's Mask para usar este aplicativo.",
     "catalog.title": "Catálogo de Hacks",
-    "catalog.sub": "Hacks da loja (mesmo JSON usado pelo app)",
+    "catalog.sub": "Hacks da loja Zelda 64 Picks (mesmo JSON usado pelo app). O app também inclui a loja Hylian Modding com 100+ hacks.",
     "catalog.loading": "Carregando catálogo...",
     "catalog.error": "Não foi possível carregar o catálogo.",
     "catalog.retry": "Tentar novamente",
@@ -43,6 +43,8 @@ const I18N = {
     "footer.catalogCurrent": "Catálogo Atual",
     "f.store.title": "Loja de Hacks com catálogo JSON",
     "f.store.desc": "Navegue e instale hacks a partir de um catálogo JSON hospedado no GitHub, com atualização em segundo plano e cache no dispositivo.",
+    "f.multistore.title": "Loja multi-fonte: Hylian Modding + Zelda 64 Picks",
+    "f.multistore.desc": "Escolha entre duas lojas de hacks direto na barra superior: a Zelda 64 Picks (curada) e a Hylian Modding (100+ hacks da comunidade, com capas, screenshots e detalhes ricos). Nunca misturamos os catálogos.",
     "f.patch.title": "Patch BPS/IPS ao vivo com validação CRC32 tripla",
     "f.patch.desc": "Aplica patches BPS/IPS em memória/cache na hora de jogar, validando CRC32 da ROM base, do patch e da ROM final.",
     "f.byteorder.title": "Normalização de byte-order N64",
@@ -74,6 +76,7 @@ const I18N = {
     "f.capture.desc": "Faça screenshots e grave o gameplay em MP4 com ou sem os controles na tela, e veja tudo numa galeria estilo Switch.",
     "fPoints": {
       "store": ["Catálogo JSON hospedado no GitHub", "Atualização em segundo plano automática", "Cache local dos hacks no dispositivo"],
+      "multistore": ["Seletor de loja na barra superior", "Hylian Modding: 100+ hacks com capas e screenshots", "Zelda 64 Picks: catálogo curado em JSON"],
       "patch": ["Suporte a patches BPS e IPS", "Aplicação em memória/cache na hora de jogar", "Validação CRC32 tripla (base, patch, final)"],
       "byteorder": ["Conversão automática de byte-order", "Suporta .z64, .v64 e .n64", "Normaliza para big-endian .z64"],
       "checksum": ["Identifica a ROM base por checksum", "Usa CRC32, MD5 e SHA1 da cabecera", "Evita parchear a ROM errada"],
@@ -114,7 +117,7 @@ const I18N = {
     "legal.title": "Legal notice",
     "legal.text": "Zelda 64 Player NEVER distributes, downloads or bundles ROMs (Ocarina of Time, Majora's Mask). The app is licensed under GPL-3.0 and only applies BPS patches to ROMs YOU legally provide. You must own a legitimate copy of Ocarina of Time or Majora's Mask to use this app.",
     "catalog.title": "Hack Catalog",
-    "catalog.sub": "Store hacks (same JSON the app uses)",
+    "catalog.sub": "Hacks from the Zelda 64 Picks store (same JSON the app uses). The app also includes the Hylian Modding store with 100+ hacks.",
     "catalog.loading": "Loading catalog...",
     "catalog.error": "Could not load the catalog.",
     "catalog.retry": "Try again",
@@ -134,6 +137,8 @@ const I18N = {
     "footer.catalogCurrent": "Current Catalog",
     "f.store.title": "Hack Store with JSON catalog",
     "f.store.desc": "Browse and install hacks from a GitHub-hosted JSON catalog, with background refresh and on-device cache.",
+    "f.multistore.title": "Multi-store: Hylian Modding + Zelda 64 Picks",
+    "f.multistore.desc": "Pick between two hack stores right from the top bar: Zelda 64 Picks (curated) and Hylian Modding (100+ community hacks with covers, screenshots and rich details). Catalogs are never mixed.",
     "f.patch.title": "Live BPS/IPS patching with triple CRC32 validation",
     "f.patch.desc": "Applies BPS/IPS patches in memory/cache at launch, validating CRC32 of base ROM, patch and final ROM.",
     "f.byteorder.title": "N64 byte-order normalization",
@@ -164,6 +169,7 @@ const I18N = {
     "f.capture.desc": "Take screenshots and record gameplay to MP4 with or without on-screen controls, and browse everything in a Switch-style gallery.",
     "fPoints": {
       "store": ["GitHub-hosted JSON catalog", "Automatic background refresh", "On-device hack cache"],
+      "multistore": ["Store selector in the top bar", "Hylian Modding: 100+ hacks with covers and screenshots", "Zelda 64 Picks: curated JSON catalog"],
       "patch": ["BPS and IPS patch support", "Applied in memory/cache at launch", "Triple CRC32 validation (base, patch, final)"],
       "byteorder": ["Automatic byte-order conversion", "Supports .z64, .v64 and .n64", "Normalizes to big-endian .z64"],
       "checksum": ["Matches the correct base ROM by checksum", "Uses header CRC32, MD5 and SHA1", "Prevents patching the wrong ROM"],
@@ -204,7 +210,7 @@ const I18N = {
     "legal.title": "Aviso legal",
     "legal.text": "Zelda 64 Player NUNCA distribuye, descarga ni incluye ROMs (Ocarina of Time, Majora's Mask). La app es licencia GPL-3.0 y solo aplica parches BPS a las ROMs que TÚ aportas legalmente. Debes ser dueño de una copia legítima de Ocarina of Time o Majora's Mask para usar esta aplicación.",
     "catalog.title": "Catálogo de Hacks",
-    "catalog.sub": "Hacks de la tienda (mismo JSON que usa la app)",
+    "catalog.sub": "Hacks de la tienda Zelda 64 Picks (mismo JSON que usa la app). La app también incluye la tienda Hylian Modding con 100+ hacks.",
     "catalog.loading": "Cargando catálogo...",
     "catalog.error": "No se pudo cargar el catálogo.",
     "catalog.retry": "Reintentar",
@@ -224,6 +230,8 @@ const I18N = {
     "footer.catalogCurrent": "Catálogo Actual",
     "f.store.title": "Tienda de Hacks con catálogo JSON",
     "f.store.desc": "Explora e instala hacks desde un catálogo JSON en GitHub, con actualización en segundo plano y caché en el dispositivo.",
+    "f.multistore.title": "Multi-tienda: Hylian Modding + Zelda 64 Picks",
+    "f.multistore.desc": "Elige entre dos tiendas de hacks directo en la barra superior: Zelda 64 Picks (curada) y Hylian Modding (100+ hacks de la comunidad con portadas, capturas y detalles ricos). Nunca mezclamos los catálogos.",
     "f.patch.title": "Parcheo BPS/IPS en vivo con validación CRC32 triple",
     "f.patch.desc": "Aplica parches BPS/IPS en memoria/caché al iniciar, validando CRC32 de la ROM base, del parche y de la ROM final.",
     "f.byteorder.title": "Normalización de byte-order N64",
@@ -254,6 +262,7 @@ const I18N = {
     "f.capture.desc": "Haz capturas y graba gameplay en MP4 con o sin los controles en pantalla, y revisa todo en una galería estilo Switch.",
     "fPoints": {
       "store": ["Catálogo JSON alojado en GitHub", "Actualización en segundo plano automática", "Caché de hacks en el dispositivo"],
+      "multistore": ["Selector de tienda en la barra superior", "Hylian Modding: 100+ hacks con portadas y capturas", "Zelda 64 Picks: catálogo JSON curado"],
       "patch": ["Soporte de parches BPS e IPS", "Aplicados en memoria/caché al iniciar", "Validación CRC32 triple (base, parche, final)"],
       "byteorder": ["Conversión automática de byte-order", "Soporta .z64, .v64 y .n64", "Normaliza a big-endian .z64"],
       "checksum": ["Identifica la ROM base por checksum", "Usa CRC32, MD5 y SHA1 de la cabecera", "Evita parchear la ROM equivocada"],
@@ -279,14 +288,14 @@ const I18N = {
 };
 
 const FEATURE_KEYS = [
-  "store", "patch", "byteorder", "checksum",
+  "store", "multistore", "patch", "byteorder", "checksum",
   "ocarina", "ra", "profile", "switchui", "vanilla", "gamepad", "tester",
   "backup", "refresh", "i18n", "capture"
 ];
 
 const FEATURE_ICONS = {
   store: "a", patch: "b", byteorder: "c", checksum: "d", ocarina: "e", ra: "f", profile: "g", switchui: "h", vanilla: "i", gamepad: "j", tester: "k",
-  backup: "l", refresh: "m", i18n: "n", capture: "o"
+  backup: "l", refresh: "m", i18n: "n", capture: "o", multistore: "p"
 };
 
 const LIVE_CATALOG_URL = "https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/catalog.json";

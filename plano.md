@@ -469,6 +469,321 @@ Local: `filesDir/ra_metadata.json` (JSON array de `RaGameMetadata` keyed by hack
 - **N64 RDRAM mapping**: https://n64brew.dev/wiki/RDRAM (0x80000000–0x807FFFFF base, 8MB com expansion)
 - **RetroArch RA integration** (referência de implementação host): `retroarch/libretro-common/include/libretro.h` + `retroarch/retroachievements.c`
 
+---
+
+# Phase 5: Multi-Store Catalog & Hylian Modding Integration
+
+## Goal
+Add multi-store support to the Hack Store with two built-in stores: **Hylian Modding** (default) and **Zelda 64 Picks** (existing catalog.json). Catalogs must not mix in the view — a top-bar store selector switches between stores. Hylian Modding pulls rich hack data from hylianmodding.com with specific parsing rules for different download link types.
+
+## Store Model
+
+### StoreDefinition
+```kotlin
+data class StoreDefinition(
+    val id: String,                    // "picks" | "hylianmodding"
+    val displayName: String,           // "Zelda 64 Picks" | "Hylian Modding"
+    val sources: List<CatalogSourceMeta>
+)
+
+data class CatalogSourceMeta(
+    val id: String,                    // "main" | "picks" | "competition-2025-crossover" etc.
+    val type: CatalogSourceType,       // PICKS | HYLIANMODDING
+    val url: String,                   // Base URL for this source
+    val displayName: String            // "Main Index" | "2025 Crossover" etc.
+)
+
+enum class CatalogSourceType { PICKS, HYLIANMODDING }
+```
+
+### Built-in Stores (StoreDefinitions.kt)
+
+| Store | Type | Sources |
+|-------|------|---------|
+| **Zelda 64 Picks** | PICKS | Single source: `DEFAULT_CATALOG_URL` (https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/catalog.json), `storeName` from catalog.json (default "Zelda 64 Picks") |
+| **Hylian Modding** | HYLIANMODDING | 5 sources: main index + 4 competition indexes (see endpoints below) |
+
+### Custom Catalog URLs (CatalogUrlStore)
+- Backward compatible: custom URLs added via Settings merge into the **PICKS** store (single merged catalog for PICKS).
+- No new store created; just additional source in PICKS store.
+
+---
+
+## Hylian Modding Endpoints (Verified)
+
+| Source | Endpoint | Notes |
+|--------|----------|-------|
+| Main Index | `GET https://hylianmodding.com/mods/index.json` | Returns `{"mods": [slugs]}` |
+| Per-Mod | `GET https://hylianmodding.com/mods/{slug}/mod.json` | Full mod metadata |
+| Competition Index | `GET https://hylianmodding.com/competitions/{slug}/index.json` | Returns `{"mods": [slugs]}` |
+| Competition Per-Mod | `GET https://hylianmodding.com/competitions/{slug}/{mod}/mod.json` | Full mod metadata |
+
+**Corrected Competition Slugs** (verified):
+- `2025-crossover`
+- `2024-horror`
+- `2023-escape-room`
+- `hm-jam-1`
+
+**Relative URLs** in mod.json resolve against `https://hylianmodding.com`.
+
+---
+
+## mod.json Schema (All Optional Except id/name)
+
+```json
+{
+  "id": "string",
+  "name": "string",
+  "authors": ["string"],
+  "description": "string",
+  "category": "string",
+  "supported_games": ["OoT" | "MM"],
+  "compatibility": "string",
+  "completion_status": "string",
+  "thumbnail_image": "relative/path.png",
+  "screenshots": ["relative/path1.png", "relative/path2.png", ""],
+  "download_link": "string",  // relative patch path, GitHub releases URL, or HTML URL
+  "last_updated": "ISO8601",
+  "is_update": true,
+  "timestamp": 1234567890,
+  "changelog": [{"date": "ISO8601", "content": "string"}]
+}
+```
+- **NO video field exists** — be tolerant if added later (parse as optional `videos?: List<String>`).
+- `screenshots` may contain empty strings — filter them.
+- `download_link` determines `DownloadTarget` type (see below).
+
+---
+
+## Parsing Architecture
+
+### CatalogParser Interface
+```kotlin
+interface CatalogParser {
+    val sourceType: CatalogSourceType
+    suspend fun parseIndex(indexJson: String, baseUrl: String): List<String>  // returns slugs
+    suspend fun parseMod(modJson: String, baseUrl: String, sourceCatalogId: String): HackEntry
+}
+```
+
+### PicksCatalogParser (Existing Format + storeName)
+- Parses existing `HackCatalog` format (HackEntry, BaseRomRef, PatchRef, Checksums).
+- **New**: reads top-level `storeName` from catalog.json (default "Zelda 64 Picks").
+- Stamps `storeId = "picks"` on all produced `HackEntry`.
+- IDs remain bare slugs (no prefix).
+
+### HylianModdingParser
+- `parseIndex`: extracts slugs from `{"mods": [...]}`.
+- `parseMod`: tolerant parsing (all fields optional except id/name), resolves relative URLs against baseUrl, maps `supported_games` → generic OoT/MM `BaseRomRef` with **empty checksums** (matched at patch time via BPS source CRC).
+- Builds `DownloadTarget` from `download_link` (see sealed hierarchy below).
+- **Namespaces HM ids** with `hm_` prefix to avoid collision with PICKS bare-slug ids (e.g., `hm_ocarina-of-time-dx`).
+
+---
+
+## HackEntry Extensions
+
+Add to `data/model/HackEntry.kt`:
+
+```kotlin
+data class HackEntry(
+    // ... existing fields ...
+    val storeId: String,                    // "picks" | "hylianmodding"
+    val sourceCatalogId: String,            // "main" | "picks" | "competition-2025-crossover"
+    val screenshots: List<String> = emptyList(),      // absolute URLs
+    val videos: List<String> = emptyList(),           // tolerant/empty (HM has no field)
+    val completionStatus: String? = null,
+    val supportedGames: List<String>? = null,         // ["OoT", "MM"]
+    val lastUpdated: String? = null,                  // ISO8601
+    val changelog: List<ChangelogEntry> = emptyList(),
+    val downloadTarget: DownloadTarget? = null,       // NEW: replaces patch for HM
+    // Backward compat:
+    val patch: PatchRef? = null                       // PICKS only
+)
+
+data class ChangelogEntry(val date: String, val content: String)
+```
+
+---
+
+## DownloadTarget Sealed Hierarchy
+
+```kotlin
+sealed interface DownloadTarget {
+    data class DirectPatch(val patchRef: PatchRef) : DownloadTarget
+    data class GitHubRelease(val repoUrl: String) : DownloadTarget   // e.g., "https://github.com/user/repo/releases"
+    data class ExternalLink(val url: String) : DownloadTarget        // HTML page, .7z/.rar/.ppf, or GitHub resolution failed
+}
+```
+
+**Resolution Logic (at parse time):**
+- `download_link` ends with `.bps`, `.ips`, `.xdelta`, `.zip` (case-insensitive) → `DirectPatch`
+- `download_link` matches `github.com/*/releases` → `GitHubRelease`
+- Otherwise (HTML, .7z, .rar, .ppf, unknown) → `ExternalLink`
+
+---
+
+## GitHubPatchResolver.kt
+
+```kotlin
+object GitHubPatchResolver {
+    suspend fun resolve(repoUrl: String): Result<String>  // returns direct asset URL or failure
+}
+```
+
+- Uses `api.github.com/repos/{owner}/{repo}/releases` (public, no auth needed for public repos).
+- Finds asset matching `*.bps`, `*.ips`, `*.xdelta`, `*.zip` (prefer assets under `dist/` if present).
+- Returns direct download URL on success; on failure (no matching asset, API error, rate limit) → returns failure, UI falls back to `ExternalLink` (opens browser).
+- Runs **at download time** (not parse time); shows "Resolving…" state in UI.
+- Handles pagination (per_page=100), sorts by `published_at` desc (latest release first).
+
+---
+
+## Browser Fallback
+
+- `DownloadTarget.ExternalLink` → `Intent.ACTION_VIEW` with the URL.
+- Covers: HTML mod pages, unsupported archives (.7z/.rar/.ppf), GitHub resolution failures.
+- User sees "Open in browser" button in detail dialog.
+
+---
+
+## UI Changes
+
+### StoreActivity
+- **Top-bar store selector**: Segmented control / spinner with store display names.
+- Persists last-selected store in SharedPreferences (`pref_selected_store_id`).
+- Loads **only the selected store's catalog** (no mixing).
+- Switch styling: `SwitchSidePanel` or custom segmented control matching Switch tokens.
+
+### HackDetailDialog (Richer)
+- Cover image (Coil)
+- Screenshots gallery (horizontal pager, Coil)
+- Title, authors, game badge (OoT/MM), completion status badge
+- Scrollable description
+- Expandable changelog (date + content)
+- Video row (if `videos` non-empty) — placeholder for future HM video field
+- Download button driven by `downloadTarget`:
+  - `DirectPatch` → normal download flow
+  - `GitHubRelease` → "Resolving…" → direct download or fallback to browser
+  - `ExternalLink` → "Open in Browser"
+
+---
+
+## Persistence & Library Integration
+
+### MergedCatalogRepository
+- Stores **all stores' hacks** tagged by `storeId` and `sourceCatalogId`.
+- `CatalogMerger` preserves `storeId` and `sourceCatalogId` (no longer discards source).
+- Merged catalog persisted as `merged_catalog.json` (includes all stores).
+
+### Store Filtering
+- `StoreActivity` / `StoreViewModel` filters merged catalog by selected `storeId`.
+- No cross-store mixing in UI.
+
+### CatalogBackedLibrarySource
+- Copies `storeId` into `HackLibraryEntry` (add field `storeId: String`).
+- Library tiles retain store origin for potential future filtering.
+
+---
+
+## Catalog.json Update
+
+Add top-level `storeName` to both catalog files:
+
+**catalog/catalog.json** and **docs/catalog.json**:
+```json
+{
+  "catalogVersion": 2,
+  "storeName": "Zelda 64 Picks",
+  "hacks": [...]
+}
+```
+
+---
+
+## Strings (pt-BR / en / es)
+
+| Key | pt-BR | en | es |
+|-----|-------|----|----|
+| `store_selector_hylian` | Hylian Modding | Hylian Modding | Hylian Modding |
+| `store_selector_picks` | Zelda 64 Picks | Zelda 64 Picks | Zelda 64 Picks |
+| `detail_screenshots` | Capturas de tela | Screenshots | Capturas |
+| `detail_videos` | Vídeos | Videos | Vídeos |
+| `detail_open_browser` | Abrir no navegador | Open in browser | Abrir en navegador |
+| `detail_resolving` | Resolvendo… | Resolving… | Resolviendo… |
+| `detail_supported_game` | Jogo base | Base game | Juego base |
+| `detail_completion` | Status | Status | Estado |
+| `detail_changelog` | Changelog | Changelog | Registro de cambios |
+| `detail_external_notice` | Este mod não tem download direto. Será aberto no navegador. | This mod has no direct download. Will open in browser. | Este mod no tiene descarga directa. Se abrirá en el navegador. |
+| `store_source_error` | Falha ao carregar catálogo da loja | Failed to load store catalog | Error al cargar catálogo de la tienda |
+
+---
+
+## Limitations & Known Gaps
+
+1. **No HM video field** — `videos` list always empty unless HM adds it later (parser tolerant).
+2. **Unsupported archives** (.7z, .rar, .ppf) → browser fallback (no extraction).
+3. **HM baseRom generic** — `supported_games` maps to generic OoT/MM `BaseRomRef` with **empty checksums**; actual match happens at patch time via BPS source CRC (existing `PatcherFacade` logic).
+4. **GitHub API rate limits** — unauthenticated: 60 req/hr per IP. Mitigation: cache resolved URLs per session; show browser fallback on 403/429.
+5. **Competition mods without patches** — many competition entries are showcase-only; `ExternalLink` handles gracefully.
+6. **No auto-update for HM catalog** — user must pull-to-refresh in Store; no background sync (Rule 15: no telemetry/background network).
+
+---
+
+## Implementation Milestones (Phase 5)
+
+### 5.1: Store Model + Parsers (Week 1)
+- [ ] `StoreDefinition`, `CatalogSourceMeta`, `CatalogSourceType`, `CatalogParser` interface
+- [ ] `StoreDefinitions.kt` with built-in stores
+- [ ] `PicksCatalogParser` (refactor existing + `storeName` + `storeId` stamping)
+- [ ] `HylianModdingParser` (index + mod parsing, URL resolution, `hm_` ID prefix)
+- [ ] `DownloadTarget` sealed hierarchy + `GitHubPatchResolver`
+- [ ] Unit tests: parser round-trips, HM mod.json fixtures, GitHub resolver mock
+
+### 5.2: HackEntry Extensions + Persistence (Week 1–2)
+- [ ] Extend `HackEntry` with new fields
+- [ ] Update `CatalogMerger` to preserve `storeId`/`sourceCatalogId`
+- [ ] Update `MergedCatalogRepository` schema (merged_catalog.json includes store tags)
+- [ ] Add `storeId` to `HackLibraryEntry`
+- [ ] Migration: existing merged catalog → add `storeId="picks"` to all entries
+
+### 5.3: Store UI + Detail Dialog (Week 2)
+- [ ] StoreActivity top-bar store selector (Switch-styled, persists selection)
+- [ ] StoreViewModel loads single store's hacks from merged catalog
+- [ ] HackDetailDialog redesign: cover, screenshots gallery, badges, description, changelog, video row, download button per `DownloadTarget`
+- [ ] GitHubPatchResolver integration: "Resolving…" state, success→download, fail→browser
+- [ ] ExternalLink → "Open in Browser" button
+- [ ] Visual QA: Chululu screenshots (store selector, detail dialog per target type)
+
+### 5.4: Catalog.json Update + i18n + Polish (Week 2–3)
+- [ ] Add `storeName` to `catalog/catalog.json` and `docs/catalog.json`
+- [ ] Bump `catalogVersion` to 3 (or 2 if not already bumped for RA)
+- [ ] Strings.xml (pt-BR/en/es) for all new keys
+- [ ] Wally: translate strings, update README with multi-store docs
+- [ ] Build verification: `./gradlew :app:assembleDebug :app:testDebugUnitTest`
+
+---
+
+## Risk Register (Phase 5 Additions)
+
+| Risco | Probabilidade | Impacto | Mitigação |
+|-------|---------------|---------|-----------|
+| **HM site structure changes** (index/mod.json schema) | Média | Store quebra | Parser tolerante (campos opcionais); versionamento de parser; monitorar HM changelog |
+| **GitHub API rate limit / auth changes** | Baixa | Resolução falha → browser fallback | Cache resolved URLs; fallback gracioso; sem auth para repos públicos |
+| **IDs collision (PICKS vs HM)** | Baixa | Dados errados no merge | HM ids prefixados `hm_`; PICKS ids inalterados; testes de merge |
+| **Catálogo v3 migration** | Baixa | Loja quebra para usuários antigos | `catalogVersion` integer; `MergedCatalogRepository` trata campos ausentes; testar upgrade v1/v2→v3 |
+| **HM competition slugs mudam** | Baixa | Fontes de competição 404 | Slugs hardcoded em `StoreDefinitions.kt`; documentar; update via app release |
+| **DownloadTarget resolution no download time** | Média | UX "Resolving…" pode demorar | Timeout 10s; cancelável; fallback imediato para browser |
+| **Switch UI compliance do seletor + dialog** | Média | Inconsistência visual | Chululu QA obrigatório antes de merge; tokens Switch aplicados |
+
+---
+
+## Referências Técnicas (Adicionais Phase 5)
+
+- **Hylian Modding**: https://hylianmodding.com (mods index, competition indexes)
+- **GitHub Releases API**: https://docs.github.com/en/rest/releases/releases
+- **BPS Spec**: https://github.com/blakesmith/rombp/blob/master/docs/bps_spec.md (existing)
+- **N64 ROM Header**: https://n64brew.dev/wiki/ROM_Header (existing)
+
 (End of file)
 
 ---

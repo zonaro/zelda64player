@@ -36,16 +36,15 @@ enum class MediaType {
  *
  * Parsed from a file name written by
  * [br.com.redclaw.zelda64player.repositories.Storage] (see
- * [GalleryRepository] for the naming contract). [withOverlay] is meaningful
- * only for screenshots: it marks the variant that includes the on-screen
- * controls; recordings always report `false` (the overlay inclusion is decided
- * by the global setting at record time, not stored per file).
+ * [GalleryRepository] for the naming contract). New screenshots are always
+ * direct emulator-framebuffer captures and therefore report `false` for
+ * [withOverlay]. The field remains only to label legacy overlay captures.
  *
  * @param type image or video.
  * @param path absolute file in [br.com.redclaw.zelda64player.repositories.Storage.galleryDir].
  * @param hackId the game the capture belongs to (may contain underscores).
  * @param timestamp epoch millis when the capture was taken.
- * @param withOverlay true for the "with controls" screenshot variant.
+ * @param withOverlay true only for a legacy "with controls" screenshot.
  */
 data class GalleryItem(
     val type: MediaType,

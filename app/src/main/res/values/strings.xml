@@ -31,6 +31,8 @@
     <string name="badge_rb">RB</string>
     <string name="badge_l3">L3</string>
     <string name="badge_r3">R3</string>
+    <string name="badge_lt">LT</string>
+    <string name="badge_rt">RT</string>
     <string name="badge_x">X</string>
     <string name="badge_y">Y</string>
 
@@ -82,6 +84,7 @@
     <string name="store_cat_all">Todos</string>
     <string name="store_cat_installed">Instalados</string>
     <string name="store_cat_updates">Atualizações</string>
+    <string name="store_cat_not_installed">Não Instalados</string>
     <string name="store_cat_oot">Ocarina of Time</string>
     <string name="store_cat_mm">Majora\'s Mask</string>
     <string name="store_search_icon_desc">Buscar</string>
@@ -113,6 +116,20 @@
     <string name="detail_error_generic">Falha ao baixar o patch.</string>
     <string name="detail_patching">Aplicando patch…</string>
     <string name="detail_installed_toast">Patch instalado. Disponível na Biblioteca.</string>
+
+    <!-- Store: multi-store + detail enhancements -->
+    <string name="store_selector_desc">Selecionar loja</string>
+    <string name="store_selector_hylian">Hylian Modding</string>
+    <string name="store_selector_picks">Zelda 64 Picks</string>
+    <string name="store_source_error">Não foi possível carregar esta loja.</string>
+    <string name="detail_screenshots">Capturas de tela</string>
+    <string name="detail_videos">Vídeos</string>
+    <string name="detail_open_browser">Abrir no navegador</string>
+    <string name="detail_resolving">Resolvendo download...</string>
+    <string name="detail_supported_game">Jogo suportado</string>
+    <string name="detail_completion">Status</string>
+    <string name="detail_changelog">Registro de alterações</string>
+    <string name="detail_external_notice">Este mod deve ser baixado de sua fonte.</string>
 
     <!-- Download queue (Hack Store) -->
     <string name="store_downloads">Downloads</string>
@@ -277,6 +294,61 @@
     <string name="backup_import_summary">Restaurado: %1$d hacks, %2$d arquivos. Ignorados: %3$d.</string>
     <string name="backup_error_stream">Não foi possível abrir o arquivo.</string>
 
+    <!-- Settings: Google Drive cloud backup -->
+    <string name="gdrive_subtitle">Backup na nuvem (Google Drive)</string>
+    <string name="gdrive_enable">Ativar backup no Google Drive</string>
+    <string name="gdrive_connect">Conectar conta Google</string>
+    <string name="gdrive_connected">Conta: %1$s</string>
+    <string name="gdrive_not_connected">Nenhuma conta conectada</string>
+    <string name="gdrive_backup_saves">Saves (SRAM e estados)</string>
+    <string name="gdrive_backup_images">Imagens (capturas de tela)</string>
+    <string name="gdrive_backup_videos">Vídeos (gravações)</string>
+    <string name="gdrive_auto">Backup automático</string>
+    <string name="gdrive_frequency">Frequência</string>
+    <string name="gdrive_frequency_daily">Diário</string>
+    <string name="gdrive_frequency_weekly">Semanal</string>
+    <string name="gdrive_frequency_manual">Manual</string>
+    <string name="gdrive_backup_now">Fazer backup agora</string>
+    <string name="gdrive_view">Ver backups no Drive</string>
+    <string name="gdrive_last_backup">Último backup: %1$s</string>
+    <string name="gdrive_last_backup_never">Nunca</string>
+    <string name="gdrive_backup_summary">Backup concluído: %1$d arquivo(s) enviado(s).</string>
+    <string name="gdrive_backup_none">Nenhum arquivo novo para fazer backup.</string>
+    <string name="gdrive_backup_failed">Falha no backup: %1$s</string>
+    <string name="gdrive_need_account">Conecte uma conta Google primeiro.</string>
+    <string name="gdrive_need_enable">Ative o backup no Google Drive primeiro.</string>
+    <string name="gdrive_consent_required">É necessário autorizar o acesso ao Google Drive.</string>
+    <string name="gdrive_open_failed">Não foi possível abrir o Google Drive.</string>
+
+    <!-- Cloud Sync (automatic, per-save) -->
+    <string name="cloudsync_title">Sync na Nuvem</string>
+    <string name="cloudsync_description">Sincroniza SRAM e estados de save automaticamente a cada alteração local, via Google Drive.</string>
+    <string name="cloudsync_enable">Sincronizar saves automaticamente</string>
+    <string name="cloudsync_wifi_only">Apenas no Wi-Fi</string>
+    <string name="cloudsync_notify">Notificar conflitos</string>
+    <string name="cloudsync_status_in_progress">Sync em andamento...</string>
+    <string name="cloudsync_status_last">Último sync: %1$s</string>
+    <string name="cloudsync_status_never">Nunca sincronizado</string>
+    <string name="cloudsync_status_no_account">Conecte uma conta Google para sincronizar</string>
+    <string name="cloudsync_status_disabled">Sync na nuvem desativado</string>
+    <string name="cloudsync_view_conflicts">Ver conflitos pendentes</string>
+    <string name="cloudsync_conflicts_count">Conflitos pendentes: %1$d</string>
+    <string name="cloudsync_conflict_title">Conflito de save</string>
+    <string name="cloudsync_conflict_notify">Conflito de save detectado em %1$s. Toque para resolver.</string>
+    <string name="cloudsync_conflict_message">Conflito em %1$s (%2$s). Escolha qual versão manter:</string>
+    <string name="cloudsync_conflict_preview">Local: %1$s | %2$d bytes | CRC %3$s\nNuvem: %4$s | %5$d bytes | CRC %6$s</string>
+    <string name="cloudsync_conflict_item">%1$s — %2$s</string>
+    <string name="cloudsync_keep_local">Manter LOCAL (meu save atual)</string>
+    <string name="cloudsync_keep_cloud">Manter NUVEM (save de outro dispositivo)</string>
+    <string name="cloudsync_keep_both">Manter AMBOS (renomear local)</string>
+    <string name="cloudsync_pending_title">Conflitos pendentes</string>
+    <string name="cloudsync_no_conflicts">Nenhum conflito pendente.</string>
+    <string name="cloudsync_resolved">Conflito resolvido.</string>
+    <string name="cloudsync_resolve_failed">Falha ao resolver conflito.</string>
+    <string name="cloudsync_unknown_time">desconhecido</string>
+    <string name="cloudsync_channel_name">Sync de Saves</string>
+    <string name="cloudsync_channel_desc">Notificações de conflito de sincronização de saves</string>
+
     <!-- App shortcuts (installed games as launcher shortcuts) -->
     <string name="shortcut_add_to_home">Adicionar à tela inicial</string>
     <string name="shortcut_long_label_play">Jogar %1$s</string>
@@ -360,7 +432,7 @@
     <string name="dock_store">Loja</string>
     <string name="dock_achievements">RetroAchievements</string>
     <string name="dock_settings">Configurações</string>
-    <string name="dock_gamepad_tester">Teste de Controle</string>
+    <string name="dock_control">Controle</string>
     <string name="footer_about">(i) Sobre</string>
     <string name="footer_options">+ Opções</string>
     <string name="footer_gamepad_disconnected">Controle desconectado</string>
@@ -419,6 +491,22 @@
     <string name="options_ra_status_connected">RetroAchievements: %1$s</string>
     <string name="options_ra_status_disconnected">RetroAchievements: Desconectado</string>
     <string name="options_settings_full">Configurações completas</string>
+    <string name="options_accent_color">Cor de Destaque</string>
+    <string name="options_accent_color_description">Altera a cor de foco e destaque da interface</string>
+
+    <!-- Accent color options -->
+    <string name="accent_cyan">Ciano</string>
+    <string name="accent_green_light">Verde Claro</string>
+    <string name="accent_green_dark">Verde Escuro</string>
+    <string name="accent_blue">Azul</string>
+    <string name="accent_yellow">Amarelo</string>
+    <string name="accent_pink">Rosa</string>
+    <string name="accent_red">Vermelho</string>
+    <string name="accent_violet">Violeta</string>
+    <string name="accent_teal">Turquesa</string>
+    <string name="accent_orange">Laranja</string>
+    <string name="accent_purple">Roxo</string>
+    <string name="accent_indigo">Índigo</string>
 
     <!-- ===== Nintendo Switch UI - Todos os Jogos grid (Phase C) ===== -->
     <string name="grid_search_hint">Buscar...</string>
@@ -487,15 +575,13 @@
     <string name="gallery_delete_confirm">Excluir esta captura? Esta ação não pode ser desfeita.</string>
     <string name="gallery_view">Visualizar</string>
     <string name="gallery_record_badge">Vídeo</string>
+    <string name="gallery_screenshot_badge">Imagem</string>
     <string name="gallery_overlay_badge">Com Controles</string>
     <string name="settings_capture_category">Captura</string>
     <string name="settings_capture_description">Capturas de tela e gravação de gameplay ficam apenas no dispositivo.</string>
-    <string name="settings_capture_include_overlay">Incluir controles na gravação</string>
     <string name="capture_saved">Captura salva</string>
     <string name="capture_failed">Falha ao capturar</string>
     <string name="recording_started">Gravação iniciada</string>
     <string name="recording_stopped">Gravação parada</string>
-    <string name="recording_permission_denied">Permissão de gravação negada</string>
-    <string name="capture_overlay_hidden_hint">Controles ocultos na gravação</string>
     <string name="recording_label">REC</string>
 </resources>

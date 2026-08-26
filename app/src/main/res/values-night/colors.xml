@@ -21,6 +21,21 @@
     <color name="switch_dock_circle_light">#FFFFFF</color>
     <color name="switch_card_dim">#1A000000</color>
 
+    <!-- Accent color options (constant across configs, used by AccentManager).
+         Keys match AccentOption enum values. -->
+    <color name="accent_cyan">#00BCD4</color>
+    <color name="accent_green_light">#4CAF50</color>
+    <color name="accent_green_dark">#2E7D32</color>
+    <color name="accent_blue">#2196F3</color>
+    <color name="accent_yellow">#FFEB3B</color>
+    <color name="accent_pink">#E91E63</color>
+    <color name="accent_red">#F44336</color>
+    <color name="accent_violet">#9C27B0</color>
+    <color name="accent_teal">#009688</color>
+    <color name="accent_orange">#FF9800</color>
+    <color name="accent_purple">#673AB7</color>
+    <color name="accent_indigo">#3F51B5</color>
+
     <!-- Active (mode-resolved) Switch tokens. values-night/ = dark appearance
          (this is the app's default theme per ThemeManager). -->
     <color name="switch_bg">#2D2D2D</color>
@@ -31,6 +46,10 @@
     <color name="switch_scrim">#99000000</color>
     <color name="switch_dock_circle">#555555</color>
     <color name="switch_dock_icon">#FFFFFF</color>
+    <!-- Per-dock glyph colors (constant across night mode, like switch_accent_*).
+         Store = red, Control = green; others reuse switch_accent_* / text tokens. -->
+    <color name="switch_dock_icon_store">#E53935</color>
+    <color name="switch_dock_icon_control">#43A047</color>
     <!-- Charcoal fill for the circular "Todos os Jogos" card (NS Launcher style). -->
     <color name="switch_all_games_bg">#424242</color>
 

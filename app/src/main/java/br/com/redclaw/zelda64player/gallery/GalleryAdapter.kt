@@ -38,10 +38,10 @@ import java.io.File
 /**
  * Renders [GalleryItem]s in the Gallery grid. Each card shows a thumbnail
  * (Coil for images, a [MediaMetadataRetriever] frame for videos) plus a type
- * badge and, for screenshots, an overlay/clean badge. Tapping a card invokes
- * [onActivate], which the Activity uses to present the view/share/delete
- * actions (kept here as a single callback to avoid duplicating the dialog in
- * the adapter).
+ * badge. Legacy overlay screenshots retain their extra badge. Tapping a card
+ * invokes [onActivate], which the Activity uses to present the
+ * view/share/delete actions (kept here as a single callback to avoid
+ * duplicating the dialog in the adapter).
  */
 class GalleryAdapter(
     private val onActivate: (GalleryItem) -> Unit
@@ -83,17 +83,27 @@ class GalleryAdapter(
         private val typeBadge: TextView = view.findViewById(R.id.gallery_type_badge)
         private val overlayBadge: TextView = view.findViewById(R.id.gallery_overlay_badge)
         var job: Job? = null
+        private var boundItem: GalleryItem? = null
 
         init {
             itemView.setOnClickListener {
-                val pos = bindingAdapterPosition
-                if (pos in items.indices) onActivate(items[pos])
+                /* bindingAdapterPosition may be NO_POSITION while the gallery
+                   refreshes on resume. Keep the bound model instead so a card
+                   always opens its action menu when it is visibly tappable. */
+                boundItem?.let(onActivate)
             }
         }
 
         fun bind(item: GalleryItem) {
             job?.cancel()
-            typeBadge.text = itemView.context.getString(R.string.gallery_record_badge)
+            boundItem = item
+            val isVideo = item.type == MediaType.VIDEO
+            typeBadge.text = itemView.context.getString(
+                if (isVideo) R.string.gallery_record_badge else R.string.gallery_screenshot_badge
+            )
+            typeBadge.setBackgroundResource(
+                if (isVideo) R.drawable.bg_badge_video else R.drawable.bg_badge_teal
+            )
             typeBadge.visibility = View.VISIBLE
             if (item.type == MediaType.IMAGE && item.withOverlay) {
                 overlayBadge.visibility = View.VISIBLE

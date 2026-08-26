@@ -33,4 +33,30 @@ object ZipExtractor {
         }
         throw StoreException.GenericError("Entry '$entryName' not found in archive")
     }
+
+    /**
+     * Extract the first entry whose name matches [regex] (case-insensitive).
+     * Used when a catalog only declares a `.zip` archive without the inner patch
+     * filename: we pick the first `*.bps`/`*.ips`/`*.xdelta` inside it.
+     */
+    fun extractFirstMatching(zipBytes: ByteArray, regex: String): ByteArray =
+        extractFirstMatching(ByteArrayInputStream(zipBytes), regex)
+
+    fun extractFirstMatching(zipFile: File, regex: String): ByteArray =
+        extractFirstMatching(zipFile.inputStream(), regex)
+
+    private fun extractFirstMatching(stream: InputStream, regex: String): ByteArray {
+        val pattern = Regex(regex, RegexOption.IGNORE_CASE)
+        ZipInputStream(stream).use { zis ->
+            var entry = zis.nextEntry
+            while (entry != null) {
+                if (!entry.isDirectory && pattern.matches(entry.name)) {
+                    return zis.readBytes()
+                }
+                zis.closeEntry()
+                entry = zis.nextEntry
+            }
+        }
+        throw StoreException.GenericError("No entry matching '$regex' found in archive")
+    }
 }

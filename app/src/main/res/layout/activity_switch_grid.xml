@@ -23,6 +23,7 @@
             android:contentDescription="@string/about_dialog_close" />
 
         <ImageView
+            android:id="@+id/grid_header_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="12dp"

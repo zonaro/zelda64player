@@ -4,7 +4,8 @@
 // GPL-3.0, Copyright (C) Filippo Scognamiglio) so the app can access core
 // memory for the RetroAchievements runtime (rcheevos). The only functional
 // changes against upstream are the getMemoryData/getMemorySize JNI
-// passthroughs; everything else is kept verbatim (package name included).
+// passthroughs plus EGL-backed emulator-only video recording; everything else
+// is kept verbatim (package name included).
 //
 // Submodules vendored in-tree: oboe (1.5-stable, b15f5e39) and
 // libretro/libretro-common (public domain / MIT per-file headers).

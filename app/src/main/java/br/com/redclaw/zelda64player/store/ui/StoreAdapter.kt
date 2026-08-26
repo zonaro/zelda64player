@@ -54,9 +54,6 @@ class StoreAdapter(
             binding.itemVersion.text =
                 binding.root.context.getString(R.string.store_version_format, hack.version)
 
-            // 1-based ranking number within the current page (eShop-style).
-            binding.itemRank.text = (position + 1).toString()
-
             when (val status = item.status) {
                 is StoreStatus.NotInstalled -> {
                     binding.itemStatus.setText(R.string.store_status_not_installed)

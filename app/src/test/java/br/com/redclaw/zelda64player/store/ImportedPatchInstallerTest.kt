@@ -36,7 +36,7 @@ class ImportedPatchInstallerTest {
     }
 
     private fun newWorkspace(): Triple<File, File, File> {
-        val root = File.createTempFile("ws", "").apply { delete(); mkdirs() }
+        val root = File.createTempFile("wsx", ".tmp").apply { delete(); mkdirs() }
         val storage = File(root, "storage").apply { mkdirs() }
         val cache = File(root, "cache").apply { mkdirs() }
         val files = File(root, "files").apply { mkdirs() }

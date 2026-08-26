@@ -22,12 +22,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.views.HackLibraryEntry
 
 /**
@@ -65,9 +67,14 @@ class SwitchHomeRow @JvmOverloads constructor(
         LayoutInflater.from(context).inflate(R.layout.switch_home_row, this, true)
         orientation = VERTICAL
         label = findViewById(R.id.home_row_label)
+        val labelIcon = findViewById<ImageView>(R.id.home_row_label_icon)
         recycler = findViewById(R.id.home_row_recycler)
         recycler.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        // Apply dynamic accent color to label and icon
+        val accentColor = AccentManager.getAccentColor(context)
+        label.setTextColor(accentColor)
+        labelIcon.setColorFilter(accentColor)
         // The row height must grow with the portrait cover ratio (5:7) so the
         // rectangular cards are not clipped. The ratio lives in SwitchGameCard (DRY).
         val homeSize = resources.getDimensionPixelSize(R.dimen.switch_card_size_home)

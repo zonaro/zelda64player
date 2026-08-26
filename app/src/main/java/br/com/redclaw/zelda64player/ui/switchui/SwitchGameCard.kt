@@ -28,6 +28,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.views.HackLibraryEntry
 import coil.load
 import kotlin.math.roundToInt
@@ -67,6 +68,8 @@ class SwitchGameCard @JvmOverloads constructor(
         badge = findViewById(R.id.card_badge)
         dim = findViewById(R.id.card_dim)
         border = findViewById(R.id.card_focus_border)
+        // Apply dynamic accent color to focus border
+        border.background = AccentManager.createFocusBorder(context)
         isFocusable = true
         isFocusableInTouchMode = true
         isClickable = true

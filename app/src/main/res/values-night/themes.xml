@@ -51,4 +51,23 @@
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="android:background">@android:color/transparent</item>
     </style>
+
+    <!-- Fullscreen hack-detail dialog (replaces the old bottom sheet): fills the
+         screen, Switch background, fade animation. -->
+    <style name="StoreDetailFullscreen" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/switch_bg</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowAnimationStyle">@style/SwitchDialogAnimation</item>
+    </style>
+
+    <style name="StoreBottomSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_down</item>
+    </style>
+
+    <style name="SwitchDialogAnimation">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+    </style>
 </resources>

@@ -31,8 +31,10 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 
 /**
  * Reusable right slide-in quick options panel matching the Nintendo Switch HOME
@@ -105,6 +107,8 @@ class SwitchSidePanel(private val activity: AppCompatActivity) {
         )
 
         // Header.
+        val badgeContainer = root.findViewById<View>(R.id.panel_badge)
+        badgeContainer.background = AccentManager.createBadgeBackground(activity)
         root.findViewById<ImageView>(R.id.panel_badge_icon).apply {
             if (badgeIconRes != null) {
                 setImageResource(badgeIconRes)
@@ -224,8 +228,12 @@ class SwitchSidePanel(private val activity: AppCompatActivity) {
             LayoutInflater.from(context)
                 .inflate(R.layout.switch_side_panel_row, this, true)
             border = findViewById(R.id.row_border)
-            if (row.amberFocus) {
-                border.setBackgroundResource(R.drawable.switch_focus_border_amber)
+            // Apply dynamic accent color to focus border
+            border.background = if (row.amberFocus) {
+                // Amber focus uses the static amber accent
+                ContextCompat.getDrawable(context, R.drawable.switch_focus_border_amber)!!
+            } else {
+                AccentManager.createFocusBorder(context)
             }
             val icon = findViewById<ImageView>(R.id.row_icon)
             if (row.iconRes != null) {

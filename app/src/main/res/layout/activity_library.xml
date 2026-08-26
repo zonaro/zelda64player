@@ -14,7 +14,7 @@
              mirroring the compact account/status area above the HOME row. -->
         <Space
             android:layout_width="match_parent"
-            android:layout_height="60dp" />
+            android:layout_height="@dimen/switch_home_row_top_spacing" />
 
         <br.com.redclaw.zelda64player.ui.switchui.SwitchHomeRow
             android:id="@+id/library_home_row"
@@ -64,7 +64,7 @@
         android:focusable="true"
         android:padding="3dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_trophy" />
+        android:src="@drawable/ic_user" />
 
     <!-- Empty state, toggled as a unit when no games are installed. -->
     <LinearLayout

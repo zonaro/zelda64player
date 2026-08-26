@@ -30,12 +30,11 @@ import java.io.File
 /**
  * Reads and mutates the gallery directory.
  *
- * Screenshots are named `screenshot_<hackId>_<timestamp>_<overlay|clean>.png`
- * and recordings `recording_<hackId>_<timestamp>.mp4`. [hackId] may itself
- * contain underscores (e.g. `vanilla_abc123`), so the parser never splits the
- * whole name on `_`; instead it strips the known prefix/suffix and treats the
- * trailing one or two segments as the timestamp (+ overlay flag), joining the
- * remainder back into the hack id. This keeps parsing robust to arbitrary ids.
+ * Screenshots are named `screenshot_<hackId>_<timestamp>.png` and recordings
+ * `recording_<hackId>_<timestamp>.mp4`. Older screenshot pairs with trailing
+ * `_overlay` / `_clean` remain readable. [hackId] may itself contain
+ * underscores (e.g. `vanilla_abc123`), so the parser removes only known
+ * suffixes before locating the timestamp.
  *
  * All file IO runs on [Dispatchers.IO] so callers can `suspend` safely.
  */
@@ -71,9 +70,9 @@ class GalleryRepository(context: Context) {
         when {
             name.startsWith("screenshot_") && name.endsWith(".png") -> {
                 val body = name.removePrefix("screenshot_").removeSuffix(".png")
-                val lastUnder = body.lastIndexOf('_')
-                val overlayToken = body.substring(lastUnder + 1) // "overlay" | "clean"
-                val rest = body.substring(0, lastUnder)
+                val legacyOverlay = body.substringAfterLast('_')
+                    .takeIf { it == "overlay" || it == "clean" }
+                val rest = if (legacyOverlay == null) body else body.substringBeforeLast('_')
                 val tsUnder = rest.lastIndexOf('_')
                 val timestamp = rest.substring(tsUnder + 1).toLongOrNull() ?: 0L
                 val hackId = rest.substring(0, tsUnder).takeIf { it.isNotEmpty() }
@@ -82,7 +81,7 @@ class GalleryRepository(context: Context) {
                     path = file,
                     hackId = hackId,
                     timestamp = timestamp,
-                    withOverlay = overlayToken == "overlay"
+                    withOverlay = legacyOverlay == "overlay"
                 )
             }
             name.startsWith("recording_") && name.endsWith(".mp4") -> {

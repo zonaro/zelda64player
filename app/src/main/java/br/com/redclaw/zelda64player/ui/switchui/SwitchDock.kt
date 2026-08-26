@@ -32,7 +32,7 @@ import br.com.redclaw.zelda64player.Zelda64PlayerApp
 
 /**
  * Bottom dock of the Switch home screen: a centered row of circular buttons
- * (Loja, RetroAchievements, Sobre e Licenças). Each button shows a
+ * (Loja, Galeria, RetroAchievements, Controle, Configurações). Each button shows a
  * colored glyph on a dock-circle background and gains a round green focus border
  * when focused; the glyph brightens slightly on focus. Click plays the select sound
  * then runs the button's [DockItem.action].
@@ -53,7 +53,9 @@ class SwitchDock @JvmOverloads constructor(
         val iconRes: Int,
         val labelRes: Int,
         @ColorRes val iconColorRes: Int,
-        val action: () -> Unit
+        val action: () -> Unit,
+        /** Optional dynamic color int (overrides iconColorRes when non-zero). */
+        val iconColorInt: Int = 0
     )
 
     init {
@@ -97,7 +99,12 @@ class SwitchDock @JvmOverloads constructor(
 
         fun bind(item: DockItem) {
             icon.setImageResource(item.iconRes)
-            icon.setColorFilter(context.getColor(item.iconColorRes))
+            val color = if (item.iconColorInt != 0) {
+                item.iconColorInt
+            } else {
+                context.getColor(item.iconColorRes)
+            }
+            icon.setColorFilter(color)
             icon.contentDescription = context.getString(item.labelRes)
             tag = item
             setOnClickListener {

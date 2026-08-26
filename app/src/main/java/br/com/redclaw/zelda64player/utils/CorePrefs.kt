@@ -26,6 +26,24 @@ object CorePrefs {
     // Nintendo Switch UI preferences.
     private const val PREF_SWITCH_THEME = "pref_switch_theme"
     private const val PREF_SWITCH_SFX_ENABLED = "pref_switch_sfx_enabled"
+    private const val PREF_SWITCH_ACCENT = "pref_switch_accent"
+
+    // Automatic cloud sync (incremental, per-save) preference keys.
+    private const val PREF_CLOUD_SYNC_ENABLED = "pref_cloud_sync_enabled"
+    private const val PREF_CLOUD_SYNC_WIFI_ONLY = "pref_cloud_sync_wifi_only"
+    private const val PREF_CLOUD_SYNC_NOTIFICATIONS = "pref_cloud_sync_notifications"
+    private const val PREF_CLOUD_SYNC_LAST_SYNC = "pref_cloud_sync_last_sync"
+
+    // Google Drive cloud backup preference keys.
+    private const val PREF_GDRIVE_ENABLED = "pref_gdrive_enabled"
+    private const val PREF_GDRIVE_BACKUP_SAVES = "pref_gdrive_backup_saves"
+    private const val PREF_GDRIVE_BACKUP_IMAGES = "pref_gdrive_backup_images"
+    private const val PREF_GDRIVE_BACKUP_VIDEOS = "pref_gdrive_backup_videos"
+    private const val PREF_GDRIVE_ACCOUNT_NAME = "pref_gdrive_account_name"
+    private const val PREF_GDRIVE_LAST_BACKUP = "pref_gdrive_last_backup"
+    private const val PREF_GDRIVE_AUTO_BACKUP = "pref_gdrive_auto_backup"
+    private const val PREF_GDRIVE_BACKUP_FREQUENCY = "pref_gdrive_backup_frequency" // daily, weekly, manual
+    private const val PREF_GDRIVE_FOLDER_ID = "pref_gdrive_folder_id"
 
     // "Todos os Jogos" grid sort mode (values: last_played | download_date | alpha).
     private const val PREF_GRID_SORT = "pref_grid_sort"
@@ -200,6 +218,19 @@ object CorePrefs {
             .edit().putBoolean(PREF_SWITCH_SFX_ENABLED, enabled).apply()
     }
 
+    /** Selected Switch UI accent color. Returns the accent key (e.g., "cyan", "green_light"). */
+    fun getSwitchAccent(context: Context): String =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(PREF_SWITCH_ACCENT, ACCENT_DEFAULT) ?: ACCENT_DEFAULT
+
+    fun setSwitchAccent(context: Context, accentKey: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putString(PREF_SWITCH_ACCENT, accentKey).apply()
+    }
+
+    /** Default accent color key. */
+    const val ACCENT_DEFAULT = "cyan"
+
     /**
      * Selected "Todos os Jogos" grid sort mode, persisted as its [GridSortMode.prefValue]
      * string. Defaults to [br.com.redclaw.zelda64player.views.GridSortMode.ALPHA]
@@ -212,6 +243,152 @@ object CorePrefs {
     fun setGridSort(context: Context, mode: String) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit().putString(PREF_GRID_SORT, mode).apply()
+    }
+
+    // ---- Google Drive cloud backup ----
+
+    /** Master switch for Google Drive backup (default off). */
+    fun getGdriveEnabled(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(PREF_GDRIVE_ENABLED, false)
+
+    fun setGdriveEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(PREF_GDRIVE_ENABLED, enabled).apply()
+    }
+
+    /** Back up SRAM + save-states when true (default on). */
+    fun getGdriveBackupSaves(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(PREF_GDRIVE_BACKUP_SAVES, true)
+
+    fun setGdriveBackupSaves(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(PREF_GDRIVE_BACKUP_SAVES, enabled).apply()
+    }
+
+    /** Back up screenshots when true (default on). */
+    fun getGdriveBackupImages(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(PREF_GDRIVE_BACKUP_IMAGES, true)
+
+    fun setGdriveBackupImages(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(PREF_GDRIVE_BACKUP_IMAGES, enabled).apply()
+    }
+
+    /** Back up screen recordings when true (default on). */
+    fun getGdriveBackupVideos(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(PREF_GDRIVE_BACKUP_VIDEOS, true)
+
+    fun setGdriveBackupVideos(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(PREF_GDRIVE_BACKUP_VIDEOS, enabled).apply()
+    }
+
+    /** Connected Google account name, or null when not connected. */
+    fun getGdriveAccountName(context: Context): String? {
+        val name = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(PREF_GDRIVE_ACCOUNT_NAME, null)
+        return if (name.isNullOrBlank()) null else name
+    }
+
+    fun setGdriveAccountName(context: Context, name: String?) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putString(PREF_GDRIVE_ACCOUNT_NAME, name).apply()
+    }
+
+    /** Epoch millis of the last successful backup, or 0 when never. */
+    fun getGdriveLastBackup(context: Context): Long =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(PREF_GDRIVE_LAST_BACKUP, 0L)
+
+    fun setGdriveLastBackup(context: Context, epochMillis: Long) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putLong(PREF_GDRIVE_LAST_BACKUP, epochMillis).apply()
+    }
+
+    /** Automatic periodic backup switch (default off). */
+    fun getGdriveAutoBackup(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(PREF_GDRIVE_AUTO_BACKUP, false)
+
+    fun setGdriveAutoBackup(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(PREF_GDRIVE_AUTO_BACKUP, enabled).apply()
+    }
+
+    /**
+     * Backup frequency. One of [GDRIVE_FREQ_DAILY], [GDRIVE_FREQ_WEEKLY] or
+     * [GDRIVE_FREQ_MANUAL]. Defaults to [GDRIVE_FREQ_DAILY].
+     */
+    fun getGdriveBackupFrequency(context: Context): String =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(PREF_GDRIVE_BACKUP_FREQUENCY, GDRIVE_FREQ_DAILY)
+            ?: GDRIVE_FREQ_DAILY
+
+    fun setGdriveBackupFrequency(context: Context, frequency: String) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putString(PREF_GDRIVE_BACKUP_FREQUENCY, frequency).apply()
+    }
+
+    /** Drive folder id for the app backup folder, or null until first created. */
+    fun getGdriveFolderId(context: Context): String? {
+        val id = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(PREF_GDRIVE_FOLDER_ID, null)
+        return if (id.isNullOrBlank()) null else id
+    }
+
+    fun setGdriveFolderId(context: Context, folderId: String?) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putString(PREF_GDRIVE_FOLDER_ID, folderId).apply()
+    }
+
+    const val GDRIVE_FREQ_DAILY = "daily"
+    const val GDRIVE_FREQ_WEEKLY = "weekly"
+    const val GDRIVE_FREQ_MANUAL = "manual"
+
+    // ---- Automatic cloud sync (incremental, per-save) ----
+
+    /** Master switch for automatic cloud sync of saves (default off). */
+    fun getCloudSyncEnabled(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(PREF_CLOUD_SYNC_ENABLED, false)
+
+    fun setCloudSyncEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(PREF_CLOUD_SYNC_ENABLED, enabled).apply()
+    }
+
+    /** Only sync while on an unmetered (Wi-Fi) network (default off). */
+    fun getCloudSyncWifiOnly(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(PREF_CLOUD_SYNC_WIFI_ONLY, false)
+
+    fun setCloudSyncWifiOnly(context: Context, wifiOnly: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(PREF_CLOUD_SYNC_WIFI_ONLY, wifiOnly).apply()
+    }
+
+    /** Raise a notification when a sync conflict is detected (default on). */
+    fun getCloudSyncNotifications(context: Context): Boolean =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getBoolean(PREF_CLOUD_SYNC_NOTIFICATIONS, true)
+
+    fun setCloudSyncNotifications(context: Context, notify: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(PREF_CLOUD_SYNC_NOTIFICATIONS, notify).apply()
+    }
+
+    /** Epoch millis of the last successful sync run, or 0 when never. */
+    fun getCloudSyncLastSync(context: Context): Long =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(PREF_CLOUD_SYNC_LAST_SYNC, 0L)
+
+    fun setCloudSyncLastSync(context: Context, epochMillis: Long) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putLong(PREF_CLOUD_SYNC_LAST_SYNC, epochMillis).apply()
     }
 
     private const val THEME_DARK = "dark"

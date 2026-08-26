@@ -18,6 +18,8 @@
 
 package br.com.redclaw.zelda64player.store.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -25,19 +27,36 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.data.model.Checksums
 import br.com.redclaw.zelda64player.data.model.HackEntry
+import br.com.redclaw.zelda64player.data.model.PatchRef
+import br.com.redclaw.zelda64player.store.DownloadTarget
+import br.com.redclaw.zelda64player.store.GitHubPatchResolver
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.databinding.DialogHackDetailBinding
 import br.com.redclaw.zelda64player.store.DownloadPhase
 import coil.load
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 /**
  * Fullscreen hack-detail dialog (replaces the old bottom sheet). Shows the full
  * metadata, the required base ROM (and whether the user already has a matching
- * one), and a download/update button with determinate progress and inline error
- * states.
+ * one), a screenshots gallery, supported-game/completion badges, an expandable
+ * changelog, optional video links, and a download/update button whose behavior
+ * is driven by [HackEntry.downloadTarget]:
+ *
+ *  - [DownloadTarget.DirectPatch] (or a legacy [HackEntry.patch]) enqueues the
+ *    download + patch pipeline directly.
+ *  - [DownloadTarget.GitHubRelease] resolves a concrete patch asset from the
+ *    GitHub Releases API at click time, then enqueues it; if resolution fails
+ *    the source page is opened in a browser.
+ *  - [DownloadTarget.ExternalLink] opens the source in a browser.
  *
  * The [StoreViewModel] is obtained from the host [StoreActivity] so it survives
  * configuration changes. The hack is passed as JSON in the arguments for the
@@ -54,6 +73,9 @@ class HackDetailDialog : DialogFragment() {
     }
 
     private lateinit var hack: HackEntry
+
+    /** When set, the download button opens this URL in a browser instead. */
+    private var pendingBrowserUrl: String? = null
 
     override fun getTheme(): Int = R.style.StoreDetailFullscreen
 
@@ -81,14 +103,17 @@ class HackDetailDialog : DialogFragment() {
             dismiss()
         }
         binding.detailDownload.setOnClickListener {
-            sfx?.select()
-            viewModel.enqueue(hack)
+            if (pendingBrowserUrl != null) {
+                openBrowser(pendingBrowserUrl!!)
+            } else {
+                initiateDownload()
+            }
         }
+        binding.detailChangelogHeader.setOnClickListener { toggleChangelog() }
     }
 
     override fun onStart() {
         super.onStart()
-        // BACK plays the back sound; let the dialog handle the actual dismissal.
         dialog?.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
                 sfx?.back()
@@ -104,10 +129,8 @@ class HackDetailDialog : DialogFragment() {
 
     private fun populate() {
         binding.detailName.text = hack.name
-        binding.detailAuthor.text =
-            getString(R.string.detail_author, hack.author)
-        binding.detailVersion.text =
-            getString(R.string.detail_version, hack.version)
+        binding.detailAuthor.text = getString(R.string.detail_author, hack.author)
+        binding.detailVersion.text = getString(R.string.detail_version, hack.version)
         binding.detailDescription.text = hack.description
 
         if (hack.tags.isNotEmpty()) {
@@ -136,7 +159,7 @@ class HackDetailDialog : DialogFragment() {
         binding.detailBaseMatch.setTextColor(
             ContextCompat.getColor(
                 requireContext(),
-                if (matches) R.color.switch_accent else R.color.switch_text_secondary
+                if (matches) AccentManager.getAccentColor(requireContext()) else R.color.switch_text_secondary
             )
         )
 
@@ -150,15 +173,92 @@ class HackDetailDialog : DialogFragment() {
             binding.detailCover.setImageResource(R.drawable.placeholder_cover)
         }
 
+        populateScreenshots()
+        populateBadges()
+        populateChangelog()
+        populateVideos()
+        updateDownloadButton()
+    }
+
+    private fun populateScreenshots() {
+        if (hack.screenshots.isEmpty()) return
+        binding.detailScreenshotsLabel.visibility = View.VISIBLE
+        binding.detailScreenshots.visibility = View.VISIBLE
+        binding.detailScreenshots.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        binding.detailScreenshots.adapter = ScreenshotAdapter(hack.screenshots)
+    }
+
+    private fun populateBadges() {
+        val sg = hack.supportedGames
+        if (!sg.isNullOrBlank()) {
+            val gameText = when {
+                sg.contains("OoT", ignoreCase = true) -> getString(R.string.game_oot)
+                sg.contains("MM", ignoreCase = true) -> getString(R.string.game_mm)
+                else -> sg
+            }
+            binding.detailGameBadge.text = gameText
+            binding.detailGameBadge.visibility = View.VISIBLE
+        }
+        val completion = hack.completionStatus
+        if (!completion.isNullOrBlank()) {
+            binding.detailCompletionBadge.text = completion
+            binding.detailCompletionBadge.visibility = View.VISIBLE
+        }
+    }
+
+    private fun populateChangelog() {
+        if (hack.changelog.isEmpty()) return
+        binding.detailChangelogHeader.visibility = View.VISIBLE
+        hack.changelog.forEach { entry ->
+            val line = buildString {
+                if (!entry.date.isNullOrBlank()) append("${entry.date}: ")
+                append(entry.content ?: "")
+            }
+            val tv = android.widget.TextView(requireContext()).apply {
+                text = line
+                textSize = 13f
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.color_on_surface_variant))
+                setPadding(0, 4, 0, 4)
+            }
+            binding.detailChangelogContainer.addView(tv)
+        }
+    }
+
+    private fun toggleChangelog() {
+        sfx?.select()
+        val visible = binding.detailChangelogContainer.visibility == View.VISIBLE
+        binding.detailChangelogContainer.visibility = if (visible) View.GONE else View.VISIBLE
+    }
+
+    private fun populateVideos() {
+        if (hack.videos.isEmpty()) return
+        binding.detailVideosLabel.visibility = View.VISIBLE
+        binding.detailVideosContainer.visibility = View.VISIBLE
+        hack.videos.forEach { url ->
+            val tv = android.widget.TextView(requireContext()).apply {
+                text = url
+                textSize = 13f
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.switch_accent))
+                setPadding(0, 4, 0, 4)
+                isClickable = true
+                isFocusable = true
+                setOnClickListener { openBrowser(url) }
+            }
+            binding.detailVideosContainer.addView(tv)
+        }
+    }
+
+    /** Sets the download button label/state from install status + download target. */
+    private fun updateDownloadButton() {
+        pendingBrowserUrl = null
         when (val status = viewModel.statusFor(hack)) {
             is StoreStatus.NotInstalled -> {
                 binding.detailDownload.setText(R.string.detail_download)
                 binding.detailDownload.isEnabled = true
             }
             is StoreStatus.Installed -> {
-                binding.detailDownload.text = getString(
-                    R.string.store_status_installed, status.version
-                )
+                binding.detailDownload.text = getString(R.string.store_status_installed, status.version)
                 binding.detailDownload.isEnabled = false
             }
             is StoreStatus.UpdateAvailable -> {
@@ -168,9 +268,61 @@ class HackDetailDialog : DialogFragment() {
         }
     }
 
+    private fun initiateDownload() {
+        sfx?.select()
+        when (val target = hack.downloadTarget) {
+            is DownloadTarget.DirectPatch -> {
+                val toEnqueue = if (hack.patch != null) hack else hack.copy(patch = target.patch)
+                viewModel.enqueue(toEnqueue)
+            }
+            null -> {
+                if (hack.patch != null) {
+                    viewModel.enqueue(hack)
+                } else {
+                    openBrowser(hack.coverImageUrl ?: "")
+                }
+            }
+            is DownloadTarget.GitHubRelease -> resolveGitHubAndDownload(target.repoUrl)
+            is DownloadTarget.ExternalLink -> openBrowser(target.url)
+        }
+    }
+
+    /** Resolve a GitHub release to a concrete patch URL, then enqueue or fall back to browser. */
+    private fun resolveGitHubAndDownload(repoUrl: String) {
+        binding.detailDownload.setText(R.string.detail_resolving)
+        binding.detailDownload.isEnabled = false
+        lifecycleScope.launch(Dispatchers.IO) {
+            val resolved = runCatching { GitHubPatchResolver().resolve(repoUrl) }.getOrNull()
+            launch(Dispatchers.Main) {
+                if (resolved != null) {
+                    val filename = resolved.substringAfterLast('/').takeIf { it.isNotBlank() } ?: "patch.bps"
+                    val patch = PatchRef(
+                        url = resolved, filename = filename, size = 0,
+                        checksums = Checksums("", null, null)
+                    )
+                    val toEnqueue = hack.copy(patch = patch, downloadTarget = DownloadTarget.DirectPatch(patch))
+                    viewModel.enqueue(toEnqueue)
+                } else {
+                    pendingBrowserUrl = repoUrl
+                    binding.detailDownload.setText(R.string.detail_open_browser)
+                    binding.detailDownload.isEnabled = true
+                }
+            }
+        }
+    }
+
+    private fun openBrowser(url: String) {
+        if (url.isBlank()) return
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        runCatching {
+            startActivity(Intent.createChooser(intent, getString(R.string.detail_open_browser)))
+        }
+    }
+
     private fun observeQueue() {
         viewModel.queueStateFor(hack.id).observe(viewLifecycleOwner) { ui ->
-            // No entry yet (not queued): leave the button as populate() set it.
             if (ui == null) return@observe
             when (ui.phase) {
                 DownloadPhase.QUEUED, DownloadPhase.DOWNLOADING, DownloadPhase.PATCHING -> {
@@ -179,8 +331,6 @@ class HackDetailDialog : DialogFragment() {
                     binding.detailDownload.isEnabled = false
                     when (ui.phase) {
                         DownloadPhase.PATCHING -> {
-                            // No byte progress while applying the patch; show an
-                            // indeterminate bar with a dedicated message.
                             binding.detailProgress.isIndeterminate = true
                             binding.detailProgressText.visibility = View.VISIBLE
                             binding.detailProgressText.text = getString(R.string.detail_patching)
@@ -193,12 +343,10 @@ class HackDetailDialog : DialogFragment() {
                                 getString(R.string.detail_installing, ui.progressPercent)
                         }
                         else -> {
-                            // QUEUED: show a neutral "in queue" message.
                             binding.detailProgress.isIndeterminate = false
                             binding.detailProgress.progress = 0
                             binding.detailProgressText.visibility = View.VISIBLE
-                            binding.detailProgressText.text =
-                                getString(R.string.store_status_queued)
+                            binding.detailProgressText.text = getString(R.string.store_status_queued)
                         }
                     }
                 }

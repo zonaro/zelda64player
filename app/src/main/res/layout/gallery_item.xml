@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- A single capture card in the Gallery grid: a square thumbnail with a
-     type badge (video) and, for screenshots, an overlay/clean badge. -->
+     media-type badge. The second badge is reserved for legacy overlays. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_settings_section"
     android:focusable="true"
-    android:focusableInTouchMode="true"
+    android:focusableInTouchMode="false"
     android:clickable="true">
 
     <ImageView

@@ -49,6 +49,9 @@
     <!-- Compact gap between home-row cards, matching the original HOME carousel. -->
     <dimen name="switch_home_card_gap">16dp</dimen>
     <dimen name="switch_screen_margin">22dp</dimen>
+    <!-- Top spacing above the HOME game row, separating it from the account
+         entry point (RA avatar) in the upper-left corner. -->
+    <dimen name="switch_home_row_top_spacing">96dp</dimen>
     <!-- Grid screen: padding around the card grid and gap between square cards. -->
     <dimen name="switch_grid_padding">16dp</dimen>
     <dimen name="switch_grid_card_gap">16dp</dimen>

@@ -7,8 +7,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
 
     <application
         android:name=".Zelda64PlayerApp"
@@ -29,6 +27,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.GAME" />
             </intent-filter>
         </activity>
         <activity
@@ -48,19 +47,27 @@
             android:parentActivityName=".views.LibraryActivity" />
         <activity
             android:name=".store.ui.StoreActivity"
-            android:exported="false" />
+            android:exported="true"
+            android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".store.ui.DownloadQueueActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="sensorLandscape" />
         <receiver
             android:name=".store.DownloadCancelReceiver"
             android:exported="false" />
         <activity
             android:name=".settings.ui.SettingsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".drive.ConflictResolveActivity"
+            android:exported="false"
+            android:theme="@style/SwitchDialogTheme" />
         <activity
             android:name=".retroachievements.ui.AchievementsActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".retroachievements.ui.RaProfileActivity"
             android:exported="false"
@@ -76,11 +83,6 @@
             android:exported="false"
             android:screenOrientation="sensorLandscape"
             android:parentActivityName=".views.LibraryActivity" />
-
-        <service
-            android:name=".capture.CaptureService"
-            android:exported="false"
-            android:foregroundServiceType="mediaProjection" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

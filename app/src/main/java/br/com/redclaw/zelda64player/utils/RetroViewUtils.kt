@@ -3,6 +3,7 @@ package br.com.redclaw.zelda64player.utils
 import android.app.Activity
 import android.content.Context
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.drive.SyncTrigger
 import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroview.RetroView
 
@@ -34,6 +35,8 @@ class RetroViewUtils(private val activity: Activity, private val hackId: String)
         storage.sram(hackId).outputStream().use {
             it.write(retroView.view.serializeSRAM())
         }
+        // Schedule an incremental cloud sync of this SRAM (no-op when disabled).
+        SyncTrigger.markDirtySram(activity, hackId)
     }
 
     fun loadState(retroView: RetroView) {
@@ -55,6 +58,8 @@ class RetroViewUtils(private val activity: Activity, private val hackId: String)
         storage.state(hackId).outputStream().use {
             it.write(retroView.view.serializeState())
         }
+        // Schedule an incremental cloud sync of this save state (no-op when disabled).
+        SyncTrigger.markDirtyState(activity, hackId)
     }
 
     fun fastForward(retroView: RetroView) {

@@ -31,6 +31,8 @@
     <string name="badge_rb">RB</string>
     <string name="badge_l3">L3</string>
     <string name="badge_r3">R3</string>
+    <string name="badge_lt">LT</string>
+    <string name="badge_rt">RT</string>
     <string name="badge_x">X</string>
     <string name="badge_y">Y</string>
 
@@ -82,6 +84,7 @@
     <string name="store_cat_all">Todos</string>
     <string name="store_cat_installed">Instalados</string>
     <string name="store_cat_updates">Actualizaciones</string>
+    <string name="store_cat_not_installed">No Instalados</string>
     <string name="store_cat_oot">Ocarina of Time</string>
     <string name="store_cat_mm">Majora\'s Mask</string>
     <string name="store_search_icon_desc">Buscar</string>
@@ -113,6 +116,20 @@
     <string name="detail_error_generic">Error al descargar el parche.</string>
     <string name="detail_patching">Aplicando parche…</string>
     <string name="detail_installed_toast">Parche instalado. Disponible en Biblioteca.</string>
+
+    <!-- Store: multi-store + detail enhancements -->
+    <string name="store_selector_desc">Seleccionar tienda</string>
+    <string name="store_selector_hylian">Hylian Modding</string>
+    <string name="store_selector_picks">Zelda 64 Picks</string>
+    <string name="store_source_error">No se pudo cargar esta tienda.</string>
+    <string name="detail_screenshots">Capturas de pantalla</string>
+    <string name="detail_videos">Vídeos</string>
+    <string name="detail_open_browser">Abrir en el navegador</string>
+    <string name="detail_resolving">Resolviendo descarga...</string>
+    <string name="detail_supported_game">Juego compatible</string>
+    <string name="detail_completion">Estado</string>
+    <string name="detail_changelog">Registro de cambios</string>
+    <string name="detail_external_notice">Este mod debe descargarse desde su fuente.</string>
 
     <!-- Download queue (Hack Store) -->
     <string name="store_downloads">Descargas</string>
@@ -275,6 +292,61 @@
     <string name="backup_import_summary">Restaurado: %1$d hacks, %2$d archivos. Omitidos: %3$d.</string>
     <string name="backup_error_stream">No se pudo abrir el archivo.</string>
 
+    <!-- Settings: Google Drive cloud backup -->
+    <string name="gdrive_subtitle">Copia de seguridad en la nube (Google Drive)</string>
+    <string name="gdrive_enable">Activar copia de seguridad en Google Drive</string>
+    <string name="gdrive_connect">Conectar cuenta de Google</string>
+    <string name="gdrive_connected">Cuenta: %1$s</string>
+    <string name="gdrive_not_connected">Ninguna cuenta conectada</string>
+    <string name="gdrive_backup_saves">Partidas (SRAM y estados)</string>
+    <string name="gdrive_backup_images">Imágenes (capturas de pantalla)</string>
+    <string name="gdrive_backup_videos">Vídeos (grabaciones)</string>
+    <string name="gdrive_auto">Copia automática</string>
+    <string name="gdrive_frequency">Frecuencia</string>
+    <string name="gdrive_frequency_daily">Diaria</string>
+    <string name="gdrive_frequency_weekly">Semanal</string>
+    <string name="gdrive_frequency_manual">Manual</string>
+    <string name="gdrive_backup_now">Hacer copia ahora</string>
+    <string name="gdrive_view">Ver copias en Drive</string>
+    <string name="gdrive_last_backup">Última copia: %1$s</string>
+    <string name="gdrive_last_backup_never">Nunca</string>
+    <string name="gdrive_backup_summary">Copia completa: %1$d archivo(s) subido(s).</string>
+    <string name="gdrive_backup_none">No hay archivos nuevos para copiar.</string>
+    <string name="gdrive_backup_failed">Error en la copia: %1$s</string>
+    <string name="gdrive_need_account">Conecta una cuenta de Google primero.</string>
+    <string name="gdrive_need_enable">Activa la copia en Google Drive primero.</string>
+    <string name="gdrive_consent_required">Debes autorizar el acceso a Google Drive.</string>
+    <string name="gdrive_open_failed">No se pudo abrir Google Drive.</string>
+
+    <!-- Cloud Sync (automatic, per-save) -->
+    <string name="cloudsync_title">Sincronización en la nube</string>
+    <string name="cloudsync_description">Sincroniza SRAM y estados de partida automáticamente en cada cambio local, vía Google Drive.</string>
+    <string name="cloudsync_enable">Sincronizar partidas automáticamente</string>
+    <string name="cloudsync_wifi_only">Solo en Wi-Fi</string>
+    <string name="cloudsync_notify">Notificar conflictos</string>
+    <string name="cloudsync_status_in_progress">Sincronización en curso...</string>
+    <string name="cloudsync_status_last">Última sincronización: %1$s</string>
+    <string name="cloudsync_status_never">Nunca sincronizado</string>
+    <string name="cloudsync_status_no_account">Conecta una cuenta de Google para sincronizar</string>
+    <string name="cloudsync_status_disabled">Sincronización en la nube desactivada</string>
+    <string name="cloudsync_view_conflicts">Ver conflictos pendientes</string>
+    <string name="cloudsync_conflicts_count">Conflictos pendientes: %1$d</string>
+    <string name="cloudsync_conflict_title">Conflicto de partida</string>
+    <string name="cloudsync_conflict_notify">Conflicto de partida detectado en %1$s. Toca para resolver.</string>
+    <string name="cloudsync_conflict_message">Conflicto en %1$s (%2$s). Elige qué versión conservar:</string>
+    <string name="cloudsync_conflict_preview">Local: %1$s | %2$d bytes | CRC %3$s\nNube: %4$s | %5$d bytes | CRC %6$s</string>
+    <string name="cloudsync_conflict_item">%1$s — %2$s</string>
+    <string name="cloudsync_keep_local">Conservar LOCAL (mi partida actual)</string>
+    <string name="cloudsync_keep_cloud">Conservar NUBE (partida de otro dispositivo)</string>
+    <string name="cloudsync_keep_both">Conservar AMBAS (renombrar local)</string>
+    <string name="cloudsync_pending_title">Conflictos pendientes</string>
+    <string name="cloudsync_no_conflicts">No hay conflictos pendientes.</string>
+    <string name="cloudsync_resolved">Conflicto resuelto.</string>
+    <string name="cloudsync_resolve_failed">Error al resolver el conflicto.</string>
+    <string name="cloudsync_unknown_time">desconocido</string>
+    <string name="cloudsync_channel_name">Sincronización de partidas</string>
+    <string name="cloudsync_channel_desc">Notificaciones de conflictos de sincronización</string>
+
     <!-- App shortcuts (installed games as launcher shortcuts) -->
     <string name="shortcut_add_to_home">Añadir a la pantalla de inicio</string>
     <string name="shortcut_long_label_play">Jugar %1$s</string>
@@ -358,7 +430,7 @@
     <string name="dock_store">Tienda</string>
     <string name="dock_achievements">RetroAchievements</string>
     <string name="dock_settings">Configuración</string>
-    <string name="dock_gamepad_tester">Prueba de Mando</string>
+    <string name="dock_control">Control</string>
     <string name="footer_about">(i) Acerca de</string>
     <string name="footer_options">+ Opciones</string>
     <string name="footer_gamepad_disconnected">Mando desconectado</string>
@@ -481,15 +553,13 @@
     <string name="gallery_delete_confirm">¿Eliminar esta captura? Esta acción no se puede deshacer.</string>
     <string name="gallery_view">Ver</string>
     <string name="gallery_record_badge">Vídeo</string>
+    <string name="gallery_screenshot_badge">Imagen</string>
     <string name="gallery_overlay_badge">Con Controles</string>
     <string name="settings_capture_category">Captura</string>
     <string name="settings_capture_description">Las capturas y grabaciones se guardan solo en el dispositivo.</string>
-    <string name="settings_capture_include_overlay">Incluir controles en la grabación</string>
     <string name="capture_saved">Captura guardada</string>
     <string name="capture_failed">Error al capturar</string>
     <string name="recording_started">Grabación iniciada</string>
     <string name="recording_stopped">Grabación detenida</string>
-    <string name="recording_permission_denied">Permiso de grabación denegado</string>
-    <string name="capture_overlay_hidden_hint">Controles ocultos en la grabación</string>
     <string name="recording_label">REC</string>
 </resources>

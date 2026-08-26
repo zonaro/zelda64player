@@ -1,6 +1,7 @@
 package br.com.redclaw.zelda64player.retroview
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import android.view.Gravity
 import android.widget.FrameLayout
@@ -99,6 +100,20 @@ class RetroView(
      * GLRetroView instance itself
      */
     val view = GLRetroView(context, retroViewData)
+
+    /** Record only the emulator's GL framebuffer; no system screen capture is used. */
+    fun startVideoRecording(outputFile: File, onResult: (Boolean) -> Unit) {
+        view.startVideoRecording(outputFile, onResult)
+    }
+
+    fun stopVideoRecording(onStopped: (() -> Unit)? = null) {
+        view.stopVideoRecording(onStopped)
+    }
+
+    /** Capture only the emulator framebuffer, excluding all Android overlay Views. */
+    fun captureScreenshot(onResult: (Bitmap?) -> Unit) {
+        view.captureScreenshot(onResult)
+    }
 
     init {
         val params = FrameLayout.LayoutParams(

@@ -1,6 +1,7 @@
 package br.com.redclaw.zelda64player.store.ui
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -11,8 +12,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -26,6 +30,7 @@ import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.databinding.ActivityStoreBinding
 import br.com.redclaw.zelda64player.ocarina.OcarinaGame
+import br.com.redclaw.zelda64player.store.BuiltInStores
 import br.com.redclaw.zelda64player.store.DownloadPhase
 import br.com.redclaw.zelda64player.store.DownloadQueueManager
 import br.com.redclaw.zelda64player.store.ImportPatchInvalid
@@ -37,6 +42,7 @@ import br.com.redclaw.zelda64player.store.ImportRomDuplicate
 import br.com.redclaw.zelda64player.store.ImportRomInvalid
 import br.com.redclaw.zelda64player.store.ImportRomSuccess
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -47,6 +53,10 @@ class StoreActivity : AppCompatActivity() {
     private lateinit var adapter: StoreAdapter
 
     private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
+
+    companion object {
+        private const val KEY_SELECTED_STORE = "selected_store"
+    }
 
     /** Sidebar category rows, rebuilt once in [onCreate]. */
     private val categoryRows = mutableListOf<CategoryRowUi>()
@@ -112,6 +122,8 @@ class StoreActivity : AppCompatActivity() {
         buildCategoryRows()
         binding.storeSearchIcon.setOnClickListener { toggleSearch() }
 
+        setupStoreSelector()
+
         binding.storePrev.setOnClickListener { viewModel.prevPage() }
         binding.storeNext.setOnClickListener { viewModel.nextPage() }
 
@@ -155,7 +167,55 @@ class StoreActivity : AppCompatActivity() {
         // (queued / downloading / patching / finished states).
         DownloadQueueManager.queue.observe(this) { renderItems() }
 
+        // Surface per-source fetch errors (e.g. a store that failed to load).
+        viewModel.sourceError.observe(this) { error ->
+            if (error != null) {
+                binding.storeSourceError.text = getString(R.string.store_source_error)
+                binding.storeSourceError.visibility = View.VISIBLE
+            } else {
+                binding.storeSourceError.visibility = View.GONE
+            }
+        }
+
         viewModel.refresh()
+    }
+
+    /** Top-bar store selector: lists built-in stores, persists the last choice. */
+    private fun setupStoreSelector() {
+        val stores = viewModel.storeList
+        val adapter = ArrayAdapter(
+            this, R.layout.store_spinner_item, stores.map { storeDisplayName(it.id, it.displayName) }
+        )
+        adapter.setDropDownViewResource(R.layout.store_spinner_dropdown_item)
+        binding.storeSelector.adapter = adapter
+
+        // Restore the last-selected store (default Hylian Modding).
+        val prefs = storePrefs()
+        val saved = prefs.getString(KEY_SELECTED_STORE, BuiltInStores.STORE_HYLIANMODDING)
+            ?: BuiltInStores.STORE_HYLIANMODDING
+        val initialIndex = stores.indexOfFirst { it.id == saved }.coerceAtLeast(0)
+        binding.storeSelector.setSelection(initialIndex)
+        if (viewModel.selectedStoreId.value != saved) viewModel.setStore(saved)
+
+        binding.storeSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
+                val store = stores.getOrNull(pos) ?: return
+                prefs.edit().putString(KEY_SELECTED_STORE, store.id).apply()
+                viewModel.setStore(store.id)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) = Unit
+        }
+    }
+
+    private fun storePrefs(): SharedPreferences =
+        getSharedPreferences("zelda64_store", MODE_PRIVATE)
+
+    /** Localized display name for a store id (falls back to the definition name). */
+    private fun storeDisplayName(id: String, fallback: String): String = when (id) {
+        BuiltInStores.STORE_HYLIANMODDING -> getString(R.string.store_selector_hylian)
+        BuiltInStores.STORE_PICKS -> getString(R.string.store_selector_picks)
+        else -> fallback
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -245,7 +305,7 @@ class StoreActivity : AppCompatActivity() {
                     (4 * density).toInt(),
                     LinearLayout.LayoutParams.MATCH_PARENT
                 ).apply { marginEnd = (12 * density).toInt() }
-                setBackgroundResource(R.color.switch_accent)
+                setBackgroundColor(AccentManager.getAccentColor(this@StoreActivity))
                 visibility = View.GONE
             }
             val label = TextView(this).apply {
@@ -285,6 +345,7 @@ class StoreActivity : AppCompatActivity() {
 
     /** Highlights the active category row (accent bar + bg + accent text). */
     private fun updateCategoryHighlight(active: StoreCategory) {
+        val accentColor = AccentManager.getAccentColor(this)
         categoryRows.forEach { (cat, row, accent, label) ->
             val isActive = cat == active
             accent.visibility = if (isActive) View.VISIBLE else View.GONE
@@ -295,10 +356,7 @@ class StoreActivity : AppCompatActivity() {
                 )
             )
             label.setTextColor(
-                ContextCompat.getColor(
-                    this,
-                    if (isActive) R.color.switch_accent else R.color.switch_text_primary
-                )
+                if (isActive) accentColor else ContextCompat.getColor(this, R.color.switch_text_primary)
             )
         }
     }

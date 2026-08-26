@@ -12,6 +12,9 @@ import br.com.redclaw.zelda64player.patcher.n64.ChecksumCalculator
  */
 object PatchValidator {
     fun validate(bytes: ByteArray, checksums: Checksums): Result<Unit> = runCatching {
+        // A blank catalog CRC means "no checksum declared" (e.g. Hylian Modding
+        // patches resolved at download time) — skip validation rather than fail.
+        if (checksums.crc32.isBlank()) return@runCatching
         val actualCrc = ChecksumCalculator.crc32(bytes)
         if (!actualCrc.equals(checksums.crc32, ignoreCase = true)) {
             throw StoreException.ChecksumMismatch(expected = checksums.crc32, actual = actualCrc)

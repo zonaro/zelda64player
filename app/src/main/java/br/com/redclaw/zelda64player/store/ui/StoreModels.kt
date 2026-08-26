@@ -21,7 +21,7 @@ sealed class StoreStatus {
  * from data already present on each [HackEntry] (no new catalog fields needed):
  *
  * - [All] shows everything.
- * - [Installed] / [Updates] depend on the computed install [StoreStatus].
+ * - [Installed] / [Updates] / [NotInstalled] depend on the computed install [StoreStatus].
  * - [Oot] / [Mm] depend on the base ROM game code prefix.
  *
  * [labelRes] points at the localized category name shown in the sidebar and as
@@ -36,6 +36,9 @@ sealed class StoreCategory(val labelRes: Int) {
 
     /** Hacks whose install status is UpdateAvailable. */
     object Updates : StoreCategory(R.string.store_cat_updates)
+
+    /** Hacks whose install status is NotInstalled. */
+    object NotInstalled : StoreCategory(R.string.store_cat_not_installed)
 
     /** Hacks whose base ROM game code starts with "CZL" (Ocarina of Time). */
     object Oot : StoreCategory(R.string.store_cat_oot)
@@ -53,7 +56,7 @@ sealed class StoreCategory(val labelRes: Int) {
          * leaving a null category in the list and crashing the Store at launch.
          */
         val ALL: List<StoreCategory>
-            get() = listOf(All, Installed, Updates, Oot, Mm)
+            get() = listOf(All, Installed, Updates, NotInstalled, Oot, Mm)
     }
 }
 
