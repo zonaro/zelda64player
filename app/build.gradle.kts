@@ -6,6 +6,8 @@
 import de.undercouch.gradle.tasks.download.DownloadSpec
 import org.gradle.api.Action
 import java.util.Properties
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 plugins {
     id("com.android.application")
@@ -17,12 +19,19 @@ android {
     namespace = "br.com.redclaw.zelda64player"
     compileSdk = 35
 
+    // Generate version at build time: {yy}.{dayOfYear}.{hhmm}
+    // Example: 26.238.1430 = 2026, day 238 (Aug 26), 14:30
+    val buildTime = LocalDateTime.now()
+    val generatedVersionName = buildTime.format(DateTimeFormatter.ofPattern("yy.DDD.HHmm"))
+    // versionCode: yydddHHmm as integer (e.g., 262381430)
+    val generatedVersionCode = buildTime.format(DateTimeFormatter.ofPattern("yyDDDHHmm")).toInt()
+
     defaultConfig {
         applicationId = "br.com.redclaw.zelda64player"
         minSdk = 24
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = generatedVersionCode
+        versionName = generatedVersionName
 
         // RetroAchievements native runtime: same ABI set as the prebuilt cores.
         ndk {
@@ -279,4 +288,10 @@ dependencies {
 
     // EncryptedSharedPreferences (AES256 master key) for RetroAchievements credentials.
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    // Google Drive cloud backup: account picker + OAuth2 token retrieval. The
+    // Drive REST API v3 is called directly over OkHttp (already a dependency) to
+    // avoid the heavy, deprecated google-api-services-drive client. Only the
+    // drive.file scope is requested, so the app can only see files it created.
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
 }
