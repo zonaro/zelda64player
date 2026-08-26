@@ -1,0 +1,29 @@
+# Zelda 64 Player — robots.txt
+# GitHub Pages site for the Zelda 64 Player Android app
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://zonaro.github.io/zelda64player/sitemap.xml
+
+# Host
+Host: https://zonaro.github.io/zelda64player/
+
+# Crawl-delay (optional, be respectful)
+Crawl-delay: 10
+
+# Disallow non-public assets
+Disallow: /assets/fonts/
+Disallow: /assets/app.js
+Disallow: /assets/styles.css
+Disallow: /catalog.example.json
+
+# Allow important files
+Allow: /catalog.json
+Allow: /CATALOG.md
+Allow: /llms.txt
+Allow: /sitemap.xml
+Allow: /assets/app-icon.png
+Allow: /assets/placeholder_cover_preview.png
+Allow: /covers/

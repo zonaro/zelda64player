@@ -1,16 +1,207 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Zelda 64 Player</title>
-  <meta name="description" content="Emulador Android para hacks de Zelda 64, com patches BPS/IPS, biblioteca de ROMs próprias e interface inspirada na HOME do Switch." />
+  <title>Zelda 64 Player — Emulador de Hacks N64 para Android</title>
+  <meta name="description" content="Zelda 64 Player: emulador Android nativo para hacks de Ocarina of Time e Majora's Mask. Live BPS/IPS patching, Auto-Ocarina, RetroAchievements, UI estilo Nintendo Switch. Sem ROMs embutidas. GPL-3.0." />
   <meta name="color-scheme" content="dark" />
-  <meta property="og:title" content="Zelda 64 Player" />
+  <meta name="theme-color" content="#02830C" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow" />
+  <meta name="bingbot" content="index, follow" />
+
+  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://zonaro.github.io/zelda64player/" />
+  <meta property="og:title" content="Zelda 64 Player — Emulador de Hacks N64 para Android" />
+  <meta property="og:description" content="Emulador Android nativo para hacks de Zelda 64 (Ocarina of Time, Majora's Mask) com live BPS/IPS patching, Auto-Ocarina, RetroAchievements e UI estilo Nintendo Switch. GPL-3.0, sem ROMs embutidas." />
+  <meta property="og:image" content="https://zonaro.github.io/zelda64player/assets/app-icon.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:site_name" content="Zelda 64 Player" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:locale:alternate" content="es_ES" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@zonaro" />
+  <meta name="twitter:creator" content="@zonaro" />
+  <meta name="twitter:title" content="Zelda 64 Player — Emulador de Hacks N64 para Android" />
+  <meta name="twitter:description" content="Emulador Android nativo para hacks de Zelda 64 com live BPS/IPS patching, Auto-Ocarina, RetroAchievements e UI estilo Nintendo Switch." />
+  <meta name="twitter:image" content="https://zonaro.github.io/zelda64player/assets/app-icon.png" />
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://zonaro.github.io/zelda64player/" />
+
+  <!-- Alternate languages -->
+  <link rel="alternate" hreflang="pt-BR" href="https://zonaro.github.io/zelda64player/" />
+  <link rel="alternate" hreflang="en" href="https://zonaro.github.io/zelda64player/" />
+  <link rel="alternate" hreflang="es" href="https://zonaro.github.io/zelda64player/" />
+  <link rel="alternate" hreflang="x-default" href="https://zonaro.github.io/zelda64player/" />
+
+  <!-- Styles -->
   <link rel="stylesheet" href="./assets/styles.css" />
-  <link rel="icon" type="image/png" href="./assets/app-icon.png" />
-  <link rel="apple-touch-icon" href="./assets/app-icon.png" />
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="512x512" href="./assets/app-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/app-icon.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/app-icon.png" />
+  <link rel="manifest" href="./manifest.json" />
+
+  <!-- Preconnect for external resources -->
+  <link rel="preconnect" href="https://www.youtube.com" crossorigin />
+  <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin />
+  <link rel="preconnect" href="https://api.github.com" crossorigin />
+
+  <!-- DNS Prefetch -->
+  <link rel="dns-prefetch" href="https://www.youtube.com" />
+  <link rel="dns-prefetch" href="https://raw.githubusercontent.com" />
+  <link rel="dns-prefetch" href="https://api.github.com" />
+  <link rel="dns-prefetch" href="https://github.com" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Zelda 64 Player",
+    "alternateName": "Z64P",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Android 7.0+ (API 24+)",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "BRL",
+      "availability": "https://schema.org/InStock",
+      "url": "https://github.com/zonaro/zelda64player/releases",
+      "description": "Download gratuito do APK assinado no GitHub Releases"
+    },
+    "description": "Emulador Android nativo para hacks de Nintendo 64 Zelda (Ocarina of Time, Majora's Mask) com live BPS/IPS patching, Auto-Ocarina, RetroAchievements e interface inspirada na HOME do Nintendo Switch. Licenciado sob GPL-3.0. Não distribui ROMs.",
+    "author": {
+      "@type": "Person",
+      "name": "zonaro",
+      "url": "https://github.com/zonaro"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "RedClaw",
+      "url": "https://github.com/zonaro/zelda64player"
+    },
+    "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+    "codeRepository": "https://github.com/zonaro/zelda64player",
+    "url": "https://zonaro.github.io/zelda64player/",
+    "downloadUrl": "https://github.com/zonaro/zelda64player/releases",
+    "featureList": [
+      "Live BPS/IPS patching com validação CRC32 tripla",
+      "Auto-Ocarina: HUD in-game toca músicas automaticamente (OoT: 12, MM: 11)",
+      "RetroAchievements: conquistas, leaderboards, modo hardcore via rcheevos",
+      "UI estilo Nintendo Switch HOME menu (implementação nativa customizada)",
+      "Jogos Vanilla na Biblioteca: ROMs base OoT/MM jogáveis direto da tela principal",
+      "Catálogo de hacks hospedado no GitHub com atualização em background (WorkManager)",
+      "Normalização de byte-order N64 (.z64/.v64/.n64 → big-endian)",
+      "Correspondência de ROM base por checksum (CRC32/MD5/SHA1)",
+      "Layout de gamepad RadialGamePad sob medida para OoT/MM",
+      "Teste de controle N64 em tempo real",
+      "Backup e restauração de saves via ZIP local",
+      "Captura de tela, gravação MP4 e galeria estilo Switch",
+      "Internacionalização: pt-BR, inglês, espanhol"
+    ],
+    "screenshot": "https://zonaro.github.io/zelda64player/assets/app-icon.png",
+    "keywords": "emulador, nintendo 64, zelda, ocarina of time, majora's mask, rom hack, bps patch, android, retroachievements, gpL-3.0",
+    "inLanguage": ["pt-BR", "en", "es"],
+    "datePublished": "2024-01-01",
+    "dateModified": "2026-08-26",
+    "version": "1.0.1",
+    "releaseNotes": "https://github.com/zonaro/zelda64player/releases"
+  }
+  </script>
+
+  <!-- JSON-LD: WebSite with SearchAction -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Zelda 64 Player",
+    "url": "https://zonaro.github.io/zelda64player/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://github.com/zonaro/zelda64player/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "inLanguage": ["pt-BR", "en", "es"]
+  }
+  </script>
+
+  <!-- JSON-LD: BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Início",
+        "item": "https://zonaro.github.io/zelda64player/"
+      }
+    ]
+  }
+  </script>
+
+  <!-- JSON-LD: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "O Zelda 64 Player vem com ROMs inclusas?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Não. O Zelda 64 Player NUNCA distribui, baixa ou embute ROMs base (Ocarina of Time, Majora's Mask). Você deve fornecer suas próprias ROMs legalmente obtidas via Settings → Import Base ROM."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quais hacks são suportados?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "O app suporta 20+ hacks de Zelda 64 via catálogo JSON hospedado no GitHub, incluindo Ocarina of Time DX, Ultimate Trial, Majora's Mask Redux, Master of Time Revisited, The Missing Link, The Sealed Palace, Dawn & Dusk, Sands of Time, e muitos outros."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Como funciona o patch BPS?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "O app aplica patches BPS (e IPS legado) em memória/cache na hora de jogar, validando CRC32 da ROM base, do patch e da ROM final (validação tripla). A ROM base nunca é modificada permanentemente."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "O app funciona offline?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sim, após importar a ROM base e baixar o patch do hack desejado, a emulação funciona totalmente offline. Apenas a loja de hacks e RetroAchievements requerem internet."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Qual a licença do projeto?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "GPL-3.0. O projeto é derivado do Ludere (GPL-3.0). O código-fonte completo deve ser oferecido; mantenha o arquivo LICENSE e cabeçalhos de copyright intactos."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <header class="topbar type-zone" data-type-zone>
@@ -106,6 +297,19 @@
     <div class="container">
       <p data-i18n="footer.text"></p>
       <p><a href="https://github.com/zonaro/zelda64player" target="_blank" rel="noopener" data-i18n="footer.source"></a></p>
+      <nav class="footer-links" aria-label="Links adicionais">
+        <a href="./llms.txt" target="_blank" rel="noopener" data-i18n="footer.llms"></a>
+        <span aria-hidden="true">·</span>
+        <a href="./sitemap.xml" target="_blank" rel="noopener" data-i18n="footer.sitemap"></a>
+        <span aria-hidden="true">·</span>
+        <a href="./robots.txt" target="_blank" rel="noopener" data-i18n="footer.robots"></a>
+        <span aria-hidden="true">·</span>
+        <a href="./CATALOG.md" target="_blank" rel="noopener" data-i18n="footer.catalogSchema"></a>
+        <span aria-hidden="true">·</span>
+        <a href="./catalog.example.json" target="_blank" rel="noopener" data-i18n="footer.catalogExample"></a>
+        <span aria-hidden="true">·</span>
+        <a href="./catalog.json" target="_blank" rel="noopener" data-i18n="footer.catalogCurrent"></a>
+      </nav>
     </div>
   </footer>
 

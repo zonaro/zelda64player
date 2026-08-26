@@ -574,6 +574,25 @@ a:hover { text-decoration: underline; }
   text-align: center;
 }
 .footer a { color: var(--accent-focus); }
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.footer-links a {
+  color: var(--text-secondary);
+  transition: color 0.15s;
+}
+.footer-links a:hover {
+  color: var(--accent-focus);
+  text-decoration: underline;
+}
+.footer-links span {
+  color: rgba(255, 255, 255, 0.2);
+}
 
 /* ---------- Responsive / TV ---------- */
 @media (min-width: 1600px) {
