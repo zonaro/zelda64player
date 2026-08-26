@@ -35,6 +35,12 @@ const I18N = {
     "card.coverFallback": "Sem capa",
     "footer.text": "Zelda 64 Player é um software livre GPL-3.0. Não afiliado à Nintendo.",
     "footer.source": "Código-fonte",
+    "footer.llms": "LLMS.txt",
+    "footer.sitemap": "Sitemap",
+    "footer.robots": "Robots",
+    "footer.catalogSchema": "Catálogo Schema",
+    "footer.catalogExample": "Exemplo JSON",
+    "footer.catalogCurrent": "Catálogo Atual",
     "f.store.title": "Loja de Hacks com catálogo JSON",
     "f.store.desc": "Navegue e instale hacks a partir de um catálogo JSON hospedado no GitHub, com atualização em segundo plano e cache no dispositivo.",
     "f.patch.title": "Patch BPS/IPS ao vivo com validação CRC32 tripla",
@@ -120,6 +126,12 @@ const I18N = {
     "card.coverFallback": "No cover",
     "footer.text": "Zelda 64 Player is free software under GPL-3.0. Not affiliated with Nintendo.",
     "footer.source": "Source code",
+    "footer.llms": "LLMS.txt",
+    "footer.sitemap": "Sitemap",
+    "footer.robots": "Robots",
+    "footer.catalogSchema": "Catalog Schema",
+    "footer.catalogExample": "JSON Example",
+    "footer.catalogCurrent": "Current Catalog",
     "f.store.title": "Hack Store with JSON catalog",
     "f.store.desc": "Browse and install hacks from a GitHub-hosted JSON catalog, with background refresh and on-device cache.",
     "f.patch.title": "Live BPS/IPS patching with triple CRC32 validation",
@@ -204,6 +216,12 @@ const I18N = {
     "card.coverFallback": "Sin portada",
     "footer.text": "Zelda 64 Player es software libre GPL-3.0. No afiliado a Nintendo.",
     "footer.source": "Código fuente",
+    "footer.llms": "LLMS.txt",
+    "footer.sitemap": "Sitemap",
+    "footer.robots": "Robots",
+    "footer.catalogSchema": "Esquema Catálogo",
+    "footer.catalogExample": "Ejemplo JSON",
+    "footer.catalogCurrent": "Catálogo Actual",
     "f.store.title": "Tienda de Hacks con catálogo JSON",
     "f.store.desc": "Explora e instala hacks desde un catálogo JSON en GitHub, con actualización en segundo plano y caché en el dispositivo.",
     "f.patch.title": "Parcheo BPS/IPS en vivo con validación CRC32 triple",
@@ -603,30 +621,53 @@ function setupTypographyAwakening() {
   if (!zones.length) return;
 
   const awaken = function (zone) {
-    zone.classList.add("font-awakened");
+    if (!zone.classList.contains("font-awakened")) {
+      zone.classList.add("font-awakened");
+    }
   };
 
-  if (!("IntersectionObserver" in window)) {
-    const awakenVisible = function () {
-      zones.forEach(function (zone) {
-        if (zone.getBoundingClientRect().top < window.innerHeight * 0.85) awaken(zone);
+  // IntersectionObserver with rootMargin to trigger earlier (more reliable on mobile)
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          awaken(entry.target);
+          observer.unobserve(entry.target);
+        }
       });
-    };
-    awakenVisible();
-    window.addEventListener("scroll", awakenVisible, { passive: true });
-    return;
+    }, { threshold: 0.15, rootMargin: "100px 0px" });
+
+    zones.forEach(function (zone) { observer.observe(zone); });
   }
 
-  const observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) {
-        awaken(entry.target);
-        observer.unobserve(entry.target);
-      }
+  // Scroll-based backup checker (runs always, catches any missed zones on mobile)
+  let scrollTicking = false;
+  const checkVisibilityOnScroll = function () {
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(function () {
+      const vh = window.innerHeight;
+      const triggerPoint = vh * 0.85; // same as fallback logic
+      zones.forEach(function (zone) {
+        if (!zone.classList.contains("font-awakened")) {
+          const rect = zone.getBoundingClientRect();
+          if (rect.top < triggerPoint && rect.bottom > 0) {
+            awaken(zone);
+          }
+        }
+      });
+      scrollTicking = false;
     });
-  }, { threshold: 0.15 });
+  };
 
-  zones.forEach(function (zone) { observer.observe(zone); });
+  // Initial check (in case some zones are already in view)
+  checkVisibilityOnScroll();
+
+  // Listen for scroll with passive listener
+  window.addEventListener("scroll", checkVisibilityOnScroll, { passive: true });
+
+  // Also check on resize (mobile address bar hide/show changes viewport)
+  window.addEventListener("resize", checkVisibilityOnScroll, { passive: true });
 }
 
 document.addEventListener("DOMContentLoaded", function () {
