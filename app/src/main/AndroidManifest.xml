@@ -90,6 +90,11 @@
             android:exported="false"
             android:screenOrientation="sensorLandscape"
             android:parentActivityName=".gallery.GalleryActivity" />
+        <activity
+            android:name=".store.ui.WebViewDownloadActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:parentActivityName=".store.ui.StoreActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

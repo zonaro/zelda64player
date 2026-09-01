@@ -19,7 +19,6 @@
 package br.com.redclaw.zelda64player.store.ui
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -113,7 +112,7 @@ class HackDetailDialog : DialogFragment() {
                     "Download button clicked! pendingBrowserUrl=$pendingBrowserUrl, hack.id=${hack.id}"
             )
             if (pendingBrowserUrl != null) {
-                openBrowser(pendingBrowserUrl!!)
+                openWebView(pendingBrowserUrl!!)
             } else {
                 initiateDownload()
             }
@@ -260,7 +259,7 @@ class HackDetailDialog : DialogFragment() {
                         setPadding(0, 4, 0, 4)
                         isClickable = true
                         isFocusable = true
-                        setOnClickListener { openBrowser(url) }
+                        setOnClickListener { openWebView(url) }
                     }
             binding.detailVideosContainer.addView(tv)
         }
@@ -316,11 +315,11 @@ class HackDetailDialog : DialogFragment() {
                 if (hack.patch != null) {
                     viewModel.enqueue(hack)
                 } else {
-                    openBrowser(hack.coverImageUrl ?: "")
+                    openWebView(hack.coverImageUrl ?: "")
                 }
             }
             is DownloadTarget.GitHubRelease -> resolveGitHubAndDownload(target.repoUrl)
-            is DownloadTarget.ExternalLink -> openBrowser(target.url)
+            is DownloadTarget.ExternalLink -> openWebView(target.url)
         }
     }
 
@@ -357,15 +356,14 @@ class HackDetailDialog : DialogFragment() {
         }
     }
 
-    private fun openBrowser(url: String) {
+    private fun openWebView(url: String) {
         if (url.isBlank()) return
         val intent =
-                Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                Intent(requireContext(), WebViewDownloadActivity::class.java).apply {
+                    putExtra(WebViewDownloadActivity.EXTRA_HACK_JSON, hack.toJson().toString())
+                    putExtra(WebViewDownloadActivity.EXTRA_URL, url)
                 }
-        runCatching {
-            startActivity(Intent.createChooser(intent, getString(R.string.detail_open_browser)))
-        }
+        startActivity(intent)
     }
 
     private fun observeQueue() {

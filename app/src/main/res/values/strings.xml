@@ -141,6 +141,20 @@
     <string name="detail_changelog">Registro de alterações</string>
     <string name="detail_external_notice">Este mod deve ser baixado de sua fonte.</string>
 
+    <!-- Embedded WebView downloader (ExternalLink hacks) -->
+    <string name="webview_title">Baixar hack</string>
+    <string name="webview_back_desc">Voltar</string>
+    <string name="webview_downloading">Baixando %1$s…</string>
+    <string name="webview_install_success">Instalado: %1$s</string>
+    <string name="webview_install_error_title">Falha na instalação</string>
+    <string name="webview_install_failed">Falha ao instalar o arquivo.</string>
+    <string name="webview_download_failed">Falha no download: %1$s</string>
+    <string name="webview_unsupported_file">Arquivo não suportado: %1$s</string>
+    <string name="webview_unsupported_archive_title">Arquivo não suportado</string>
+    <string name="webview_unsupported_archive_message">O arquivo %1$s está em formato .7z ou .rar, que não pode ser extraído automaticamente. Baixe a versão .zip ou .bps/.ips/.xdelta se disponível.</string>
+    <string name="webview_no_patch_in_zip">Nenhum patch ou ROM encontrado dentro de %1$s.</string>
+    <string name="webview_no_base_rom">ROM base não encontrada (CRC32 %1$s). Importe a ROM %2$s nas configurações.</string>
+
     <!-- Download queue (Hack Store) -->
     <string name="store_downloads">Downloads</string>
     <string name="download_queue_title">Downloads</string>

@@ -69,6 +69,7 @@ body {
 }
 
 .type-zone.font-awakened {
+  font-family: "Cairopixel", sans-serif;
   --font-title: "Cairopixel", sans-serif;
   --font-heading: "Cairopixel", sans-serif;
   --font-copy: "Cairopixel", sans-serif;
@@ -111,6 +112,24 @@ body {
   font-family: var(--glyph-awake-font);
   opacity: 1;
   transform: none;
+}
+
+/* Catalog is dynamic — must always be readable, never Hylian */
+#catalog-grid,
+#catalog-grid .hack-card,
+#catalog-grid .hack-body,
+#catalog-grid .hack-title,
+#catalog-grid .hack-desc,
+#catalog-grid .hack-meta,
+#catalog-grid .chip,
+#catalog-grid .hack-cores,
+#catalog-count,
+#catalog-state {
+  font-family: "Cairopixel", sans-serif;
+}
+
+#catalog-grid .ph-icon {
+  font-family: "Hylian Symbols", sans-serif;
 }
 
 .hylian-symbol {
