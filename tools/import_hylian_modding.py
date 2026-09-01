@@ -560,8 +560,12 @@ def merge_catalog(catalog: dict[str, Any], imported: list[dict[str, Any]]) -> tu
 
     additions = sorted(incoming.values(), key=lambda entry: (entry["name"].casefold(), entry["id"]))
     retained.extend(additions)
-    # Ensure all retained entries have developerLinks and proper videos
+    # Ensure all retained entries have developerLinks, videos and proper screenshots
     for entry in retained:
+        if not isinstance(entry.get("videos"), list):
+            entry["videos"] = []
+        if not isinstance(entry.get("screenshots"), list):
+            entry["screenshots"] = []
         if not isinstance(entry.get("developerLinks"), list):
             entry["developerLinks"] = infer_developer_links(entry)
         elif len(entry.get("developerLinks", [])) == 0:

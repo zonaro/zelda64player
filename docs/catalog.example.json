@@ -1,5 +1,5 @@
 {
-  "catalogVersion": 1,
+  "catalogVersion": 3,
   "lastUpdated": "2026-08-23T00:00:00Z",
   "hacks": [
     {
@@ -28,8 +28,23 @@
         }
       },
       "coverImageUrl": "https://example.com/covers/oot_dx.png",
-      "tags": ["quality-of-life", "restoration", "enhancement"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": [
+        "quality-of-life",
+        "restoration",
+        "enhancement"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/N64DX/oot-dx"
+        }
+      ],
+      "videos": [],
+      "screenshots": []
     },
     {
       "id": "ultimate_trial",
@@ -56,8 +71,28 @@
           "md5": "db9a3c0d7fc56882e3bfa0a55cbf8617"
         }
       },
-      "tags": ["new-content", "achievements"],
-      "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"]
+      "tags": [
+        "new-content",
+        "achievements"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/RichieUltimate/ultimate-trial"
+        }
+      ],
+      "videos": [
+        "https://www.youtube.com/watch?v=3t1mvYpJWn4"
+      ],
+      "screenshots": [
+        "https://example.com/screenshots/ut1.png",
+        "https://example.com/screenshots/ut2.png"
+      ],
+      "coverImageUrl": "https://example.com/covers/ultimate_trial.png"
     }
   ]
 }

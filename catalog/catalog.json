@@ -1,7 +1,7 @@
 {
-  "catalogVersion": 2,
+  "catalogVersion": 3,
   "storeName": "Main Store",
-  "lastUpdated": "2026-09-01T11:34:44Z",
+  "lastUpdated": "2026-09-01T19:00:23Z",
   "hacks": [
     {
       "id": "ocarina_of_time_dx",
@@ -38,7 +38,15 @@
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "supportedGames": "OoT"
+      "supportedGames": "OoT",
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/N64DX/oot-dx"
+        }
+      ],
+      "videos": [],
+      "screenshots": []
     },
     {
       "id": "ultimate_trial",
@@ -75,7 +83,6 @@
         "parallel_n64"
       ],
       "screenshots": [
-        "https://www.youtube.com/watch?v=3t1mvYpJWn4&ab_channel=Richie",
         "https://hylianmodding.com/mods/ultimate_trial/screenshots/screenshot_1.png",
         "https://hylianmodding.com/mods/ultimate_trial/screenshots/screenshot_2.png",
         "https://hylianmodding.com/mods/ultimate_trial/screenshots/screenshot_3.png",
@@ -100,7 +107,16 @@
         "catalogId": "mods",
         "modUrl": "https://hylianmodding.com/mods/ultimate_trial/mod.json",
         "managed": false
-      }
+      },
+      "videos": [
+        "https://www.youtube.com/watch?v=3t1mvYpJWn4&ab_channel=Richie"
+      ],
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/RichieUltimate/ultimate-trial"
+        }
+      ]
     },
     {
       "id": "majoras_mask_redux",
@@ -138,7 +154,15 @@
       "downloadTarget": {
         "type": "external",
         "url": "https://www.romhacking.net/hacks/5122/"
-      }
+      },
+      "developerLinks": [
+        {
+          "label": "Romhacking.net",
+          "url": "https://www.romhacking.net/hacks/5122/"
+        }
+      ],
+      "videos": [],
+      "screenshots": []
     },
     {
       "id": "master_of_time_revisited",
@@ -175,7 +199,6 @@
         "parallel_n64"
       ],
       "screenshots": [
-        "https://www.youtube.com/watch?v=NdTIjpgfGb4",
         "https://hylianmodding.com/mods/master_of_time_revisited/screenshots/screenshot_1.png",
         "https://hylianmodding.com/mods/master_of_time_revisited/screenshots/screenshot_2.png",
         "https://hylianmodding.com/mods/master_of_time_revisited/screenshots/screenshot_3.png",
@@ -195,7 +218,11 @@
         "catalogId": "mods",
         "modUrl": "https://hylianmodding.com/mods/master_of_time_revisited/mod.json",
         "managed": false
-      }
+      },
+      "videos": [
+        "https://www.youtube.com/watch?v=NdTIjpgfGb4"
+      ],
+      "developerLinks": []
     },
     {
       "id": "the_missing_link",
@@ -256,7 +283,14 @@
         "catalogId": "mods",
         "modUrl": "https://hylianmodding.com/mods/the_missing_link/mod.json",
         "managed": false
-      }
+      },
+      "videos": [],
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/zeldaret/oot"
+        }
+      ]
     },
     {
       "id": "sealed_palace",
@@ -296,7 +330,15 @@
       "downloadTarget": {
         "type": "external",
         "url": "https://www.romhacking.net/hacks/7663/"
-      }
+      },
+      "developerLinks": [
+        {
+          "label": "Romhacking.net",
+          "url": "https://www.romhacking.net/hacks/7663/"
+        }
+      ],
+      "videos": [],
+      "screenshots": []
     },
     {
       "id": "dawn_and_dusk",
@@ -331,7 +373,15 @@
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "supportedGames": "OoT"
+      "supportedGames": "OoT",
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/LuigiBlood/zelda64-dawn-dusk"
+        }
+      ],
+      "videos": [],
+      "screenshots": []
     },
     {
       "id": "sands_of_time",
@@ -376,6 +426,7 @@
         "https://hylianmodding.com/mods/sands_of_time/screenshots/screenshot_5.jpg"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -439,11 +490,13 @@
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
-        "https://www.youtube.com/watch?v=rYWtGcdsrcY",
         "https://hylianmodding.com/mods/shadows_of_eldoria/screenshots/screenshot1.webp",
         "https://hylianmodding.com/mods/shadows_of_eldoria/screenshots/screenshot2.webp"
       ],
-      "videos": [],
+      "videos": [
+        "https://www.youtube.com/watch?v=rYWtGcdsrcY"
+      ],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -507,13 +560,15 @@
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
-        "https://www.youtube.com/watch?v=dJhRMBkyz8Q",
         "https://hylianmodding.com/mods/crystal_clocks/screenshots/XNwHBuS.jpg",
         "https://hylianmodding.com/mods/crystal_clocks/screenshots/Jyg8Mg4.jpg",
         "https://hylianmodding.com/mods/crystal_clocks/screenshots/cy5nNm1.jpg",
         "https://hylianmodding.com/mods/crystal_clocks/screenshots/6KTOa01.jpg"
       ],
-      "videos": [],
+      "videos": [
+        "https://www.youtube.com/watch?v=dJhRMBkyz8Q"
+      ],
+      "developerLinks": [],
       "completionStatus": "Complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -583,6 +638,7 @@
         "https://hylianmodding.com/mods/fate_of_the_bombiwa/screenshots/screenshot4.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -651,6 +707,7 @@
         "https://hylianmodding.com/mods/dark_hyrule_fantasy/screenshots/screenshot3.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -713,7 +770,10 @@
         "parallel_n64"
       ],
       "coverImageUrl": "https://hylianmodding.com/mods/zelda's_birthday/screenshots/thumbnail.png",
-      "supportedGames": "OoT"
+      "supportedGames": "OoT",
+      "developerLinks": [],
+      "videos": [],
+      "screenshots": []
     },
     {
       "id": "time_lost",
@@ -750,12 +810,14 @@
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
-        "https://www.youtube.com/watch?v=SsU3uC68dBc",
         "https://hylianmodding.com/mods/time_lost/screenshots/image.png",
         "https://hylianmodding.com/mods/time_lost/screenshots/image2.png",
         "https://hylianmodding.com/mods/time_lost/screenshots/image4.png"
       ],
-      "videos": [],
+      "videos": [
+        "https://www.youtube.com/watch?v=SsU3uC68dBc"
+      ],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -824,6 +886,7 @@
         "https://hylianmodding.com/mods/child_quest/screenshots/screenshot3.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -886,7 +949,15 @@
         "parallel_n64"
       ],
       "coverImageUrl": "https://hylianmodding.com/mods/demon's_quest/screenshots/thumbnail.png",
-      "supportedGames": "OoT"
+      "supportedGames": "OoT",
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/thinedave/ocarina-demonsquest"
+        }
+      ],
+      "videos": [],
+      "screenshots": []
     },
     {
       "id": "the_helix_blade",
@@ -923,7 +994,6 @@
       ],
       "coverImageUrl": "https://hylianmodding.com/mods/the_helix_blade/screenshots/thumbnail.jpg",
       "screenshots": [
-        "https://www.youtube.com/watch?v=k3_VXmb7bb0",
         "https://hylianmodding.com/mods/the_helix_blade/screenshots/screenshot_1.jpg"
       ],
       "completionStatus": "Demo",
@@ -940,7 +1010,11 @@
         "catalogId": "mods",
         "modUrl": "https://hylianmodding.com/mods/the_helix_blade/mod.json",
         "managed": false
-      }
+      },
+      "videos": [
+        "https://www.youtube.com/watch?v=k3_VXmb7bb0"
+      ],
+      "developerLinks": []
     },
     {
       "id": "voyager_of_time",
@@ -982,6 +1056,7 @@
         "https://hylianmodding.com/mods/voyager_of_time/screenshots/screenshot_2.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -1045,7 +1120,6 @@
       ],
       "coverImageUrl": "https://hylianmodding.com/mods/hero_of_law/screenshots/thumbnail.png",
       "screenshots": [
-        "https://www.youtube.com/watch?v=VOdY_7dKNSU",
         "https://hylianmodding.com/mods/hero_of_law/screenshots/screenshot_1.png",
         "https://hylianmodding.com/mods/hero_of_law/screenshots/screenshot_2.png",
         "https://hylianmodding.com/mods/hero_of_law/screenshots/screenshot_3.png",
@@ -1070,7 +1144,16 @@
       "downloadTarget": {
         "type": "external",
         "url": "https://newerteam.com/en/hol/index.html"
-      }
+      },
+      "videos": [
+        "https://www.youtube.com/watch?v=VOdY_7dKNSU"
+      ],
+      "developerLinks": [
+        {
+          "label": "Newerteam",
+          "url": "https://newerteam.com/en/hol/index.html"
+        }
+      ]
     },
     {
       "id": "3rd_quest",
@@ -1111,6 +1194,7 @@
         "https://hylianmodding.com/mods/3rd_quest/screenshots/screenshot3.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -1172,6 +1256,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1229,6 +1314,7 @@
         "https://hylianmodding.com/mods/abandoned_archives/screenshots/screenshot1.jpg"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -1283,6 +1369,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1344,6 +1431,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1405,6 +1493,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1466,6 +1555,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1527,6 +1617,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1588,6 +1679,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1649,6 +1741,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1710,6 +1803,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1771,6 +1865,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1832,6 +1927,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -1889,6 +1985,12 @@
         "https://hylianmodding.com/mods/demon's_quest/screenshots/thumbnail.png"
       ],
       "videos": [],
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/thinedave/ocarina-demonsquest"
+        }
+      ],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -1946,6 +2048,7 @@
         "https://hylianmodding.com/mods/dungeon_rush/screenshots/thumbnail.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -2010,6 +2113,7 @@
         "https://hylianmodding.com/mods/eagle_dungeon/screenshots/thumbnail.jpg"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -2071,6 +2175,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2132,6 +2237,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2193,6 +2299,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2254,6 +2361,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2315,6 +2423,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2375,10 +2484,11 @@
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
-      "screenshots": [
+      "screenshots": [],
+      "videos": [
         "https://youtu.be/FDdjPfhYrBM?si=_v6Sh5fR4_wbfNFy"
       ],
-      "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -2440,6 +2550,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2501,6 +2612,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2558,6 +2670,7 @@
         "https://hylianmodding.com/mods/hero_of_hyrule/screenshots/screenshot1.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -2612,6 +2725,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2681,6 +2795,16 @@
         "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/screenshots/screenshot_5.png"
       ],
       "videos": [],
+      "developerLinks": [
+        {
+          "label": "Ocarina of Time decompilation project...",
+          "url": "https://github.com/zeldaret/oot"
+        },
+        {
+          "label": "For setup instructions, please visit ...",
+          "url": "https://github.com/hylian-modding/hm-actor-pack#setting-up"
+        }
+      ],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -2740,6 +2864,12 @@
         "https://hylianmodding.com/mods/indigo_chapter_2/screenshots/screenshot_2.png"
       ],
       "videos": [],
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/krm01/oot-indigo-mod"
+        }
+      ],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -2794,6 +2924,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2855,6 +2986,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -2919,6 +3051,7 @@
         "https://hylianmodding.com/mods/majora's_mask_masked_quest/screenshots/screenshot_0.jpg"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "MM",
       "compatibility": "",
@@ -2983,6 +3116,7 @@
         "https://hylianmodding.com/mods/majora's_mask_master_quest/screenshots/screenshot_0.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "MM",
       "compatibility": "",
@@ -3050,6 +3184,12 @@
         "https://hylianmodding.com/mods/mm_transforms_oot/screenshots/screenshot3.png"
       ],
       "videos": [],
+      "developerLinks": [
+        {
+          "label": "Discord server",
+          "url": "https://discord.com/invite/mSN9e5sKfq"
+        }
+      ],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -3108,6 +3248,12 @@
         "https://hylianmodding.com/mods/majora's_mask_chaos_edition/screenshots/screenshot_2.png"
       ],
       "videos": [],
+      "developerLinks": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/GabrielCNoble/mm-chaos"
+        }
+      ],
       "completionStatus": "complete",
       "supportedGames": "MM",
       "compatibility": "",
@@ -3162,6 +3308,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -3219,6 +3366,7 @@
         "https://hylianmodding.com/mods/minidungeon/screenshots/thumbnail.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -3278,6 +3426,7 @@
         "https://hylianmodding.com/mods/new_master_quest/screenshots/screenshot_2.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -3338,10 +3487,11 @@
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
-      "screenshots": [
+      "screenshots": [],
+      "videos": [
         "https://www.youtube.com/watch?v=sotmg3OiVfI"
       ],
-      "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -3409,6 +3559,7 @@
         "https://hylianmodding.com/mods/ocarina_of_time_gold_quest/screenshots/screenshot_3.jpg"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -3478,6 +3629,7 @@
         "https://hylianmodding.com/mods/oot_chaos_mod/screenshots/screenshot_5.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -3532,12 +3684,14 @@
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
-        "https://www.youtube.com/watch?v=06w-EaZvJWc",
         "https://hylianmodding.com/mods/outset_island/screenshots/screenshot1.png",
         "https://hylianmodding.com/mods/outset_island/screenshots/screenshot2.png",
         "https://hylianmodding.com/mods/outset_island/screenshots/screenshot3.png"
       ],
-      "videos": [],
+      "videos": [
+        "https://www.youtube.com/watch?v=06w-EaZvJWc"
+      ],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -3598,6 +3752,7 @@
         "https://hylianmodding.com/mods/pumkin_tower/screenshots/screenshot_3.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "MM",
       "compatibility": "",
@@ -3659,6 +3814,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -3720,6 +3876,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -3781,6 +3938,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -3847,6 +4005,7 @@
         "https://hylianmodding.com/mods/silent_hill_in_ocarina_of_time/screenshots/screensho3.webp"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -3908,6 +4067,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -3968,6 +4128,12 @@
         "https://hylianmodding.com/mods/spaceworld_97_experience/screenshots/screenshot_3.png"
       ],
       "videos": [],
+      "developerLinks": [
+        {
+          "label": "The original repository with more inf...",
+          "url": "https://github.com/z64proto/sw97"
+        }
+      ],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -4027,10 +4193,10 @@
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
-        "https://hylianmodding.com/mods/spider_mansion/screenshots/screenshot1.webp",
         "https://hylianmodding.com/mods/spider_mansion/screenshots/screenshot1.webp"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -4092,6 +4258,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -4153,11 +4320,13 @@
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
-        "https://www.youtube.com/watch?v=TzqfstBv71I",
         "https://hylianmodding.com/mods/star_fox_64_survival/screenshots/screenshot1.png",
         "https://hylianmodding.com/mods/star_fox_64_survival/screenshots/screenshot2.png"
       ],
-      "videos": [],
+      "videos": [
+        "https://www.youtube.com/watch?v=TzqfstBv71I"
+      ],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -4219,6 +4388,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -4280,6 +4450,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -4341,14 +4512,16 @@
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
-        "https://www.youtube.com/watch?v=u8qx4KiPVSQ",
         "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_1.jpg",
         "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_2.jpg",
         "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_3.jpg",
         "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_4.jpg",
         "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_5.jpg"
       ],
-      "videos": [],
+      "videos": [
+        "https://www.youtube.com/watch?v=u8qx4KiPVSQ"
+      ],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -4403,6 +4576,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -4457,6 +4631,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -4518,6 +4693,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -4579,6 +4755,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -4640,6 +4817,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -4693,10 +4871,11 @@
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
-      "screenshots": [
+      "screenshots": [],
+      "videos": [
         "https://www.youtube.com/watch?v=Ja-neQaiycs"
       ],
-      "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -4759,6 +4938,7 @@
         "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/screenshots/screenshot_5.jpg"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
@@ -4825,6 +5005,7 @@
         "https://hylianmodding.com/mods/zelda_nightmare/screenshots/screenshot_2.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -4890,6 +5071,7 @@
         "https://hylianmodding.com/mods/zelda_puzzling/screenshots/screenshot_1.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -4951,14 +5133,16 @@
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
-        "https://www.youtube.com/watch?v=NOx3vP5GL54",
         "https://hylianmodding.com/mods/zelda_revival/screenshots/screenshot_1.png",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbFEZi7mpu5Opnu17W1ZZsxvhXZtUHKmJGGA&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm6380VvnS2eiQeaBnZSQU_6LOCzhd6cnbkg&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqf-Fh39nygDj-LQmNtq0uJCQ-38f6hnowTA&s",
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRa-CR6j5e1YtfW_vYmKGVS5FKl-YxWiSg_GQ&s"
       ],
-      "videos": [],
+      "videos": [
+        "https://www.youtube.com/watch?v=NOx3vP5GL54"
+      ],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "MM",
       "compatibility": "",
@@ -5028,6 +5212,7 @@
         "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/screenshots/screenshot_5.jpg"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -5092,6 +5277,7 @@
         "https://hylianmodding.com/mods/zelda's_birthday/screenshots/screenshot_0.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -5156,6 +5342,7 @@
         "https://hylianmodding.com/mods/zelda's_eternal_youth/screenshots/screenshot_0.png"
       ],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "Demo",
       "supportedGames": "OoT",
       "compatibility": "",
@@ -5217,6 +5404,7 @@
       "sourceCatalogId": "picks",
       "screenshots": [],
       "videos": [],
+      "developerLinks": [],
       "completionStatus": "complete",
       "supportedGames": "OoT",
       "compatibility": null,
