@@ -85,6 +85,11 @@
             android:exported="false"
             android:screenOrientation="sensorLandscape"
             android:parentActivityName=".views.LibraryActivity" />
+        <activity
+            android:name=".gallery.CaptureViewerActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            android:parentActivityName=".gallery.GalleryActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

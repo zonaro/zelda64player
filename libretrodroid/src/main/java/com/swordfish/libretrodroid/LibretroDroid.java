@@ -112,6 +112,11 @@ public class LibretroDroid {
     public static native void setRumbleEnabled(boolean enabled);
     public static native void setFrameSpeed(int speed);
     public static native void setAudioEnabled(boolean enabled);
+    public static native void startRecordingAudioCapture();
+    public static native void stopRecordingAudioCapture();
+    /** Copies interleaved stereo PCM from the running core into {@code destination}. */
+    public static native int readRecordingAudio(short[] destination);
+    public static native int getRecordingAudioSampleRate();
     public static native void setShaderConfig(GLRetroShader shader);
     public static native void setViewport(float x, float y, float width, float height);
 

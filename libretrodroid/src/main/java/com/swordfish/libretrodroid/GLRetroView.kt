@@ -99,10 +99,14 @@ class GLRetroView(
      * Start encoding only this GL view's emulator framebuffer to [outputFile].
      * No MediaProjection or screen-capture permission is involved.
      */
-    fun startVideoRecording(outputFile: java.io.File, onResult: (Boolean) -> Unit) {
+    fun startVideoRecording(
+        outputFile: java.io.File,
+        includeMicrophone: Boolean,
+        onResult: (Boolean) -> Unit
+    ) {
         queueEvent {
             val recorder = EglVideoRecorder()
-            val started = recorder.start(outputFile, width, height)
+            val started = recorder.start(outputFile, width, height, includeMicrophone)
             if (started) {
                 videoRecorder?.stop()
                 videoRecorder = recorder

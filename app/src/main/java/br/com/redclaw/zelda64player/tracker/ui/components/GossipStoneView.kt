@@ -38,14 +38,7 @@ class GossipStoneView(context: Context) : FrameLayout(context) {
         val iconSize = (28 * resources.displayMetrics.density).toInt()
         iconView =
                 ImageView(context).apply {
-                    // Use an existing drawable as stone icon; fallback to ic_info if missing.
-                    val res =
-                            try {
-                                R.drawable.ic_info
-                            } catch (_: Exception) {
-                                android.R.drawable.ic_menu_info_details
-                            }
-                    setImageResource(res)
+                    setImageResource(R.drawable.gossip_stone)
                     scaleType = ImageView.ScaleType.FIT_CENTER
                 }
         textView =

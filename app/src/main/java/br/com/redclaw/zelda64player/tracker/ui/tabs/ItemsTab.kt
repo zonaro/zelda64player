@@ -100,37 +100,14 @@ class ItemsTab : Fragment() {
                                     1f
                             )
                             .apply { marginEnd = gap }
-            val isRupees = item.id == "rupees"
-            cell.setRupeesMode(isRupees)
-            if (isRupees) {
-                cell.setOnMinusClickListener {
-                    sfx?.select()
-                    viewModel.decrementItem(item.id, step = 1)
-                    rebindCell(cell, item)
-                }
-                cell.setOnPlusClickListener {
-                    sfx?.select()
-                    viewModel.incrementItem(item.id, item.maxCount, step = 1)
-                    rebindCell(cell, item)
-                }
-                // Tap on the card itself does nothing for Rupees (stepper only).
-                cell.setOnClickListener(null)
-                cell.isClickable = true
-                cell.setOnLongClickListener {
-                    sfx?.back()
-                    viewModel.clearItem(item.id)
-                    rebindCell(cell, item)
-                    true
-                }
-            } else {
-                cell.setOnMinusClickListener(null)
-                cell.setOnPlusClickListener(null)
-                cell.setOnLongClickListener(null)
-                cell.setOnClickListener {
-                    sfx?.select()
-                    viewModel.cycleItem(item.id, item.maxCount)
-                    rebindCell(cell, item)
-                }
+            cell.setRupeesMode(false)
+            cell.setOnMinusClickListener(null)
+            cell.setOnPlusClickListener(null)
+            cell.setOnLongClickListener(null)
+            cell.setOnClickListener {
+                sfx?.select()
+                viewModel.cycleItem(item.id, item.maxCount)
+                rebindCell(cell, item)
             }
             row?.addView(cell)
         }

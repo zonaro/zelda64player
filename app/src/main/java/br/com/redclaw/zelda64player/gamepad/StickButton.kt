@@ -26,7 +26,9 @@ class StickButton(
         context: Context,
         val targetKeyCode: Int,
         private val label: String,
-        private val theme: Theme
+        private val theme: Theme,
+        private val supportsAnalogDrag: Boolean = true,
+        private val hapticEnabled: Boolean = true
 ) : View(context) {
 
     data class Theme(val normal: Int, val pressed: Int, val text: Int)
@@ -37,6 +39,7 @@ class StickButton(
         val YELLOW_THEME = Theme(0xFFFFEB3B.toInt(), 0xFFF9A825.toInt(), Color.DKGRAY)
         val BLUE_THEME = Theme(0xFF2196F3.toInt(), 0xFF1565C0.toInt(), Color.WHITE)
         val GREEN_THEME = Theme(0xFF4CAF50.toInt(), 0xFF2E7D32.toInt(), Color.WHITE)
+        val NEUTRAL_THEME = Theme(0x44FFFFFF.toInt(), 0x88FFFFFF.toInt(), Color.WHITE)
     }
 
     var retroView: GLRetroView? = null
@@ -92,12 +95,12 @@ class StickButton(
                 downY = event.y
                 dragging = false
                 pressed = true
-                performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                if (hapticEnabled) performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 retroView?.sendKeyEvent(KeyEvent.ACTION_DOWN, InputMapper.mapKeyCode(targetKeyCode))
                 invalidate()
             }
             MotionEvent.ACTION_MOVE -> {
-                if (!stickEnabled) return true
+                if (!stickEnabled || !supportsAnalogDrag) return true
                 val dx = event.x - downX
                 val dy = event.y - downY
                 val dist = hypot(dx, dy)
@@ -116,7 +119,7 @@ class StickButton(
                 invalidate()
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                if (dragging && stickEnabled) {
+                if (dragging && stickEnabled && supportsAnalogDrag) {
                     retroView?.sendMotionEvent(GLRetroView.MOTION_SOURCE_ANALOG_LEFT, 0f, 0f)
                 }
                 retroView?.sendKeyEvent(KeyEvent.ACTION_UP, InputMapper.mapKeyCode(targetKeyCode))

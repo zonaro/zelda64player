@@ -27,7 +27,6 @@ import br.com.redclaw.zelda64player.BuildConfig
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.data.local.MergedCatalogRepository
-import br.com.redclaw.zelda64player.gamepad.ButtonStick
 import br.com.redclaw.zelda64player.gamepad.DoubleTapContainer
 import br.com.redclaw.zelda64player.gamepad.FloatingJoystick
 import br.com.redclaw.zelda64player.gamepad.GamePad
@@ -35,6 +34,7 @@ import br.com.redclaw.zelda64player.gamepad.GamePadConfig
 import br.com.redclaw.zelda64player.gamepad.PadPlacement
 import br.com.redclaw.zelda64player.gamepad.RightTapZone
 import br.com.redclaw.zelda64player.gamepad.StickButton
+import br.com.redclaw.zelda64player.gamepad.TouchControlLayout
 import br.com.redclaw.zelda64player.input.ControllerInput
 import br.com.redclaw.zelda64player.input.InputMapper
 import br.com.redclaw.zelda64player.input.N64ControllerMapping
@@ -88,6 +88,9 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         /** Request code for the POST_NOTIFICATIONS runtime permission ask. */
         private const val RA_NOTIFICATION_PERMISSION_REQUEST = 51001
 
+        /** Request code for the optional microphone mix in gameplay recordings. */
+        private const val CAPTURE_MICROPHONE_PERMISSION_REQUEST = 51002
+
         /** Delay between the two learning snapshots (user stores the ocarina). */
         const val OCARINA_LEARN_SNAPSHOT_DELAY_MS = 10_000L
     }
@@ -122,7 +125,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
 
     private var gamePads: List<GamePad> = emptyList()
     private var floatingJoystick: FloatingJoystick? = null
-    private var buttonStick: ButtonStick? = null
     private var isButtonStickEnabled: Boolean = true
     private var stickButtons: List<StickButton> = emptyList()
     private var rightTapZone: RightTapZone? = null
@@ -137,7 +139,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      * height before the dialog is shown and size the window to wrap (or scroll) it.
      */
     private var menuView: View? = null
-    private var buttonStickDialog: AlertDialog? = null
     private var sensitivityDialog: AlertDialog? = null
     private var activityContext: Activity? = null
 
@@ -192,10 +193,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     private val menuKeyListenerMain =
             DialogInterface.OnKeyListener { _, keyCode, event ->
                 handleMenuKey(menuDialog, keyCode, event)
-            }
-    private val menuKeyListenerButtonStick =
-            DialogInterface.OnKeyListener { _, keyCode, event ->
-                handleMenuKey(buttonStickDialog, keyCode, event)
             }
     private val menuKeyListenerSensitivity =
             DialogInterface.OnKeyListener { _, keyCode, event ->
@@ -439,21 +436,38 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                 ) { showRaLeaderboards(currentRaGame()?.id ?: 0L) }
                         )
                 )
-        /* Auto-Ocarina is only meaningful for OoT / MM (the games with an
-        in-game Ocarina). Hide the item entirely when detection failed. */
-        val ocarina =
-                if (ocarinaGame != null) {
-                    MenuSection(
-                            R.string.menu_category_ocarina,
-                            listOf(
-                                    MenuActionItem(
-                                            "auto_ocarina",
-                                            R.string.menu_auto_ocarina,
-                                            R.drawable.ic_oot,
-                                            tintIcon = true
-                                    ) { showOcarinaSongList() }
-                            )
-                    )
+        /* Ferramentas: Auto-Ocarina + Rastreador de Itens na mesma categoria.
+        Ambos só fazem sentido para OoT / MM (jogos com Ocarina). A categoria
+        só aparece quando o jogo atual suporta Ocarina; o rastreador respeita
+        ainda a configuração de visibilidade do usuário. */
+        val toolsItems = mutableListOf<MenuActionItem>()
+        ocarinaGame?.let { runningGame ->
+            toolsItems.add(
+                    MenuActionItem(
+                            "auto_ocarina",
+                            R.string.menu_auto_ocarina,
+                            R.drawable.ic_oot,
+                            tintIcon = true
+                    ) { showOcarinaSongList() }
+            )
+            if (isTrackerVisible()) {
+                val trackerGame =
+                        when (runningGame) {
+                            OcarinaGame.OOT -> TrackerGame.OOT
+                            OcarinaGame.MM -> TrackerGame.MM
+                        }
+                toolsItems.add(
+                        MenuActionItem(
+                                "item_tracker",
+                                R.string.menu_item_tracker,
+                                R.drawable.ic_tracker
+                        ) { openItemTracker(trackerGame) }
+                )
+            }
+        }
+        val tools =
+                if (toolsItems.isNotEmpty()) {
+                    MenuSection(R.string.menu_category_tools, toolsItems)
                 } else null
         /* Screen capture / recording controls. Both are taken directly from
         the emulator GL framebuffer, excluding Android overlay Views. */
@@ -481,37 +495,15 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 )
 
         /* Assemble the in-game menu in the requested display order:
-        Ocarina -> Game -> RetroAchievements -> Controls -> Audio & Video ->
+        Ferramentas -> Game -> RetroAchievements -> Controls -> Audio & Video ->
         Capture. */
         val sections = mutableListOf<MenuSection>()
-        ocarina?.let { sections.add(it) }
+        tools?.let { sections.add(it) }
         sections.add(game)
         sections.add(ra)
         sections.add(controls)
         sections.add(audioVideo)
         sections.add(capture)
-
-        // Item Tracker (manual) — only for OoT / MM runs, and respecting the visibility setting.
-        ocarinaGame?.let { runningGame ->
-            if (!isTrackerVisible()) return@let
-            val trackerGame =
-                    when (runningGame) {
-                        OcarinaGame.OOT -> TrackerGame.OOT
-                        OcarinaGame.MM -> TrackerGame.MM
-                    }
-            val tracker =
-                    MenuSection(
-                            R.string.menu_category_tracker,
-                            listOf(
-                                    MenuActionItem(
-                                            "item_tracker",
-                                            R.string.menu_item_tracker,
-                                            R.drawable.ic_tracker
-                                    ) { openItemTracker(trackerGame) }
-                            )
-                    )
-            sections.add(tracker)
-        }
         return sections
     }
 
@@ -603,7 +595,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
             val which =
                     when (dialog) {
                         menuDialog -> "main"
-                        buttonStickDialog -> "buttonStick"
                         sensitivityDialog -> "sensitivity"
                         else -> "unknown"
                     }
@@ -628,7 +619,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
             else -> return true
         }
 
-        val isSub = dialog == buttonStickDialog || dialog == sensitivityDialog
+        val isSub = dialog == sensitivityDialog
 
         when (keyCode) {
             /* Close EVERYTHING and return to game -- works from any layer. */
@@ -741,7 +732,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     /** Dismiss every menu layer and return to the game. */
     private fun closeAllMenus() {
         if (BuildConfig.DEBUG) Log.d("MenuDebug", "closeAllMenus(): dismissing all layers")
-        buttonStickDialog?.dismiss()
         sensitivityDialog?.dismiss()
         menuDialog?.dismiss()
     }
@@ -913,7 +903,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
 
     private fun applyButtonStickEnabled(enabled: Boolean) {
         isButtonStickEnabled = enabled
-        buttonStick?.isStickEnabled = enabled
         stickButtons.forEach { it.stickEnabled = enabled }
         controllerInput.isButtonStickEnabled = { isButtonStickEnabled }
         // Physical right stick analog behavior follows toggle
@@ -1470,7 +1459,27 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                         }
         val outputFile =
                 Storage.getInstance(context).recordingFile(hackId, System.currentTimeMillis())
-        emulator.startVideoRecording(outputFile) { started ->
+        val includeMicrophone = CorePrefs.getCaptureIncludeMicrophone(context)
+        if (includeMicrophone &&
+                        ContextCompat.checkSelfPermission(
+                                context,
+                                android.Manifest.permission.RECORD_AUDIO
+                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                    context,
+                    arrayOf(android.Manifest.permission.RECORD_AUDIO),
+                    CAPTURE_MICROPHONE_PERMISSION_REQUEST
+            )
+            Toast.makeText(
+                            context,
+                            R.string.capture_microphone_permission_required,
+                            Toast.LENGTH_SHORT
+                    )
+                    .show()
+            return
+        }
+        emulator.startVideoRecording(outputFile, includeMicrophone) { started ->
             _isRecording.value = started
             Toast.makeText(
                             context,
@@ -1655,6 +1664,10 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         val density = overlay.resources.displayMetrics.density
         val config = GamePadConfig(context, resources)
 
+        // Applies equally to RadialGamePad, ButtonStick, and FloatingJoystick without changing
+        // their input behavior or the overlay visibility lifecycle.
+        overlay.alpha = TouchControlLayout.OVERLAY_OPACITY
+
         /* RadialGamePad caches its on-screen position/size on its first layout pass, and
         doesn't refresh that cache on a later resize -- it keeps drawing in the new spot
         but hit-tests touches against the stale one. So each pad must be created with its
@@ -1781,14 +1794,16 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                     overlay.addView(it, zoneParams)
                                 }
 
-                        // StickButtons: always created for C/A/B, behavior toggled via stickEnabled
+                        // C/A/B use ButtonStick behavior; R shares the same visual button as a
+                        // pure press control, so it never captures a larger transparent area.
                         val stickKeyCodes =
                                 setOf(
                                         KeyEvent.KEYCODE_BUTTON_R1, // C-Right
                                         KeyEvent.KEYCODE_BUTTON_L1, // C-Left
                                         KeyEvent.KEYCODE_BUTTON_X, // C-Down
                                         KeyEvent.KEYCODE_BUTTON_A, // A
-                                        KeyEvent.KEYCODE_BUTTON_B // B
+                                        KeyEvent.KEYCODE_BUTTON_B, // B
+                                        KeyEvent.KEYCODE_BUTTON_R2 // R
                                 )
                         val stickPlacements =
                                 config.placements.filter { placement ->
@@ -1802,7 +1817,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                 }
                         val regularPlacements = config.placements.filter { it !in stickPlacements }
 
-                        // StickButtons for C/A/B when enabled
+                        // C/A/B/R action buttons; only C/A/B honor ButtonStick drag behavior.
                         val stickSensitivity = getSavedButtonStickSensitivity()
                         stickButtons =
                                 stickPlacements.mapNotNull { placement ->
@@ -1819,12 +1834,14 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                                 KeyEvent.KEYCODE_BUTTON_X -> "C▼"
                                                 KeyEvent.KEYCODE_BUTTON_A -> "A"
                                                 KeyEvent.KEYCODE_BUTTON_B -> "B"
+                                                KeyEvent.KEYCODE_BUTTON_R2 -> "R"
                                                 else -> "?"
                                             }
                                     val theme =
                                             when (centerId) {
                                                 KeyEvent.KEYCODE_BUTTON_A -> StickButton.BLUE_THEME
                                                 KeyEvent.KEYCODE_BUTTON_B -> StickButton.GREEN_THEME
+                                                KeyEvent.KEYCODE_BUTTON_R2 -> StickButton.NEUTRAL_THEME
                                                 else -> StickButton.YELLOW_THEME
                                             }
                                     val sizePx =
@@ -1841,12 +1858,25 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                             (clampedX * overlay.width - sizePx / 2f).toInt()
                                     params.topMargin =
                                             (clampedY * overlay.height - sizePx / 2f).toInt()
-                                    StickButton(context, centerId, label, theme).also { btn ->
-                                        btn.retroView = retroView?.view
-                                        btn.sensitivity = stickSensitivity
-                                        btn.stickEnabled = isButtonStickEnabled
-                                        overlay.addView(btn, params)
-                                    }
+                                    StickButton(
+                                                    context,
+                                                    centerId,
+                                                    label,
+                                                    theme,
+                                                    supportsAnalogDrag =
+                                                            centerId != KeyEvent.KEYCODE_BUTTON_R2,
+                                                    hapticEnabled =
+                                                            centerId != KeyEvent.KEYCODE_BUTTON_R2 ||
+                                                                    resources.getBoolean(
+                                                                            R.bool.config_gamepad_haptic
+                                                                    )
+                                            )
+                                            .also { btn ->
+                                                btn.retroView = retroView?.view
+                                                btn.sensitivity = stickSensitivity
+                                                btn.stickEnabled = isButtonStickEnabled
+                                                overlay.addView(btn, params)
+                                            }
                                 }
 
                         gamePads =
@@ -1876,36 +1906,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                             it.subscribe(compositeDisposable, rv.view, onButtonDown)
                                         }
                                     }
-                                }
-
-                        val buttonStickSizePx =
-                                (GamePadConfig.BUTTON_STICK_SIZE_FRACTION *
-                                                overlay.height *
-                                                overlayScale)
-                                        .toInt()
-                        val buttonStickParams =
-                                FrameLayout.LayoutParams(buttonStickSizePx, buttonStickSizePx)
-                        buttonStickParams.leftMargin =
-                                (GamePadConfig.BUTTON_STICK_GRAVITY_X * overlay.width -
-                                                buttonStickSizePx / 2f)
-                                        .toInt()
-                        buttonStickParams.topMargin =
-                                (GamePadConfig.BUTTON_STICK_GRAVITY_Y * overlay.height -
-                                                buttonStickSizePx / 2f)
-                                        .toInt()
-                        buttonStick =
-                                ButtonStick(context).also {
-                                    it.isStickEnabled = isButtonStickEnabled
-                                    it.onToggle = { enabled ->
-                                        isButtonStickEnabled = enabled
-                                        CorePrefs.setButtonStickEnabled(context, enabled)
-                                        stickButtons.forEach { btn -> btn.stickEnabled = enabled }
-                                        controllerInput.isButtonStickEnabled = { enabled }
-                                        controllerInput.buttonStickTargetKeyCode = {
-                                            if (enabled) KeyEvent.KEYCODE_BUTTON_R1 else null
-                                        }
-                                    }
-                                    overlay.addView(it, buttonStickParams)
                                 }
 
                         controllerInput.isButtonStickEnabled = { isButtonStickEnabled }

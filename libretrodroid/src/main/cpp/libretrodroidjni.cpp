@@ -590,6 +590,38 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setAudioEn
     LibretroDroid::getInstance().setAudioEnabled(enabled);
 }
 
+JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_startRecordingAudioCapture(
+    JNIEnv* env, jclass obj
+) {
+    LibretroDroid::getInstance().startRecordingAudioCapture();
+}
+
+JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_stopRecordingAudioCapture(
+    JNIEnv* env, jclass obj
+) {
+    LibretroDroid::getInstance().stopRecordingAudioCapture();
+}
+
+JNIEXPORT jint JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_readRecordingAudio(
+    JNIEnv* env, jclass obj, jshortArray destination
+) {
+    if (destination == nullptr) return 0;
+    const auto length = static_cast<size_t>(env->GetArrayLength(destination));
+    auto* samples = env->GetShortArrayElements(destination, nullptr);
+    if (samples == nullptr) return 0;
+    const auto count = LibretroDroid::getInstance().readRecordingAudio(
+        reinterpret_cast<int16_t*>(samples), length
+    );
+    env->ReleaseShortArrayElements(destination, samples, 0);
+    return static_cast<jint>(count);
+}
+
+JNIEXPORT jint JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_getRecordingAudioSampleRate(
+    JNIEnv* env, jclass obj
+) {
+    return LibretroDroid::getInstance().getRecordingAudioSampleRate();
+}
+
 JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setShaderConfig(
     JNIEnv* env,
     jclass obj,

@@ -29,7 +29,7 @@ enum class TrackerGame {
         MM
 }
 
-/** A trackable inventory item. [maxCount] > 1 means it is stackable (e.g. rupees, skulls). */
+/** A trackable inventory item. [maxCount] > 1 enables a level or quantity cycle. */
 data class TrackerItem(
         val id: String,
         @StringRes val nameRes: Int,
@@ -73,9 +73,6 @@ data class TrackerHint(
         @StringRes val labelRes: Int,
         var text: String = ""
 )
-
-/** An upgrade chain (e.g. strength 0->3, bottles 0->4). */
-data class TrackerUpgrade(val id: String, @StringRes val nameRes: Int, val maxLevel: Int)
 
 /** Full mutable tracker state for one game. Persisted as JSON. */
 data class TrackerState(

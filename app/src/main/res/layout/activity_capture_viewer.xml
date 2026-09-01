@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fullscreen local capture viewer. Images and recordings share the same
+     Switch-style header; the recording-only play/pause control remains in the
+     app so gallery viewing never leaves Zelda 64 Player. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/switch_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/switch_screen_margin">
+
+        <include
+            android:id="@+id/capture_viewer_back"
+            layout="@layout/switch_back_button"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_gallery"
+            android:tint="@color/switch_accent_focus"
+            android:contentDescription="@string/dock_gallery" />
+
+        <TextView
+            android:id="@+id/capture_viewer_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/switch_text_primary"
+            android:textSize="@dimen/switch_title_text"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/switch_text_secondary" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="@dimen/switch_grid_padding">
+
+        <ImageView
+            android:id="@+id/capture_viewer_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/gallery_image_content_description"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <VideoView
+            android:id="@+id/capture_viewer_video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/capture_viewer_loading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/gallery_video_loading" />
+
+        <TextView
+            android:id="@+id/capture_viewer_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/gallery_view_error"
+            android:textColor="@color/switch_text_secondary"
+            android:textSize="@dimen/switch_row_text"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/capture_viewer_playback"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_menu_item"
+            android:contentDescription="@string/gallery_play_video"
+            android:enabled="false"
+            android:focusableInTouchMode="false"
+            android:padding="14dp"
+            android:src="@drawable/ic_play"
+            android:tint="@color/switch_text_primary"
+            android:visibility="gone" />
+    </FrameLayout>
+</LinearLayout>

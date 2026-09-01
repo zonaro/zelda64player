@@ -48,6 +48,10 @@ object CorePrefs {
         // "Todos os Jogos" grid sort mode (values: last_played | download_date | alpha).
         private const val PREF_GRID_SORT = "pref_grid_sort"
 
+        // Gameplay recording. Emulator PCM is always recorded; this opt-in
+        // adds the device microphone to that same recording.
+        private const val PREF_CAPTURE_INCLUDE_MICROPHONE = "pref_capture_include_microphone"
+
         // ---- Gamepad Overlay ----
         private const val PREF_BUTTON_STICK_ENABLED = "button_stick_enabled"
         private const val PREF_OVERLAY_SCALE = "overlay_scale"
@@ -272,6 +276,18 @@ object CorePrefs {
                 context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                         .edit()
                         .putString(PREF_GRID_SORT, mode)
+                        .apply()
+        }
+
+        /** Include the device microphone in gameplay recordings (default off). */
+        fun getCaptureIncludeMicrophone(context: Context): Boolean =
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                        .getBoolean(PREF_CAPTURE_INCLUDE_MICROPHONE, false)
+
+        fun setCaptureIncludeMicrophone(context: Context, enabled: Boolean) {
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                        .edit()
+                        .putBoolean(PREF_CAPTURE_INCLUDE_MICROPHONE, enabled)
                         .apply()
         }
 

@@ -23,7 +23,6 @@ import br.com.redclaw.zelda64player.tracker.model.TrackerGame
 import br.com.redclaw.zelda64player.tracker.model.TrackerItem
 import br.com.redclaw.zelda64player.tracker.model.TrackerLocation
 import br.com.redclaw.zelda64player.tracker.model.TrackerSong
-import br.com.redclaw.zelda64player.tracker.model.TrackerUpgrade
 
 /**
  * Static, hand-curated vanilla Ocarina of Time tracker content. Names are factual game terms
@@ -35,7 +34,6 @@ interface TrackerContent {
         val items: List<TrackerItem>
         val locations: List<TrackerLocation>
         val songs: List<TrackerSong>
-        val upgrades: List<TrackerUpgrade>
 }
 
 object OotItemDatabase : TrackerContent {
@@ -58,7 +56,11 @@ object OotItemDatabase : TrackerContent {
                                 R.string.oot_item_biggoron_sword,
                                 iconRes = R.drawable.biggoron
                         ),
-                        TrackerItem("deku_shield", R.string.oot_item_deku_shield),
+                        TrackerItem(
+                                "deku_shield",
+                                R.string.oot_item_deku_shield,
+                                iconRes = R.drawable.kokiri_shield
+                        ),
                         TrackerItem(
                                 "hylian_shield",
                                 R.string.oot_item_hylian_shield,
@@ -100,12 +102,19 @@ object OotItemDatabase : TrackerContent {
                                 "bow",
                                 R.string.oot_item_bow,
                                 iconRes = R.drawable.bow,
-                                maxCount = 3
+                                maxCount = 3,
+                                cycleLabels =
+                                        listOf(
+                                                R.string.oot_item_bow_level_1,
+                                                R.string.oot_item_bow_level_2,
+                                                R.string.oot_item_bow_level_3
+                                        ),
+                                cycleIcons = listOf(R.drawable.bow, R.drawable.bow, R.drawable.bow)
                         ),
                         TrackerItem(
                                 "bomb_bag",
                                 R.string.oot_item_bomb_bag,
-                                iconRes = R.drawable.bombs,
+                                iconRes = R.drawable.mm_bomb_bag,
                                 maxCount = 3
                         ),
                         TrackerItem(
@@ -115,9 +124,34 @@ object OotItemDatabase : TrackerContent {
                                 maxCount = 3
                         ),
                         TrackerItem(
+                                "deku_stick",
+                                R.string.oot_item_deku_stick,
+                                iconRes = R.drawable.deku_stick,
+                                maxCount = 2,
+                                cycleLabels =
+                                        listOf(
+                                                R.string.oot_item_deku_stick_level_1,
+                                                R.string.oot_item_deku_stick_level_2
+                                        ),
+                                cycleIcons = listOf(R.drawable.deku_stick, R.drawable.deku_stick)
+                        ),
+                        TrackerItem(
+                                "deku_nut",
+                                R.string.oot_item_deku_nut,
+                                iconRes = R.drawable.deku_nut,
+                                maxCount = 2,
+                                cycleLabels =
+                                        listOf(
+                                                R.string.oot_item_deku_nut_level_1,
+                                                R.string.oot_item_deku_nut_level_2
+                                        ),
+                                cycleIcons = listOf(R.drawable.deku_nut, R.drawable.deku_nut)
+                        ),
+                        TrackerItem("bombchu", R.string.oot_item_bombchu, iconRes = R.drawable.bombchu),
+                        TrackerItem(
                                 "lens_of_truth",
                                 R.string.oot_item_lens_of_truth,
-                                iconRes = R.drawable.lens
+                                iconRes = R.drawable.mm_lens_of_truth
                         ),
                         TrackerItem(
                                 "megaton_hammer",
@@ -143,17 +177,17 @@ object OotItemDatabase : TrackerContent {
                         TrackerItem(
                                 "fire_arrows",
                                 R.string.oot_item_fire_arrows,
-                                iconRes = R.drawable.fire_arrow
+                                iconRes = R.drawable.mm_fire_arrow
                         ),
                         TrackerItem(
                                 "ice_arrows",
                                 R.string.oot_item_ice_arrows,
-                                iconRes = R.drawable.ice_arrow
+                                iconRes = R.drawable.mm_ice_arrow
                         ),
                         TrackerItem(
                                 "light_arrows",
                                 R.string.oot_item_light_arrows,
-                                iconRes = R.drawable.light_arrow
+                                iconRes = R.drawable.mm_light_arrow
                         ),
                         TrackerItem(
                                 "din_fire",
@@ -170,9 +204,48 @@ object OotItemDatabase : TrackerContent {
                                 R.string.oot_item_nayru_love,
                                 iconRes = R.drawable.nairus_love
                         ),
-                        TrackerItem("goron_bracelet", R.string.oot_item_goron_bracelet),
-                        TrackerItem("silver_gauntlets", R.string.oot_item_silver_gauntlets),
-                        TrackerItem("golden_gauntlets", R.string.oot_item_golden_gauntlets),
+                        TrackerItem(
+                                "strength",
+                                R.string.oot_item_strength,
+                                iconRes = R.drawable.strength,
+                                maxCount = 3,
+                                cycleLabels =
+                                        listOf(
+                                                R.string.oot_item_goron_bracelet,
+                                                R.string.oot_item_silver_gauntlets,
+                                                R.string.oot_item_golden_gauntlets
+                                        ),
+                                cycleIcons =
+                                        listOf(
+                                                R.drawable.strength,
+                                                R.drawable.strength2,
+                                                R.drawable.strength3
+                                        )
+                        ),
+                        TrackerItem(
+                                "magic",
+                                R.string.oot_item_magic,
+                                iconRes = R.drawable.magic,
+                                maxCount = 2,
+                                cycleLabels =
+                                        listOf(
+                                                R.string.oot_item_magic_level_1,
+                                                R.string.oot_item_magic_level_2
+                                        ),
+                                cycleIcons = listOf(R.drawable.magic, R.drawable.magic)
+                        ),
+                        TrackerItem(
+                                "scale",
+                                R.string.oot_item_scale,
+                                iconRes = R.drawable.scale,
+                                maxCount = 2,
+                                cycleLabels =
+                                        listOf(
+                                                R.string.oot_item_scale_silver,
+                                                R.string.oot_item_scale_golden
+                                        ),
+                                cycleIcons = listOf(R.drawable.scale, R.drawable.scale)
+                        ),
                         TrackerItem(
                                 "kokiri_tunic",
                                 R.string.oot_item_kokiri_tunic,
@@ -188,7 +261,32 @@ object OotItemDatabase : TrackerContent {
                                 R.string.oot_item_zora_tunic,
                                 iconRes = R.drawable.zora_tunic
                         ),
-                        TrackerItem("rupees", R.string.oot_item_rupees, maxCount = 999)
+                        TrackerItem(
+                                "rupees",
+                                R.string.oot_item_rupees,
+                                iconRes = R.drawable.wallet,
+                                maxCount = 2,
+                                cycleLabels =
+                                        listOf(
+                                                R.string.oot_item_wallet_adult,
+                                                R.string.oot_item_wallet_giant
+                                        ),
+                                cycleIcons = listOf(R.drawable.wallet2, R.drawable.wallet3)
+                        ),
+                        TrackerItem("forest_medallion", R.string.oot_item_forest_medallion, R.drawable.oot_medallion_forest),
+                        TrackerItem("fire_medallion", R.string.oot_item_fire_medallion, R.drawable.oot_medallion_fire),
+                        TrackerItem("water_medallion", R.string.oot_item_water_medallion, R.drawable.oot_medallion_water),
+                        TrackerItem("spirit_medallion", R.string.oot_item_spirit_medallion, R.drawable.oot_medallion_spirit),
+                        TrackerItem("shadow_medallion", R.string.oot_item_shadow_medallion, R.drawable.oot_medallion_shadow),
+                        TrackerItem("light_medallion", R.string.oot_item_light_medallion, R.drawable.oot_medallion_light),
+                        TrackerItem("keaton_mask", R.string.oot_item_keaton_mask, R.drawable.oot_mask_keaton),
+                        TrackerItem("skull_mask", R.string.oot_item_skull_mask, R.drawable.oot_mask_skull),
+                        TrackerItem("spooky_mask", R.string.oot_item_spooky_mask, R.drawable.oot_mask_spooky),
+                        TrackerItem("bunny_hood", R.string.oot_item_bunny_hood, R.drawable.oot_mask_bunny_hood),
+                        TrackerItem("goron_mask", R.string.oot_item_goron_mask, R.drawable.oot_mask_goron),
+                        TrackerItem("zora_mask", R.string.oot_item_zora_mask, R.drawable.oot_mask_zora),
+                        TrackerItem("gerudo_mask", R.string.oot_item_gerudo_mask, R.drawable.oot_mask_gerudo),
+                        TrackerItem("mask_of_truth", R.string.oot_item_mask_of_truth, R.drawable.oot_mask_truth)
                 )
 
         override val locations: List<TrackerLocation> =
@@ -894,16 +992,6 @@ object OotItemDatabase : TrackerContent {
                         TrackerSong("nocturne_of_shadow", R.string.oot_song_nocturne_of_shadow),
                         TrackerSong("requiem_of_spirit", R.string.oot_song_requiem_of_spirit),
                         TrackerSong("prelude_of_light", R.string.oot_song_prelude_of_light)
-                )
-
-        override val upgrades: List<TrackerUpgrade> =
-                listOf(
-                        TrackerUpgrade("strength", R.string.oot_upg_strength, 3),
-                        TrackerUpgrade("bombs", R.string.oot_upg_bombs, 3),
-                        TrackerUpgrade("bow", R.string.oot_upg_bow, 3),
-                        TrackerUpgrade("wallet", R.string.oot_upg_wallet, 2),
-                        TrackerUpgrade("scale", R.string.oot_upg_scale, 2),
-                        TrackerUpgrade("magic", R.string.oot_upg_magic, 2)
                 )
 
         fun forGame(game: TrackerGame): TrackerContent =

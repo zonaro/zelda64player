@@ -28,6 +28,7 @@
 #include <mutex>
 #include <memory>
 #include <optional>
+#include <atomic>
 
 #include "log.h"
 #include "core.h"
@@ -136,6 +137,14 @@ public:
 
     void setAudioEnabled(bool enabled);
 
+    // Emulator-only recording audio tap. Audio is copied from the libretro
+    // callback before it reaches the Android playback device, so it neither
+    // needs MediaProjection nor captures sounds from other applications.
+    void startRecordingAudioCapture();
+    void stopRecordingAudioCapture();
+    size_t readRecordingAudio(int16_t* destination, size_t maxSamples);
+    int getRecordingAudioSampleRate() const;
+
     void setShaderConfig(ShaderManager::Config shaderConfig);
 
     void resetGlobalVariables();
@@ -187,6 +196,15 @@ private:
     std::unique_ptr<FPSSync> fpsSync;
     std::unique_ptr<Input> input;
     std::unique_ptr<Rumble> rumble;
+
+    // Lock-free, single-producer (libretro callback) / single-consumer (AAC
+    // encoder) ring. A full buffer drops only the newest audio: emulation
+    // must never block on video recording.
+    std::vector<int16_t> recordingAudioBuffer;
+    std::atomic<size_t> recordingAudioRead { 0 };
+    std::atomic<size_t> recordingAudioWrite { 0 };
+    std::atomic<bool> recordingAudioEnabled { false };
+    std::atomic<int> recordingAudioSampleRate { 44100 };
 };
 
 } //namespace libretrodroid

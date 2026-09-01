@@ -41,7 +41,7 @@ import java.io.File
 /**
  * Gallery screen (Nintendo Switch style): a grid of captured screenshots and
  * recordings. Each card opens a Switch-style action dialog offering View
- * (native viewer via [FileProvider]), Share ([Intent.ACTION_SEND]) and Delete
+ * (the internal [CaptureViewerActivity]), Share ([Intent.ACTION_SEND]) and Delete
  * (confirmation then [GalleryViewModel.delete]). The list is observed from
  * [GalleryViewModel] and refreshed on create / resume.
  */
@@ -132,15 +132,9 @@ class GalleryActivity : AppCompatActivity() {
             .show()
     }
 
-    /** Open the item in the system viewer (image/png or video/mp4). */
+    /** Open [item] in the app's image viewer or video player. */
     private fun viewItem(item: GalleryItem) {
-        val uri = FileProvider.getUriForFile(this, fileProviderAuthority, item.path)
-        val mime = if (item.type == MediaType.VIDEO) "video/mp4" else "image/png"
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, mime)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        startActivity(Intent.createChooser(intent, getString(R.string.gallery_view)))
+        startActivity(CaptureViewerActivity.intent(this, item))
     }
 
     /** Share the item via ACTION_SEND. */

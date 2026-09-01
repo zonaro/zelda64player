@@ -141,6 +141,7 @@ class SettingsActivity : AppCompatActivity() {
         setupCloudSyncSection()
         setupLanguageSection()
         setupAboutSection()
+        setupCaptureSection()
         setupDashboardSection()
         setupDisplaySection()
         wireSettingsSfx()
@@ -288,7 +289,8 @@ class SettingsActivity : AppCompatActivity() {
                         binding.settingsGdriveAuto,
                         binding.settingsCloudsyncEnabled,
                         binding.settingsCloudsyncWifi,
-                        binding.settingsCloudsyncNotify
+                        binding.settingsCloudsyncNotify,
+                        binding.settingsCaptureIncludeMicrophone
                 )
         switches.forEach { switch ->
             // Create dynamic thumb and track color state lists
@@ -1123,6 +1125,14 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsAboutCatalog.setOnClickListener {
             sfx?.select()
             openLink(CatalogFetcher.DEFAULT_CATALOG_URL)
+        }
+    }
+
+    /** Configures optional voice mixing for future gameplay recordings. */
+    private fun setupCaptureSection() {
+        binding.settingsCaptureIncludeMicrophone.isChecked = CorePrefs.getCaptureIncludeMicrophone(this)
+        binding.settingsCaptureIncludeMicrophone.setOnCheckedChangeListener { _, checked ->
+            CorePrefs.setCaptureIncludeMicrophone(this, checked)
         }
     }
 

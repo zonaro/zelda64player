@@ -44,12 +44,11 @@ import br.com.redclaw.zelda64player.tracker.ui.tabs.HintsTab
 import br.com.redclaw.zelda64player.tracker.ui.tabs.ItemsTab
 import br.com.redclaw.zelda64player.tracker.ui.tabs.LocationsTab
 import br.com.redclaw.zelda64player.tracker.ui.tabs.SongsTab
-import br.com.redclaw.zelda64player.tracker.ui.tabs.UpgradesTab
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 
 /**
  * Switch-style modal hosting the manual item tracker. A tab strip switches between five child
- * fragments (Items / Locations / Songs / Hints / Upgrades) and an integrated run timer lives at the
+ * fragments (Items / Locations / Songs / Hints) and an integrated run timer lives at the
  * bottom. No core RAM is read.
  */
 class TrackerDialogFragment : DialogFragment() {
@@ -62,8 +61,7 @@ class TrackerDialogFragment : DialogFragment() {
                     R.string.tracker_tab_items to { ItemsTab() },
                     R.string.tracker_tab_locations to { LocationsTab() },
                     R.string.tracker_tab_songs to { SongsTab() },
-                    R.string.tracker_tab_hints to { HintsTab() },
-                    R.string.tracker_tab_upgrades to { UpgradesTab() }
+                    R.string.tracker_tab_hints to { HintsTab() }
             )
     private val tabButtons = mutableListOf<Button>()
     private var selected = 0

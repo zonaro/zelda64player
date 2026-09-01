@@ -163,11 +163,26 @@ class GamePadConfig(context: Context, private val resources: Resources) {
                             .takeIf { resources.getBoolean(R.bool.config_left_analog) },
                     PadPlacement(singleButton(BUTTON_SELECT), 0.017f, 0.408f, 0.093f * SIZE_SCALE)
                             .takeIf { resources.getBoolean(R.bool.config_gamepad_select) },
-                    PadPlacement(singleButton(BUTTON_A), 0.862f, 0.876f, 0.097f * SIZE_SCALE)
+                    PadPlacement(
+                                    singleButton(BUTTON_A),
+                                    TouchControlLayout.a.x,
+                                    TouchControlLayout.a.y,
+                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE
+                            )
                             .takeIf { resources.getBoolean(R.bool.config_gamepad_a) },
-                    PadPlacement(singleButton(BUTTON_B), 0.926f, 0.742f, 0.097f * SIZE_SCALE)
+                    PadPlacement(
+                                    singleButton(BUTTON_B),
+                                    TouchControlLayout.b.x,
+                                    TouchControlLayout.b.y,
+                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE
+                            )
                             .takeIf { resources.getBoolean(R.bool.config_gamepad_b) },
-                    PadPlacement(singleButton(BUTTON_R2), 0.806f, 0.494f, 0.097f * SIZE_SCALE)
+                    PadPlacement(
+                                    singleButton(BUTTON_R2),
+                                    TouchControlLayout.r.x,
+                                    TouchControlLayout.r.y,
+                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE,
+                            )
                             .takeIf { resources.getBoolean(R.bool.config_gamepad_r2) },
                     PadPlacement(
                                     singleButton(BUTTON_L2),
@@ -179,31 +194,31 @@ class GamePadConfig(context: Context, private val resources: Resources) {
                             .takeIf { resources.getBoolean(R.bool.config_gamepad_l2) },
                     PadPlacement(singleButton(BUTTON_Y), 0.956f, 0.481f, 0.052f * SIZE_SCALE)
                             .takeIf { resources.getBoolean(R.bool.config_gamepad_y) },
-                    /* Exact midpoint of R2 (R) and B, so R -> C-right -> B forms one straight,
-                    evenly-spaced diagonal */
+                    /* Exact midpoint of R and B, so R -> C-right -> B is an evenly-spaced
+                    diagonal. */
                     PadPlacement(
                                     singleButton(BUTTON_R1),
-                                    0.887f,
-                                    0.586f,
-                                    0.097f * SIZE_SCALE,
+                                    TouchControlLayout.cRight.x,
+                                    TouchControlLayout.cRight.y,
+                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE,
                                     KeyEvent.KEYCODE_BUTTON_R1
                             )
                             .takeIf { resources.getBoolean(R.bool.config_gamepad_r1) },
-                    /* Exact midpoint of L1 (C-left) and A, so C-left -> C-down -> A forms the
-                    other straight, evenly-spaced diagonal */
+                    /* Exact midpoint of C-left and A, so C-left -> C-down -> A is the other
+                    evenly-spaced diagonal. */
                     PadPlacement(
                                     singleButton(BUTTON_X),
-                                    0.823f,
-                                    0.720f,
-                                    0.097f * SIZE_SCALE,
+                                    TouchControlLayout.cDown.x,
+                                    TouchControlLayout.cDown.y,
+                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE,
                                     KeyEvent.KEYCODE_BUTTON_X
                             )
                             .takeIf { resources.getBoolean(R.bool.config_gamepad_x) },
                     PadPlacement(
                                     singleButton(BUTTON_L1),
-                                    0.744f,
-                                    0.625f,
-                                    0.097f * SIZE_SCALE,
+                                    TouchControlLayout.cLeft.x,
+                                    TouchControlLayout.cLeft.y,
+                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE,
                                     KeyEvent.KEYCODE_BUTTON_L1
                             )
                             .takeIf { resources.getBoolean(R.bool.config_gamepad_l1) },

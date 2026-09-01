@@ -28,7 +28,6 @@ import br.com.redclaw.zelda64player.tracker.model.TrackerItem
 import br.com.redclaw.zelda64player.tracker.model.TrackerLocation
 import br.com.redclaw.zelda64player.tracker.model.TrackerSong
 import br.com.redclaw.zelda64player.tracker.model.TrackerState
-import br.com.redclaw.zelda64player.tracker.model.TrackerUpgrade
 
 /**
  * Plain (non-Android-ViewModel) state holder shared by the tracker dialog and its tab fragments.
@@ -41,6 +40,7 @@ class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: Stri
     val state: TrackerState =
             repository.load(game, hackId).also {
                 if (it.hints.isEmpty()) it.hints.addAll(HintInterpreter.defaultHints())
+                migrateLegacyUpgrades(it)
             }
 
     val items: List<TrackerItem>
@@ -49,9 +49,6 @@ class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: Stri
         get() = OotItemDatabase.forGame(game).locations
     val songs: List<TrackerSong>
         get() = OotItemDatabase.forGame(game).songs
-    val upgrades: List<TrackerUpgrade>
-        get() = OotItemDatabase.forGame(game).upgrades
-
     // ---- Items ----
     fun isItemObtained(id: String) = (state.obtainedItems[id] ?: 0) > 0
     fun getItemCount(id: String) = state.obtainedItems[id] ?: 0
@@ -97,13 +94,6 @@ class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: Stri
     fun isSongFound(id: String) = state.foundSongs.contains(id)
     fun toggleSong(id: String) {
         if (state.foundSongs.contains(id)) state.foundSongs.remove(id) else state.foundSongs.add(id)
-        save()
-    }
-
-    // ---- Upgrades ----
-    fun getUpgradeLevel(id: String) = state.upgradeLevels[id] ?: 0
-    fun setUpgradeLevel(id: String, level: Int) {
-        if (level <= 0) state.upgradeLevels.remove(id) else state.upgradeLevels[id] = level
         save()
     }
 
@@ -188,4 +178,37 @@ class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: Stri
     }
 
     private fun save() = repository.save(state, hackId)
+
+    /** Moves the former Evolutions-tab values into their equivalent item cards once. */
+    private fun migrateLegacyUpgrades(state: TrackerState) {
+        val ids =
+                when (game) {
+                    TrackerGame.OOT ->
+                            mapOf(
+                                    "strength" to "strength",
+                                    "bombs" to "bomb_bag",
+                                    "bow" to "bow",
+                                    "wallet" to "rupees",
+                                    "scale" to "scale",
+                                    "magic" to "magic"
+                            )
+                    TrackerGame.MM ->
+                            mapOf(
+                                    "bombs" to "bomb_bag",
+                                    "bow" to "bow",
+                                    "wallet" to "rupees",
+                                    "magic" to "magic_power"
+                            )
+                }
+        var changed = false
+        ids.forEach { (upgradeId, itemId) ->
+            val level = state.upgradeLevels[upgradeId] ?: return@forEach
+            if (level > 0 && !state.obtainedItems.containsKey(itemId)) {
+                state.obtainedItems[itemId] = level
+            }
+            state.upgradeLevels.remove(upgradeId)
+            changed = true
+        }
+        if (changed) repository.save(state, hackId)
+    }
 }

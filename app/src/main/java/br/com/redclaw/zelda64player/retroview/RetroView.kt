@@ -102,8 +102,12 @@ class RetroView(
     val view = GLRetroView(context, retroViewData)
 
     /** Record only the emulator's GL framebuffer; no system screen capture is used. */
-    fun startVideoRecording(outputFile: File, onResult: (Boolean) -> Unit) {
-        view.startVideoRecording(outputFile, onResult)
+    fun startVideoRecording(
+        outputFile: File,
+        includeMicrophone: Boolean,
+        onResult: (Boolean) -> Unit
+    ) {
+        view.startVideoRecording(outputFile, includeMicrophone, onResult)
     }
 
     fun stopVideoRecording(onStopped: (() -> Unit)? = null) {

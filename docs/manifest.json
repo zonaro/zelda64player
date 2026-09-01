@@ -1,7 +1,7 @@
 {
   "name": "Zelda 64 Player",
   "short_name": "Z64P",
-  "description": "Emulador Android nativo para hacks de Zelda 64 (Ocarina of Time, Majora's Mask) com live BPS/IPS patching, Auto-Ocarina, RetroAchievements e UI estilo Nintendo Switch.",
+  "description": "Descubra e jogue aventuras de Zelda 64 no Android, com Auto-Ocarina, RetroAchievements, controles flexíveis e capturas locais.",
   "start_url": "/zelda64player/",
   "display": "standalone",
   "background_color": "#2D2D2D",
@@ -27,9 +27,9 @@
   "screenshots": [],
   "shortcuts": [
     {
-      "name": "Catálogo de Hacks",
-      "short_name": "Catálogo",
-      "description": "Ver todos os hacks disponíveis",
+      "name": "Aventuras Zelda 64",
+      "short_name": "Aventuras",
+      "description": "Descubra aventuras para explorar",
       "url": "/zelda64player/#catalog",
       "icons": [{ "src": "./assets/app-icon.png", "sizes": "192x192" }]
     },

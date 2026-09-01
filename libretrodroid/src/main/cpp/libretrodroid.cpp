@@ -528,6 +528,41 @@ void LibretroDroid::setAudioEnabled(bool enabled) {
     audioEnabled = enabled;
 }
 
+void LibretroDroid::startRecordingAudioCapture() {
+    // Eight seconds gives the encoder thread room to absorb a short scheduling
+    // stall without letting recording affect emulation timing.
+    const auto sampleRate = std::max(1, recordingAudioSampleRate.load());
+    recordingAudioBuffer.assign(static_cast<size_t>(sampleRate) * 2 * 8, 0);
+    recordingAudioRead.store(0, std::memory_order_relaxed);
+    recordingAudioWrite.store(0, std::memory_order_relaxed);
+    recordingAudioEnabled.store(true, std::memory_order_release);
+}
+
+void LibretroDroid::stopRecordingAudioCapture() {
+    recordingAudioEnabled.store(false, std::memory_order_release);
+    recordingAudioRead.store(0, std::memory_order_relaxed);
+    recordingAudioWrite.store(0, std::memory_order_relaxed);
+}
+
+size_t LibretroDroid::readRecordingAudio(int16_t* destination, size_t maxSamples) {
+    if (destination == nullptr || maxSamples == 0 || recordingAudioBuffer.empty()) return 0;
+
+    const auto capacity = recordingAudioBuffer.size();
+    auto read = recordingAudioRead.load(std::memory_order_relaxed);
+    const auto write = recordingAudioWrite.load(std::memory_order_acquire);
+    const auto available = write >= read ? write - read : capacity - read + write;
+    const auto count = std::min(maxSamples, available);
+    for (size_t i = 0; i < count; ++i) {
+        destination[i] = recordingAudioBuffer[(read + i) % capacity];
+    }
+    recordingAudioRead.store((read + count) % capacity, std::memory_order_release);
+    return count;
+}
+
+int LibretroDroid::getRecordingAudioSampleRate() const {
+    return recordingAudioSampleRate.load(std::memory_order_acquire);
+}
+
 void LibretroDroid::setShaderConfig(ShaderManager::Config shaderConfig) {
     fragmentShaderConfig = std::move(shaderConfig);
     if (video) {
@@ -553,6 +588,20 @@ void LibretroDroid::handleVideoRefresh(
 size_t LibretroDroid::handleAudioCallback(const int16_t *data, size_t frames) {
     if (audio && audioEnabled) {
         audio->write(data, frames);
+    }
+    if (recordingAudioEnabled.load(std::memory_order_acquire) && data != nullptr &&
+        !recordingAudioBuffer.empty()) {
+        const auto capacity = recordingAudioBuffer.size();
+        auto write = recordingAudioWrite.load(std::memory_order_relaxed);
+        const auto read = recordingAudioRead.load(std::memory_order_acquire);
+        const auto samples = frames * 2;
+        for (size_t i = 0; i < samples; ++i) {
+            const auto next = (write + 1) % capacity;
+            if (next == read) break;
+            recordingAudioBuffer[write] = data[i];
+            write = next;
+        }
+        recordingAudioWrite.store(write, std::memory_order_release);
     }
     return frames;
 }
@@ -625,6 +674,13 @@ void LibretroDroid::afterGameLoad() {
         (int32_t) std::lround(inputSampleRate),
         system_av_info.timing.fps,
         preferLowLatencyAudio
+    );
+    // The tap receives the raw samples supplied by the core. Playback may
+    // time-stretch them for display refresh, but the recorder must timestamp
+    // the source PCM at the core's own declared rate.
+    recordingAudioSampleRate.store(
+        static_cast<int>(std::lround(system_av_info.timing.sample_rate)),
+        std::memory_order_release
     );
 
     updateAudioSampleRateMultiplier();
