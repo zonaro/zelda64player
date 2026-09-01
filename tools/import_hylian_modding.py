@@ -20,6 +20,7 @@ import argparse
 import concurrent.futures
 import copy
 import json
+import re
 import sys
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -33,7 +34,19 @@ from urllib.request import Request, urlopen
 BASE_URL = "https://hylianmodding.com/"
 USER_AGENT = "Zelda64PlayerCatalogImporter/1.0 (+https://github.com/zonaro/zelda64player)"
 DIRECT_PATCH_EXTENSIONS = (".bps", ".ips", ".xdelta", ".zip")
-CATALOG_VERSION = 2
+CATALOG_VERSION = 3
+
+# Known developer sites for curated Main Store entries that have no Hylian Modding counterpart
+# or whose patch is mirrored on zonaro/zelda64player. This ensures catalog.json always has
+# useful developerLinks even for hand-curated records.
+CURATED_DEVELOPER_LINKS: dict[str, list[dict[str, str]]] = {
+    "ocarina_of_time_dx": [{"label": "GitHub", "url": "https://github.com/N64DX/oot-dx"}],
+    "ultimate_trial": [{"label": "GitHub", "url": "https://github.com/RichieUltimate/ultimate-trial"}],
+    "majoras_mask_redux": [{"label": "Romhacking.net", "url": "https://www.romhacking.net/hacks/5122/"}],
+    "sealed_palace": [{"label": "Romhacking.net", "url": "https://www.romhacking.net/hacks/7663/"}],
+    "dawn_and_dusk": [{"label": "GitHub", "url": "https://github.com/LuigiBlood/zelda64-dawn-dusk"}],
+    "the_missing_link": [{"label": "GitHub", "url": "https://github.com/zeldaret/oot"}],
+}
 
 
 @dataclass(frozen=True)
@@ -92,6 +105,21 @@ def direct_patch(url: str) -> bool:
     return urlparse(url).path.lower().endswith(DIRECT_PATCH_EXTENSIONS)
 
 
+def is_youtube_url(url: str) -> bool:
+    host = urlparse(url).netloc.lower()
+    return "youtube.com" in host or "youtu.be" in host or "youtube-nocookie.com" in host
+
+
+def youtube_id_from_url(url: str) -> str | None:
+    m = re.search(r'(?:v=|youtu\.be/|embed/|shorts/)([A-Za-z0-9_-]{11})', url)
+    if m:
+        return m.group(1)
+    m = re.search(r'youtube\.com/watch\?.*v=([A-Za-z0-9_-]{11})', url)
+    if m:
+        return m.group(1)
+    return None
+
+
 def video_urls(document: dict[str, Any]) -> list[str]:
     """Collect optional present/future video fields without assuming one schema."""
     result: list[str] = []
@@ -101,6 +129,133 @@ def video_urls(document: dict[str, Any]) -> list[str]:
             if url and url not in result:
                 result.append(url)
     return result
+
+
+def extract_markdown_links(text: str) -> list[dict[str, str]]:
+    pattern = re.compile(r'\[([^\]]+)\]\((https?://[^\)]+)\)')
+    result: list[dict[str, str]] = []
+    for label, url in pattern.findall(text):
+        label = label.strip()
+        url = url.strip()
+        if url and label:
+            result.append({"label": label, "url": url})
+    return result
+
+
+def label_for_url(url: str) -> str:
+    host = urlparse(url).netloc.lower().replace("www.", "")
+    if "github.com" in host:
+        return "GitHub"
+    if "discord.com" in host or "discord.gg" in host:
+        return "Discord"
+    if "itch.io" in host:
+        return "itch.io"
+    if "romhacking.net" in host:
+        return "Romhacking.net"
+    if "youtube.com" in host or "youtu.be" in host:
+        return "YouTube"
+    if "twitter.com" in host or "x.com" in host:
+        return "Twitter"
+    if "twitch.tv" in host:
+        return "Twitch"
+    if "gamebanana.com" in host:
+        return "GameBanana"
+    if "nexusmods.com" in host:
+        return "Nexus Mods"
+    if host:
+        # Use first part of host as label, capitalized
+        base = host.split(".")[0]
+        # Handle co.uk etc - just take first
+        return base.capitalize()
+    return "Site"
+
+
+def developer_links_for(document: dict[str, Any], download_url: str | None) -> list[dict[str, str]]:
+    links: list[dict[str, str]] = []
+    seen: set[str] = set()
+
+    def add(label: str, url: str) -> None:
+        url = url.strip()
+        if not url or url in seen:
+            return
+        host = urlparse(url).netloc.lower()
+        # Skip Hylian Modding itself - not a developer site
+        if "hylianmodding.com" in host:
+            return
+        # Skip YouTube - those are videos, not developer sites
+        if is_youtube_url(url):
+            return
+        # Skip empty or fragment-only
+        if url.startswith("#"):
+            return
+        seen.add(url)
+        clean_label = label.strip() if label and label.strip() else label_for_url(url)
+        # Truncate very long labels
+        if len(clean_label) > 40:
+            clean_label = clean_label[:37] + "..."
+        links.append({"label": clean_label, "url": url})
+
+    # From download_link if it's a developer site (github, external page, not direct hylian patch)
+    if download_url:
+        host = urlparse(download_url).netloc.lower()
+        is_github = "github.com" in host
+        is_direct = direct_patch(download_url)
+        is_hylian = "hylianmodding.com" in host
+        # If it's github, always add (even if direct patch? github direct patches are still developer)
+        # If it's external (not direct) and not hylian, add
+        # If it's direct but not hylian (e.g., direct zip on github), the downloadTarget will be direct but we still want the repo as link
+        # So for github direct, we add the repo page, not the direct file? But download_url is the direct file url for github direct? Actually for github direct, download_url is the file url, not repo. We should add the repo as well.
+        # For now, add download_url if it's github or external non-hylian
+        if is_github:
+            # For github direct file urls, extract repo base
+            # e.g., https://github.com/krm01/oot-indigo-mod/releases/download/... -> https://github.com/krm01/oot-indigo-mod
+            m = re.match(r'(https?://github\.com/[^/]+/[^/]+)', download_url)
+            if m:
+                add(label_for_url(m.group(1)), m.group(1))
+            else:
+                add(label_for_url(download_url), download_url)
+        elif not is_hylian and not is_direct:
+            add(label_for_url(download_url), download_url)
+        elif not is_hylian and is_direct:
+            # Direct patch on non-hylian host (e.g., direct zip on some site) - still add host as developer link
+            # But avoid adding direct file url as developer link if it's a file; instead add host
+            # For now, add the url itself with file label
+            add(label_for_url(download_url), download_url)
+
+    # From description markdown links
+    desc = document.get("description", "")
+    if isinstance(desc, str) and desc.strip():
+        for item in extract_markdown_links(desc):
+            add(item["label"], item["url"])
+
+    return links
+
+
+def split_screenshots_and_videos(raw_screenshots: list[str], document: dict[str, Any]) -> tuple[list[str], list[str]]:
+    screenshots: list[str] = []
+    videos: list[str] = []
+    # Explicit video fields first
+    for v in video_urls(document):
+        if v not in videos:
+            videos.append(v)
+    # Then check screenshots for youtube
+    for url in raw_screenshots:
+        if not url or not url.strip():
+            continue
+        url = url.strip()
+        # Make absolute if needed
+        if url.startswith("/"):
+            url = absolute_url(url)
+        if is_youtube_url(url):
+            if url not in videos:
+                videos.append(url)
+        else:
+            # Ensure absolute for hylian paths
+            if url.startswith("/") or url.startswith("competitions/") or url.startswith("mods/"):
+                url = absolute_url(url)
+            if url not in screenshots:
+                screenshots.append(url)
+    return screenshots, videos
 
 
 def base_rom_for(supported_games: list[str]) -> dict[str, Any]:
@@ -155,8 +310,16 @@ def hylian_entry(source: Source, slug: str, document: dict[str, Any]) -> dict[st
     games = to_strings(document.get("supported_games"))
     source_url = urljoin(source.index_url, f"{slug}/mod.json")
     thumbnails = to_strings(document.get("thumbnail_image"))
-    screenshot_urls = [absolute_url(path) for path in to_strings(document.get("screenshots"))]
+    raw_screenshots = to_strings(document.get("screenshots"))
+    # Split screenshots and videos (youtube in screenshots -> videos)
+    screenshot_urls, video_list = split_screenshots_and_videos(raw_screenshots, document)
+    # Ensure absolute for thumbnails
+    thumb_url = absolute_url(thumbnails[0]) if thumbnails else None
+    if thumb_url and thumb_url.startswith("/"):
+        thumb_url = absolute_url(thumb_url)
+
     download_link = document.get("download_link")
+    download_url: str | None = None
     if isinstance(download_link, str) and download_link.strip():
         download_url = absolute_url(download_link)
         target = download_target(download_url)
@@ -164,6 +327,8 @@ def hylian_entry(source: Source, slug: str, document: dict[str, Any]) -> dict[st
     else:
         target = {"type": "external", "url": source_url}
         patch = None
+
+    developer_links = developer_links_for(document, download_url)
 
     category = document.get("category")
     tags = [category.strip()] if isinstance(category, str) and category.strip() else []
@@ -183,13 +348,14 @@ def hylian_entry(source: Source, slug: str, document: dict[str, Any]) -> dict[st
         "version": str(document.get("last_updated") or "1.0"),
         "baseRom": base_rom_for(games),
         "patch": patch,
-        "coverImageUrl": absolute_url(thumbnails[0]) if thumbnails else None,
+        "coverImageUrl": thumb_url,
         "tags": tags,
         "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"],
         "storeId": "picks",
         "sourceCatalogId": "picks",
         "screenshots": screenshot_urls,
-        "videos": video_urls(document),
+        "videos": video_list,
+        "developerLinks": developer_links,
         "completionStatus": completion.strip() if isinstance(completion, str) and completion.strip() else None,
         "supportedGames": ", ".join(games) or None,
         "compatibility": document.get("compatibility") if isinstance(document.get("compatibility"), str) else None,
@@ -270,6 +436,8 @@ def enrich_curated_entry(existing: dict[str, Any], imported: dict[str, Any]) -> 
         "coverImageUrl",
         "tags",
         "screenshots",
+        "videos",
+        "developerLinks",
         "completionStatus",
         "supportedGames",
         "compatibility",
@@ -282,6 +450,60 @@ def enrich_curated_entry(existing: dict[str, Any], imported: dict[str, Any]) -> 
     origin["managed"] = False
     enriched["importSource"] = origin
     return enriched
+
+
+def infer_developer_links(entry: dict[str, Any]) -> list[dict[str, str]]:
+    """Infer developer links for curated entries that lack them."""
+    existing = entry.get("developerLinks")
+    if isinstance(existing, list) and len(existing) > 0:
+        return existing
+    # Check curated mapping first
+    hack_id = entry.get("id", "")
+    if hack_id in CURATED_DEVELOPER_LINKS:
+        return copy.deepcopy(CURATED_DEVELOPER_LINKS[hack_id])
+    links: list[dict[str, str]] = []
+    seen: set[str] = set()
+    def add(url: str, label: str | None = None) -> None:
+        if not url or url in seen:
+            return
+        host = urlparse(url).netloc.lower()
+        if "hylianmodding.com" in host:
+            return
+        if "zonaro/zelda64player" in url:
+            return
+        if is_youtube_url(url):
+            return
+        seen.add(url)
+        links.append({"label": label or label_for_url(url), "url": url})
+    # From downloadTarget
+    dt = entry.get("downloadTarget")
+    if isinstance(dt, dict):
+        if dt.get("type") == "github" and isinstance(dt.get("repoUrl"), str):
+            add(dt["repoUrl"])
+        elif dt.get("type") == "external" and isinstance(dt.get("url"), str):
+            add(dt["url"])
+        elif dt.get("type") == "direct" and isinstance(dt.get("patch"), dict):
+            patch_url = dt["patch"].get("url", "")
+            if isinstance(patch_url, str) and "github.com" in patch_url:
+                m = re.match(r'(https?://github\.com/[^/]+/[^/]+)', patch_url)
+                if m:
+                    add(m.group(1))
+    # From patch url
+    patch = entry.get("patch")
+    if isinstance(patch, dict) and isinstance(patch.get("url"), str):
+        url = patch["url"]
+        if "github.com" in url and "zonaro/zelda64player" not in url:
+            m = re.match(r'(https?://github\.com/[^/]+/[^/]+)', url)
+            if m:
+                add(m.group(1))
+    # From description markdown
+    desc = entry.get("description", "")
+    if isinstance(desc, str):
+        for item in extract_markdown_links(desc):
+            host = urlparse(item["url"]).netloc.lower()
+            if "hylianmodding.com" not in host and not is_youtube_url(item["url"]):
+                add(item["url"], item["label"])
+    return links
 
 
 def merge_catalog(catalog: dict[str, Any], imported: list[dict[str, Any]]) -> tuple[dict[str, Any], int, int]:
@@ -299,6 +521,31 @@ def merge_catalog(catalog: dict[str, Any], imported: list[dict[str, Any]]) -> tu
         item_id = item.get("id")
         replacement = incoming.pop(item_id, None) if isinstance(item_id, str) else None
         if replacement is None:
+            # No incoming update - ensure developerLinks and videos are backfilled
+            # Fix youtube in screenshots -> videos for legacy entries
+            if isinstance(item.get("screenshots"), list):
+                raw = [str(x) for x in item["screenshots"] if isinstance(x, str)]
+                # Also check if videos already has youtube, keep it
+                existing_videos = item.get("videos") if isinstance(item.get("videos"), list) else []
+                # Re-split
+                new_screenshots: list[str] = []
+                new_videos: list[str] = list(existing_videos)
+                for url in raw:
+                    if is_youtube_url(url):
+                        if url not in new_videos:
+                            new_videos.append(url)
+                    else:
+                        if url not in new_screenshots:
+                            new_screenshots.append(url)
+                item["screenshots"] = new_screenshots
+                item["videos"] = new_videos
+            # Backfill developerLinks
+            if not isinstance(item.get("developerLinks"), list) or len(item.get("developerLinks", [])) == 0:
+                inferred = infer_developer_links(item)
+                if inferred:
+                    item["developerLinks"] = inferred
+                elif "developerLinks" not in item:
+                    item["developerLinks"] = []
             retained.append(item)
             continue
         if is_legacy_hylian_entry(item):
@@ -313,6 +560,32 @@ def merge_catalog(catalog: dict[str, Any], imported: list[dict[str, Any]]) -> tu
 
     additions = sorted(incoming.values(), key=lambda entry: (entry["name"].casefold(), entry["id"]))
     retained.extend(additions)
+    # Ensure all retained entries have developerLinks and proper videos
+    for entry in retained:
+        if not isinstance(entry.get("developerLinks"), list):
+            entry["developerLinks"] = infer_developer_links(entry)
+        elif len(entry.get("developerLinks", [])) == 0:
+            inferred = infer_developer_links(entry)
+            if inferred:
+                entry["developerLinks"] = inferred
+        # Ensure videos/screenshots split for any remaining legacy
+        if isinstance(entry.get("screenshots"), list):
+            raw = [str(x) for x in entry["screenshots"] if isinstance(x, str)]
+            vids = entry.get("videos") if isinstance(entry.get("videos"), list) else []
+            new_screenshots: list[str] = []
+            new_videos: list[str] = list(vids)
+            changed = False
+            for url in raw:
+                if is_youtube_url(url):
+                    if url not in new_videos:
+                        new_videos.append(url)
+                    changed = True
+                else:
+                    new_screenshots.append(url)
+            if changed:
+                entry["screenshots"] = new_screenshots
+                entry["videos"] = new_videos
+
     result = copy.deepcopy(catalog)
     result["catalogVersion"] = max(int(result.get("catalogVersion", 1)), CATALOG_VERSION)
     result["storeName"] = "Main Store"

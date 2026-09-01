@@ -134,6 +134,7 @@
     <string name="store_source_error">Não foi possível carregar esta loja.</string>
     <string name="detail_screenshots">Capturas de tela</string>
     <string name="detail_videos">Vídeos</string>
+    <string name="detail_developer_links">Links do criador</string>
     <string name="detail_open_browser">Abrir no navegador</string>
     <string name="detail_resolving">Resolvendo download...</string>
     <string name="detail_supported_game">Jogo suportado</string>
@@ -154,6 +155,9 @@
     <string name="webview_unsupported_archive_message">O arquivo %1$s está em formato .7z ou .rar, que não pode ser extraído automaticamente. Baixe a versão .zip ou .bps/.ips/.xdelta se disponível.</string>
     <string name="webview_no_patch_in_zip">Nenhum patch ou ROM encontrado dentro de %1$s.</string>
     <string name="webview_no_base_rom">ROM base não encontrada (CRC32 %1$s). Importe a ROM %2$s nas configurações.</string>
+    <string name="webview_badge">Navegador</string>
+    <string name="webview_badge_desc">Download via navegador embutido</string>
+    <string name="detail_webview_notice">Este hack requer download manual via navegador embutido.</string>
 
     <!-- Download queue (Hack Store) -->
     <string name="store_downloads">Downloads</string>

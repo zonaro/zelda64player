@@ -1,12 +1,14 @@
 package br.com.redclaw.zelda64player.store.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.databinding.StoreGridItemBinding
 import br.com.redclaw.zelda64player.store.DownloadPhase
+import br.com.redclaw.zelda64player.store.DownloadTarget
 import br.com.redclaw.zelda64player.ui.switchui.BadgeBinder
 import coil.load
 
@@ -101,6 +103,14 @@ class StoreAdapter(private val onItemClick: (HackEntry) -> Unit) :
             // Family icon badge (OoT / MM) overlaid on the cover; never hidden for
             // known gameCode — falls back to gameCode when supportedGames is absent.
             BadgeBinder.bindFamily(binding.itemFamilyBadge, BadgeBinder.familyForHack(hack))
+
+            // WebView/manual-download indicator: visible when the hack requires
+            // the embedded browser (ExternalLink) instead of a direct download.
+            val needsWebView = hack.downloadTarget is DownloadTarget.ExternalLink
+            binding.itemWebviewBadge.visibility = if (needsWebView) View.VISIBLE else View.GONE
+            binding.itemWebviewBadge.contentDescription =
+                    if (needsWebView) binding.root.context.getString(R.string.webview_badge_desc)
+                    else null
         }
     }
 }

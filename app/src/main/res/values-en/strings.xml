@@ -134,6 +134,7 @@
     <string name="store_source_error">Could not load this store.</string>
     <string name="detail_screenshots">Screenshots</string>
     <string name="detail_videos">Videos</string>
+    <string name="detail_developer_links">Creator links</string>
     <string name="detail_open_browser">Open in browser</string>
     <string name="detail_resolving">Resolving download...</string>
     <string name="detail_supported_game">Supported game</string>

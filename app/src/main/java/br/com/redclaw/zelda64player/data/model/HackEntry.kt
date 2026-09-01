@@ -77,6 +77,21 @@ data class CatalogImportSource(
     }
 }
 
+/** A developer / project link (GitHub, itch.io, etc.) for a hack. */
+data class DeveloperLink(val label: String, val url: String) {
+    fun toJson(): JSONObject = JSONObject().apply {
+        put("label", label)
+        put("url", url)
+    }
+
+    companion object {
+        fun fromJson(o: JSONObject): DeveloperLink = DeveloperLink(
+            label = o.optString("label", "Site"),
+            url = o.getString("url")
+        )
+    }
+}
+
 /** Reference to the base ROM a hack requires (user-supplied, never shipped). */
 data class BaseRomRef(
         val name: String,
@@ -164,6 +179,8 @@ data class HackEntry(
         val screenshots: List<String> = emptyList(),
         /** Absolute video URLs (tolerant; usually empty — HM has no video field). */
         val videos: List<String> = emptyList(),
+        /** Developer / project links (GitHub, itch.io, etc.) extracted from the source. */
+        val developerLinks: List<DeveloperLink> = emptyList(),
         /** Completion status string from the catalog, if declared. */
         val completionStatus: String? = null,
         /** Raw supported game(s) string ("OoT" / "MM"), if declared. */
@@ -211,6 +228,7 @@ data class HackEntry(
                 put("sourceCatalogId", sourceCatalogId)
                 put("screenshots", JSONArray(screenshots))
                 put("videos", JSONArray(videos))
+                put("developerLinks", JSONArray(developerLinks.map { it.toJson() }))
                 put("completionStatus", completionStatus ?: JSONObject.NULL)
                 put("supportedGames", supportedGames ?: JSONObject.NULL)
                 put("lastUpdated", lastUpdated ?: JSONObject.NULL)
@@ -302,6 +320,13 @@ data class HackEntry(
                         videos =
                                 if (o.has("videos")) jsonToStringList(o.getJSONArray("videos"))
                                 else emptyList(),
+                        developerLinks =
+                                if (o.has("developerLinks")) {
+                                    val arr = o.getJSONArray("developerLinks")
+                                    (0 until arr.length()).mapNotNull { i ->
+                                        runCatching { DeveloperLink.fromJson(arr.getJSONObject(i)) }.getOrNull()
+                                    }
+                                } else emptyList(),
                         completionStatus =
                                 if (o.isNull("completionStatus")) null
                                 else o.optString("completionStatus", null),

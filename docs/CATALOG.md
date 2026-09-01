@@ -17,7 +17,7 @@ a small author-maintained example.
 
 | Field | Required | Type | Description |
 |---|---:|---|---|
-| `catalogVersion` | Yes | int | Schema version for compatible migrations. The shipped catalog is version 2, which permits `downloadTarget` as an alternative to a direct `patch`. |
+| `catalogVersion` | Yes | int | Schema version for compatible migrations. The shipped catalog is version 3, which adds `developerLinks` and normalizes YouTube URLs from `screenshots` into `videos`. |
 | `storeName` | Recommended | string | Human-readable name. The shipped catalog uses `Main Store`. |
 | `lastUpdated` | Yes | ISO 8601 UTC string | Catalog generation timestamp. |
 | `hacks` | Yes | array | Hack records described below. |
@@ -104,7 +104,8 @@ HTTPS URLs for remote media.
 | `lastUpdated` | ISO 8601 string | Source-record update time, distinct from the catalog's top-level timestamp. |
 | `changelog` | array of `{ "date", "content" }` | Source release/change notes. Either property may be absent. |
 | `compatibleCores` | array of strings | Known supported core ids: `mupen64plus_next_gles3` and/or `parallel_n64`. |
-| `videos` | array of URLs | Optional source video links. |
+| `videos` | array of URLs | Optional source video links (YouTube etc.). The importer moves YouTube URLs found in `screenshots` into `videos` and embeds them on the site/app. |
+| `developerLinks` | array of `{ label, url }` | Developer / project links (GitHub, itch.io, Discord, etc.) extracted from the source `download_link` and markdown links in the description. Hylian Modding and YouTube URLs are excluded. |
 | `ocarinaSongs` | array | Optional per-hack Auto-Ocarina extension. |
 | `retroAchievements` | object | Optional known RetroAchievements metadata. |
 

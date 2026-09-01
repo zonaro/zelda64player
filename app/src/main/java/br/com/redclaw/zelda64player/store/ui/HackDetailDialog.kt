@@ -190,6 +190,7 @@ class HackDetailDialog : DialogFragment() {
         populateBadges()
         populateChangelog()
         populateVideos()
+        populateDeveloperLinks()
         updateDownloadButton()
         showInstalledAsOtherNote()
     }
@@ -212,6 +213,11 @@ class HackDetailDialog : DialogFragment() {
             binding.detailCompletionBadge.text = completion
             binding.detailCompletionBadge.visibility = View.VISIBLE
         }
+        // WebView/manual-download indicator: visible when the hack requires
+        // the embedded browser (ExternalLink) instead of a direct download.
+        val needsWebView = hack.downloadTarget is DownloadTarget.ExternalLink
+        binding.detailWebviewBadge.visibility = if (needsWebView) View.VISIBLE else View.GONE
+        binding.detailWebviewNotice.visibility = if (needsWebView) View.VISIBLE else View.GONE
     }
 
     private fun populateChangelog() {
@@ -262,6 +268,27 @@ class HackDetailDialog : DialogFragment() {
                         setOnClickListener { openWebView(url) }
                     }
             binding.detailVideosContainer.addView(tv)
+        }
+    }
+
+    private fun populateDeveloperLinks() {
+        if (hack.developerLinks.isEmpty()) return
+        binding.detailDeveloperLinksLabel.visibility = View.VISIBLE
+        binding.detailDeveloperLinksContainer.visibility = View.VISIBLE
+        hack.developerLinks.forEach { link ->
+            val tv =
+                    android.widget.TextView(requireContext()).apply {
+                        text = "${link.label}: ${link.url}"
+                        textSize = 13f
+                        setTextColor(
+                                ContextCompat.getColor(requireContext(), R.color.switch_accent)
+                        )
+                        setPadding(0, 4, 0, 4)
+                        isClickable = true
+                        isFocusable = true
+                        setOnClickListener { openWebView(link.url) }
+                    }
+            binding.detailDeveloperLinksContainer.addView(tv)
         }
     }
 

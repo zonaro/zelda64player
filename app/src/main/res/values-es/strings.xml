@@ -134,6 +134,7 @@
     <string name="store_source_error">No se pudo cargar esta tienda.</string>
     <string name="detail_screenshots">Capturas de pantalla</string>
     <string name="detail_videos">Vídeos</string>
+    <string name="detail_developer_links">Enlaces del creador</string>
     <string name="detail_open_browser">Abrir en el navegador</string>
     <string name="detail_resolving">Resolviendo descarga...</string>
     <string name="detail_supported_game">Juego compatible</string>
