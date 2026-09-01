@@ -13,50 +13,60 @@ enum class BadgeType {
 
 /** A single hack shown in the library grid. */
 data class HackLibraryEntry(
-    val id: String,
-    val title: String,
-    val coverUrl: String? = null,
-    /** Icon badge drawn over the tile, distinguishing tile categories. Null hides the badge. */
-    val badge: BadgeType? = null,
-    /**
-     * Game family driving the badge's chip background and icon tint. Null means
-     * the family is unknown, in which case the adapter falls back to a neutral
-     * chip (color_primary background / white icon). OoT -> yellow bg / black
-     * icon, MM -> purple bg / white icon.
-     */
-    val family: OcarinaGame? = null,
-    /** True when this tile is a user-imported vanilla base ROM (managed in Settings). */
-    val isVanilla: Boolean = false,
-    /** True only for hacks installed from a file chosen by the user (not Store catalog entries). */
-    val isUserImported: Boolean = false,
-    /** Store this entry originated from ("picks" | "hylianmodding"), or null for local/unknown. */
-    val storeId: String? = null
+        val id: String,
+        val title: String,
+        val coverUrl: String? = null,
+        /** Icon badge drawn over the tile, distinguishing tile categories. Null hides the badge. */
+        val badge: BadgeType? = null,
+        /**
+         * Game family driving the badge's chip background and icon tint. Null means the family is
+         * unknown, in which case the adapter falls back to a neutral chip (color_primary background
+         * / white icon). OoT -> yellow bg / black icon, MM -> purple bg / white icon.
+         */
+        val family: OcarinaGame? = null,
+        /** True when this tile is a user-imported vanilla base ROM (managed in Settings). */
+        val isVanilla: Boolean = false,
+        /**
+         * True only for hacks installed from a file chosen by the user (not Store catalog entries).
+         */
+        val isUserImported: Boolean = false,
+        /**
+         * Store this entry originated from ("picks" | "hylianmodding"), or null for local/unknown.
+         */
+        val storeId: String? = null,
+        /**
+         * The original hack id used for file-system operations (ROM file, save files, shortcuts,
+         * uninstall). Always matches the `rom_<hackId>` filename on disk. For vanilla entries this
+         * equals [id]; for catalog hacks grouped by
+         * [br.com.redclaw.zelda64player.store.CanonicalIdResolver] it may differ from the display
+         * [id] (which is the canonical slug used for grouping).
+         */
+        val romId: String = id
 )
 
 /**
- * Seam for the library data source. Phase 1 is backed by locally-placed patch
- * files; Phase 2 will add a catalog-driven implementation behind the same
- * interface without touching the UI.
+ * Seam for the library data source. Phase 1 is backed by locally-placed patch files; Phase 2 will
+ * add a catalog-driven implementation behind the same interface without touching the UI.
  */
 interface HackLibrarySource {
     fun available(): List<HackLibraryEntry>
 }
 
 /**
- * Interim [HackLibrarySource] reading locally-placed `<hackId>.bps` patches.
- * The displayed title is derived from the hack id (filename without extension).
+ * Interim [HackLibrarySource] reading locally-placed `<hackId>.bps` patches. The displayed title is
+ * derived from the hack id (filename without extension).
  */
 class LocalPatchesSource(private val patchRepository: PatchRepository) : HackLibrarySource {
     override fun available(): List<HackLibraryEntry> =
-        patchRepository.listHackIds().map {
-            HackLibraryEntry(it, prettify(it), badge = BadgeType.HACK)
-        }
+            patchRepository.listHackIds().map {
+                HackLibraryEntry(it, prettify(it), badge = BadgeType.HACK)
+            }
 
     companion object {
         /** Turn a slug like `ocarina_of_time_dx` into `Ocarina Of Time Dx`. */
         fun prettify(hackId: String): String =
-            hackId.split('_', '-', '.')
-                .filter { it.isNotBlank() }
-                .joinToString(" ") { it.replaceFirstChar(Char::titlecase) }
+                hackId.split('_', '-', '.').filter { it.isNotBlank() }.joinToString(" ") {
+                    it.replaceFirstChar(Char::titlecase)
+                }
     }
 }

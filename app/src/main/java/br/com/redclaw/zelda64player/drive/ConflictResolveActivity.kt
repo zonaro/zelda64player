@@ -19,11 +19,17 @@
 package br.com.redclaw.zelda64player.drive
 
 import android.os.Bundle
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,8 +50,25 @@ class ConflictResolveActivity : AppCompatActivity() {
 
     private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
 
+    private val backHelper = SwitchBackButton()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // On-screen Switch-style back button. This activity is dialog-themed and
+        // immediately presents a modal SwitchDialog whose scrim covers the button;
+        // the dialog's own negative/cancel action already finishes the activity.
+        // The helper wiring (hide-on-controller, show-on-touch) is kept consistent
+        // with the other Switch screens.
+        val backButton = layoutInflater.inflate(R.layout.switch_back_button, null)
+        val backSize = resources.getDimensionPixelSize(R.dimen.icon_button_size)
+        val backMargin = resources.getDimensionPixelSize(R.dimen.switch_screen_margin)
+        val backParams = FrameLayout.LayoutParams(backSize, backSize).apply {
+            gravity = Gravity.TOP or Gravity.START
+            setMargins(backMargin, backMargin, 0, 0)
+        }
+        (window.decorView as ViewGroup).addView(backButton, backParams)
+        backHelper.attach(this, backButton, onBack = { finish() })
 
         val store = ConflictStore(this)
         val id = intent.getStringExtra(EXTRA_CONFLICT_ID)
@@ -151,6 +174,11 @@ class ConflictResolveActivity : AppCompatActivity() {
         } else {
             SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US).format(Date(epoch))
         }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        backHelper.onTouch(ev)
+        return super.dispatchTouchEvent(ev)
+    }
 
     companion object {
         /** Extra key carrying the conflict id when launched from a notification. */

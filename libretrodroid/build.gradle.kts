@@ -32,20 +32,14 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-        }
-    }
+    buildTypes { release { isMinifyEnabled = false } }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+    kotlinOptions { jvmTarget = "1.8" }
 
     externalNativeBuild {
         cmake {
@@ -56,6 +50,6 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.20")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 }

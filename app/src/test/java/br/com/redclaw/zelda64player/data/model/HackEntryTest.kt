@@ -62,4 +62,23 @@ class HackEntryTest {
         val b = entry("hack_y", "picks")
         assertFalse(HackEntry.isSameHack(a, b))
     }
+
+    @Test
+    fun preservesImportedCatalogMetadataThroughJsonRoundTrip() {
+        val original = entry("source_record").copy(
+            compatibility = "Works with original hardware",
+            sourceMetadata = SourceMetadata(timestamp = 42, isUpdate = true),
+            importSource = CatalogImportSource(
+                provider = "Hylian Modding",
+                catalogId = "mods",
+                modUrl = "https://hylianmodding.com/mods/source_record/mod.json"
+            )
+        )
+
+        val restored = HackEntry.fromJson(original.toJson())
+
+        assertEquals(original.compatibility, restored.compatibility)
+        assertEquals(original.sourceMetadata, restored.sourceMetadata)
+        assertEquals(original.importSource, restored.importSource)
+    }
 }

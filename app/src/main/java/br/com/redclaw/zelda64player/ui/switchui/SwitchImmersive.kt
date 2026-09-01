@@ -20,6 +20,7 @@ package br.com.redclaw.zelda64player.ui.switchui
 
 import android.app.Activity
 import android.os.Build
+import android.view.Window
 import android.view.WindowManager
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -27,33 +28,44 @@ import androidx.core.view.WindowInsetsControllerCompat
 /**
  * Reusable helper that puts a Switch-style activity into sticky immersive mode.
  *
- * Hides the status and navigation bars (they re-appear on a transient swipe) and
- * extends the drawing area into the display cutout so the Switch UI fills the whole
- * screen edge-to-edge. Centralised here so every top-level activity shares one
- * implementation instead of re-implementing the insets logic (DRY).
+ * Hides the status and navigation bars (they re-appear on a transient swipe) and extends the
+ * drawing area into the display cutout so the Switch UI fills the whole screen edge-to-edge.
+ * Centralised here so every top-level activity shares one implementation instead of re-implementing
+ * the insets logic (DRY).
  */
 object SwitchImmersive {
 
     /**
      * Enters sticky immersive mode for [activity].
      *
-     * Uses [WindowInsetsControllerCompat] to hide [WindowInsetsCompat.Type.systemBars]
-     * with [WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE], and
-     * sets [WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES] so
-     * content is not letterboxed around a notch (guarded to API 28+).
+     * Uses [WindowInsetsControllerCompat] to hide [WindowInsetsCompat.Type.systemBars] with
+     * [WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE], and sets
+     * [WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES] so content is not
+     * letterboxed around a notch (guarded to API 28+).
      *
-     * Safe to call multiple times (e.g. from [Activity.onWindowFocusChanged] after a
-     * dialog drops immersive mode); repeated calls are idempotent.
+     * Safe to call multiple times (e.g. from [Activity.onWindowFocusChanged] after a dialog drops
+     * immersive mode); repeated calls are idempotent.
      */
     fun enterFullscreen(activity: Activity) {
-        val window = activity.window
+        enterFullscreen(activity.window)
+    }
+
+    /**
+     * Enters sticky immersive mode on an arbitrary [window].
+     *
+     * Useful for non-floating [android.app.Dialog] windows that create their own
+     * [android.view.Window] (e.g. fullscreen [androidx.fragment.app.DialogFragment] subclasses with
+     * `windowIsFloating=false`). Without this, the system bars reappear on the dialog's window even
+     * though the underlying activity is immersive.
+     */
+    fun enterFullscreen(window: Window) {
         val controller = WindowInsetsControllerCompat(window, window.decorView)
         controller.hide(WindowInsetsCompat.Type.systemBars())
         controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
     }
 }

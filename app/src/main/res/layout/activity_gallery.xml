@@ -16,14 +16,11 @@
         android:gravity="center_vertical"
         android:padding="@dimen/switch_screen_margin">
 
-        <ImageButton
+        <include
             android:id="@+id/gallery_back"
+            layout="@layout/switch_back_button"
             android:layout_width="@dimen/icon_button_size"
-            android:layout_height="@dimen/icon_button_size"
-            android:background="@drawable/bg_icon_button"
-            android:src="@drawable/ic_close"
-            android:tint="@color/switch_text_primary"
-            android:contentDescription="@string/about_dialog_close" />
+            android:layout_height="@dimen/icon_button_size" />
 
         <ImageView
             android:layout_width="24dp"

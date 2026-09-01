@@ -62,8 +62,8 @@ object LibraryOrdering {
         history: Map<String, Long>,
         limit: Int
     ): List<HackLibraryEntry> = entries
-        .filter { history.containsKey(it.id) }
-        .sortedByDescending { history[it.id] ?: Long.MIN_VALUE }
+        .filter { history.containsKey(it.romId) }
+        .sortedByDescending { history[it.romId] ?: Long.MIN_VALUE }
         .take(limit)
 
     /**
@@ -86,8 +86,8 @@ object LibraryOrdering {
         GridSortMode.ALPHA ->
             entries.sortedBy { it.title.lowercase() }
         GridSortMode.LAST_PLAYED ->
-            entries.sortedByDescending { history[it.id] ?: Long.MIN_VALUE }
+            entries.sortedByDescending { history[it.romId] ?: Long.MIN_VALUE }
         GridSortMode.DOWNLOAD_DATE ->
-            entries.sortedByDescending { romLastModified(it.id) }
+            entries.sortedByDescending { romLastModified(it.romId) }
     }
 }

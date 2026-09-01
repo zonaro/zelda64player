@@ -1,0 +1,700 @@
+/* Zelda 64 Player — Dashboard Styles — Nintendo Switch HOME edition
+   Tokens match the native app (values-night/colors.xml + VISUAL_IDENTITY.md).
+   Dark default (#2D2D2D), cyan focus (#00BCD4), amber (#FFA000), green (#02830C).
+*/
+
+:root {
+    --bg-primary: #2D2D2D;
+    --bg-panel: #1E1E1E;
+    --bg-panel-2: #2A2A2A;
+    --bg-dialog: #3A3A3C;
+    --accent: #00BCD4;
+    --accent-hover: #00E5FF;
+    --accent-amber: #FFA000;
+    --accent-green: #02830C;
+    --text-primary: #FFFFFF;
+    --text-secondary: #9E9E9E;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --scrim: rgba(0,0,0,0.55);
+    --card-radius: 6px;
+    --dialog-radius: 14px;
+    --focus-border: 3px solid var(--accent);
+    --dock-circle: #555555;
+    --danger: #E53935;
+    --success: #43A047;
+    --warning: #FF9800;
+    --shadow: 0 8px 24px rgba(0,0,0,0.45);
+    --shadow-card: 0 4px 16px rgba(0,0,0,0.35);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------- Switch Top Bar ---------- */
+.switch-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(30,30,30,0.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+}
+.switch-topbar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 22px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.switch-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.switch-brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--accent-green);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+.switch-brand-text {
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+}
+.switch-brand-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-left: 1px solid var(--border-strong);
+    padding-left: 10px;
+    margin-left: 2px;
+    white-space: nowrap;
+}
+.switch-nav {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.switch-nav-link {
+    color: var(--text-secondary);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 2px solid transparent;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.switch-nav-link:hover { color: var(--text-primary); text-decoration: none; }
+.switch-nav-link.active {
+    border-color: var(--accent);
+    color: var(--text-primary);
+    background: rgba(0,188,212,0.12);
+}
+.switch-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+.switch-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 0 4px rgba(67,160,71,0.18);
+    animation: switchPulse 2s infinite;
+}
+.switch-status-dot.offline { background: var(--danger); box-shadow: 0 0 0 4px rgba(229,57,53,0.18); animation: none; }
+@keyframes switchPulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+
+/* ---------- Main ---------- */
+.switch-main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 22px 96px;
+}
+.switch-page { display: none; }
+.switch-page.active { display: block; }
+
+.switch-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 18px;
+    border-left: 4px solid var(--accent);
+    padding-left: 14px;
+}
+.switch-section-head h2 {
+    font-size: clamp(22px, 3.2vw, 28px);
+    font-weight: 700;
+    line-height: 1.15;
+}
+.switch-section-sub {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.switch-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.switch-toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.switch-count {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* ---------- Buttons (Switch) ---------- */
+.switch-btn {
+    appearance: none;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.12s;
+    line-height: 1;
+}
+.switch-btn:active { transform: scale(0.98); }
+.switch-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.switch-btn-primary {
+    background: var(--accent);
+    color: #0a0a0a;
+    border-color: var(--accent);
+}
+.switch-btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.switch-btn-secondary {
+    background: var(--bg-panel-2);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+}
+.switch-btn-secondary:hover { border-color: var(--accent); color: var(--text-primary); }
+.switch-btn-danger {
+    background: rgba(229,57,53,0.14);
+    color: #ff8a80;
+    border-color: rgba(229,57,53,0.35);
+}
+.switch-btn-danger:hover { border-color: var(--danger); }
+.switch-btn-small { padding: 7px 10px; font-size: 14px; border-radius: 8px; }
+.switch-btn-block { width: 100%; }
+.switch-btn-icon { font-size: 14px; line-height: 1; }
+
+/* ---------- Switch Grid (13:9 cards) ---------- */
+.switch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+@media (max-width: 520px) {
+    .switch-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+}
+
+.switch-card {
+    background: var(--bg-panel);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    display: flex;
+    flex-direction: column;
+}
+.switch-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+    border-color: rgba(0,188,212,0.35);
+}
+.switch-card:focus-within,
+.switch-card.is-focused {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), var(--shadow-card);
+    outline: none;
+}
+.switch-card-cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 13 / 9;
+    background: var(--bg-panel-2);
+    overflow: hidden;
+}
+.switch-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.switch-card-cover-fallback {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    font-size: 36px;
+    color: var(--text-secondary);
+    background: linear-gradient(135deg, #1E1E1E 0%, #2A2A2A 100%);
+}
+.switch-card-dim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.10);
+    pointer-events: none;
+    transition: opacity 0.15s;
+}
+.switch-card:hover .switch-card-dim,
+.switch-card.is-focused .switch-card-dim { opacity: 0; }
+.switch-card-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.12);
+}
+.switch-card-badge-vanilla { background: rgba(255,235,59,0.92); color: #000; border-color: rgba(0,0,0,0.12); }
+.switch-card-badge-hack { background: rgba(0,188,212,0.92); color: #000; }
+
+.switch-card-info {
+    padding: 10px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+.switch-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.6em;
+}
+.switch-card-meta {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.switch-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--bg-panel-2);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+.switch-badge-rom { background: #1b5e20; color: #a5d6a7; border-color: #2e7d32; }
+.switch-badge-sram { background: #e65100; color: #ffcc80; border-color: #ef6c00; }
+.switch-badge-state { background: #4a148c; color: #ce93d8; border-color: #6a1b9a; }
+
+.switch-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 2px;
+}
+.switch-card-actions .switch-btn { flex: 1; padding: 8px 10px; font-size: 12px; }
+.switch-card-actions .switch-btn-play {
+    background: var(--accent);
+    color: #0a0a0a;
+    border-color: var(--accent);
+}
+.switch-card-actions .switch-btn-play:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.switch-card-actions .switch-btn-play:disabled {
+    background: var(--bg-panel-2);
+    color: var(--text-secondary);
+    border-color: var(--border);
+}
+
+/* ---------- Loading / Empty ---------- */
+.switch-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 16px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+.switch-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 16px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+}
+.switch-empty p { color: var(--text-secondary); font-size: 14px; margin-bottom: 12px; }
+
+/* ---------- Player Overlay (Switch Dialog) ---------- */
+.switch-player-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+}
+.switch-player-overlay[hidden] { display: none !important; }
+.switch-player-scrim {
+    position: absolute;
+    inset: 0;
+    background: var(--scrim);
+    backdrop-filter: blur(4px);
+}
+.switch-player-box {
+    position: relative;
+    width: min(960px, 100%);
+    max-height: min(88vh, 900px);
+    background: var(--bg-dialog);
+    border-radius: var(--dialog-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-strong);
+}
+.switch-player-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+}
+.switch-player-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.switch-player-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.switch-player-body {
+    flex: 1;
+    min-height: 0;
+    background: #000;
+    display: grid;
+    place-items: center;
+}
+.switch-emulator-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 62vh;
+    background: #000;
+    overflow: hidden;
+}
+.switch-emulator-container video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    background: #000;
+}
+.switch-emulator-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    place-content: center;
+    gap: 10px;
+    text-align: center;
+    padding: 24px;
+    background: radial-gradient(600px 400px at 50% 30%, rgba(0,188,212,0.14), transparent 70%), #0a0a0a;
+}
+.switch-emulator-placeholder[hidden] { display: none !important; }
+.switch-emulator-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #000;
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    font-weight: 800;
+}
+.switch-emulator-placeholder p { color: var(--text-secondary); font-size: 13px; }
+.switch-emulator-hint { font-size: 12px !important; opacity: 0.85; max-width: 420px; }
+.switch-player-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-panel);
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* ---------- Settings Panel (Switch Side Panel) ---------- */
+.switch-panel {
+    max-width: 560px;
+    background: var(--bg-panel);
+    border-radius: var(--dialog-radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-card);
+}
+.switch-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    font-weight: 700;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel-2);
+}
+.switch-panel-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #000;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+}
+.switch-panel-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+.switch-setting-row { display: flex; flex-direction: column; gap: 8px; }
+.switch-setting-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.switch-input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+}
+.switch-input:focus { border-color: var(--accent); }
+.switch-settings-info {
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.switch-settings-info strong { color: var(--accent); }
+
+/* ---------- Switch Dock ---------- */
+.switch-dock {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    z-index: 40;
+    display: flex;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(30,30,30,0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+}
+.switch-dock-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: var(--dock-circle);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.12s, background 0.15s;
+    font-size: 16px;
+}
+.switch-dock-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+.switch-dock-btn:active { transform: scale(0.96); }
+.switch-dock-icon { line-height: 1; }
+
+/* ---------- Switch Footer ---------- */
+.switch-footer {
+    border-top: 1px solid var(--border);
+    background: rgba(30,30,30,0.92);
+    backdrop-filter: blur(6px);
+    position: sticky;
+    bottom: 0;
+    z-index: 30;
+}
+.switch-footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 10px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.switch-footer-left { display: flex; align-items: center; gap: 8px; }
+.switch-footer-tv, .switch-footer-gamepad {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+}
+.switch-hint { display: inline-flex; align-items: center; gap: 6px; }
+.switch-hint b {
+    display: inline-grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    font-size: 11px;
+    line-height: 1;
+}
+
+/* ---------- Switch Dialog (card actions) ---------- */
+.switch-dialog-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: var(--scrim);
+    backdrop-filter: blur(4px);
+}
+.switch-dialog-scrim[hidden] { display: none !important; }
+.switch-dialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 71;
+    width: min(420px, calc(100vw - 24px));
+    background: var(--bg-dialog);
+    border-radius: var(--dialog-radius);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+.switch-dialog[hidden] { display: none !important; }
+.switch-dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+}
+.switch-dialog-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #000;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+.switch-dialog-title { font-size: 15px; font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.switch-dialog-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.switch-dialog-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 13px;
+    font-weight: 500;
+}
+.switch-dialog-row:hover { border-color: var(--accent); background: rgba(0,188,212,0.08); }
+.switch-dialog-row small { color: var(--text-secondary); font-weight: 400; }
+.switch-dialog-footer { padding: 12px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border); }
+
+/* ---------- Toast (Switch style) ---------- */
+.switch-toast {
+    position: fixed;
+    bottom: 88px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 90;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: var(--bg-dialog);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow);
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: switchToastIn 0.22s ease;
+    max-width: min(520px, calc(100vw - 24px));
+    text-align: center;
+}
+.switch-toast.success { border-color: rgba(67,160,71,0.45); }
+.switch-toast.error { border-color: rgba(229,57,53,0.45); }
+.switch-toast.info { border-color: rgba(0,188,212,0.35); }
+@keyframes switchToastIn { from { transform: translateX(-50%) translateY(8px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .switch-topbar-inner { height: auto; padding: 12px 16px; flex-wrap: wrap; }
+    .switch-main { padding: 18px 16px 96px; }
+    .switch-section-head { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .switch-toolbar { flex-direction: column; align-items: stretch; }
+    .switch-footer-inner { flex-direction: column; align-items: flex-start; }
+    .switch-dock { bottom: 12px; padding: 8px 10px; gap: 8px; }
+    .switch-dock-btn { width: 40px; height: 40px; font-size: 14px; }
+    .switch-player-box { width: 100%; max-height: 92vh; }
+    .switch-emulator-container { aspect-ratio: 4 / 3; }
+}

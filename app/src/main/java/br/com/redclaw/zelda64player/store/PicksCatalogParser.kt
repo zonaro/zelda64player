@@ -5,9 +5,9 @@ import br.com.redclaw.zelda64player.data.model.HackEntry
 import org.json.JSONObject
 
 /**
- * Parses the legacy "Zelda 64 Picks" catalog format (the `catalog.json` schema
- * with `catalogVersion`, `lastUpdated` and a `hacks` array). Every produced
- * entry is stamped with `storeId = "picks"` and `sourceCatalogId = "picks"`.
+ * Parses the legacy "Main Store" catalog format (the `catalog.json` schema with `catalogVersion`,
+ * `lastUpdated` and a `hacks` array). Every produced entry is stamped with `storeId = "picks"` and
+ * `sourceCatalogId = "picks"`.
  *
  * Tolerant: malformed individual entries are skipped by [HackCatalog.parse].
  */
@@ -19,7 +19,7 @@ class PicksCatalogParser : CatalogParser {
 
     /** Reads the optional top-level `storeName` (used to name the PICKS store). */
     fun storeName(json: String): String? =
-        runCatching { JSONObject(json).optString("storeName", null) }
-            .getOrNull()
-            ?.takeIf { it.isNotBlank() }
+            runCatching { JSONObject(json).optString("storeName", null) }.getOrNull()?.takeIf {
+                it.isNotBlank()
+            }
 }

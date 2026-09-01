@@ -18,14 +18,13 @@
             app:titleTextColor="@color/switch_text_primary"
             app:navigationIconTint="@color/switch_text_primary">
 
-            <Spinner
-                android:id="@+id/store_selector"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="8dp"
-                android:contentDescription="@string/store_selector_desc"
-                android:minWidth="160dp" />
+            <include
+                android:id="@+id/store_back"
+                layout="@layout/switch_back_button"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:layout_gravity="start|center_vertical" />
+
         </androidx.appcompat.widget.Toolbar>
 
         <!-- Two-panel split: fixed left sidebar + flexible main content. -->

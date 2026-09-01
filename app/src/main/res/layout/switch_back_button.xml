@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Reusable Switch-style back button. Mirrors the grid / gallery / tester back
+     buttons exactly (bg_icon_button + ic_close + switch_text_primary) so every
+     non-HOME screen shares one source of truth for the affordance. Host layouts
+     include it and assign their own id, e.g.:
+       <include android:id="@+id/gallery_back" layout="@layout/switch_back_button"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size" />
+     then bind via binding.galleryBack.root. -->
+<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/back_button"
+    android:layout_width="@dimen/icon_button_size"
+    android:layout_height="@dimen/icon_button_size"
+    android:background="@drawable/bg_icon_button"
+    android:src="@drawable/ic_close"
+    android:tint="@color/switch_text_primary"
+    android:scaleType="centerInside"
+    android:contentDescription="@string/back_button" />

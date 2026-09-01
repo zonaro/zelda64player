@@ -1,6 +1,7 @@
 package br.com.redclaw.zelda64player.retroachievements.ui
 
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.LinearLayout
@@ -15,6 +16,7 @@ import br.com.redclaw.zelda64player.databinding.ActivityRaProfileBinding
 import br.com.redclaw.zelda64player.retroachievements.data.RaUserProfile
 import br.com.redclaw.zelda64player.retroachievements.data.RaUserProfileField
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
+import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import coil.load
 import kotlinx.coroutines.launch
 
@@ -23,13 +25,15 @@ class RaProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRaProfileBinding
     private val viewModel: RaProfileViewModel by viewModels()
 
+    private val backHelper = SwitchBackButton()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRaProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
         SwitchImmersive.enterFullscreen(this)
 
-        binding.raProfileToolbar.setNavigationOnClickListener { finish() }
+        backHelper.attach(this, binding.raProfileBack.root, onBack = { finish() })
         binding.raProfileRetry.setOnClickListener { viewModel.retry() }
         binding.raProfileAvatar.outlineProvider = ViewOutlineProvider.BACKGROUND
         binding.raProfileAvatar.clipToOutline = true
@@ -44,6 +48,11 @@ class RaProfileActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) SwitchImmersive.enterFullscreen(this)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        backHelper.onTouch(ev)
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun render(state: RaProfileUiState) {

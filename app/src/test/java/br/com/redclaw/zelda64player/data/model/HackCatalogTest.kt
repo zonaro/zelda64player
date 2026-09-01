@@ -86,6 +86,25 @@ class HackCatalogTest {
     }
 
     @Test
+    fun acceptsExternalDownloadTargetWithoutDirectPatch() {
+        val hack = validHackJson("external", "External")
+        hack.remove("patch")
+        hack.put(
+            "downloadTarget", JSONObject().apply {
+                put("type", "external")
+                put("url", "https://example.com/external")
+            }
+        )
+        val catalog = HackCatalog.parse(
+            JSONObject().apply { put("hacks", JSONArray().apply { put(hack) }) }
+        )
+
+        assertEquals(1, catalog.hacks.size)
+        assertEquals("external", catalog.hacks.single().id)
+        assertEquals(null, catalog.hacks.single().patch)
+    }
+
+    @Test
     fun ignoresUnknownFields() {
         val hack = validHackJson("h1", "H1")
         hack.put("extraField", "should be ignored")

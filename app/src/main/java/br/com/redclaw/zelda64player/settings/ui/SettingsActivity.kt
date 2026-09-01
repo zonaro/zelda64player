@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -33,26 +34,27 @@ import br.com.redclaw.zelda64player.drive.ConflictResolveActivity
 import br.com.redclaw.zelda64player.drive.ConflictStore
 import br.com.redclaw.zelda64player.drive.GoogleDriveAuth
 import br.com.redclaw.zelda64player.drive.GoogleDriveBackup
-import br.com.redclaw.zelda64player.drive.GoogleDriveBackupWorker
 import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
-import br.com.redclaw.zelda64player.views.InstalledLibrary
 import br.com.redclaw.zelda64player.settings.SettingsViewModel
 import br.com.redclaw.zelda64player.store.CatalogFetcher
+import br.com.redclaw.zelda64player.dashboard.server.DashboardManager
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
+import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
-import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.utils.LanguageManager
+import br.com.redclaw.zelda64player.views.InstalledLibrary
 import com.google.android.gms.auth.UserRecoverableAuthException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
@@ -60,6 +62,8 @@ class SettingsActivity : AppCompatActivity() {
 
     /** Shared Switch UI sound-effects manager (null-safe if not yet ready). */
     private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
+
+    private val backHelper = SwitchBackButton()
 
     private lateinit var baseRomAdapter: BaseRomAdapter
     private lateinit var catalogUrlAdapter: CatalogUrlAdapter
@@ -69,43 +73,45 @@ class SettingsActivity : AppCompatActivity() {
     private var settingsDrawer: View? = null
     private var isSettingsDrawerOpen = false
 
-    private val pickRomLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode != RESULT_OK) return@registerForActivityResult
-        val data = result.data ?: return@registerForActivityResult
-        val uris = mutableListOf<Uri>()
-        data.data?.let { uris.add(it) }
-        data.clipData?.let { clip ->
-            for (i in 0 until clip.itemCount) uris.add(clip.getItemAt(i).uri)
-        }
-        if (uris.isNotEmpty()) viewModel.importRomsFromUris(uris)
-    }
+    private val pickRomLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode != RESULT_OK) return@registerForActivityResult
+                val data = result.data ?: return@registerForActivityResult
+                val uris = mutableListOf<Uri>()
+                data.data?.let { uris.add(it) }
+                data.clipData?.let { clip ->
+                    for (i in 0 until clip.itemCount) uris.add(clip.getItemAt(i).uri)
+                }
+                if (uris.isNotEmpty()) viewModel.importRomsFromUris(uris)
+            }
 
-    private val exportBackupLauncher = registerForActivityResult(
-        ActivityResultContracts.CreateDocument("application/zip")
-    ) { uri -> if (uri != null) runExportBackup(uri) }
+    private val exportBackupLauncher =
+            registerForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) {
+                    uri ->
+                if (uri != null) runExportBackup(uri)
+            }
 
-    private val importBackupLauncher = registerForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri -> if (uri != null) runImportBackup(uri) }
+    private val importBackupLauncher =
+            registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+                if (uri != null) runImportBackup(uri)
+            }
 
     /** Google account chooser for the Drive backup feature. */
-    private val pickDriveAccountLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode != RESULT_OK) return@registerForActivityResult
-        val name = result.data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-        if (name != null) {
-            CorePrefs.setGdriveAccountName(this, name)
-            updateGdriveAccountUi()
-        }
-    }
+    private val pickDriveAccountLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode != RESULT_OK) return@registerForActivityResult
+                val name = result.data?.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+                if (name != null) {
+                    CorePrefs.setGdriveAccountName(this, name)
+                    updateGdriveAccountUi()
+                }
+            }
 
     /** OAuth consent recovery intent launched when the token needs user approval. */
-    private val driveConsentLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { /* User can tap "Back up now" again after granting consent. */ }
+    private val driveConsentLauncher =
+            registerForActivityResult(
+                    ActivityResultContracts.StartActivityForResult()
+            ) { /* User can tap "Back up now" again after granting consent. */}
 
     private val installedRepository by lazy {
         InstalledHacksRepository(File(filesDir, "installed_hacks.json"))
@@ -119,6 +125,7 @@ class SettingsActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setTitle(R.string.settings_title)
+        backHelper.attach(this, binding.settingsBack.root, onBack = { finish() })
         setupSwitchNavigation()
         applyDynamicAccentToSwitches()
 
@@ -134,6 +141,8 @@ class SettingsActivity : AppCompatActivity() {
         setupCloudSyncSection()
         setupLanguageSection()
         setupAboutSection()
+        setupDashboardSection()
+        setupDisplaySection()
         wireSettingsSfx()
         observeImport()
     }
@@ -141,6 +150,11 @@ class SettingsActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) SwitchImmersive.enterFullscreen(this)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        backHelper.onTouch(ev)
+        return super.dispatchTouchEvent(ev)
     }
 
     override fun onResume() {
@@ -151,24 +165,27 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Matches the System Settings information architecture: landscape keeps the
-     * categories permanently visible on the left, while a portrait phone gets a
-     * familiar hamburger drawer. The same navigation view is moved at runtime,
-     * so both modes always expose exactly the same localized categories.
+     * Matches the System Settings information architecture: landscape keeps the categories
+     * permanently visible on the left, while a portrait phone gets a familiar hamburger drawer. The
+     * same navigation view is moved at runtime, so both modes always expose exactly the same
+     * localized categories.
      */
     private fun setupSwitchNavigation() {
-        val navigationTargets = listOf(
-            binding.settingsNavImport to binding.settingsSectionImport,
-            binding.settingsNavBaseroms to binding.settingsSectionBaseroms,
-            binding.settingsNavCatalog to binding.settingsSectionCatalog,
-            binding.settingsNavRa to binding.settingsSectionRa,
-            binding.settingsNavCore to binding.settingsSectionCore,
-            binding.settingsNavBackup to binding.settingsSectionBackup,
-            binding.settingsNavCloudsync to binding.settingsSectionCloudsync,
-            binding.settingsNavLanguage to binding.settingsSectionLanguage,
-            binding.settingsNavAbout to binding.settingsSectionAbout,
-            binding.settingsNavCapture to binding.settingsSectionCapture
-        )
+        val navigationTargets =
+                listOf(
+                        binding.settingsNavImport to binding.settingsSectionImport,
+                        binding.settingsNavBaseroms to binding.settingsSectionBaseroms,
+                        binding.settingsNavCatalog to binding.settingsSectionCatalog,
+                        binding.settingsNavRa to binding.settingsSectionRa,
+                        binding.settingsNavCore to binding.settingsSectionCore,
+                        binding.settingsNavBackup to binding.settingsSectionBackup,
+                        binding.settingsNavCloudsync to binding.settingsSectionCloudsync,
+                        binding.settingsNavLanguage to binding.settingsSectionLanguage,
+                        binding.settingsNavAbout to binding.settingsSectionAbout,
+                        binding.settingsNavCapture to binding.settingsSectionCapture,
+                        binding.settingsNavDashboard to binding.settingsSectionDashboard,
+                        binding.settingsNavDisplay to binding.settingsSectionDisplay
+                )
 
         navigationTargets.forEach { (row, target) ->
             row.setOnClickListener {
@@ -177,14 +194,13 @@ class SettingsActivity : AppCompatActivity() {
                 // Delay until async section content (e.g. the base-ROM RecyclerView)
                 // has laid out AND settled; scrolling earlier gets reset to top when
                 // that list populates and changes the layout height.
-                binding.settingsScroll.postDelayed({
-                    binding.settingsScroll.scrollTo(0, target.top)
-                }, 600)
+                binding.settingsScroll.postDelayed(
+                        { binding.settingsScroll.scrollTo(0, target.top) },
+                        600
+                )
                 if (isPortraitSettings()) closeSettingsDrawer()
             }
-            row.setOnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) sfx?.focusMove()
-            }
+            row.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) sfx?.focusMove() }
         }
         selectSettingsSection(binding.settingsNavImport)
 
@@ -193,30 +209,32 @@ class SettingsActivity : AppCompatActivity() {
         } else {
             // A non-interactive settings glyph makes the toolbar match the
             // System Settings header without presenting a misleading back action.
-            binding.settingsToolbar.navigationIcon = AppCompatResources.getDrawable(
-                this, R.drawable.ic_settings
-            )
+            binding.settingsToolbar.navigationIcon =
+                    AppCompatResources.getDrawable(this, R.drawable.ic_settings)
             binding.settingsToolbar.navigationContentDescription = null
             binding.settingsToolbar.setNavigationOnClickListener(null)
         }
     }
 
     private fun isPortraitSettings(): Boolean =
-        resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
     private fun selectSettingsSection(selectedRow: View) {
-        val rows = listOf(
-            binding.settingsNavImport,
-            binding.settingsNavBaseroms,
-            binding.settingsNavCatalog,
-            binding.settingsNavRa,
-            binding.settingsNavCore,
-            binding.settingsNavBackup,
-            binding.settingsNavCloudsync,
-            binding.settingsNavLanguage,
-            binding.settingsNavAbout,
-            binding.settingsNavCapture
-        )
+        val rows =
+                listOf(
+                        binding.settingsNavImport,
+                        binding.settingsNavBaseroms,
+                        binding.settingsNavCatalog,
+                        binding.settingsNavRa,
+                        binding.settingsNavCore,
+                        binding.settingsNavBackup,
+                        binding.settingsNavCloudsync,
+                        binding.settingsNavLanguage,
+                        binding.settingsNavAbout,
+                        binding.settingsNavCapture,
+                        binding.settingsNavDashboard,
+                        binding.settingsNavDisplay
+                )
         val accentColor = AccentManager.getAccentColor(this)
         rows.forEach { row ->
             row.isSelected = row === selectedRow
@@ -230,15 +248,19 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /** Creates a background drawable for the selected navigation row (left accent bar). */
-    private fun createSelectedNavBackground(accentColor: Int): android.graphics.drawable.LayerDrawable {
-        val accentBar = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            setColor(accentColor)
-        }
-        val transparent = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            setColor(android.graphics.Color.TRANSPARENT)
-        }
+    private fun createSelectedNavBackground(
+            accentColor: Int
+    ): android.graphics.drawable.LayerDrawable {
+        val accentBar =
+                GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    setColor(accentColor)
+                }
+        val transparent =
+                GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    setColor(android.graphics.Color.TRANSPARENT)
+                }
         val layerDrawable = android.graphics.drawable.LayerDrawable(arrayOf(transparent, accentBar))
         // Inset the accent bar to be a 3dp wide bar on the left
         layerDrawable.setLayerInset(1, 0, 0, 0, 0)
@@ -256,33 +278,36 @@ class SettingsActivity : AppCompatActivity() {
     /** Applies the dynamic accent color to all Switch widgets in the settings. */
     private fun applyDynamicAccentToSwitches() {
         val accentColor = AccentManager.getAccentColor(this)
-        val switches = listOf(
-            binding.settingsRaEnabledSwitch,
-            binding.settingsGdriveEnabled,
-            binding.settingsGdriveSaves,
-            binding.settingsGdriveImages,
-            binding.settingsGdriveVideos,
-            binding.settingsGdriveAuto,
-            binding.settingsCloudsyncEnabled,
-            binding.settingsCloudsyncWifi,
-            binding.settingsCloudsyncNotify
-        )
+        val switches =
+                listOf(
+                        binding.settingsRaEnabledSwitch,
+                        binding.settingsGdriveEnabled,
+                        binding.settingsGdriveSaves,
+                        binding.settingsGdriveImages,
+                        binding.settingsGdriveVideos,
+                        binding.settingsGdriveAuto,
+                        binding.settingsCloudsyncEnabled,
+                        binding.settingsCloudsyncWifi,
+                        binding.settingsCloudsyncNotify
+                )
         switches.forEach { switch ->
             // Create dynamic thumb and track color state lists
-            val thumbStateList = android.content.res.ColorStateList(
-                arrayOf(
-                    intArrayOf(android.R.attr.state_checked),
-                    intArrayOf()
-                ),
-                intArrayOf(accentColor, ContextCompat.getColor(this, R.color.switch_text_primary))
-            )
-            val trackStateList = android.content.res.ColorStateList(
-                arrayOf(
-                    intArrayOf(android.R.attr.state_checked),
-                    intArrayOf()
-                ),
-                intArrayOf(accentColor, ContextCompat.getColor(this, R.color.switch_text_secondary))
-            )
+            val thumbStateList =
+                    android.content.res.ColorStateList(
+                            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                            intArrayOf(
+                                    accentColor,
+                                    ContextCompat.getColor(this, R.color.switch_text_primary)
+                            )
+                    )
+            val trackStateList =
+                    android.content.res.ColorStateList(
+                            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                            intArrayOf(
+                                    accentColor,
+                                    ContextCompat.getColor(this, R.color.switch_text_secondary)
+                            )
+                    )
             switch.thumbTintList = thumbStateList
             switch.trackTintList = trackStateList
         }
@@ -297,40 +322,43 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsBody.removeView(drawer)
         binding.settingsNavigationDivider.visibility = View.GONE
 
-        val drawerWidth = minOf(
-            (resources.displayMetrics.widthPixels * 0.86f).toInt(),
-            (320 * resources.displayMetrics.density).toInt()
-        )
-        val scrim = View(this).apply {
-            background = ColorDrawable(Color.TRANSPARENT)
-            contentDescription = getString(R.string.settings_close_navigation)
-            isClickable = true
-            isFocusable = true
-            visibility = View.GONE
-            setOnClickListener { closeSettingsDrawer() }
-        }
+        val drawerWidth =
+                minOf(
+                        (resources.displayMetrics.widthPixels * 0.86f).toInt(),
+                        (320 * resources.displayMetrics.density).toInt()
+                )
+        val scrim =
+                View(this).apply {
+                    background = ColorDrawable(Color.TRANSPARENT)
+                    contentDescription = getString(R.string.settings_close_navigation)
+                    isClickable = true
+                    isFocusable = true
+                    visibility = View.GONE
+                    setOnClickListener { closeSettingsDrawer() }
+                }
         settingsDrawerScrim = scrim
         binding.settingsRoot.addView(
-            scrim,
-            FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
+                scrim,
+                FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                )
         )
         drawer.visibility = View.GONE
         drawer.elevation = 12f * resources.displayMetrics.density
         settingsDrawer = drawer
         binding.settingsRoot.addView(
-            drawer,
-            FrameLayout.LayoutParams(
-                drawerWidth,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                Gravity.START
-            )
+                drawer,
+                FrameLayout.LayoutParams(
+                        drawerWidth,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        Gravity.START
+                )
         )
-        binding.settingsToolbar.navigationIcon = AppCompatResources.getDrawable(this, R.drawable.ic_menu)
+        binding.settingsToolbar.navigationIcon =
+                AppCompatResources.getDrawable(this, R.drawable.ic_menu)
         binding.settingsToolbar.navigationContentDescription =
-            getString(R.string.settings_open_navigation)
+                getString(R.string.settings_open_navigation)
         binding.settingsToolbar.setNavigationOnClickListener { openSettingsDrawer() }
     }
 
@@ -347,11 +375,12 @@ class SettingsActivity : AppCompatActivity() {
         }
         drawer.apply {
             visibility = View.VISIBLE
-            translationX = if (width > 0) {
-                -width.toFloat()
-            } else {
-                -resources.displayMetrics.widthPixels.toFloat()
-            }
+            translationX =
+                    if (width > 0) {
+                        -width.toFloat()
+                    } else {
+                        -resources.displayMetrics.widthPixels.toFloat()
+                    }
             animate().translationX(0f).setDuration(220L).start()
             binding.settingsNavImport.requestFocus()
         }
@@ -364,15 +393,15 @@ class SettingsActivity : AppCompatActivity() {
         val scrim = settingsDrawerScrim ?: return
         isSettingsDrawerOpen = false
         drawer.animate()
-            .translationX(-drawer.width.toFloat())
-            .setDuration(180L)
-            .withEndAction { drawer.visibility = View.GONE }
-            .start()
+                .translationX(-drawer.width.toFloat())
+                .setDuration(180L)
+                .withEndAction { drawer.visibility = View.GONE }
+                .start()
         scrim.animate()
-            .alpha(0f)
-            .setDuration(180L)
-            .withEndAction { scrim.visibility = View.GONE }
-            .start()
+                .alpha(0f)
+                .setDuration(180L)
+                .withEndAction { scrim.visibility = View.GONE }
+                .start()
         sfx?.panelClose()
     }
 
@@ -386,40 +415,40 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Wires the Switch UI sound effects to the primary Settings controls so the
-     * screen stays consistent with the other Switch-style surfaces (home row,
-     * dock, grid, side panel). Focus traversal plays the focus-move "toc" and
-     * activation plays the select blip. This is additive only — no control flow
-     * is changed.
+     * Wires the Switch UI sound effects to the primary Settings controls so the screen stays
+     * consistent with the other Switch-style surfaces (home row, dock, grid, side panel). Focus
+     * traversal plays the focus-move "toc" and activation plays the select blip. This is additive
+     * only — no control flow is changed.
      */
     private fun wireSettingsSfx() {
-        val focusViews = listOf(
-            binding.settingsImportButton,
-            binding.settingsBackupExport,
-            binding.settingsBackupImport,
-            binding.settingsCatalogAdd,
-            binding.settingsRaLogin,
-            binding.settingsRaLogout,
-            binding.settingsCoreButton,
-            binding.settingsGdriveConnect,
-            binding.settingsGdriveBackupNow,
-            binding.settingsGdriveView,
-            binding.settingsGdriveFrequency,
-            binding.settingsLanguageButton,
-            binding.settingsAboutRepo,
-            binding.settingsAboutCatalog
-        )
+        val focusViews =
+                listOf(
+                        binding.settingsImportButton,
+                        binding.settingsBackupExport,
+                        binding.settingsBackupImport,
+                        binding.settingsCatalogAdd,
+                        binding.settingsRaLogin,
+                        binding.settingsRaLogout,
+                        binding.settingsCoreButton,
+                        binding.settingsGdriveConnect,
+                        binding.settingsGdriveBackupNow,
+                        binding.settingsGdriveView,
+                        binding.settingsGdriveFrequency,
+                        binding.settingsLanguageButton,
+                        binding.settingsAboutRepo,
+                        binding.settingsAboutCatalog
+                )
         for (view in focusViews) {
-            view.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) sfx?.focusMove()
-            }
+            view.onFocusChangeListener =
+                    View.OnFocusChangeListener { _, hasFocus -> if (hasFocus) sfx?.focusMove() }
         }
     }
 
     private fun setupBackupSection() {
         binding.settingsBackupExport.setOnClickListener {
             sfx?.select()
-            val name = "zelda64_saves_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.zip"
+            val name =
+                    "zelda64_saves_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.zip"
             exportBackupLauncher.launch(name)
         }
         binding.settingsBackupImport.setOnClickListener {
@@ -436,21 +465,31 @@ class SettingsActivity : AppCompatActivity() {
         }
         val storage = Storage.getInstance(this)
         val saves = installed.associateWith { storage.saveFiles(it) }
-        val version = runCatching {
-            packageManager.getPackageInfo(packageName, 0).versionName
-        }.getOrNull() ?: "?"
+        val version =
+                runCatching { packageManager.getPackageInfo(packageName, 0).versionName }
+                        .getOrNull()
+                        ?: "?"
         binding.settingsBackupProgress.visibility = View.VISIBLE
         lifecycleScope.launch(Dispatchers.IO) {
-            val summary = try {
-                contentResolver.openOutputStream(uri)?.use { out ->
-                    SaveBackupManager.export(out, saves, version)
-                } ?: SaveBackupManager.BackupSummary(0, 0, 0, listOf(getString(R.string.backup_error_stream)))
-            } catch (e: Exception) {
-                SaveBackupManager.BackupSummary(0, 0, 0, listOf(e.message ?: "error"))
-            }
+            val summary =
+                    try {
+                        contentResolver.openOutputStream(uri)?.use { out ->
+                            SaveBackupManager.export(out, saves, version)
+                        }
+                                ?: SaveBackupManager.BackupSummary(
+                                        0,
+                                        0,
+                                        0,
+                                        listOf(getString(R.string.backup_error_stream))
+                                )
+                    } catch (e: Exception) {
+                        SaveBackupManager.BackupSummary(0, 0, 0, listOf(e.message ?: "error"))
+                    }
             withContext(Dispatchers.Main) {
                 binding.settingsBackupProgress.visibility = View.GONE
-                showBackupResult(getString(R.string.backup_export_summary, summary.hacks, summary.files))
+                showBackupResult(
+                        getString(R.string.backup_export_summary, summary.hacks, summary.files)
+                )
             }
         }
     }
@@ -466,17 +505,31 @@ class SettingsActivity : AppCompatActivity() {
         }
         binding.settingsBackupProgress.visibility = View.VISIBLE
         lifecycleScope.launch(Dispatchers.IO) {
-            val summary = try {
-                contentResolver.openInputStream(uri)?.use { input ->
-                    SaveBackupManager.restore(input, resolver)
-                } ?: SaveBackupManager.BackupSummary(0, 0, 0, listOf(getString(R.string.backup_error_stream)))
-            } catch (e: Exception) {
-                SaveBackupManager.BackupSummary(0, 0, 0, listOf(e.message ?: "error"))
-            }
+            val summary =
+                    try {
+                        contentResolver.openInputStream(uri)?.use { input ->
+                            SaveBackupManager.restore(input, resolver)
+                        }
+                                ?: SaveBackupManager.BackupSummary(
+                                        0,
+                                        0,
+                                        0,
+                                        listOf(getString(R.string.backup_error_stream))
+                                )
+                    } catch (e: Exception) {
+                        SaveBackupManager.BackupSummary(0, 0, 0, listOf(e.message ?: "error"))
+                    }
             withContext(Dispatchers.Main) {
                 binding.settingsBackupProgress.visibility = View.GONE
                 val message = buildString {
-                    append(getString(R.string.backup_import_summary, summary.hacks, summary.files, summary.skipped))
+                    append(
+                            getString(
+                                    R.string.backup_import_summary,
+                                    summary.hacks,
+                                    summary.files,
+                                    summary.skipped
+                            )
+                    )
                     if (summary.errors.isNotEmpty()) {
                         append("\n\n")
                         append(summary.errors.joinToString("\n"))
@@ -489,10 +542,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun showBackupResult(message: String) {
         SwitchDialog(this)
-            .title(getString(R.string.backup_title))
-            .message(message)
-            .positiveButton(getString(android.R.string.ok))
-            .show()
+                .title(getString(R.string.backup_title))
+                .message(message)
+                .positiveButton(getString(android.R.string.ok))
+                .show()
     }
 
     // ---- Google Drive cloud backup section ----
@@ -554,37 +607,41 @@ class SettingsActivity : AppCompatActivity() {
     /** Reflect the connected account name (or the "none" hint) in the status. */
     private fun updateGdriveAccountUi() {
         val name = CorePrefs.getGdriveAccountName(this)
-        binding.settingsGdriveAccount.text = if (name != null) {
-            getString(R.string.gdrive_connected, name)
-        } else {
-            getString(R.string.gdrive_not_connected)
-        }
+        binding.settingsGdriveAccount.text =
+                if (name != null) {
+                    getString(R.string.gdrive_connected, name)
+                } else {
+                    getString(R.string.gdrive_not_connected)
+                }
     }
 
     /** Show the last successful backup time, or "Nunca" when never run. */
     private fun updateGdriveStatus() {
         val last = CorePrefs.getGdriveLastBackup(this)
-        binding.settingsGdriveStatus.text = if (last > 0) {
-            getString(R.string.gdrive_last_backup, formatBackupDate(last))
-        } else {
-            getString(R.string.gdrive_last_backup_never)
-        }
+        binding.settingsGdriveStatus.text =
+                if (last > 0) {
+                    getString(R.string.gdrive_last_backup, formatBackupDate(last))
+                } else {
+                    getString(R.string.gdrive_last_backup_never)
+                }
     }
 
     private fun updateGdriveFrequencyUi() {
-        binding.settingsGdriveFrequency.text = frequencyLabel(
-            CorePrefs.getGdriveBackupFrequency(this)
-        )
+        binding.settingsGdriveFrequency.text =
+                frequencyLabel(CorePrefs.getGdriveBackupFrequency(this))
     }
 
-    private fun frequencyLabel(value: String): String = when (value) {
-        CorePrefs.GDRIVE_FREQ_WEEKLY -> getString(R.string.gdrive_frequency_weekly)
-        CorePrefs.GDRIVE_FREQ_MANUAL -> getString(R.string.gdrive_frequency_manual)
-        else -> getString(R.string.gdrive_frequency_daily)
-    }
+    private fun frequencyLabel(value: String): String =
+            when (value) {
+                CorePrefs.GDRIVE_FREQ_WEEKLY -> getString(R.string.gdrive_frequency_weekly)
+                CorePrefs.GDRIVE_FREQ_MANUAL -> getString(R.string.gdrive_frequency_manual)
+                else -> getString(R.string.gdrive_frequency_daily)
+            }
 
-    /** "Back up now": runs the same orchestrator as the periodic worker, inline,
-     *  so the progress bar can reflect real upload progress. */
+    /**
+     * "Back up now": runs the same orchestrator as the periodic worker, inline, so the progress bar
+     * can reflect real upload progress.
+     */
     private fun startManualDriveBackup() {
         sfx?.select()
         if (!CorePrefs.getGdriveEnabled(this)) {
@@ -602,7 +659,7 @@ class SettingsActivity : AppCompatActivity() {
             return
         }
         val storage = Storage.getInstance(this)
-        val hackIds = InstalledLibrary.entries(this).map { it.id }
+        val hackIds = InstalledLibrary.entries(this).map { it.romId }
         val since = CorePrefs.getGdriveLastBackup(this)
 
         binding.settingsGdriveProgress.visibility = View.VISIBLE
@@ -611,32 +668,35 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsGdriveView.isEnabled = false
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val summary = try {
-                GoogleDriveBackup.run(
-                    context = this@SettingsActivity,
-                    accountName = accountName,
-                    saveDir = File(storage.storagePath),
-                    galleryDir = storage.galleryDir(),
-                    hackIds = hackIds,
-                    categories = categories,
-                    sinceMillis = since,
-                    onItemProgress = { done, total ->
+            val summary =
+                    try {
+                        GoogleDriveBackup.run(
+                                context = this@SettingsActivity,
+                                accountName = accountName,
+                                saveDir = File(storage.storagePath),
+                                galleryDir = storage.galleryDir(),
+                                hackIds = hackIds,
+                                categories = categories,
+                                sinceMillis = since,
+                                onItemProgress = { done, total ->
+                                    runOnUiThread {
+                                        binding.settingsGdriveProgress.isIndeterminate = false
+                                        binding.settingsGdriveProgress.max = total.coerceAtLeast(1)
+                                        binding.settingsGdriveProgress.progress = done
+                                    }
+                                }
+                        )
+                    } catch (e: UserRecoverableAuthException) {
+                        runOnUiThread { driveConsentLauncher.launch(e.intent) }
+                        null
+                    } catch (e: Exception) {
                         runOnUiThread {
-                            binding.settingsGdriveProgress.isIndeterminate = false
-                            binding.settingsGdriveProgress.max = total.coerceAtLeast(1)
-                            binding.settingsGdriveProgress.progress = done
+                            showGdriveDialog(
+                                    getString(R.string.gdrive_backup_failed, e.message ?: "error")
+                            )
                         }
+                        null
                     }
-                )
-            } catch (e: UserRecoverableAuthException) {
-                runOnUiThread { driveConsentLauncher.launch(e.intent) }
-                null
-            } catch (e: Exception) {
-                runOnUiThread {
-                    showGdriveDialog(getString(R.string.gdrive_backup_failed, e.message ?: "error"))
-                }
-                null
-            }
             withContext(Dispatchers.Main) {
                 binding.settingsGdriveProgress.visibility = View.GONE
                 binding.settingsGdriveBackupNow.isEnabled = true
@@ -644,11 +704,12 @@ class SettingsActivity : AppCompatActivity() {
                 if (summary != null) {
                     CorePrefs.setGdriveLastBackup(this@SettingsActivity, System.currentTimeMillis())
                     updateGdriveStatus()
-                    val msg = if (summary.uploaded == 0 && summary.deleted == 0) {
-                        getString(R.string.gdrive_backup_none)
-                    } else {
-                        getString(R.string.gdrive_backup_summary, summary.uploaded)
-                    }
+                    val msg =
+                            if (summary.uploaded == 0 && summary.deleted == 0) {
+                                getString(R.string.gdrive_backup_none)
+                            } else {
+                                getString(R.string.gdrive_backup_summary, summary.uploaded)
+                            }
                     showGdriveDialog(msg)
                 }
             }
@@ -671,18 +732,20 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsGdriveProgress.visibility = View.VISIBLE
         binding.settingsGdriveProgress.isIndeterminate = true
         lifecycleScope.launch(Dispatchers.IO) {
-            val link = try {
-                val id = service.ensureAppFolder { folderId ->
-                    CorePrefs.setGdriveFolderId(this@SettingsActivity, folderId)
-                }
-                service.folderLink(id)
-            } catch (e: UserRecoverableAuthException) {
-                runOnUiThread { driveConsentLauncher.launch(e.intent) }
-                null
-            } catch (e: Exception) {
-                runOnUiThread { showGdriveDialog(getString(R.string.gdrive_open_failed)) }
-                null
-            }
+            val link =
+                    try {
+                        val id =
+                                service.ensureAppFolder { folderId ->
+                                    CorePrefs.setGdriveFolderId(this@SettingsActivity, folderId)
+                                }
+                        service.folderLink(id)
+                    } catch (e: UserRecoverableAuthException) {
+                        runOnUiThread { driveConsentLauncher.launch(e.intent) }
+                        null
+                    } catch (e: Exception) {
+                        runOnUiThread { showGdriveDialog(getString(R.string.gdrive_open_failed)) }
+                        null
+                    }
             withContext(Dispatchers.Main) {
                 binding.settingsGdriveProgress.visibility = View.GONE
                 if (link != null) {
@@ -705,29 +768,30 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun showFrequencyDialog() {
-        val values = listOf(
-            CorePrefs.GDRIVE_FREQ_DAILY,
-            CorePrefs.GDRIVE_FREQ_WEEKLY,
-            CorePrefs.GDRIVE_FREQ_MANUAL
-        )
+        val values =
+                listOf(
+                        CorePrefs.GDRIVE_FREQ_DAILY,
+                        CorePrefs.GDRIVE_FREQ_WEEKLY,
+                        CorePrefs.GDRIVE_FREQ_MANUAL
+                )
         val labels = values.map { frequencyLabel(it) }
         val current = values.indexOf(CorePrefs.getGdriveBackupFrequency(this)).coerceAtLeast(0)
         SwitchDialog(this)
-            .title(getString(R.string.gdrive_frequency))
-            .singleChoice(labels, current) { which ->
-                CorePrefs.setGdriveBackupFrequency(this, values[which])
-                updateGdriveFrequencyUi()
-            }
-            .negativeButton(getString(android.R.string.cancel))
-            .show()
+                .title(getString(R.string.gdrive_frequency))
+                .singleChoice(labels, current) { which ->
+                    CorePrefs.setGdriveBackupFrequency(this, values[which])
+                    updateGdriveFrequencyUi()
+                }
+                .negativeButton(getString(android.R.string.cancel))
+                .show()
     }
 
     private fun showGdriveDialog(message: String) {
         SwitchDialog(this)
-            .title(getString(R.string.gdrive_subtitle))
-            .message(message)
-            .positiveButton(getString(android.R.string.ok))
-            .show()
+                .title(getString(R.string.gdrive_subtitle))
+                .message(message)
+                .positiveButton(getString(android.R.string.ok))
+                .show()
     }
 
     // ---- Cloud Sync (automatic, per-save) section ----
@@ -755,8 +819,10 @@ class SettingsActivity : AppCompatActivity() {
         updateCloudSyncStatus()
     }
 
-    /** Reflect sync state: master switch, connected account, last sync time and
-     *  pending conflict count. Also toggles the "view conflicts" button. */
+    /**
+     * Reflect sync state: master switch, connected account, last sync time and pending conflict
+     * count. Also toggles the "view conflicts" button.
+     */
     private fun updateCloudSyncStatus() {
         val enabled = CorePrefs.getCloudSyncEnabled(this)
         val account = CorePrefs.getGdriveAccountName(this)
@@ -764,35 +830,37 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.settingsCloudsyncViewConflicts.isEnabled = conflicts > 0
 
-        val text = when {
-            !enabled -> getString(R.string.cloudsync_status_disabled)
-            account == null -> getString(R.string.cloudsync_status_no_account)
-            conflicts > 0 -> getString(R.string.cloudsync_conflicts_count, conflicts)
-            else -> {
-                val last = CorePrefs.getCloudSyncLastSync(this)
-                if (last > 0) {
-                    getString(R.string.cloudsync_status_last, formatBackupDate(last))
-                } else {
-                    getString(R.string.cloudsync_status_never)
+        val text =
+                when {
+                    !enabled -> getString(R.string.cloudsync_status_disabled)
+                    account == null -> getString(R.string.cloudsync_status_no_account)
+                    conflicts > 0 -> getString(R.string.cloudsync_conflicts_count, conflicts)
+                    else -> {
+                        val last = CorePrefs.getCloudSyncLastSync(this)
+                        if (last > 0) {
+                            getString(R.string.cloudsync_status_last, formatBackupDate(last))
+                        } else {
+                            getString(R.string.cloudsync_status_never)
+                        }
+                    }
                 }
-            }
-        }
         binding.settingsCloudsyncStatus.text = text
     }
 
     private fun formatBackupDate(epoch: Long): String =
-        SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US).format(Date(epoch))
+            SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.US).format(Date(epoch))
 
     private fun setupImportSection() {
         binding.settingsImportButton.setOnClickListener {
             sfx?.select()
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                // .z64 has no registered MIME type, so accept everything and let
-                // RomNormalizer reject non-N64 files during import.
-                type = "*/*"
-                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            }
+            val intent =
+                    Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        // .z64 has no registered MIME type, so accept everything and let
+                        // RomNormalizer reject non-N64 files during import.
+                        type = "*/*"
+                        putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                    }
             pickRomLauncher.launch(intent)
         }
     }
@@ -819,10 +887,13 @@ class SettingsActivity : AppCompatActivity() {
         val lines = mutableListOf<String>()
         result.successes.forEach { rom ->
             lines.add(
-                getString(
-                    R.string.settings_import_success,
-                    rom.displayName, rom.gameCode, rom.versionByte.toString(), rom.crc32
-                )
+                    getString(
+                            R.string.settings_import_success,
+                            rom.displayName,
+                            rom.gameCode,
+                            rom.versionByte.toString(),
+                            rom.crc32
+                    )
             )
         }
         result.duplicates.forEach { rom ->
@@ -831,21 +902,22 @@ class SettingsActivity : AppCompatActivity() {
         result.invalids.forEach { reason ->
             lines.add(getString(R.string.settings_import_invalid, reason))
         }
-        val summary = getString(
-            R.string.settings_import_summary,
-            result.successes.size, result.duplicates.size, result.invalids.size
-        )
+        val summary =
+                getString(
+                        R.string.settings_import_summary,
+                        result.successes.size,
+                        result.duplicates.size,
+                        result.invalids.size
+                )
         SwitchDialog(this)
-            .title(getString(R.string.settings_import_result_title))
-            .message("$summary\n\n${lines.joinToString("\n")}")
-            .positiveButton(getString(android.R.string.ok))
-            .show()
+                .title(getString(R.string.settings_import_result_title))
+                .message("$summary\n\n${lines.joinToString("\n")}")
+                .positiveButton(getString(android.R.string.ok))
+                .show()
     }
 
     private fun setupBaseRomList() {
-        baseRomAdapter = BaseRomAdapter(mutableListOf()) { rom ->
-            confirmDeleteBaseRom(rom)
-        }
+        baseRomAdapter = BaseRomAdapter(mutableListOf()) { rom -> confirmDeleteBaseRom(rom) }
         binding.settingsBaseromList.layoutManager = LinearLayoutManager(this)
         binding.settingsBaseromList.adapter = baseRomAdapter
         refreshBaseRomList()
@@ -854,31 +926,30 @@ class SettingsActivity : AppCompatActivity() {
     private fun refreshBaseRomList() {
         val roms = viewModel.getBaseRoms()
         baseRomAdapter.update(roms)
-        binding.settingsBaseromEmpty.visibility =
-            if (roms.isEmpty()) View.VISIBLE else View.GONE
+        binding.settingsBaseromEmpty.visibility = if (roms.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun confirmDeleteBaseRom(rom: BaseRom) {
         SwitchDialog(this)
-            .title(getString(R.string.settings_baserom_delete_confirm_title))
-            .message(
-                getString(
-                    R.string.settings_baserom_delete_confirm_message,
-                    rom.displayName, rom.crc32
+                .title(getString(R.string.settings_baserom_delete_confirm_title))
+                .message(
+                        getString(
+                                R.string.settings_baserom_delete_confirm_message,
+                                rom.displayName,
+                                rom.crc32
+                        )
                 )
-            )
-            .positiveButton(getString(android.R.string.ok)) {
-                viewModel.deleteBaseRom(rom.id)
-                refreshBaseRomList()
-            }
-            .negativeButton(getString(android.R.string.cancel))
-            .show()
+                .positiveButton(getString(android.R.string.ok)) {
+                    viewModel.deleteBaseRom(rom.id)
+                    refreshBaseRomList()
+                }
+                .negativeButton(getString(android.R.string.cancel))
+                .show()
     }
 
     private fun setupCatalogSection() {
-        catalogUrlAdapter = CatalogUrlAdapter(mutableListOf()) { url ->
-            confirmDeleteCatalogUrl(url)
-        }
+        catalogUrlAdapter =
+                CatalogUrlAdapter(mutableListOf()) { url -> confirmDeleteCatalogUrl(url) }
         binding.settingsCatalogList.layoutManager = LinearLayoutManager(this)
         binding.settingsCatalogList.adapter = catalogUrlAdapter
         refreshCatalogList()
@@ -900,33 +971,31 @@ class SettingsActivity : AppCompatActivity() {
     private fun refreshCatalogList() {
         val urls = viewModel.getCatalogUrls()
         catalogUrlAdapter.update(urls)
-        binding.settingsCatalogEmpty.visibility =
-            if (urls.isEmpty()) View.VISIBLE else View.GONE
+        binding.settingsCatalogEmpty.visibility = if (urls.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun confirmDeleteCatalogUrl(url: String) {
         SwitchDialog(this)
-            .title(getString(R.string.settings_catalog_remove_confirm_title))
-            .message(url)
-            .positiveButton(getString(android.R.string.ok)) {
-                viewModel.removeCatalogUrl(url)
-                refreshCatalogList()
-            }
-            .negativeButton(getString(android.R.string.cancel))
-            .show()
+                .title(getString(R.string.settings_catalog_remove_confirm_title))
+                .message(url)
+                .positiveButton(getString(android.R.string.ok)) {
+                    viewModel.removeCatalogUrl(url)
+                    refreshCatalogList()
+                }
+                .negativeButton(getString(android.R.string.cancel))
+                .show()
     }
 
     /**
-     * RetroAchievements section: master enable switch plus username/password
-     * login. The password is used once for the credential exchange and never
-     * persisted; only the issued token is stored (encrypted).
+     * RetroAchievements section: master enable switch plus username/password login. The password is
+     * used once for the credential exchange and never persisted; only the issued token is stored
+     * (encrypted).
      */
     private fun setupRetroAchievementsSection() {
         val credentials = Zelda64PlayerApp.raCredentialStore
         val authService = Zelda64PlayerApp.raAuthService
 
-        binding.settingsRaEnabledSwitch.isChecked =
-            CorePrefs.getRetroAchievementsEnabled(this)
+        binding.settingsRaEnabledSwitch.isChecked = CorePrefs.getRetroAchievementsEnabled(this)
         binding.settingsRaEnabledSwitch.setOnCheckedChangeListener { _, checked ->
             CorePrefs.setRetroAchievementsEnabled(this, checked)
             updateRaStatus(credentials)
@@ -948,20 +1017,21 @@ class SettingsActivity : AppCompatActivity() {
                 // Never keep the secret visible on screen after use.
                 binding.settingsRaPassword.text.clear()
                 result.fold(
-                    onSuccess = {
-                        binding.settingsRaUsername.text.clear()
-                        updateRaStatus(credentials)
-                    },
-                    onFailure = { e ->
-                        // Surface the sanitized server detail; do NOT call
-                        // updateRaStatus here or it would overwrite the error.
-                        val detail = e.message?.takeIf { it.isNotBlank() }
-                        binding.settingsRaStatus.text = if (detail != null) {
-                            getString(R.string.settings_ra_status_failed_detail, detail)
-                        } else {
-                            getString(R.string.settings_ra_status_failed)
+                        onSuccess = {
+                            binding.settingsRaUsername.text.clear()
+                            updateRaStatus(credentials)
+                        },
+                        onFailure = { e ->
+                            // Surface the sanitized server detail; do NOT call
+                            // updateRaStatus here or it would overwrite the error.
+                            val detail = e.message?.takeIf { it.isNotBlank() }
+                            binding.settingsRaStatus.text =
+                                    if (detail != null) {
+                                        getString(R.string.settings_ra_status_failed_detail, detail)
+                                    } else {
+                                        getString(R.string.settings_ra_status_failed)
+                                    }
                         }
-                    }
                 )
             }
         }
@@ -979,18 +1049,20 @@ class SettingsActivity : AppCompatActivity() {
     private fun updateRaStatus(credentials: RaCredentialStore) {
         val enabled = CorePrefs.getRetroAchievementsEnabled(this)
         binding.settingsRaStatus.setText(
-            when {
-                !enabled -> R.string.settings_ra_status_disabled
-                credentials.hasCredentials() ->
-                    R.string.settings_ra_status_logged_in
-                else -> R.string.settings_ra_status_logged_out
-            }
+                when {
+                    !enabled -> R.string.settings_ra_status_disabled
+                    credentials.hasCredentials() -> R.string.settings_ra_status_logged_in
+                    else -> R.string.settings_ra_status_logged_out
+                }
         )
     }
 
     private fun setupCoreSection() {
         updateCoreLabel()
-        binding.settingsCoreButton.setOnClickListener { sfx?.select(); showCoreDialog() }
+        binding.settingsCoreButton.setOnClickListener {
+            sfx?.select()
+            showCoreDialog()
+        }
     }
 
     private fun updateCoreLabel() {
@@ -1002,13 +1074,13 @@ class SettingsActivity : AppCompatActivity() {
     private fun showCoreDialog() {
         val currentIndex = CorePrefs.getSelectedCoreIndex(this)
         SwitchDialog(this)
-            .title(getString(R.string.settings_core_change))
-            .singleChoice(CorePrefs.options.toList(), currentIndex) { which ->
-                CorePrefs.setSelectedCoreIndex(this, which)
-                updateCoreLabel()
-            }
-            .negativeButton(getString(android.R.string.cancel))
-            .show()
+                .title(getString(R.string.settings_core_change))
+                .singleChoice(CorePrefs.options.toList(), currentIndex) { which ->
+                    CorePrefs.setSelectedCoreIndex(this, which)
+                    updateCoreLabel()
+                }
+                .negativeButton(getString(android.R.string.cancel))
+                .show()
     }
 
     private fun setupLanguageSection() {
@@ -1029,21 +1101,21 @@ class SettingsActivity : AppCompatActivity() {
         val currentIndex = codes.indexOf(LanguageManager.getLanguage(this)).coerceAtLeast(0)
         val labels = codes.map { LanguageManager.labelFor(this, it) }
         SwitchDialog(this)
-            .title(getString(R.string.settings_language_title))
-            .singleChoice(labels, currentIndex) { which ->
-                LanguageManager.setLanguage(this, codes[which])
-                updateLanguageLabel()
-            }
-            .negativeButton(getString(android.R.string.cancel))
-            .show()
+                .title(getString(R.string.settings_language_title))
+                .singleChoice(labels, currentIndex) { which ->
+                    LanguageManager.setLanguage(this, codes[which])
+                    updateLanguageLabel()
+                }
+                .negativeButton(getString(android.R.string.cancel))
+                .show()
     }
 
     private fun setupAboutSection() {
-        val versionName = runCatching {
-            packageManager.getPackageInfo(packageName, 0).versionName
-        }.getOrNull() ?: "?"
-        binding.settingsAboutVersion.text =
-            getString(R.string.settings_about_version, versionName)
+        val versionName =
+                runCatching { packageManager.getPackageInfo(packageName, 0).versionName }
+                        .getOrNull()
+                        ?: "?"
+        binding.settingsAboutVersion.text = getString(R.string.settings_about_version, versionName)
         binding.settingsAboutRepo.setOnClickListener {
             sfx?.select()
             openLink("https://github.com/zonaro/zelda64player")
@@ -1054,17 +1126,178 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    // ---- Dashboard (Self-Hosted Server) section ----
+
+    private fun setupDashboardSection() {
+        val enabled = CorePrefs.isDashboardEnabled(this)
+        binding.settingsDashboardEnabled.isChecked = enabled
+        updateDashboardEnabledUi()
+
+        binding.settingsDashboardEnabled.setOnCheckedChangeListener { _, checked ->
+            CorePrefs.setDashboardEnabled(this, checked)
+            if (checked) {
+                DashboardManager.start(this)
+            } else {
+                DashboardManager.stop()
+            }
+            updateDashboardEnabledUi()
+            updateDashboardStatus()
+        }
+
+        binding.settingsDashboardPort.setText(CorePrefs.getDashboardPort(this).toString())
+        binding.settingsDashboardPort.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                val port = (view as? android.widget.EditText)?.text?.toString()?.toIntOrNull()
+                if (port != null && port in 1024..65535 && port != CorePrefs.getDashboardPort(this)) {
+                    CorePrefs.setDashboardPort(this, port)
+                    if (CorePrefs.isDashboardEnabled(this)) DashboardManager.restart(this)
+                    updateDashboardStatus()
+                }
+            }
+        }
+
+        binding.settingsDashboardPassword.setText(CorePrefs.getDashboardPassword(this) ?: "")
+        binding.settingsDashboardPassword.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus) {
+                val password = (view as? android.widget.EditText)?.text?.toString().orEmpty()
+                if (password != CorePrefs.getDashboardPassword(this)) {
+                    CorePrefs.setDashboardPassword(this, password)
+                    if (CorePrefs.isDashboardEnabled(this)) DashboardManager.restart(this)
+                    updateDashboardStatus()
+                }
+            }
+        }
+
+        updateDashboardStatus()
+    }
+
+    private fun updateDashboardEnabledUi() {
+        val enabled = CorePrefs.isDashboardEnabled(this)
+        binding.settingsDashboardGroup.isEnabled = enabled
+        for (i in 0 until binding.settingsDashboardGroup.childCount) {
+            binding.settingsDashboardGroup.getChildAt(i).isEnabled = enabled
+        }
+    }
+
+    private fun updateDashboardStatus() {
+        val enabled = CorePrefs.isDashboardEnabled(this)
+        binding.settingsDashboardStatus.text =
+                if (DashboardManager.isRunning) {
+                    getString(R.string.dashboard_status_running, CorePrefs.getDashboardPort(this))
+                } else if (enabled && DashboardManager.isStarting) {
+                    binding.root.postDelayed({ updateDashboardStatus() }, DASHBOARD_STATUS_REFRESH_DELAY_MS)
+                    getString(R.string.dashboard_status_starting)
+                } else {
+                    getString(R.string.dashboard_status_stopped)
+                }
+        binding.settingsDashboardUrl.text =
+                if (DashboardManager.isRunning) {
+                    DashboardManager.address?.let { address ->
+                        getString(R.string.dashboard_url_hint, "http://$address")
+                    }.orEmpty()
+                } else {
+                    ""
+                }
+    }
+
+    private companion object {
+        const val DASHBOARD_STATUS_REFRESH_DELAY_MS = 250L
+    }
+
+    // ---- Display (Multi-Monitor) section ----
+
+    private fun setupDisplaySection() {
+        // Display output mode spinner
+        val outputOptions =
+                listOf(
+                        getString(R.string.settings_display_auto) to CorePrefs.DISPLAY_AUTO,
+                        getString(R.string.settings_display_primary) to CorePrefs.DISPLAY_PRIMARY,
+                        getString(R.string.settings_display_secondary) to
+                                CorePrefs.DISPLAY_SECONDARY
+                )
+        val outputAdapter =
+                android.widget.ArrayAdapter(
+                        this,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        outputOptions.map { it.first }
+                )
+        binding.settingsDisplayOutput.adapter = outputAdapter
+        val currentOutput = CorePrefs.getDisplayOutput(this)
+        val outputIndex = outputOptions.indexOfFirst { it.second == currentOutput }
+        if (outputIndex >= 0) binding.settingsDisplayOutput.setSelection(outputIndex)
+        binding.settingsDisplayOutput.onItemSelectedListener =
+                object : android.widget.AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                            parent: android.widget.AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                    ) {
+                        val selected = outputOptions[position].second
+                        CorePrefs.setDisplayOutput(this@SettingsActivity, selected)
+                    }
+                    override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+                }
+
+        // Touch controls placement spinner
+        val touchOptions =
+                listOf(
+                        getString(R.string.settings_display_touch_primary) to
+                                CorePrefs.TOUCH_CONTROLS_PRIMARY,
+                        getString(R.string.settings_display_touch_secondary) to
+                                CorePrefs.TOUCH_CONTROLS_SECONDARY,
+                        getString(R.string.settings_display_touch_both) to
+                                CorePrefs.TOUCH_CONTROLS_BOTH
+                )
+        val touchAdapter =
+                android.widget.ArrayAdapter(
+                        this,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        touchOptions.map { it.first }
+                )
+        binding.settingsDisplayTouch.adapter = touchAdapter
+        val currentTouch = CorePrefs.getDisplayTouchControls(this)
+        val touchIndex = touchOptions.indexOfFirst { it.second == currentTouch }
+        if (touchIndex >= 0) binding.settingsDisplayTouch.setSelection(touchIndex)
+        binding.settingsDisplayTouch.onItemSelectedListener =
+                object : android.widget.AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                            parent: android.widget.AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                    ) {
+                        val selected = touchOptions[position].second
+                        CorePrefs.setDisplayTouchControls(this@SettingsActivity, selected)
+                    }
+                    override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+                }
+
+        // Available displays info
+        val displayManager =
+                getSystemService(android.content.Context.DISPLAY_SERVICE) as
+                        android.hardware.display.DisplayManager
+        val displays = displayManager.displays
+        val secondaryCount = displays.count { it.displayId != android.view.Display.DEFAULT_DISPLAY }
+        binding.settingsDisplayDisplaysInfo.text =
+                if (secondaryCount > 0) {
+                    getString(R.string.settings_display_displays_found, secondaryCount)
+                } else {
+                    getString(R.string.settings_display_no_external)
+                }
+    }
+
     private fun openLink(url: String) {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
 
     private class BaseRomAdapter(
-        private val items: MutableList<BaseRom>,
-        private val onDelete: (BaseRom) -> Unit
+            private val items: MutableList<BaseRom>,
+            private val onDelete: (BaseRom) -> Unit
     ) : RecyclerView.Adapter<BaseRomAdapter.ViewHolder>() {
 
         class ViewHolder(val binding: SettingsBaseRomItemBinding) :
-            RecyclerView.ViewHolder(binding.root)
+                RecyclerView.ViewHolder(binding.root)
 
         fun update(newItems: List<BaseRom>) {
             items.clear()
@@ -1073,23 +1306,27 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val binding = SettingsBaseRomItemBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
+            val binding =
+                    SettingsBaseRomItemBinding.inflate(
+                            LayoutInflater.from(parent.context),
+                            parent,
+                            false
+                    )
             return ViewHolder(binding)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val rom = items[position]
             holder.binding.itemBaseromName.text = rom.displayName
-            holder.binding.itemBaseromDetails.text = holder.itemView.context.getString(
-                R.string.settings_baserom_details,
-                rom.gameCode,
-                rom.versionByte.toString(),
-                rom.crc32,
-                formatSize(rom.sizeBytes),
-                rom.sourceName ?: rom.displayName
-            )
+            holder.binding.itemBaseromDetails.text =
+                    holder.itemView.context.getString(
+                            R.string.settings_baserom_details,
+                            rom.gameCode,
+                            rom.versionByte.toString(),
+                            rom.crc32,
+                            formatSize(rom.sizeBytes),
+                            rom.sourceName ?: rom.displayName
+                    )
             holder.binding.itemBaseromDelete.setOnClickListener {
                 runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()?.select()
                 onDelete(rom)
@@ -1105,12 +1342,12 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private class CatalogUrlAdapter(
-        private val items: MutableList<String>,
-        private val onDelete: (String) -> Unit
+            private val items: MutableList<String>,
+            private val onDelete: (String) -> Unit
     ) : RecyclerView.Adapter<CatalogUrlAdapter.ViewHolder>() {
 
         class ViewHolder(val binding: SettingsCatalogUrlItemBinding) :
-            RecyclerView.ViewHolder(binding.root)
+                RecyclerView.ViewHolder(binding.root)
 
         fun update(newItems: List<String>) {
             items.clear()
@@ -1119,9 +1356,12 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val binding = SettingsCatalogUrlItemBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
+            val binding =
+                    SettingsCatalogUrlItemBinding.inflate(
+                            LayoutInflater.from(parent.context),
+                            parent,
+                            false
+                    )
             return ViewHolder(binding)
         }
 

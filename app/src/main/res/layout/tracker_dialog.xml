@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/switch_scrim">
+
+    <LinearLayout
+        android:id="@+id/tracker_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_switch_dialog"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/tracker_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_tracker"
+                android:tint="@color/switch_accent" />
+
+            <TextView
+                android:id="@+id/tracker_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/switch_text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/tracker_clear"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_icon_button"
+                android:contentDescription="@string/tracker_clear"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_uninstall"
+                android:tint="@color/switch_accent" />
+
+            <ImageButton
+                android:id="@+id/tracker_export"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_icon_button"
+                android:contentDescription="@string/tracker_export"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_export"
+                android:tint="@color/switch_accent" />
+
+            <ImageButton
+                android:id="@+id/tracker_import"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_icon_button"
+                android:contentDescription="@string/tracker_import"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_import"
+                android:tint="@color/switch_accent" />
+
+            <Button
+                android:id="@+id/tracker_close"
+                style="@style/SwitchButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@android:string/ok" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:alpha="0.3"
+            android:background="@color/switch_text_secondary" />
+
+        <LinearLayout
+            android:id="@+id/tracker_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="12dp" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/tracker_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingTop="8dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:alpha="0.3"
+            android:background="@color/switch_text_secondary" />
+
+        <br.com.redclaw.zelda64player.tracker.ui.components.TrackerTimerView
+            android:id="@+id/tracker_timer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp" />
+
+    </LinearLayout>
+</FrameLayout>

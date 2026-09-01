@@ -118,7 +118,7 @@ class RaAchievementSectionsTest {
         // Two unique game ids; first entry title wins for the duplicated id.
         assertEquals(2, resolved.size)
         assertEquals("OoT Vanilla", resolved[100L])
-        assertEquals("A Seed", resolved[200L])
+        assertEquals("A Hack", resolved[200L])
         assertFalse(resolved.containsKey(0L))
     }
 

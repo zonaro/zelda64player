@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Zelda 64 Player — Dashboard</title>
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#2D2D2D">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Switch Top Bar -->
+    <header class="switch-topbar" id="topbar">
+        <div class="switch-topbar-inner">
+            <div class="switch-brand">
+                <div class="switch-brand-icon">Z</div>
+                <span class="switch-brand-text">Zelda 64 Player</span>
+                <span class="switch-brand-sub">Dashboard</span>
+            </div>
+            <nav class="switch-nav" aria-label="Navegação">
+                <a href="#" class="switch-nav-link active" data-page="collection" data-i18n="nav_collection">Coleção</a>
+                <a href="#" class="switch-nav-link" data-page="settings" data-i18n="nav_settings">Configurações</a>
+            </nav>
+            <div class="switch-status" id="serverStatus">
+                <span class="switch-status-dot" id="statusDot"></span>
+                <span class="switch-status-text" id="statusText" data-i18n="status_connected">Conectado</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="switch-main">
+        <!-- Collection / Play Unified Page -->
+        <section class="switch-page active" id="page-collection">
+            <div class="switch-section-head">
+                <h2 data-i18n="collection_title">Coleção</h2>
+                <span class="switch-section-sub" data-i18n="collection_sub">Jogos instalados — clique em Jogar para iniciar no navegador</span>
+            </div>
+
+            <div class="switch-toolbar">
+                <div class="switch-toolbar-left">
+                    <span class="switch-count" id="gameCount"></span>
+                </div>
+                <div class="switch-toolbar-actions">
+                    <button class="switch-btn switch-btn-secondary" id="btnBackupExport">
+                        <span class="switch-btn-icon">⤓</span>
+                        <span data-i18n="backup_export">Exportar Backup</span>
+                    </button>
+                    <label class="switch-btn switch-btn-secondary" for="backupImportInput">
+                        <span class="switch-btn-icon">⤒</span>
+                        <span data-i18n="backup_import">Importar Backup</span>
+                    </label>
+                    <input type="file" id="backupImportInput" accept=".zip" hidden>
+                </div>
+            </div>
+
+            <div class="switch-grid" id="gameGrid">
+                <div class="switch-loading" data-i18n="loading">Carregando...</div>
+            </div>
+
+            <!-- Player Overlay (Switch Dialog style) -->
+            <div class="switch-player-overlay" id="playerOverlay" hidden>
+                <div class="switch-player-scrim" id="playerScrim"></div>
+                <div class="switch-player-box">
+                    <div class="switch-player-header">
+                        <h3 id="playerTitle">—</h3>
+                        <div class="switch-player-actions">
+                            <button class="switch-btn switch-btn-small" id="btnFullscreen" title="Tela cheia">⛶</button>
+                            <button class="switch-btn switch-btn-small switch-btn-danger" id="btnExitGame" title="Sair">✕</button>
+                        </div>
+                    </div>
+                    <div class="switch-player-body">
+                        <div class="switch-emulator-container" id="emulatorContainer">
+                            <video id="emulatorVideo" autoplay playsinline></video>
+                            <div class="switch-emulator-placeholder" id="emulatorPlaceholder">
+                                <div class="switch-emulator-icon">▶</div>
+                                <p data-i18n="player_starting">Iniciando...</p>
+                                <p class="switch-emulator-hint" data-i18n="player_hint">O jogo será carregado via streaming do celular. Mantenha o app aberto.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="switch-player-footer">
+                        <span class="switch-hint"><b>B</b> <span data-i18n="hint_back">Voltar</span></span>
+                        <span class="switch-hint"><b>+</b> <span data-i18n="hint_options">Opções</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Page (Switch Side Panel style) -->
+        <section class="switch-page" id="page-settings">
+            <div class="switch-section-head">
+                <h2 data-i18n="settings_title">Configurações</h2>
+                <span class="switch-section-sub" data-i18n="settings_sub">Servidor local e preferências</span>
+            </div>
+            <div class="switch-panel">
+                <div class="switch-panel-header">
+                    <span class="switch-panel-icon">⚙</span>
+                    <span data-i18n="settings_panel_title">Servidor</span>
+                </div>
+                <div class="switch-panel-body">
+                    <div class="switch-setting-row">
+                        <label class="switch-setting-label" for="settingPort" data-i18n="settings_port">Porta</label>
+                        <input class="switch-input" type="number" id="settingPort" min="1024" max="65535" value="8080">
+                    </div>
+                    <div class="switch-setting-row">
+                        <label class="switch-setting-label" for="settingPassword" data-i18n="settings_password">Senha (opcional)</label>
+                        <input class="switch-input" type="password" id="settingPassword" placeholder="Deixe vazio para sem senha">
+                    </div>
+                    <div class="switch-setting-row">
+                        <label class="switch-setting-label" for="settingDisplayOutput" data-i18n="settings_display_output">Saída de Vídeo</label>
+                        <select class="switch-input" id="settingDisplayOutput">
+                            <option value="auto" data-i18n="settings_display_auto">Automático (usar secundário)</option>
+                            <option value="primary" data-i18n="settings_display_primary">Primário</option>
+                            <option value="secondary" data-i18n="settings_display_secondary">Secundário</option>
+                        </select>
+                    </div>
+                    <button class="switch-btn switch-btn-primary switch-btn-block" id="btnSaveSettings">
+                        <span data-i18n="settings_save">Salvar</span>
+                    </button>
+                    <div class="switch-settings-info">
+                        <p><span data-i18n="settings_address">Endereço:</span> <strong id="serverAddress">—</strong></p>
+                        <p><span data-i18n="settings_clients">Clientes conectados:</span> <strong id="clientCount">0</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Switch Dock -->
+    <nav class="switch-dock" aria-label="Ações rápidas">
+        <button class="switch-dock-btn" data-action="collection" title="Coleção">
+            <span class="switch-dock-icon">◧</span>
+        </button>
+        <button class="switch-dock-btn" data-action="backup-export" title="Exportar Backup">
+            <span class="switch-dock-icon">⤓</span>
+        </button>
+        <button class="switch-dock-btn" data-action="backup-import" title="Importar Backup">
+            <span class="switch-dock-icon">⤒</span>
+        </button>
+        <button class="switch-dock-btn" data-action="settings" title="Configurações">
+            <span class="switch-dock-icon">⚙</span>
+        </button>
+        <button class="switch-dock-btn" data-action="refresh" title="Atualizar">
+            <span class="switch-dock-icon">↻</span>
+        </button>
+    </nav>
+
+    <!-- Switch Footer Hints -->
+    <footer class="switch-footer">
+        <div class="switch-footer-inner">
+            <div class="switch-footer-left">
+                <span class="switch-footer-tv">◫</span>
+                <span class="switch-footer-gamepad">◧</span>
+                <span class="switch-footer-text">Zelda 64 Player</span>
+            </div>
+            <div class="switch-footer-right">
+                <span class="switch-hint"><b>A</b> <span data-i18n="hint_play">Jogar</span></span>
+                <span class="switch-hint"><b>X</b> <span data-i18n="hint_options">Opções</span></span>
+                <span class="switch-hint"><b>B</b> <span data-i18n="hint_back">Voltar</span></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Card Actions Dialog (SwitchDialog) -->
+    <div class="switch-dialog-scrim" id="cardDialogScrim" hidden></div>
+    <div class="switch-dialog" id="cardDialog" hidden role="dialog" aria-modal="true">
+        <div class="switch-dialog-header">
+            <span class="switch-dialog-icon">◧</span>
+            <h3 class="switch-dialog-title" id="cardDialogTitle">—</h3>
+        </div>
+        <div class="switch-dialog-body" id="cardDialogBody"></div>
+        <div class="switch-dialog-footer">
+            <button class="switch-btn switch-btn-secondary" id="cardDialogClose" data-i18n="dialog_close">Fechar</button>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -2,6 +2,9 @@
 # Zelda 64 Player — Automated Release Script
 # Generates version at build time, commits, pushes, and creates GitHub release via GH CLI
 # Version format: {yy}.{dayOfYear}.{hhmm} (e.g., 26.238.1430)
+#
+# By default this script ONLY builds the release APK (no GitHub interaction).
+# Pass --github to also tag, push and publish the GitHub release.
 
 set -euo pipefail
 
@@ -145,32 +148,48 @@ Download the APK below and install on your Android device (API 24+).
 }
 
 # Main flow
+# DO_GITHUB=1 (set via --github) publishes the GitHub release; otherwise we
+# only build the APK locally.
 main() {
     echo "=========================================="
     echo "  Zelda 64 Player — Release Automation"
     echo "=========================================="
     echo
-    
-    check_gh_cli
-    check_git_status
+
     build_app
-    
+
     local version_info=$(get_generated_version)
     local version_name=$(echo "$version_info" | cut -d'|' -f1)
     local version_code=$(echo "$version_info" | cut -d'|' -f2)
-    
+
     log_info "Generated version: $version_name (code: $version_code)"
-    
-    create_git_tag "$version_name"
-    commit_and_push "$version_name" "$version_code"
-    delete_existing_release "$version_name"
-    create_github_release "$version_name" "$version_code"
-    
-    echo
-    log_success "🎉 Release v$version_name completed successfully!"
-    echo "   Version: $version_name"
-    echo "   Version Code: $version_code"
-    echo "   Tag: v$version_name"
+
+    if [[ "${DO_GITHUB:-0}" -eq 1 ]]; then
+        check_gh_cli
+        check_git_status
+        create_git_tag "$version_name"
+        commit_and_push "$version_name" "$version_code"
+        delete_existing_release "$version_name"
+        create_github_release "$version_name" "$version_code"
+
+        echo
+        log_success "🎉 Release v$version_name completed successfully!"
+        echo "   Version: $version_name"
+        echo "   Version Code: $version_code"
+        echo "   Tag: v$version_name"
+    else
+        log_success "Build complete: v$version_name (APK in app/build/outputs/apk/release/)"
+        log_info "GitHub release skipped. Re-run with --github to tag, push and publish."
+    fi
 }
 
-main "$@"
+# Parse flags: only --github triggers the GitHub release steps.
+DO_GITHUB=0
+for arg in "$@"; do
+    case "$arg" in
+        --github) DO_GITHUB=1 ;;
+        *) log_warn "Unknown argument ignored: $arg" ;;
+    esac
+done
+
+main

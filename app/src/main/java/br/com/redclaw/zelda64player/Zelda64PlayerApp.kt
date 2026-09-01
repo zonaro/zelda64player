@@ -8,6 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import br.com.redclaw.zelda64player.repositories.Storage
+import br.com.redclaw.zelda64player.dashboard.server.DashboardManager
 import br.com.redclaw.zelda64player.drive.GoogleDriveBackupWorker
 import br.com.redclaw.zelda64player.store.DownloadQueueManager
 import br.com.redclaw.zelda64player.retroachievements.api.RaHttpClient
@@ -58,6 +59,8 @@ import java.util.concurrent.TimeUnit
         // Relocate any patched ROMs left in the legacy cache dir by earlier
         // builds into the durable external-files store (idempotent, safe).
         Storage.getInstance(this).migrateLegacyRoms()
+        // Restore the user-enabled local dashboard after a process restart.
+        DashboardManager.start(this)
         scheduleCatalogRefresh()
         scheduleDriveBackup()
         syncGameShortcuts()

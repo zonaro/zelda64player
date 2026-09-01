@@ -22,6 +22,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +30,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import br.com.redclaw.zelda64player.BuildConfig
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import br.com.redclaw.zelda64player.databinding.ActivityGalleryBinding
@@ -49,6 +51,7 @@ class GalleryActivity : AppCompatActivity() {
     private lateinit var viewModel: GalleryViewModel
     private lateinit var adapter: GalleryAdapter
 
+    private val backHelper = SwitchBackButton()
     private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
 
     /** FileProvider authority, derived from the application id (matches the
@@ -67,10 +70,7 @@ class GalleryActivity : AppCompatActivity() {
         binding.galleryRecycler.layoutManager = GridLayoutManager(this, 3)
         binding.galleryRecycler.adapter = adapter
 
-        binding.galleryBack.setOnClickListener {
-            sfx?.back()
-            finish()
-        }
+        backHelper.attach(this, binding.galleryBack.root, onBack = { finish() })
 
         lifecycleScope.launch {
             viewModel.items.collectLatest { items ->
@@ -96,6 +96,11 @@ class GalleryActivity : AppCompatActivity() {
     override fun onBackPressed() {
         sfx?.back()
         super.onBackPressed()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        backHelper.onTouch(ev)
+        return super.dispatchTouchEvent(ev)
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {

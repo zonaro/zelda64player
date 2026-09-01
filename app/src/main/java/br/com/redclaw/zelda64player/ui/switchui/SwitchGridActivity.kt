@@ -18,18 +18,37 @@
 
 package br.com.redclaw.zelda64player.ui.switchui
 
+import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.ocarina.OcarinaGame
+import br.com.redclaw.zelda64player.store.ImportPatchInvalid
+import br.com.redclaw.zelda64player.store.ImportPatchNoCompatibleRom
+import br.com.redclaw.zelda64player.store.ImportPatchResult
+import br.com.redclaw.zelda64player.store.ImportPatchSuccess
+import br.com.redclaw.zelda64player.store.ImportPatchUnsupported
+import br.com.redclaw.zelda64player.store.ImportRomDuplicate
+import br.com.redclaw.zelda64player.store.ImportRomInvalid
+import br.com.redclaw.zelda64player.store.ImportRomSuccess
+import br.com.redclaw.zelda64player.store.ui.StoreViewModel
+import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.databinding.ActivitySwitchGridBinding
@@ -39,6 +58,9 @@ import br.com.redclaw.zelda64player.viewmodels.LibraryMenuHostDelegate
 import br.com.redclaw.zelda64player.views.GridSortMode
 import br.com.redclaw.zelda64player.views.HackLibraryEntry
 import br.com.redclaw.zelda64player.views.InstalledLibrary
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
 
 /**
  * Fullscreen "Todos os Jogos" (All Games) grid, opened from the home row's
@@ -71,7 +93,51 @@ class SwitchGridActivity : AppCompatActivity() {
     private lateinit var menuController: LibraryMenuController
     private lateinit var adapter: GridAdapter
 
+    private val backHelper = SwitchBackButton()
     private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
+
+    /** Reuses the Store's import pipeline so the grid offers the same
+     *  "Importar jogo ou patch" action as the Loja. */
+    private lateinit var storeViewModel: StoreViewModel
+
+    /** Picks a BPS/IPS patch or .n64/.z64/.z.64 base ROM from the document provider. */
+    private val importLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@registerForActivityResult
+        val rawName = queryDisplayName(uri) ?: "hack"
+        val extension = rawName.substringAfterLast('.', "bin").lowercase()
+        val temp = File(cacheDir, "import_${System.currentTimeMillis()}.$extension.tmp")
+        try {
+            contentResolver.openInputStream(uri)?.use { input ->
+                temp.outputStream().use { out -> input.copyTo(out) }
+            } ?: run {
+                temp.delete()
+                return@registerForActivityResult
+            }
+        } catch (_: Exception) {
+            temp.delete()
+            return@registerForActivityResult
+        }
+
+        val progress = showProgressDialog(isDirectRomFile(rawName))
+        progress.show()
+        lifecycleScope.launch(Dispatchers.Main) {
+            val result = storeViewModel.importFile(temp, rawName)
+            temp.delete()
+            progress.dismiss()
+            showResultDialog(result)
+            // The grid IS the installed-games catalog, so surface a freshly
+            // imported entry immediately instead of waiting for a re-open.
+            if (result is ImportPatchSuccess ||
+                result is ImportRomSuccess ||
+                result is ImportRomDuplicate
+            ) {
+                allEntries = InstalledLibrary.sortedEntries(this@SwitchGridActivity, sortMode)
+                refreshGrid()
+            }
+        }
+    }
 
     /** All installed entries (unfiltered), the source for live search filtering. */
     private var allEntries: List<HackLibraryEntry> = emptyList()
@@ -110,15 +176,21 @@ class SwitchGridActivity : AppCompatActivity() {
         val accentColor = AccentManager.getAccentColor(this)
         binding.gridHeaderIcon.setColorFilter(accentColor)
         binding.gridSort.setColorFilter(accentColor)
+        binding.gridImport.setColorFilter(accentColor)
+        binding.gridImport.setOnClickListener {
+            sfx?.select()
+            importLauncher.launch(arrayOf("*/*"))
+        }
 
         menuHost = LibraryMenuHostDelegate(this) { refreshGrid() }
         menuController = LibraryMenuController(menuHost)
+        storeViewModel = ViewModelProvider(this)[StoreViewModel::class.java]
 
         computeGridMetrics()
         sortMode = GridSortMode.fromPref(CorePrefs.getGridSort(this))
         allEntries = InstalledLibrary.sortedEntries(this, sortMode)
 
-        binding.gridBack.setOnClickListener { goBack() }
+        backHelper.attach(this, binding.gridBack.root, onBack = { finish() })
         binding.gridSort.setOnClickListener { openSortMenu() }
         binding.gridSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
@@ -195,11 +267,6 @@ class SwitchGridActivity : AppCompatActivity() {
         binding.gridNoResults.visibility = if (hasEntries && !hasResults) View.VISIBLE else View.GONE
     }
 
-    private fun goBack() {
-        sfx?.back()
-        finish()
-    }
-
     /**
      * Open the reusable [SwitchDialog] single-choice list to pick the grid sort
      * order. The active option shows a check mark; selecting an option persists
@@ -228,6 +295,11 @@ class SwitchGridActivity : AppCompatActivity() {
         GridSortMode.LAST_PLAYED -> getString(R.string.grid_sort_last_played)
         GridSortMode.DOWNLOAD_DATE -> getString(R.string.grid_sort_download_date)
         GridSortMode.ALPHA -> getString(R.string.grid_sort_alpha)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        backHelper.onTouch(ev)
+        return super.dispatchTouchEvent(ev)
     }
 
     override fun onBackPressed() {
@@ -274,6 +346,111 @@ class SwitchGridActivity : AppCompatActivity() {
             }
         }
         return super.dispatchKeyEvent(event)
+    }
+
+    /**
+     * Indeterminate spinner shown while a patch is applied or a ROM is normalized.
+     * Mirrors the Loja's import progress dialog for a consistent experience.
+     */
+    private fun showProgressDialog(importingRom: Boolean): AlertDialog {
+        val size = (48 * resources.displayMetrics.density).toInt()
+        val progressBar = ProgressBar(this).apply {
+            isIndeterminate = true
+            layoutParams = ViewGroup.LayoutParams(size, size)
+        }
+        return AlertDialog.Builder(this)
+            .setTitle(R.string.store_import_bps)
+            .setMessage(if (importingRom) R.string.import_rom_progress else R.string.import_patch_progress)
+            .setView(progressBar)
+            .setCancelable(false)
+            .create()
+    }
+
+    /** Present the result of an import to the user (same copy as the Loja). */
+    private fun showResultDialog(result: ImportPatchResult) {
+        val titleRes: Int
+        val message: String
+        when (result) {
+            is ImportPatchSuccess -> {
+                titleRes = R.string.import_success_title
+                message = getString(
+                    R.string.import_success_message,
+                    result.title,
+                    gameName(result.family)
+                )
+            }
+            is ImportPatchNoCompatibleRom -> {
+                titleRes = R.string.import_no_rom_title
+                message = if (result.targetDescription != null) {
+                    getString(
+                        R.string.import_no_rom_message,
+                        result.targetDescription,
+                        result.expectedCrc32
+                    )
+                } else {
+                    getString(R.string.import_no_rom_unknown_message, result.expectedCrc32)
+                }
+            }
+            is ImportPatchInvalid -> {
+                titleRes = R.string.import_invalid_title
+                message = getString(R.string.import_invalid_message, result.message)
+            }
+            is ImportPatchUnsupported -> {
+                titleRes = R.string.import_invalid_title
+                message = getString(R.string.import_unsupported_message)
+            }
+            is ImportRomSuccess -> {
+                titleRes = R.string.import_rom_success_title
+                message = getString(R.string.import_rom_success_message, result.title)
+            }
+            is ImportRomDuplicate -> {
+                titleRes = R.string.import_rom_success_title
+                message = getString(R.string.import_rom_success_message, result.title)
+            }
+            is ImportRomInvalid -> {
+                titleRes = R.string.import_invalid_rom_title
+                message = result.message
+            }
+        }
+        AlertDialog.Builder(this)
+            .setTitle(titleRes)
+            .setMessage(message)
+            .setPositiveButton(R.string.dialog_ok, null)
+            .show()
+    }
+
+    /** Human-readable game family name for success messages. */
+    private fun gameName(family: OcarinaGame?): String = when (family) {
+        OcarinaGame.OOT -> getString(R.string.game_oot)
+        OcarinaGame.MM -> getString(R.string.game_mm)
+        null -> getString(R.string.game_unknown)
+    }
+
+    /** Best-effort display name of a content URI (falls back to "hack"). */
+    private fun queryDisplayName(uri: Uri): String? {
+        var name: String? = null
+        try {
+            contentResolver.query(
+                uri,
+                arrayOf(OpenableColumns.DISPLAY_NAME),
+                null,
+                null,
+                null
+            )?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (index >= 0) name = cursor.getString(index)
+                }
+            }
+        } catch (_: Exception) {
+            // Ignore; fall back to the default name below.
+        }
+        return name
+    }
+
+    private fun isDirectRomFile(name: String): Boolean {
+        val lower = name.lowercase()
+        return lower.endsWith(".n64") || lower.endsWith(".z64") || lower.endsWith(".z.64")
     }
 
     /**

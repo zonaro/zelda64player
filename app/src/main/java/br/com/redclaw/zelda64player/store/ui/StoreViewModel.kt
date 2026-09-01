@@ -1,7 +1,6 @@
 package br.com.redclaw.zelda64player.store.ui
 
 import android.app.Application
-import br.com.redclaw.zelda64player.R
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
@@ -10,44 +9,34 @@ import androidx.lifecycle.viewModelScope
 import br.com.redclaw.zelda64player.data.local.AppRepositories
 import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
 import br.com.redclaw.zelda64player.data.local.MergedCatalogRepository
-import br.com.redclaw.zelda64player.data.local.UserHacksRepository
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.repositories.Storage
-import br.com.redclaw.zelda64player.settings.CatalogUrlStore
-import br.com.redclaw.zelda64player.settings.SharedPreferencesStore
 import br.com.redclaw.zelda64player.store.BuiltInStores
 import br.com.redclaw.zelda64player.store.CatalogRefresher
 import br.com.redclaw.zelda64player.store.DownloadPhase
 import br.com.redclaw.zelda64player.store.DownloadQueueManager
+import br.com.redclaw.zelda64player.store.ImportPatchResult
 import br.com.redclaw.zelda64player.store.ImportedPatchInstaller
 import br.com.redclaw.zelda64player.store.ImportedRomInstaller
-import br.com.redclaw.zelda64player.store.ImportPatchResult
 import br.com.redclaw.zelda64player.store.QueueItemUi
-import br.com.redclaw.zelda64player.store.StoreDefinition
-import kotlinx.coroutines.launch
+import br.com.redclaw.zelda64player.store.findBaseRomForHack
 import java.io.File
+import kotlinx.coroutines.launch
 
 /**
- * Drives the Hack Store: fetches/merges the catalog, exposes install state, and
- * runs patch downloads. Repositories are constructed from the application
- * context (matching the existing manual service-locator style in the project).
+ * Drives the Hack Store: fetches/merges the catalog, exposes install state, and runs patch
+ * downloads. Repositories are constructed from the application context (matching the existing
+ * manual service-locator style in the project).
  */
 class StoreViewModel(application: Application) : AndroidViewModel(application) {
     private val appContext = application.applicationContext
 
     private val patchRepository = AppRepositories.patchRepository(appContext)
     private val installedRepository =
-        InstalledHacksRepository(File(appContext.filesDir, "installed_hacks.json"))
+            InstalledHacksRepository(File(appContext.filesDir, "installed_hacks.json"))
     private val mergedCatalogRepository =
-        MergedCatalogRepository(File(appContext.filesDir, "merged_catalog.json"))
+            MergedCatalogRepository(File(appContext.filesDir, "merged_catalog.json"))
     private val baseRomRepository = AppRepositories.baseRomRepository(appContext)
-    private val catalogUrlStore = CatalogUrlStore(
-        SharedPreferencesStore(
-            appContext.getSharedPreferences(CatalogUrlStore.PREFS_NAME, android.content.Context.MODE_PRIVATE)
-        ),
-        CatalogUrlStore.KEY
-    )
-
     private val _catalog = MutableLiveData<CatalogUiState>(CatalogUiState.Loading)
     val catalog: LiveData<CatalogUiState> = _catalog
 
@@ -59,13 +48,6 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     private val _category = MutableLiveData<StoreCategory>(StoreCategory.All)
     val category: LiveData<StoreCategory> = _category
 
-    /** Currently selected store id (drives catalog filtering; catalogs never mix). */
-    private val _selectedStoreId = MutableLiveData<String>(BuiltInStores.STORE_HYLIANMODDING)
-    val selectedStoreId: LiveData<String> = _selectedStoreId
-
-    /** Built-in stores available in the top-bar selector (id + display name). */
-    val storeList: List<StoreDefinition> = BuiltInStores.all(catalogUrlStore.getUrls())
-
     /** Non-null when the last refresh had one or more source errors. */
     private val _sourceError = MutableLiveData<String?>(null)
     val sourceError: LiveData<String?> = _sourceError
@@ -75,10 +57,9 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     val page: LiveData<Int> = _page
 
     /**
-     * Derived rendering state combining the loaded catalog, the active query
-     * and the current page. Null while the catalog is not in the Loaded
-     * state (Loading/Error), so the Activity can let the [catalog] observer
-     * own those states.
+     * Derived rendering state combining the loaded catalog, the active query and the current page.
+     * Null while the catalog is not in the Loaded state (Loading/Error), so the Activity can let
+     * the [catalog] observer own those states.
      */
     private val _pagedItems = MediatorLiveData<StorePageState?>()
     val pagedItems: LiveData<StorePageState?> = _pagedItems
@@ -91,9 +72,8 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Recomputes the filtered + paginated view state. When the catalog is not
-     * Loaded the derived state is cleared (null) so the [catalog] observer
-     * drives Loading/Error rendering instead.
+     * Recomputes the filtered + paginated view state. When the catalog is not Loaded the derived
+     * state is cleared (null) so the [catalog] observer drives Loading/Error rendering instead.
      */
     private fun recomputePaged() {
         val state = _catalog.value
@@ -102,40 +82,45 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         val q = _query.value ?: ""
-        val storeId = _selectedStoreId.value ?: BuiltInStores.STORE_HYLIANMODDING
-        val byStore = state.hacks.filter { it.storeId == storeId }
-        val byQuery = StorePager.filter(byStore, q)
+        // Hide legacy cached entries from the retired store until the next refresh replaces them.
+        val picks = state.hacks.filter { it.storeId == BuiltInStores.STORE_PICKS }
+        val byQuery = StorePager.filter(picks, q)
         val byCategory = filterByCategory(byQuery, _category.value ?: StoreCategory.All)
         val result = StorePager.page(byCategory, _page.value ?: 0)
-        _pagedItems.value = StorePageState(
-            items = result.items,
-            pageIndex = result.pageIndex,
-            totalPages = result.totalPages,
-            query = q,
-            catalogEmpty = state.hacks.isEmpty(),
-            filteredEmpty = byCategory.isEmpty() && state.hacks.isNotEmpty()
-        )
+        _pagedItems.value =
+                StorePageState(
+                        items = result.items,
+                        pageIndex = result.pageIndex,
+                        totalPages = result.totalPages,
+                        query = q,
+                        catalogEmpty = picks.isEmpty(),
+                        filteredEmpty = byCategory.isEmpty() && picks.isNotEmpty()
+                )
     }
 
     /**
-     * Filters [hacks] by the active [StoreCategory]. The category predicates are
-     * derived from data already on each hack: install status (for [StoreCategory.Installed],
-     * [StoreCategory.Updates] and [StoreCategory.NotInstalled]) and the base ROM game code
-     * prefix (for [StoreCategory.Oot] and [StoreCategory.Mm]).
+     * Filters [hacks] by the active [StoreCategory]. The category predicates are derived from data
+     * already on each hack: install status (for [StoreCategory.Installed], [StoreCategory.Updates]
+     * and [StoreCategory.NotInstalled]) and the base ROM game code prefix (for [StoreCategory.Oot]
+     * and [StoreCategory.Mm]).
      */
     private fun filterByCategory(hacks: List<HackEntry>, category: StoreCategory): List<HackEntry> {
         return when (category) {
             StoreCategory.All -> hacks
-            StoreCategory.Installed -> hacks.filter {
-                statusFor(it) is StoreStatus.Installed || statusFor(it) is StoreStatus.UpdateAvailable
-            }
+            StoreCategory.Installed ->
+                    hacks.filter {
+                        statusFor(it) is StoreStatus.Installed ||
+                                statusFor(it) is StoreStatus.UpdateAvailable
+                    }
             StoreCategory.Updates -> hacks.filter { statusFor(it) is StoreStatus.UpdateAvailable }
             StoreCategory.NotInstalled -> hacks.filter { statusFor(it) is StoreStatus.NotInstalled }
-            StoreCategory.Oot -> hacks.filter { it.baseRom.gameCode.startsWith("CZL", ignoreCase = true) }
-            StoreCategory.Mm -> hacks.filter {
-                it.baseRom.gameCode.startsWith("NZL", ignoreCase = true) ||
-                    it.baseRom.gameCode.startsWith("NSM", ignoreCase = true)
-            }
+            StoreCategory.Oot ->
+                    hacks.filter { it.baseRom.gameCode.startsWith("CZL", ignoreCase = true) }
+            StoreCategory.Mm ->
+                    hacks.filter {
+                        it.baseRom.gameCode.startsWith("NZL", ignoreCase = true) ||
+                                it.baseRom.gameCode.startsWith("NSM", ignoreCase = true)
+                    }
         }
     }
 
@@ -151,13 +136,6 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
     fun setCategory(cat: StoreCategory) {
         if (_category.value == cat) return
         _category.value = cat
-        _page.value = 0
-    }
-
-    /** Switches the active store, resetting to the first page. Catalogs never mix. */
-    fun setStore(storeId: String) {
-        if (_selectedStoreId.value == storeId) return
-        _selectedStoreId.value = storeId
         _page.value = 0
     }
 
@@ -185,53 +163,60 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
         _catalog.value = CatalogUiState.Loading
         viewModelScope.launch {
             val result = CatalogRefresher(getApplication()).refresh()
-            result.onSuccess { fetchResult ->
-                _sourceError.postValue(
-                    fetchResult.sources.firstOrNull { it.error != null }?.error
-                )
-                _catalog.postValue(CatalogUiState.Loaded(fetchResult.hacks))
-            }.onFailure { e ->
-                val cached = mergedCatalogRepository.load()
-                if (cached.isNotEmpty()) {
-                    _catalog.postValue(CatalogUiState.Loaded(cached))
-                } else {
-                    _catalog.postValue(CatalogUiState.Error(e.message ?: "unknown error"))
-                }
-            }
+            result
+                    .onSuccess { fetchResult ->
+                        _sourceError.postValue(
+                                fetchResult.sources.firstOrNull { it.error != null }?.error
+                        )
+                        _catalog.postValue(CatalogUiState.Loaded(fetchResult.hacks))
+                    }
+                    .onFailure { e ->
+                        val cached = mergedCatalogRepository.load()
+                        if (cached.isNotEmpty()) {
+                            _catalog.postValue(CatalogUiState.Loaded(cached))
+                        } else {
+                            _catalog.postValue(CatalogUiState.Error(e.message ?: "unknown error"))
+                        }
+                    }
         }
     }
 
     fun statusFor(hack: HackEntry): StoreStatus =
-        StoreStatusCalculator.statusFor(installedRepository.load(), hack)
+            StoreStatusCalculator.statusFor(installedRepository.load(), hack)
 
     fun isInstalled(hackId: String): Boolean =
-        StoreStatusCalculator.isInstalled(installedRepository.load(), hackId)
+            StoreStatusCalculator.isInstalled(installedRepository.load(), hackId)
 
     /**
-     * If [hack] is installed via a DIFFERENT store id (cross-catalog match)
-     * rather than its exact id, returns the other installed hack's display name
-     * and version so the detail dialog can show an "Installed as X" note.
-     * Returns null when the exact [hack.id] is installed or nothing matches.
+     * If [hack] is installed via a DIFFERENT store id (cross-catalog match) rather than its exact
+     * id, returns the other installed hack's display name and version so the detail dialog can show
+     * an "Installed as X" note. Returns null when the exact [hack.id] is installed or nothing
+     * matches.
      */
     fun installedAsOther(hack: HackEntry): Pair<String, String>? {
         val installed = installedRepository.load()
         val canonical = hack.canonicalId
         val checksums = hack.patch?.checksums
-        val other = installed.values.firstOrNull { inst ->
-            inst.hackId != hack.id && (inst.canonicalId == canonical ||
-                (checksums != null && inst.patchChecksums != null &&
-                    inst.patchChecksums.crc32 == checksums.crc32 &&
-                    inst.patchChecksums.md5 == checksums.md5 &&
-                    inst.patchChecksums.sha1 == checksums.sha1))
-        } ?: return null
-        val name = mergedCatalogRepository.load().firstOrNull { it.id == other.hackId }?.name
-            ?: other.hackId
+        val other =
+                installed.values.firstOrNull { inst ->
+                    inst.hackId != hack.id &&
+                            (inst.canonicalId == canonical ||
+                                    (checksums != null &&
+                                            inst.patchChecksums != null &&
+                                            inst.patchChecksums.crc32 == checksums.crc32 &&
+                                            inst.patchChecksums.md5 == checksums.md5 &&
+                                            inst.patchChecksums.sha1 == checksums.sha1))
+                }
+                        ?: return null
+        val name =
+                mergedCatalogRepository.load().firstOrNull { it.id == other.hackId }?.name
+                        ?: other.hackId
         return name to other.version
     }
 
-    /** Whether any imported base ROM matches the hack's required CRC32. */
-    fun baseRomMatches(crc32: String): Boolean =
-        baseRomRepository.getAll().any { it.crc32.equals(crc32, ignoreCase = true) }
+    /** Whether the user has an imported base ROM compatible with [hack]. */
+    fun baseRomMatches(hack: HackEntry): Boolean =
+            findBaseRomForHack(baseRomRepository.getAll(), hack) != null
 
     /** Enqueues [hack] for download + patch via the shared queue manager. */
     fun enqueue(hack: HackEntry) = DownloadQueueManager.enqueue(hack)
@@ -241,34 +226,32 @@ class StoreViewModel(application: Application) : AndroidViewModel(application) {
 
     /** LiveData of the queue state for a single hack (null when not queued). */
     fun queueStateFor(hackId: String): LiveData<QueueItemUi?> =
-        DownloadQueueManager.stateFor(hackId)
+            DownloadQueueManager.stateFor(hackId)
 
     /**
      * Install a user-imported patch (BPS/IPS) file into the Library. Builds the
-     * [ImportedPatchInstaller] from the application context and runs it. The
-     * resulting hack launches exactly like a catalog hack (same `rom_<id>` +
-     * installed record), so no launch-flow changes are needed.
+     * [ImportedPatchInstaller] from the application context and runs it. The resulting hack
+     * launches exactly like a catalog hack (same `rom_<id>` + installed record), so no launch-flow
+     * changes are needed.
      */
     suspend fun importFile(file: File, displayName: String): ImportPatchResult {
         if (isDirectRomFile(displayName)) {
-            return ImportedRomInstaller(getApplication(), baseRomRepository).install(
-                file,
-                romDisplayName(displayName)
-            )
+            return ImportedRomInstaller(getApplication(), baseRomRepository)
+                    .install(file, romDisplayName(displayName))
         }
-        val installer = ImportedPatchInstaller(
-            getApplication(),
-            AppRepositories.baseRomRepository(getApplication()),
-            InstalledHacksRepository(File(appContext.filesDir, "installed_hacks.json")),
-            AppRepositories.userHacksRepository(getApplication()),
-            Storage.getInstance(getApplication())
-        )
+        val installer =
+                ImportedPatchInstaller(
+                        getApplication(),
+                        AppRepositories.baseRomRepository(getApplication()),
+                        InstalledHacksRepository(File(appContext.filesDir, "installed_hacks.json")),
+                        AppRepositories.userHacksRepository(getApplication()),
+                        Storage.getInstance(getApplication())
+                )
         return installer.install(file, displayName.substringBeforeLast('.', displayName))
     }
 
     /** Synchronous current phase for [hackId], or null when not queued. */
-    fun queuePhaseFor(hackId: String): DownloadPhase? =
-        DownloadQueueManager.queuePhaseFor(hackId)
+    fun queuePhaseFor(hackId: String): DownloadPhase? = DownloadQueueManager.queuePhaseFor(hackId)
 
     private fun isDirectRomFile(name: String): Boolean {
         val lower = name.lowercase()

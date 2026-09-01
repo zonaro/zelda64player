@@ -11,14 +11,11 @@
         android:gravity="center_vertical"
         android:padding="@dimen/switch_screen_margin">
 
-        <ImageButton
+        <include
             android:id="@+id/tester_back"
+            layout="@layout/switch_back_button"
             android:layout_width="@dimen/icon_button_size"
-            android:layout_height="@dimen/icon_button_size"
-            android:background="@drawable/bg_icon_button"
-            android:contentDescription="@string/gamepad_tester_back"
-            android:src="@drawable/ic_close"
-            android:tint="@color/switch_text_primary" />
+            android:layout_height="@dimen/icon_button_size" />
 
         <ImageView
             android:layout_width="24dp"

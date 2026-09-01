@@ -21,6 +21,7 @@ package br.com.redclaw.zelda64player.viewmodels
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -37,28 +38,27 @@ import br.com.redclaw.zelda64player.shortcuts.GameShortcutsManager
 import br.com.redclaw.zelda64player.views.GameActivity
 import br.com.redclaw.zelda64player.views.HackLibraryEntry
 import java.io.File
-import androidx.activity.result.contract.ActivityResultContracts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Shared [LibraryMenuHost] implementation used by both [br.com.redclaw.zelda64player.views.LibraryActivity]
- * and the full-screen [br.com.redclaw.zelda64player.ui.switchui.SwitchGridActivity] so the per-game
- * context menu actions (launch, export/import saves, uninstall, pin,
- * achievements) are defined exactly once (DRY).
+ * Shared [LibraryMenuHost] implementation used by both
+ * [br.com.redclaw.zelda64player.views.LibraryActivity] and the full-screen
+ * [br.com.redclaw.zelda64player.ui.switchui.SwitchGridActivity] so the per-game context menu
+ * actions (launch, export/import saves, uninstall, pin, achievements) are defined exactly once
+ * (DRY).
  *
- * Owns the SAF document pickers, the debounced launch, and the uninstall
- * flow. After a library mutation (uninstall) it
- * invokes [onLibraryChanged] so the host can rebuild its grid and re-sync
+ * Owns the SAF document pickers, the debounced launch, and the uninstall flow. After a library
+ * mutation (uninstall) it invokes [onLibraryChanged] so the host can rebuild its grid and re-sync
  * shortcuts without this class knowing about either screen's UI.
  *
  * The menu *structure* (which items appear, in which sections) lives in
  * [LibraryMenuController.buildSections]; this class only performs the actions.
  */
 class LibraryMenuHostDelegate(
-    private val activity: AppCompatActivity,
-    private val onLibraryChanged: () -> Unit
+        private val activity: AppCompatActivity,
+        private val onLibraryChanged: () -> Unit
 ) : LibraryMenuHost {
 
     private var lastLaunchClickTime = 0L
@@ -68,109 +68,127 @@ class LibraryMenuHostDelegate(
     private var pendingImportEntry: HackLibraryEntry? = null
     private var pendingCoverEntry: HackLibraryEntry? = null
 
-    private val exportLauncher = activity.registerForActivityResult(
-        ActivityResultContracts.CreateDocument("application/zip")
-    ) { uri ->
-        val entry = pendingExportEntry ?: return@registerForActivityResult
-        pendingExportEntry = null
-        if (uri == null) return@registerForActivityResult
-        val storage = Storage.getInstance(activity)
-        try {
-            activity.contentResolver.openOutputStream(uri)?.use { out ->
-                SaveBackupManager.exportToStream(out, storage.sram(entry.id), storage.state(entry.id))
-            }
-            showToast(R.string.menu_export_success)
-        } catch (e: Exception) {
-            Log.e(TAG, "exportSaves failed for ${entry.id}", e)
-            showToast(R.string.menu_export_failure)
-        }
-    }
-
-    private val importLauncher = activity.registerForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        val entry = pendingImportEntry ?: return@registerForActivityResult
-        pendingImportEntry = null
-        if (uri == null) return@registerForActivityResult
-        val storage = Storage.getInstance(activity)
-        try {
-            activity.contentResolver.openInputStream(uri)?.use { input ->
-                val summary = SaveBackupManager.importFromStream(
-                    input, storage.sram(entry.id), storage.state(entry.id)
-                )
-                if (summary.ok) showToast(R.string.menu_import_success)
-                else showToast(R.string.menu_import_failure)
-            } ?: showToast(R.string.menu_import_failure)
-        } catch (e: Exception) {
-            Log.e(TAG, "importSaves failed for ${entry.id}", e)
-            showToast(R.string.menu_import_failure)
-        }
-    }
-
-    private val coverLauncher = activity.registerForActivityResult(
-        ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        val entry = pendingCoverEntry ?: return@registerForActivityResult
-        pendingCoverEntry = null
-        if (uri == null || !entry.isUserImported) return@registerForActivityResult
-        activity.lifecycleScope.launch(Dispatchers.IO) {
-            val saved = runCatching {
-                activity.contentResolver.openInputStream(uri)?.use { input ->
-                    AppRepositories.userHackCoverRepository(activity).replace(entry.id, input).getOrThrow()
-                } ?: error("Unable to open selected image")
-            }.getOrNull()
-            val updated = saved != null && AppRepositories.userHacksRepository(activity)
-                .updateCover(entry.id, saved)
-            withContext(Dispatchers.Main) {
-                if (updated) {
-                    onLibraryChanged()
-                    showToast(R.string.manual_cover_success)
-                } else {
-                    showToast(R.string.manual_cover_invalid)
+    private val exportLauncher =
+            activity.registerForActivityResult(
+                    ActivityResultContracts.CreateDocument("application/zip")
+            ) { uri ->
+                val entry = pendingExportEntry ?: return@registerForActivityResult
+                pendingExportEntry = null
+                if (uri == null) return@registerForActivityResult
+                val storage = Storage.getInstance(activity)
+                try {
+                    activity.contentResolver.openOutputStream(uri)?.use { out ->
+                        SaveBackupManager.exportToStream(
+                                out,
+                                storage.sram(entry.romId),
+                                storage.state(entry.romId)
+                        )
+                    }
+                    showToast(R.string.menu_export_success)
+                } catch (e: Exception) {
+                    Log.e(TAG, "exportSaves failed for ${entry.romId}", e)
+                    showToast(R.string.menu_export_failure)
                 }
             }
-        }
-    }
+
+    private val importLauncher =
+            activity.registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+                val entry = pendingImportEntry ?: return@registerForActivityResult
+                pendingImportEntry = null
+                if (uri == null) return@registerForActivityResult
+                val storage = Storage.getInstance(activity)
+                try {
+                    activity.contentResolver.openInputStream(uri)?.use { input ->
+                        val summary =
+                                SaveBackupManager.importFromStream(
+                                        input,
+                                        storage.sram(entry.romId),
+                                        storage.state(entry.romId)
+                                )
+                        if (summary.ok) showToast(R.string.menu_import_success)
+                        else showToast(R.string.menu_import_failure)
+                    }
+                            ?: showToast(R.string.menu_import_failure)
+                } catch (e: Exception) {
+                    Log.e(TAG, "importSaves failed for ${entry.romId}", e)
+                    showToast(R.string.menu_import_failure)
+                }
+            }
+
+    private val coverLauncher =
+            activity.registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+                val entry = pendingCoverEntry ?: return@registerForActivityResult
+                pendingCoverEntry = null
+                if (uri == null || !entry.isUserImported) return@registerForActivityResult
+                activity.lifecycleScope.launch(Dispatchers.IO) {
+                    val saved =
+                            runCatching {
+                                        activity.contentResolver.openInputStream(uri)?.use { input
+                                            ->
+                                            AppRepositories.userHackCoverRepository(activity)
+                                                    .replace(entry.romId, input)
+                                                    .getOrThrow()
+                                        }
+                                                ?: error("Unable to open selected image")
+                                    }
+                                    .getOrNull()
+                    val updated =
+                            saved != null &&
+                                    AppRepositories.userHacksRepository(activity)
+                                            .updateCover(entry.romId, saved)
+                    withContext(Dispatchers.Main) {
+                        if (updated) {
+                            onLibraryChanged()
+                            showToast(R.string.manual_cover_success)
+                        } else {
+                            showToast(R.string.manual_cover_invalid)
+                        }
+                    }
+                }
+            }
 
     override fun context(): Activity = activity
 
     /**
-     * Launch [entry] the same way tapping its tile does, respecting the shared
-     * debounce so a rapid repeat (e.g. physical A + tile tap) fires only once.
+     * Launch [entry] the same way tapping its tile does, respecting the shared debounce so a rapid
+     * repeat (e.g. physical A + tile tap) fires only once.
      */
     override fun launchGame(entry: HackLibraryEntry) {
         val now = System.currentTimeMillis()
         if (now - lastLaunchClickTime < LAUNCH_CLICK_DEBOUNCE_MS) return
         lastLaunchClickTime = now
-        val intent = Intent(activity, GameActivity::class.java).apply {
-            putExtra("hack_id", entry.id)
-        }
+        val intent =
+                Intent(activity, GameActivity::class.java).apply {
+                    putExtra("hack_id", entry.romId)
+                }
         activity.startActivity(intent)
     }
 
     /** Open the RetroAchievements screen for [entry]. */
     override fun openAchievements(entry: HackLibraryEntry) {
         activity.startActivity(
-            Intent(activity, AchievementsActivity::class.java).apply {
-                putExtra(AchievementsActivity.EXTRA_HACK_ID, entry.id)
-            }
+                Intent(activity, AchievementsActivity::class.java).apply {
+                    putExtra(AchievementsActivity.EXTRA_HACK_ID, entry.romId)
+                }
         )
     }
 
     override fun requestExportSaves(entry: HackLibraryEntry) {
         val storage = Storage.getInstance(activity)
-        val hasSaves = storage.sram(entry.id).exists() || storage.state(entry.id).exists()
+        val hasSaves = storage.sram(entry.romId).exists() || storage.state(entry.romId).exists()
         if (!hasSaves) {
             showToast(R.string.menu_export_nothing)
             return
         }
         pendingExportEntry = entry
         val safeName = entry.title.replace(Regex("[^a-zA-Z0-9 _-]"), "_").trim()
-        exportLauncher.launch("$safeName${activity.getString(R.string.menu_export_filename_suffix)}")
+        exportLauncher.launch(
+                "$safeName${activity.getString(R.string.menu_export_filename_suffix)}"
+        )
     }
 
     override fun requestImportSaves(entry: HackLibraryEntry) {
-        val romFile = GameRomResolver.resolveRomFile(activity, entry.id)
+        val romFile = GameRomResolver.resolveRomFile(activity, entry.romId)
         if (romFile == null || !romFile.exists()) {
             showToast(R.string.menu_import_not_installed)
             return
@@ -187,28 +205,30 @@ class LibraryMenuHostDelegate(
 
     override fun confirmUninstall(entry: HackLibraryEntry) {
         AlertDialog.Builder(activity)
-            .setTitle(activity.getString(R.string.menu_uninstall_title, entry.title))
-            .setMessage(R.string.menu_uninstall_message)
-            .setPositiveButton(R.string.menu_uninstall_button) { _, _ -> performUninstall(entry) }
-            .setNegativeButton(R.string.dialog_cancel, null)
-            .show()
+                .setTitle(activity.getString(R.string.menu_uninstall_title, entry.title))
+                .setMessage(R.string.menu_uninstall_message)
+                .setPositiveButton(R.string.menu_uninstall_button) { _, _ ->
+                    performUninstall(entry)
+                }
+                .setNegativeButton(R.string.dialog_cancel, null)
+                .show()
     }
 
     /**
-     * Delete the game's files, unmark it as installed and drop its play-history
-     * entry, then notify the host to rebuild its list. Orchestrated here (the
-     * caller of the pure [uninstallHackFiles]); the file deletion itself is a
-     * JVM-testable pure function.
+     * Delete the game's files, unmark it as installed and drop its play-history entry, then notify
+     * the host to rebuild its list. Orchestrated here (the caller of the pure [uninstallHackFiles]
+     * ); the file deletion itself is a JVM-testable pure function.
      */
     private fun performUninstall(entry: HackLibraryEntry) {
         val storage = Storage.getInstance(activity)
-        uninstallHackFiles(File(storage.storagePath), entry.id)
-        InstalledHacksRepository(File(activity.filesDir, "installed_hacks.json")).unmarkInstalled(entry.id)
+        uninstallHackFiles(File(storage.storagePath), entry.romId)
+        InstalledHacksRepository(File(activity.filesDir, "installed_hacks.json"))
+                .unmarkInstalled(entry.romId)
         if (entry.isUserImported) {
-            AppRepositories.userHacksRepository(activity).remove(entry.id)
-            AppRepositories.userHackCoverRepository(activity).remove(entry.id)
+            AppRepositories.userHacksRepository(activity).remove(entry.romId)
+            AppRepositories.userHackCoverRepository(activity).remove(entry.romId)
         }
-        GamePlayHistoryStore(File(activity.filesDir, "game_play_history.json")).remove(entry.id)
+        GamePlayHistoryStore(File(activity.filesDir, "game_play_history.json")).remove(entry.romId)
         onLibraryChanged()
         showToast(R.string.menu_uninstall_done)
     }

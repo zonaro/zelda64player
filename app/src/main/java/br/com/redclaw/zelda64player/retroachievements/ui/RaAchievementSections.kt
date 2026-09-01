@@ -79,7 +79,7 @@ fun collectResolvedGames(
 ): Map<Long, String> {
     val result = LinkedHashMap<Long, String>()
     for (entry in entries) {
-        val identity = identities[entry.id] ?: continue
+        val identity = identities[entry.romId] ?: continue
         if (!identity.isResolved) continue
         result.putIfAbsent(identity.gameId, entry.title)
     }

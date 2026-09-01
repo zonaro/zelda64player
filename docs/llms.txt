@@ -176,7 +176,9 @@ Required fields for catalog entry:
 - `patch.url`, `patch.filename`, `patch.size`, `patch.checksums.crc32`
 - Optional: `coverImageUrl`, `tags`, `compatibleCores`, `ocarinaSongs`
 
-Submit PRs with `catalog.json` following the schema.
+Submit hacks only through the repository's Hack submission issue form. Do not
+open a pull request to add a hack or edit `catalog/catalog.json`; maintainers
+review the issue and curate approved entries into the catalog.
 
 ---
 

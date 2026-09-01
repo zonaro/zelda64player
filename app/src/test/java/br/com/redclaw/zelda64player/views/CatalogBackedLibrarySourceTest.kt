@@ -111,5 +111,9 @@ class CatalogBackedLibrarySourceTest {
         assertEquals("The Missing Link", entry.title) // PICKS representative preferred
         assertEquals("picks", entry.storeId)
         assertEquals(OcarinaGame.OOT, entry.family)
+        // romId must be one of the original hack ids (the one with a ROM on disk)
+        assert(entry.romId == "the-missing-link" || entry.romId == "hm_themissinglink") {
+            "romId should be an original hack id, got ${entry.romId}"
+        }
     }
 }

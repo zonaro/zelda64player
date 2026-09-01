@@ -1,6 +1,7 @@
 package br.com.redclaw.zelda64player.retroachievements.ui
 
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -11,6 +12,7 @@ import br.com.redclaw.zelda64player.databinding.ActivityAchievementsBinding
 import br.com.redclaw.zelda64player.retroachievements.data.RaGameData
 import br.com.redclaw.zelda64player.retroachievements.data.RaGameIdentity
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
+import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import br.com.redclaw.zelda64player.views.InstalledLibrary
 import coil.load
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +45,8 @@ class AchievementsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAchievementsBinding
     private val adapter = RaAchievementAdapter()
 
+    private val backHelper = SwitchBackButton()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAchievementsBinding.inflate(layoutInflater)
@@ -50,8 +54,7 @@ class AchievementsActivity : AppCompatActivity() {
         SwitchImmersive.enterFullscreen(this)
 
         setSupportActionBar(binding.achievementsToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.achievementsToolbar.setNavigationOnClickListener { finish() }
+        backHelper.attach(this, binding.achievementsBack.root, onBack = { finish() })
 
         binding.achievementsList.layoutManager = LinearLayoutManager(this)
         binding.achievementsList.adapter = adapter
@@ -69,6 +72,11 @@ class AchievementsActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) SwitchImmersive.enterFullscreen(this)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        backHelper.onTouch(ev)
+        return super.dispatchTouchEvent(ev)
     }
 
     // --- Single game mode -------------------------------------------------
@@ -172,8 +180,8 @@ class AchievementsActivity : AppCompatActivity() {
                 buildMap<String, RaGameIdentity> {
                     for (entry in entries) {
                         val identity = Zelda64PlayerApp.raHashService
-                            .ensureIdentity(this@AchievementsActivity, entry.id)
-                        if (identity != null) put(entry.id, identity)
+                            .ensureIdentity(this@AchievementsActivity, entry.romId)
+                        if (identity != null) put(entry.romId, identity)
                     }
                 }
             }

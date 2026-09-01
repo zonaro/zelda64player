@@ -66,7 +66,7 @@ class GoogleDriveBackupWorker(
         }
 
         val storage = Storage.getInstance(context)
-        val hackIds = InstalledLibrary.entries(context).map { it.id }
+        val hackIds = InstalledLibrary.entries(context).map { it.romId }
         val since = CorePrefs.getGdriveLastBackup(context)
 
         return@withContext try {

@@ -16,7 +16,15 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/switch_panel"
             app:titleTextColor="@color/switch_text_primary"
-            app:navigationIconTint="@color/switch_text_primary" />
+            app:navigationIconTint="@color/switch_text_primary">
+
+            <include
+                android:id="@+id/download_queue_back"
+                layout="@layout/switch_back_button"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:layout_gravity="start|center_vertical" />
+        </androidx.appcompat.widget.Toolbar>
 
         <FrameLayout
             android:layout_width="match_parent"

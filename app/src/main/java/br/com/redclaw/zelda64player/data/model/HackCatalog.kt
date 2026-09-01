@@ -36,12 +36,19 @@ data class HackCatalog(
             return HackCatalog(catalogVersion, lastUpdated, hacks)
         }
 
-        /** Required top-level fields per the catalog schema. */
+        /**
+         * Required top-level fields per the catalog schema. A hack must expose
+         * either a direct [PatchRef] or a [DownloadTarget]. The latter covers
+         * catalog records whose publisher supplies a GitHub release page or an
+         * external archive rather than a directly downloadable patch.
+         */
         private fun hasRequiredFields(o: JSONObject): Boolean {
             val required = listOf(
-                "id", "name", "description", "author", "version", "baseRom", "patch"
+                "id", "name", "description", "author", "version", "baseRom"
             )
-            return required.all { o.has(it) }
+            return required.all { o.has(it) } &&
+                ((o.has("patch") && !o.isNull("patch")) ||
+                    (o.has("downloadTarget") && !o.isNull("downloadTarget")))
         }
     }
 }

@@ -1,0 +1,113 @@
+name: Hack submission
+description: Submit a Zelda ROM hack for review and possible inclusion in Main Store.
+title: "[Hack]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Submit a hack
+
+        Use this form to request inclusion in the Main Store catalog. Do not open a pull request to submit a hack or edit the catalog. Maintainers review this information and add approved entries themselves.
+
+        Never attach, upload, or link to a base ROM, BIOS, or other copyrighted game files. Submit only a patch and public metadata.
+
+  - type: input
+    id: name
+    attributes:
+      label: Hack name
+      description: Use the public release name.
+      placeholder: Ocarina of Time DX
+    validations:
+      required: true
+
+  - type: input
+    id: author
+    attributes:
+      label: Author or team
+      description: List the credited author(s) or team name.
+      placeholder: Author name or team
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Release version or public source update date.
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the hack, its main features, current completion status, and any compatibility notes.
+      placeholder: A concise public description of the hack.
+    validations:
+      required: true
+
+  - type: textarea
+    id: base-rom
+    attributes:
+      label: Required base ROM
+      description: Provide the exact supported base-ROM name and revision. Include the N64 game code, header version byte, and normalized .z64 CRC32 when they are publicly known. Never upload or link to the ROM itself.
+      placeholder: |
+        Name: The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)
+        Game code: CZLE
+        Version byte: 0
+        Normalized .z64 CRC32: cd16c529
+    validations:
+      required: true
+
+  - type: dropdown
+    id: delivery-type
+    attributes:
+      label: Patch delivery method
+      description: Choose how users can obtain the patch.
+      options:
+        - Direct HTTPS patch or ZIP URL
+        - GitHub Releases page
+        - External publisher or download page
+    validations:
+      required: true
+
+  - type: textarea
+    id: patch-source
+    attributes:
+      label: Patch source
+      description: Provide the public HTTPS URL. For a direct patch, also include its filename, byte size, and independently published MD5 or SHA-1 when available. Do not fabricate checksum or size data.
+      placeholder: |
+        URL: https://example.org/releases/my-hack.bps
+        Filename: my-hack.bps
+        Size in bytes: 0 if unknown
+        MD5 or SHA-1: leave blank if not published
+    validations:
+      required: true
+
+  - type: textarea
+    id: metadata
+    attributes:
+      label: Optional catalog metadata
+      description: Add public HTTPS links for a cover, screenshots, video, changelog, tags, supported cores, and source page. Please retain source attribution.
+      placeholder: |
+        Source page:
+        Cover image:
+        Screenshots:
+        Tags:
+        Compatible cores:
+        Changelog:
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Required confirmations
+      options:
+        - label: I own or am authorized to submit this patch and metadata for public catalog review.
+          required: true
+        - label: This submission contains no base ROM, BIOS, proprietary game file, or link to one.
+          required: true
+        - label: The supplied source and checksums are public and accurate to the best of my knowledge.
+          required: true

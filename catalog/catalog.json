@@ -1,7 +1,7 @@
 {
-  "catalogVersion": 1,
-  "storeName": "Zelda 64 Picks",
-  "lastUpdated": "2026-08-25T00:00:00Z",
+  "catalogVersion": 2,
+  "storeName": "Main Store",
+  "lastUpdated": "2026-09-01T05:26:02Z",
   "hacks": [
     {
       "id": "ocarina_of_time_dx",
@@ -42,10 +42,10 @@
     {
       "id": "ultimate_trial",
       "name": "Ultimate Trial",
-      "description": "Extended-quest mod adding achievements, Spanish language support, widescreen HUD and optional Randologic trial randomization with three modes.",
-      "author": "RichieUltimate",
+      "description": "Deep inside the Lost Woods lies a mysterious Stronghold, inhabited by lost travellers. As Link enters this place, he is greeted by Shiba, the protector of the fortress. He places the task of conquering the 3 Trials upon Link. He needs to meet new people and explore each corner of the Stronghold to be prepared, but will he be able to conquer them all and eventually reach the Ultimate Trial ?",
+      "author": "Richie, Syeo, ZeeRoX, hiisuya, Zeraphyr, Aegiker, Woon, ShuggyTheBuggy",
       "version": "1.2.3",
-      "coverImageUrl": "https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/covers/ultimate_trial.jpeg",
+      "coverImageUrl": "https://hylianmodding.com/mods/ultimate_trial/screenshots/thumbnail.png",
       "baseRom": {
         "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
         "gameCode": "CZLE",
@@ -66,13 +66,40 @@
         }
       },
       "tags": [
-        "new-content",
-        "achievements"
+        "mod",
+        "complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "screenshots": [
+        "https://www.youtube.com/watch?v=3t1mvYpJWn4&ab_channel=Richie",
+        "https://hylianmodding.com/mods/ultimate_trial/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/ultimate_trial/screenshots/screenshot_2.png",
+        "https://hylianmodding.com/mods/ultimate_trial/screenshots/screenshot_3.png",
+        "https://hylianmodding.com/mods/ultimate_trial/screenshots/screenshot_4.png"
+      ],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2024-05-27",
+      "changelog": [
+        {
+          "date": "2024-05-25",
+          "content": "Version 1.0 :\n\nRelease of the game!"
+        }
+      ],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": true
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/ultimate_trial/mod.json",
+        "managed": false
+      }
     },
     {
       "id": "majoras_mask_redux",
@@ -110,10 +137,10 @@
     {
       "id": "master_of_time_revisited",
       "name": "The Legend of Zelda: Master of Time Revisited",
-      "description": "Revision of Master of Time (Rev0) with a new pause menu, new Link model with matching icons and get-item models, texture updates and the Silver Scale crash fixed.",
-      "author": "Don Camilo",
+      "description": "After saving both Hyrule and Termina, Link found himself without a quest. He journeyed long and far without knowing what to do. He thought a lot about the time manipulation he had done and asked himself if he was the real hero or if he was just a victim of these stories.\n\nThe more his obsession of time had grown, the more it felt that time was slowing down… Until it froze completely, condemning his journey to an endless day… Just before passing out from exhaustion, Link finally found a new country…\n\nMaster of Time is a new story in a completely new world, Abello, where Link must restore the flow of time. Abello is a big and dangerous world, but Link can count on the help of Nite the fairy.\n\nAround 20 hours of gameplay in various areas and dungeons with custom cutscenes, songs and much more. Good luck finding all 100 skulltula tokens and 20 hearts!\n\nA modification of Master of Time with a new inventory screen/overworld map,and some texture changes to overworld,items,medallions and enemies. As well as an new model of Link.",
+      "author": "Don Camilo & Syeo",
       "version": "1.4.2",
-      "coverImageUrl": "https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/covers/master_of_time_revisited.jpg",
+      "coverImageUrl": "https://hylianmodding.com/mods/master_of_time_revisited/screenshots/thumbnail.png",
       "baseRom": {
         "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
         "gameCode": "CZLE",
@@ -134,21 +161,43 @@
         }
       },
       "tags": [
-        "bugfix",
-        "enhancement"
+        "mod",
+        "complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "screenshots": [
+        "https://www.youtube.com/watch?v=NdTIjpgfGb4",
+        "https://hylianmodding.com/mods/master_of_time_revisited/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/master_of_time_revisited/screenshots/screenshot_2.png",
+        "https://hylianmodding.com/mods/master_of_time_revisited/screenshots/screenshot_3.png",
+        "https://hylianmodding.com/mods/master_of_time_revisited/screenshots/screenshot_4.png"
+      ],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2025-5-14",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/master_of_time_revisited/mod.json",
+        "managed": false
+      }
     },
     {
       "id": "the_missing_link",
       "name": "The Legend of Zelda: The Missing Link",
-      "description": "Mini-adventure set between Ocarina of Time and Majora's Mask: Link's search for Navi becomes an urgent rescue mission across new environments with a brand-new dungeon.",
-      "author": "Kaze Emanuar",
+      "description": "This mini-adventure is set in between Ocarina of Time and Majora’s Mask. It follows Link on his quest to find Navi, his fairy companion from the first N64 Zelda game.  However, this search for a missing friend quickly turns into an urgent rescue mission to find all of Kokiri Forest's lost fairies. If Link doesn’t find them soon, the entire world will be at risk. Enjoy new environments, graphics, music, and a new dungeon with a brand new item!",
+      "author": "Kaze, CDi-Fails, Zel",
       "version": "2.0",
-      "coverImageUrl": "https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/covers/the_missing_link.png",
+      "coverImageUrl": "https://hylianmodding.com/mods/the_missing_link/screenshots/thumbnail.jpg",
       "baseRom": {
         "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
         "gameCode": "CZLE",
@@ -169,13 +218,39 @@
         }
       },
       "tags": [
-        "story",
-        "new-content"
+        "mod",
+        "complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "screenshots": [
+        "https://hylianmodding.com/mods/the_missing_link/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/the_missing_link/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/the_missing_link/screenshots/screenshot_2.png",
+        "https://hylianmodding.com/mods/the_missing_link/screenshots/screenshot_3.jpg"
+      ],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2023-11-08",
+      "changelog": [
+        {
+          "date": "2021-07-30",
+          "content": "Version 2.0 released\nNew title screen design, and fixed a bug in the original game where the letterbox does not function on the title screen\nMade some changes to make translations etc. easier to create and recompress"
+        }
+      ],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": true
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/the_missing_link/mod.json",
+        "managed": false
+      }
     },
     {
       "id": "sealed_palace",
@@ -249,17 +324,15 @@
     {
       "id": "sands_of_time",
       "name": "Sands of Time",
-      "description": "After the Hero of Time fell, Ganon ruled Hyrule as a tyrant, abusing the Triforce to scorch the land into a wasteland. When Ganon finally dies of old age, survivors rebuild amid the ruins. In the secluded Steel Town, a young adventurer sets out in search of fortune and the truth.",
+      "description": "After defeating the Hero of Time and eliminating all who opposed him, Ganon took hold over Hyrule as its new tyrannical ruler. Abusing the power of the Triforce, he turned the land into an almost desolate wasteland.\n\nDespite his divine position as the Demon King, possessing all 3 pieces of the Triforce and the 6 Medallions, he was still a slave to his own mortality. On that fateful, long awaited day, Ganon died of old age. The Dark Age was over.\n\nOverturning the old reign of terror, survivors built their own rule in the ruin. Some of them started new lives, some seek the fortune Ganon left behind...\n\nIn the secluded Steel Town, a young adventurer, risking his life and dreaming of success, sets out on his path.",
       "author": "Debuglog & Woon",
-      "version": "1.22",
+      "version": "2024-11-23",
       "baseRom": {
-        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "name": "Ocarina of Time",
         "gameCode": "CZLE",
-        "versionByte": 0,
+        "versionByte": -1,
         "checksums": {
-          "crc32": "cd16c529",
-          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
-          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+          "crc32": ""
         }
       },
       "patch": {
@@ -271,30 +344,66 @@
           "md5": "e7661d62ede15fb0034f496360a818ef"
         }
       },
+      "coverImageUrl": "https://hylianmodding.com/mods/sands_of_time/screenshots/thumbnail.jpg",
       "tags": [
-        "story",
-        "new-content"
+        "mod",
+        "complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/sands_of_time/screenshots/thumbnail.jpg"
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/sands_of_time/screenshots/screenshot_0.jpg",
+        "https://hylianmodding.com/mods/sands_of_time/screenshots/screenshot_1.jpg",
+        "https://hylianmodding.com/mods/sands_of_time/screenshots/screenshot_2.jpg",
+        "https://hylianmodding.com/mods/sands_of_time/screenshots/screenshot_3.jpg",
+        "https://hylianmodding.com/mods/sands_of_time/screenshots/screenshot_4.png",
+        "https://hylianmodding.com/mods/sands_of_time/screenshots/screenshot_5.jpg"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2024-11-23",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/sands_of_time/downloads/SoT1.22.bps",
+          "filename": "SoT1.22.bps",
+          "size": 38657165,
+          "checksums": {
+            "crc32": "2144df1c",
+            "md5": "e7661d62ede15fb0034f496360a818ef"
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/sands_of_time/mod.json",
+        "managed": true
+      }
     },
     {
       "id": "shadows_of_eldoria",
       "name": "Shadows of Eldoria",
-      "description": "Shadows of Eldoria is a ROM hack created by Stonee Bad Luck - an original story-driven adventure in the world of Ocarina of Time.",
+      "description": "Shadows of Eldoria is a ROM hack created by Stonee Bad Luck.",
       "author": "Stonee Bad Luck",
-      "version": "Demo",
+      "version": "2024-9-28",
       "baseRom": {
-        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "name": "Ocarina of Time",
         "gameCode": "CZLE",
-        "versionByte": 0,
+        "versionByte": -1,
         "checksums": {
-          "crc32": "cd16c529",
-          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
-          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+          "crc32": ""
         }
       },
       "patch": {
@@ -306,30 +415,63 @@
           "md5": "5fe3d5f872e92951de8fc6f221d0427b"
         }
       },
+      "coverImageUrl": "https://hylianmodding.com/mods/shadows_of_eldoria/screenshots/thumbnail.webp",
       "tags": [
-        "demo",
-        "story"
+        "mod",
+        "Demo"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/shadows_of_eldoria/screenshots/thumbnail.webp"
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=rYWtGcdsrcY",
+        "https://hylianmodding.com/mods/shadows_of_eldoria/screenshots/screenshot1.webp",
+        "https://hylianmodding.com/mods/shadows_of_eldoria/screenshots/screenshot2.webp"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2024-9-28",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/shadows_of_eldoria/downloads/Shadows of Eldoria DEMO z64.bps",
+          "filename": "Shadows of Eldoria DEMO z64.bps",
+          "size": 10178467,
+          "checksums": {
+            "crc32": "2144df1c",
+            "md5": "5fe3d5f872e92951de8fc6f221d0427b"
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/shadows_of_eldoria/mod.json",
+        "managed": true
+      }
     },
     {
       "id": "crystal_clocks",
       "name": "Crystal Clocks",
-      "description": "A calm night stargazing with Saria and Mido turns into a puzzle quest. Use the Dragshot to solve 11 time-based puzzle rooms, manage platform switches and crystal activation sequences, and hunt four optional Pieces of Heart.",
+      "description": "It’s a beautiful night, and you’re headed off to stargaze with Saria and Mido. Surely, the path to get there is simple!\n\nTake aim with the Dragshot, a modified slingshot with a creeping twist. Complete 11 different puzzle rooms as you manage platform switches and crystal activation sequences. Puzzles are primarily time-based, so being able to maintain patience and tolerate precise aiming is key. Estimated completion time is one hour.\n\nLooking for an extra challenge? Scattered around the level are four optional Pieces of Hearts. Stay alert for a special hint system that will help you find them all. Although custom music was originally planned and arranged, I was not able to get it working for this release.\n\nThis mod was originally submitted as an entry for Hylian Modding’s first competition. This update adds additional puzzles, new collectibles, new rooms like an ending room, a visual overhaul, various bug fixes, and several quality of life changes.\n\nTrailer theme: https://youtu.be/wbVXBJPg1nI ",
       "author": "SuperZambezi",
-      "version": "2.0",
+      "version": "2024-07-24",
       "baseRom": {
-        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "name": "Ocarina of Time",
         "gameCode": "CZLE",
-        "versionByte": 0,
+        "versionByte": -1,
         "checksums": {
-          "crc32": "cd16c529",
-          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
-          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+          "crc32": ""
         }
       },
       "patch": {
@@ -341,30 +483,65 @@
           "md5": "4fd652302c61e5850ffa4859786fdfda"
         }
       },
+      "coverImageUrl": "https://hylianmodding.com/mods/crystal_clocks/screenshots/VHhkwNW.jpg",
       "tags": [
-        "puzzle",
-        "new-content"
+        "mod",
+        "Complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/crystal_clocks/screenshots/VHhkwNW.jpg"
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=dJhRMBkyz8Q",
+        "https://hylianmodding.com/mods/crystal_clocks/screenshots/XNwHBuS.jpg",
+        "https://hylianmodding.com/mods/crystal_clocks/screenshots/Jyg8Mg4.jpg",
+        "https://hylianmodding.com/mods/crystal_clocks/screenshots/cy5nNm1.jpg",
+        "https://hylianmodding.com/mods/crystal_clocks/screenshots/6KTOa01.jpg"
+      ],
+      "videos": [],
+      "completionStatus": "Complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2024-07-24",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/crystal_clocks/downloads/crystal-clocks-2.0.bps",
+          "filename": "crystal-clocks-2.0.bps",
+          "size": 45417290,
+          "checksums": {
+            "crc32": "2144df1c",
+            "md5": "4fd652302c61e5850ffa4859786fdfda"
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/crystal_clocks/mod.json",
+        "managed": true
+      }
     },
     {
       "id": "fate_of_the_bombiwa",
       "name": "Fate of the Bombiwa",
-      "description": "A young adventurer sails the open sea looking for a quest and finds a town inhabited by the Bombiwa Tribe. When the king's daughter and others go missing, he takes on the task to save them and the fate of the Bombiwa rests in his hands.",
+      "description": "This is the story of a young adventurer who waanted to become legendary. After sailing acound the open sea looking for a quest, he found a town inhabited by the Bombiwa Tribe. Although, this town was in a very dire situation. He was told by the king that a few town members, includind his daughter, had gone missing. being excited for a chance to make a name for himself, he took on this task. Now, the fate of the Bombiwa, is in his hands...",
       "author": "DezZival",
-      "version": "1.0",
+      "version": "2020-1-01",
       "baseRom": {
-        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "name": "Ocarina of Time",
         "gameCode": "CZLE",
-        "versionByte": 0,
+        "versionByte": -1,
         "checksums": {
-          "crc32": "cd16c529",
-          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
-          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+          "crc32": ""
         }
       },
       "patch": {
@@ -376,30 +553,64 @@
           "md5": "dabb85c6d6af1782a0fb4d6456b30a28"
         }
       },
+      "coverImageUrl": "https://hylianmodding.com/mods/fate_of_the_bombiwa/screenshots/thumbnail.png",
       "tags": [
-        "story",
-        "new-content"
+        "mod",
+        "complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/fate_of_the_bombiwa/screenshots/thumbnail.png"
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/fate_of_the_bombiwa/screenshots/screenshot1.png",
+        "https://hylianmodding.com/mods/fate_of_the_bombiwa/screenshots/screenshot2.png",
+        "https://hylianmodding.com/mods/fate_of_the_bombiwa/screenshots/screenshot3.png",
+        "https://hylianmodding.com/mods/fate_of_the_bombiwa/screenshots/screenshot4.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2020-1-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/fate_of_the_bombiwa/downloads/TFOTB Patch.bps",
+          "filename": "TFOTB Patch.bps",
+          "size": 27340964,
+          "checksums": {
+            "crc32": "2144df1c",
+            "md5": "dabb85c6d6af1782a0fb4d6456b30a28"
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/fate_of_the_bombiwa/mod.json",
+        "managed": true
+      }
     },
     {
       "id": "dark_hyrule_fantasy",
       "name": "Dark Hyrule Fantasy",
-      "description": "Dark Hyrule Fantasy is a full Ocarina of Time conversion mod introducing a new world, story and characters built within the framework of the original N64 classic. (Demo / development later moved to the Godot engine.)",
+      "description": "Dark Hyrule Fantasy (DHF) is a ROM-hack modification of The Legend of Zelda: Ocarina of Time, a creative game development effort launched by E-Gor and Spire in October 2017. Stemming from the inspiration and remnants of Project Third Quest's original worldbuilding, DHF aims to be a full Ocarina of Time conversion mod, introducing a new world, a new story, new characters, and modifications of most elements from the original Nintendo 64 classic. Our hope is to deliver a new 'Zelda 64' experience built within the framework of our beloved predecessor.\n\nThe world of DHF is an interpretation of Hyrule like never seen before. Deriving from countless sources in and out of the Zelda universe, we aim to represent both classic and foreign concepts in an amalgamation of imagination. We have worked through many world layouts and concepts in order to land where we presently are, and we will show content when it is ready to be shared. There is much work before us, so please be patient, and enjoy the fruits of our labor thus far!\n\nWith Peace, Love, and Artistry, E-Gor and Spire\n\nCancelled and moving to Godot engine",
       "author": "E-gor & Spire",
-      "version": "1.0",
+      "version": "2017-12-04",
       "baseRom": {
-        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "name": "Ocarina of Time",
         "gameCode": "CZLE",
-        "versionByte": 0,
+        "versionByte": -1,
         "checksums": {
-          "crc32": "cd16c529",
-          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
-          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+          "crc32": ""
         }
       },
       "patch": {
@@ -411,16 +622,50 @@
           "md5": "1b96b4fc6f9cb1c74f45bbe7fe1181bf"
         }
       },
+      "coverImageUrl": "https://hylianmodding.com/mods/dark_hyrule_fantasy/screenshots/thumbnail.jpg",
       "tags": [
-        "demo",
-        "story",
-        "new-content"
+        "mod",
+        "Demo"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/dark_hyrule_fantasy/screenshots/thumbnail.jpg"
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/dark_hyrule_fantasy/screenshots/screenshot1.png",
+        "https://hylianmodding.com/mods/dark_hyrule_fantasy/screenshots/screenshot2.png",
+        "https://hylianmodding.com/mods/dark_hyrule_fantasy/screenshots/screenshot3.png"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2017-12-04",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/dark_hyrule_fantasy/downloads/DHF1_0_FIX.bps",
+          "filename": "DHF1_0_FIX.bps",
+          "size": 45944944,
+          "checksums": {
+            "crc32": "2144df1c",
+            "md5": "1b96b4fc6f9cb1c74f45bbe7fe1181bf"
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/dark_hyrule_fantasy/mod.json",
+        "managed": true
+      }
     },
     {
       "id": "zelda_birthday",
@@ -460,72 +705,139 @@
     {
       "id": "time_lost",
       "name": "Time Lost",
-      "description": "A sequel to Master of Time, taking place four years after Abello. Link finds himself on a new adventure in the country of Finlay, uncovering the worship of Majora, the mystery of Jabu milk and more. Tested on Mupen core, Wii VC, Dolphin and Project 64.",
+      "description": "A sequel to The Legend of Zelda – Master of Time, that takes place 4 years after the events of Abello. Link finds himself on yet another adventure after settling down in a new country called Finlay, where he discovers the worship of Majora to the mystery of Jabu milk and much more.\n\nCurrent Patch Version 1.02. Tested and Working on Retroarch Emulator (Mupen Core), Wii VC, Dolphin Emulator, Project 64 3.0.1",
       "author": "Stonee Bad Luck",
-      "version": "1.02",
+      "version": "2025-01-04",
       "baseRom": {
-        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "name": "Ocarina of Time",
         "gameCode": "CZLE",
-        "versionByte": 0,
+        "versionByte": -1,
         "checksums": {
-          "crc32": "cd16c529",
-          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
-          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+          "crc32": ""
         }
       },
       "patch": {
         "url": "https://hylianmodding.com/mods/time_lost/downloads/Legend of Zelda - Time Lost.zip",
-        "filename": "Legend of Zelda - Time Lost/Time Lost N64 1.02.bps",
+        "filename": "Legend of Zelda - Time Lost.zip",
         "size": 73077451,
         "checksums": {
           "crc32": "2144df1c",
           "md5": "fa11384572acf26621a15c8d3c06b054"
         }
       },
+      "coverImageUrl": "https://hylianmodding.com/mods/time_lost/screenshots/thumbnail.jpg",
       "tags": [
-        "story",
-        "sequel"
+        "mod",
+        "complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/time_lost/screenshots/thumbnail.jpg"
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=SsU3uC68dBc",
+        "https://hylianmodding.com/mods/time_lost/screenshots/image.png",
+        "https://hylianmodding.com/mods/time_lost/screenshots/image2.png",
+        "https://hylianmodding.com/mods/time_lost/screenshots/image4.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2025-01-04",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/time_lost/downloads/Legend of Zelda - Time Lost.zip",
+          "filename": "Legend of Zelda - Time Lost.zip",
+          "size": 73077451,
+          "checksums": {
+            "crc32": "2144df1c",
+            "md5": "fa11384572acf26621a15c8d3c06b054"
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/time_lost/mod.json",
+        "managed": true
+      }
     },
     {
       "id": "child_quest",
       "name": "Child Quest",
-      "description": "Experience the story of Ocarina of Time without ever reaching adulthood. All items are usable and every collectable can be acquired, including riding Epona, both trading quests, pulling the Master Sword and hidden surprises.",
-      "author": "Admentus & GhostlyDark",
-      "version": "3.0.1",
+      "description": "Experience the story of Ocarina of Time without ever reaching adulthood. All items are usuable and every collectable can be acquired. Riding Epona, doing both trading quests, pulling the Master Sword...Hidden surprises included!",
+      "author": "Admentus, GhostlyDark",
+      "version": "2023-1-01",
       "baseRom": {
-        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "name": "Ocarina of Time",
         "gameCode": "CZLE",
-        "versionByte": 0,
+        "versionByte": -1,
         "checksums": {
-          "crc32": "cd16c529",
-          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
-          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+          "crc32": ""
         }
       },
       "patch": {
         "url": "https://hylianmodding.com/mods/child_quest/downloads/LoZOoT-ChildQuest.zip",
-        "filename": "Legend of Zelda, The - OoT - Child Quest (v3.0.1) (Admentus, GhostlyDark).bps",
+        "filename": "LoZOoT-ChildQuest.zip",
         "size": 8472968,
         "checksums": {
           "crc32": "2144df1c",
           "md5": "93c282bb6adda0b8b1608ea10aebbbc5"
         }
       },
+      "coverImageUrl": "https://hylianmodding.com/mods/child_quest/screenshots/thumbnail.png",
       "tags": [
-        "new-content",
-        "quality-of-life"
+        "mod",
+        "complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/child_quest/screenshots/thumbnail.png"
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/child_quest/screenshots/screenshot1.png",
+        "https://hylianmodding.com/mods/child_quest/screenshots/screenshot2.png",
+        "https://hylianmodding.com/mods/child_quest/screenshots/screenshot3.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2023-1-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/child_quest/downloads/LoZOoT-ChildQuest.zip",
+          "filename": "LoZOoT-ChildQuest.zip",
+          "size": 8472968,
+          "checksums": {
+            "crc32": "2144df1c",
+            "md5": "93c282bb6adda0b8b1608ea10aebbbc5"
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/child_quest/mod.json",
+        "managed": true
+      }
     },
     {
       "id": "demons_quest",
@@ -565,7 +877,7 @@
     {
       "id": "the_helix_blade",
       "name": "The Helix Blade",
-      "description": "A hack about how a Terminian Link became the Fierce Deity. Patched onto an Ocarina of Time 1.0 (NTSC-U) ROM. Demo build with Oceanside Temple boss-door and beach waterbox fixes.",
+      "description": "This is a hack about how a Terminian Link became the Fierce Diety.\nUse a 1.0 US .z64 rom to patch.",
       "author": "Corrhaid",
       "version": "Demo",
       "baseRom": {
@@ -588,54 +900,106 @@
         }
       },
       "tags": [
-        "demo",
-        "story"
+        "mod",
+        "Demo"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/the_helix_blade/screenshots/thumbnail.jpg"
+      "coverImageUrl": "https://hylianmodding.com/mods/the_helix_blade/screenshots/thumbnail.jpg",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=k3_VXmb7bb0",
+        "https://hylianmodding.com/mods/the_helix_blade/screenshots/screenshot_1.jpg"
+      ],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2021-11-02",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/the_helix_blade/mod.json",
+        "managed": false
+      }
     },
     {
       "id": "voyager_of_time",
       "name": "Voyager of Time",
-      "description": "A story-driven Ocarina of Time hack set after Majora's Mask. Link returns to Kokiri Forest and is sent by the Deku Tree Sprout to stop Ganondorf, who has broken the Door of Time again. Features heavy time travel, reworked villages and environments, and new sidequests.",
+      "description": "Voyager of Time takes place after Majora’s Mask, but it is not a direct sequel. Link has come back to the Kokiri Forest to try and find peace after his last adventure. It is implied that he has had a third adventure in Termina but with the fairy Tael instead of Tatl. The younger brother of the feisty Tatl is a bit more subdued, but also more brave than what we’ve seen in Majora’s Mask. He can hold his own and he and Link have grown to be great friends.\n\nThe game starts out with Link having nightmares of his past adventures. The Deku Tree Sprout, descendant of the Great Deku Tree has summoned Link because he has sensed great evil growing lately. Link is sent on a quest to help out with the growing problems in Hyrule.\n\nAlong the way, you find that the Door of Time has been broken again by the evil villain, Ganondorf, and you must find a way to stop his rampage once more. There’s some twists and turns along the way, as Link’s items are spread out in an unfamiliar way. Link also has to face some major problems that hit a little too close to home.\n\nThe game features heavy time travel as well as side stories that highlight the problems with time traveling in general. Many places are transformed over the period of seven years that Ganondorf was in rule, and Link has to deal with the problems of his closest friends. On top of that, there may be another problem Link doesn’t realize until it’s too late…\n\nUpdated Environments\n\nThe overworld is changed quite a lot from the original Ocarina of Time. There is an attempt to make each village and section of the map seem more lively and have more character than ever before. NPCs are useful to talk to, and they give hints to the world around you. There are small stories they tell you, and even new sidequests you can accept.\n\nThe biggest change is the difference between the child and adult sections. The child sections are meant to feel more innocent and alive, and the adult sections are meant to showcase the utter destruction of Ganondorf. This is not to be intentionally dark, but just to show a realistic change that would happen over seven years.",
       "author": "Brynna Giadrosich",
-      "version": "1.0",
+      "version": "2013-1-01",
       "baseRom": {
-        "name": "The Legend of Zelda: Ocarina of Time (NTSC-U 1.0)",
+        "name": "Ocarina of Time",
         "gameCode": "CZLE",
-        "versionByte": 0,
+        "versionByte": -1,
         "checksums": {
-          "crc32": "cd16c529",
-          "md5": "5bd1fe107bf8106b2ab6650abecd54d6",
-          "sha1": "ad69c91157f6705e8ab06c79fe08aad47bb57ba7"
+          "crc32": ""
         }
       },
       "patch": {
         "url": "https://hylianmodding.com/mods/voyager_of_time/downloads/Voyager of Time.zip",
-        "filename": "The Legend of Zelda - Voyager of Time.xdelta",
+        "filename": "Voyager of Time.zip",
         "size": 6244082,
         "checksums": {
           "crc32": "31f28588",
           "md5": "94090e39643648fd83fea605ab3f3cc6"
         }
       },
+      "coverImageUrl": "https://hylianmodding.com/mods/voyager_of_time/screenshots/thumbnail.png",
       "tags": [
-        "story",
-        "new-content"
+        "mod",
+        "complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/voyager_of_time/screenshots/thumbnail.png"
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/voyager_of_time/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/voyager_of_time/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/voyager_of_time/screenshots/screenshot_2.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2013-1-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/voyager_of_time/downloads/Voyager of Time.zip",
+          "filename": "Voyager of Time.zip",
+          "size": 6244082,
+          "checksums": {
+            "crc32": "31f28588",
+            "md5": "94090e39643648fd83fea605ab3f3cc6"
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/voyager_of_time/mod.json",
+        "managed": true
+      }
     },
     {
       "id": "hero_of_law",
       "name": "Hero of Law",
-      "description": "A courtroom-drama Ocarina of Time hack by Newer Team. Link becomes a defense attorney in Hyrule, cross-examining witnesses and presenting evidence across a multi-chapter mystery. Requires the Expansion Pak. Includes an in-game English/French language selector.",
+      "description": "Hero of Law is a crossover mod for The Legend of Zelda: Ocarina of Time that puts Link into the shoes of a defence attorney!",
       "author": "Newer Team",
       "version": "1.0",
       "baseRom": {
@@ -658,14 +1022,4209 @@
         }
       },
       "tags": [
-        "story",
-        "new-content"
+        "mod",
+        "complete"
       ],
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/hero_of_law/screenshots/thumbnail.png"
+      "coverImageUrl": "https://hylianmodding.com/mods/hero_of_law/screenshots/thumbnail.png",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=VOdY_7dKNSU",
+        "https://hylianmodding.com/mods/hero_of_law/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/hero_of_law/screenshots/screenshot_2.png",
+        "https://hylianmodding.com/mods/hero_of_law/screenshots/screenshot_3.png",
+        "https://hylianmodding.com/mods/hero_of_law/screenshots/screenshot_4.png",
+        "https://hylianmodding.com/mods/hero_of_law/screenshots/screenshot_5.png"
+      ],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2025-5-28",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/hero_of_law/mod.json",
+        "managed": false
+      }
+    },
+    {
+      "id": "3rd_quest",
+      "name": "3rd Quest",
+      "description": "The Legend of Zelda: 3rd Quest (actually just called Project 3rd Quest) was a rom hack project of  The Legend of Zelda: Ocarina of Time.\n\nIt was an attempt to make a sort of sequel of Zelda Ocarina of Time and Majora's Mask, with new maps, dungeons and story.\n\nProject 3rd Quest is an ongoing WIP OoT mod. Its goal is to modify and add lots of content (such as a new storyline, an entirely new overworld, new dungeons, new characters and even new items!) to the engine of Ocarina of Time. More trailers and even more screenshots are planned to be released soon, so stay tuned!",
+      "author": "CDi-Fails, Evan20K, Ideka, Jhreamer, SanguinettiMods, Spire",
+      "version": "2015-1-01",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/3rd_quest/downloads/3rdQuest0.5.3.bps",
+        "filename": "3rdQuest0.5.3.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/3rd_quest/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/3rd_quest/screenshots/screenshot1.png",
+        "https://hylianmodding.com/mods/3rd_quest/screenshots/screenshot2.png",
+        "https://hylianmodding.com/mods/3rd_quest/screenshots/screenshot3.png"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2015-1-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/3rd_quest/downloads/3rdQuest0.5.3.bps",
+          "filename": "3rdQuest0.5.3.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/3rd_quest/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "a-link-between-rooms",
+      "name": "A Link Between Rooms",
+      "description": "",
+      "author": "FidgetBear",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/a-link-between-rooms/fidgetbear_a-link-between-rooms1.1.bps",
+        "filename": "fidgetbear_a-link-between-rooms1.1.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/a-link-between-rooms/a-link-between-rooms.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/a-link-between-rooms/fidgetbear_a-link-between-rooms1.1.bps",
+          "filename": "fidgetbear_a-link-between-rooms1.1.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/a-link-between-rooms/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "abandoned_archives",
+      "name": "Abandoned Archives",
+      "description": "Abandoned Archives is an unfinished ROM hack created by Rankaisija including a boss fight.",
+      "author": "Rankaisija",
+      "version": "2019-6-24",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/mods/abandoned_archives/screenshots/thumbnail.jpg",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/abandoned_archives/screenshots/screenshot1.jpg"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2019-6-24",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://hylianmodding.com/mods/abandoned_archives/downloads/OoT ST AA Latest.7z"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/abandoned_archives/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "barjacks_merda",
+      "name": "Barjack's Merda",
+      "description": "",
+      "author": "Barjack",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/hm-jam-1/barjacks_merda/BarjacksMerda.bps",
+        "filename": "BarjacksMerda.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/hm-jam-1/barjacks_merda/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/hm-jam-1/barjacks_merda/BarjacksMerda.bps",
+          "filename": "BarjacksMerda.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "hm-jam-1",
+        "modUrl": "https://hylianmodding.com/competitions/hm-jam-1/barjacks_merda/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "bedtime-story",
+      "name": "Bedtime Story",
+      "description": "",
+      "author": "Pontius Stone",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/bedtime-story/pontius-stone_bedtime-story.bps",
+        "filename": "pontius-stone_bedtime-story.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/bedtime-story/bedtime-story.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/bedtime-story/pontius-stone_bedtime-story.bps",
+          "filename": "pontius-stone_bedtime-story.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/bedtime-story/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "burger-quest",
+      "name": "Burger Quest",
+      "description": "",
+      "author": "skip",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/burger-quest/burger_quest_final_final_maybe.bps",
+        "filename": "burger_quest_final_final_maybe.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/burger-quest/burger-quest.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/burger-quest/burger_quest_final_final_maybe.bps",
+          "filename": "burger_quest_final_final_maybe.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/burger-quest/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "conspiracy",
+      "name": "Conspiracy",
+      "description": "",
+      "author": "T_nytro_T",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/conspiracy/t-nytro-t_conspiracy.bps",
+        "filename": "t-nytro-t_conspiracy.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/conspiracy/conspiracy.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/conspiracy/t-nytro-t_conspiracy.bps",
+          "filename": "t-nytro-t_conspiracy.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/conspiracy/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "corruptions-embrace",
+      "name": "Corruption's Embrace",
+      "description": "",
+      "author": "Skiirote",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2024-horror/corruptions-embrace/corruptions-embrace-patch-0.0.9.bps",
+        "filename": "corruptions-embrace-patch-0.0.9.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/corruptions-embrace/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2024-horror/corruptions-embrace/corruptions-embrace-patch-0.0.9.bps",
+          "filename": "corruptions-embrace-patch-0.0.9.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2024-horror",
+        "modUrl": "https://hylianmodding.com/competitions/2024-horror/corruptions-embrace/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "cosmic-goddess",
+      "name": "Cosmic Goddess",
+      "description": "",
+      "author": "Aria Hiro 64",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/cosmic-goddess/aria-hiro-64_cosmic-goddess-fixed.bps",
+        "filename": "aria-hiro-64_cosmic-goddess-fixed.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/cosmic-goddess/cosmic-goddess.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/cosmic-goddess/aria-hiro-64_cosmic-goddess-fixed.bps",
+          "filename": "aria-hiro-64_cosmic-goddess-fixed.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/cosmic-goddess/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "crystal-clocks",
+      "name": "Crystal Clocks",
+      "description": "",
+      "author": "SuperZambezi",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/crystal-clocks/superzambezi_crystal-clocks.bps",
+        "filename": "superzambezi_crystal-clocks.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/crystal-clocks/crystal-clocks.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/crystal-clocks/superzambezi_crystal-clocks.bps",
+          "filename": "superzambezi_crystal-clocks.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/crystal-clocks/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "curse-of-moonlight",
+      "name": "Curse of Moonlight",
+      "description": "",
+      "author": "Sunset Tides Interactive, Trevor Belmondo, Java Rooster, Necko Necko, Woon",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2024-horror/curse-of-moonlight/CurseOfMoonlight_v1.1.1.bps",
+        "filename": "CurseOfMoonlight_v1.1.1.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/curse-of-moonlight/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2024-horror/curse-of-moonlight/CurseOfMoonlight_v1.1.1.bps",
+          "filename": "CurseOfMoonlight_v1.1.1.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2024-horror",
+        "modUrl": "https://hylianmodding.com/competitions/2024-horror/curse-of-moonlight/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "dampes-quest",
+      "name": "Dampe's Quest",
+      "description": "",
+      "author": "Delvian, Picasso",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2024-horror/dampes-quest/Dampes_Quest.bps",
+        "filename": "Dampes_Quest.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/dampes-quest/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2024-horror/dampes-quest/Dampes_Quest.bps",
+          "filename": "Dampes_Quest.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2024-horror",
+        "modUrl": "https://hylianmodding.com/competitions/2024-horror/dampes-quest/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "dampes-hut",
+      "name": "Dampé's Hut",
+      "description": "",
+      "author": "Dragorn421, Tharo, maia090, rankaisija, sklitte22",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/dampes-hut/dragorn421_dampes-hut.bps",
+        "filename": "dragorn421_dampes-hut.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/dampes-hut/dampes-hut.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/dampes-hut/dragorn421_dampes-hut.bps",
+          "filename": "dragorn421_dampes-hut.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/dampes-hut/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "demon's_quest",
+      "name": "Demon's Quest",
+      "description": "Ocarina of Time: Demon's Quest is a gameplay mod that aims to make the game more challenging to the experienced player.\n\nFeatures include:\n\nNew enemy attacks\n\nTrial of Courage: A Savage Labyrinth-esque gauntlet of enemies required to obtain Double Defense.\n\nRPG style leveling: Strength, intelligence, endurance, and luck will bolster your stats in combat.\n\nHero Mode: Challenge yourself in this mode where damage is tripled and drained heart containers can no longer be recovered. Ever. Try not to lose them all.\n\nShield Durability: Consider dodging. Shields can be re-bought at a shop.\n\nPerfect Block: Don't want to lose stamina? Don't want to lose durability? Don't want to take damage? Now you can have it all.\n\nStamina: Every combat action you take drains stamina. No longer can you mindlessly swing your sword about and win.\n\nLife Drain: Upon death, a heart container is drained from your life. Consult the Great Fairies for aid.\n\nDouble Damage: Those Deku Babas aren't playing anymore.\n\nPotions: Drinking a potion no longer pauses the game.",
+      "author": "thinedave and Aegiker",
+      "version": "2025-5-01",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/mods/demon's_quest/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/demon's_quest/screenshots/thumbnail.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2025-5-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "github",
+        "repoUrl": "https://github.com/thinedave/ocarina-demonsquest/releases/"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/demon's_quest/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "dungeon_rush",
+      "name": "Dungeon Rush",
+      "description": "The mod focuses exclusively on dungeons, without the need to explore the outside world. The main goal is to complete the dungeons as quickly as possible, making it a popular choice among players who enjoy speedrunning.",
+      "author": "mzxrules",
+      "version": "2021-1-01",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/dungeon_rush/downloads/LoZOoT-DungeonRush.zip",
+        "filename": "LoZOoT-DungeonRush.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/dungeon_rush/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/dungeon_rush/screenshots/thumbnail.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2021-1-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/dungeon_rush/downloads/LoZOoT-DungeonRush.zip",
+          "filename": "LoZOoT-DungeonRush.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/dungeon_rush/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "eagle_dungeon",
+      "name": "Eagle Dungeon",
+      "description": "This is more of a short tech demo than anything, and not something I’d make into a full mod. I enjoyed the process for the most part, but there are some limits of OoT’s engine that make this kind of thing not that great in some regards. OoT was also never really meant for fully top down areas. The biggest limit was the amount of cameras per scene used for room to room. I do not know if, or how this can be expanded or changed. Before you play, keep this in mind:\n\nThis is mostly finished, and currently only works with MQ Debug, BUT there is no boss. I’d like to support 1.0, but dunno how yet.\n\n-Other than that, it is effectively finished. -If you die, save and reset, cause you might get death crash. -I had to use flame circles since iron bar doors permanently mess up the camera. -If you exit the boss’ room you will get a weird camera glitch, but it doesn’t effect anything and reverts quickly. Once finished, you won’t be able to leave the boss room anyway so it won’t matter. -The hack is basically done/ over once you get to the boss room (no boss yet).",
+      "author": "Anthus",
+      "version": "2020-1-01",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/eagle_dungeon/downloads/EagleDungeonBPS.bps",
+        "filename": "EagleDungeonBPS.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/eagle_dungeon/screenshots/thumbnail.jpg",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/eagle_dungeon/screenshots/thumbnail.jpg"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2020-1-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/eagle_dungeon/downloads/EagleDungeonBPS.bps",
+          "filename": "EagleDungeonBPS.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/eagle_dungeon/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "escape-eventide",
+      "name": "Escape Eventide",
+      "description": "",
+      "author": "Polish_Salad, Dingledorf",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/escape-eventide/polish-salad_escape-eventide.bps",
+        "filename": "polish-salad_escape-eventide.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/escape-eventide/escape-eventide.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/escape-eventide/polish-salad_escape-eventide.bps",
+          "filename": "polish-salad_escape-eventide.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/escape-eventide/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "escape-from-the-facility",
+      "name": "Escape from the Facility",
+      "description": "",
+      "author": "CDi-Fails",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/escape-from-the-facility/cdi-fails_escape-from-the-facility-1.5.bps",
+        "filename": "cdi-fails_escape-from-the-facility-1.5.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/escape-from-the-facility/escape-from-the-facility.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/escape-from-the-facility/cdi-fails_escape-from-the-facility-1.5.bps",
+          "filename": "cdi-fails_escape-from-the-facility-1.5.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/escape-from-the-facility/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "escape-room",
+      "name": "Escape Room",
+      "description": "",
+      "author": "jerm",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/escape-room/jerm_escape-room.bps",
+        "filename": "jerm_escape-room.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/escape-room/escape-room.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/escape-room/jerm_escape-room.bps",
+          "filename": "jerm_escape-room.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/escape-room/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "escaping-souls",
+      "name": "Escaping Souls",
+      "description": "",
+      "author": "Picasso",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/escaping-souls/picasso_escaping-souls.bps",
+        "filename": "picasso_escaping-souls.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/escaping-souls/escaping-souls.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/escaping-souls/picasso_escaping-souls.bps",
+          "filename": "picasso_escaping-souls.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/escaping-souls/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "fortress-of-agony",
+      "name": "Fortress of Agony",
+      "description": "",
+      "author": "hadahlia",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/fortress-of-agony/hadahlia_fortress-of-agony.bps",
+        "filename": "hadahlia_fortress-of-agony.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/fortress-of-agony/fortress-of-agony.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/fortress-of-agony/hadahlia_fortress-of-agony.bps",
+          "filename": "hadahlia_fortress-of-agony.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/fortress-of-agony/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "four_swords_arena_editon",
+      "name": "Four Swords Arena Editon",
+      "description": "This mod allows you to play by yourself or up to 4 players as you play through a few small dungeons in a 2D-perspective.\n\nPatches against OoT 1.0 USA .z64",
+      "author": "Psi-Hate",
+      "version": "2016-6-01",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/four_swords_arena_editon/downloads/zelda64-four-swords-arena-edition-fixed.bps",
+        "filename": "zelda64-four-swords-arena-edition-fixed.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/four_swords_arena_editon/screenshots/thumbnail.jpg",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://youtu.be/FDdjPfhYrBM?si=_v6Sh5fR4_wbfNFy"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2016-6-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/four_swords_arena_editon/downloads/zelda64-four-swords-arena-edition-fixed.bps",
+          "filename": "zelda64-four-swords-arena-edition-fixed.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/four_swords_arena_editon/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "ganons-ressurection",
+      "name": "Ganon's Resurrection",
+      "description": "",
+      "author": "Nokaubure",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/ganons-ressurection/nokaubure_ganons-ressurection-1.3.bps",
+        "filename": "nokaubure_ganons-ressurection-1.3.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/ganons-ressurection/ganons-ressurection.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/ganons-ressurection/nokaubure_ganons-ressurection-1.3.bps",
+          "filename": "nokaubure_ganons-ressurection-1.3.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/ganons-ressurection/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "halflight_shrine",
+      "name": "Halflight Shrine",
+      "description": "",
+      "author": "PlushimaTitania",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/hm-jam-1/halflight_shrine/halflightshrine.bps",
+        "filename": "halflightshrine.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/hm-jam-1/halflight_shrine/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/hm-jam-1/halflight_shrine/halflightshrine.bps",
+          "filename": "halflightshrine.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "hm-jam-1",
+        "modUrl": "https://hylianmodding.com/competitions/hm-jam-1/halflight_shrine/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "hero_of_hyrule",
+      "name": "Hero of Hyrule",
+      "description": "Hero of Hyrule is a ROM hack created by ShakemBeckford.\n\n",
+      "author": "ShakemBeckford",
+      "version": "2015-4-3",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/mods/hero_of_hyrule/screenshots/screenshot1.png",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/hero_of_hyrule/screenshots/screenshot1.png"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2015-4-3",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://hylianmodding.com/mods/hero_of_hyrule/downloads/HoH_Demo_v1.rar"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/hero_of_hyrule/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "horrors-of-arcadia",
+      "name": "Horrors of Arcadia",
+      "description": "Only Compatable with PJ64 3.0.1",
+      "author": "xRiffz, Nyxx",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2024-horror/horrors-of-arcadia/Arcadia.bps",
+        "filename": "Arcadia.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/horrors-of-arcadia/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2024-horror/horrors-of-arcadia/Arcadia.bps",
+          "filename": "Arcadia.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2024-horror",
+        "modUrl": "https://hylianmodding.com/competitions/2024-horror/horrors-of-arcadia/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "hylian_modding_oot_decomp_actor_pack",
+      "name": "Hylian Modding OoT Decomp Actor Pack",
+      "description": "This is a custom actor pack intended for use with the [Ocarina of Time decompilation project by ZeldaRET.](https://github.com/zeldaret/oot)\n\nIn this pack, you'll find the following custom actors:\n- Scalable, rotatable fans\n- Floor spikes with various modes\n- Hammer pegs\n- Red/blue platforms\n- Configurable ladders\n- Metal crates\n- Configurable floating platforms\n- Wall pull switch\n- Rat enemy\n- Pols Voice enemy\n- Wizzrobe enemy\n- Zol enemy\n\nYou can find notes for each of these actor inside their C source files located at src/overlays/actors/hm_pack/.\n[For setup instructions, please visit the official GitHub repository.](https://github.com/hylian-modding/hm-actor-pack#setting-up)",
+      "author": "CDi-Fails, kentonm, hiisuya, ZeeRoX, Aegiker",
+      "version": "2023-11-15",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/downloads/hm-actor-pack-main.zip",
+        "filename": "hm-actor-pack-main.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/screenshots/screenshot_2.png",
+        "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/screenshots/screenshot_3.png",
+        "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/screenshots/screenshot_4.png",
+        "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/screenshots/screenshot_5.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2023-11-15",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/downloads/hm-actor-pack-main.zip",
+          "filename": "hm-actor-pack-main.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/hylian_modding_oot_decomp_actor_pack/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "indigo_chapter_2",
+      "name": "Indigo: Chapter 2",
+      "description": "Indigo is an in-progress mod for Ocarina of Time that aims to be a full game replacement, with new items, enemies, bosses, maps, and story.  Play as the Hero of Time following the events of Majora's Mask in the child timeline! The story is set 27 years after the events of MM. There are currently two public demos. If you want to play Chapter 1, there is a link to it on the releases page. It's not as polished or fleshed out as Chapter 2, but there's still some unique content there for those interested!",
+      "author": "aegiker, CDi-Fails, Fig, hiisuya, kentonm, Nitro Carwash, Ostrealava02, shreedow, Tharo, TheEggoEffect",
+      "version": "2023-11-15",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/mods/indigo_chapter_2/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/indigo_chapter_2/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/indigo_chapter_2/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/indigo_chapter_2/screenshots/screenshot_2.png"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2023-11-15",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": "1697754485356",
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "github",
+        "repoUrl": "https://github.com/krm01/oot-indigo-mod/releases"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/indigo_chapter_2/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "lawn-mower-quest",
+      "name": "Lawn Mower Quest",
+      "description": "",
+      "author": "grundy0074",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2025-crossover/lawn-mower-quest/lawn-mower-quest.bps",
+        "filename": "lawn-mower-quest.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2025-crossover/lawn-mower-quest/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2025-crossover/lawn-mower-quest/lawn-mower-quest.bps",
+          "filename": "lawn-mower-quest.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2025-crossover",
+        "modUrl": "https://hylianmodding.com/competitions/2025-crossover/lawn-mower-quest/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "link-in-golden-sun",
+      "name": "Link in Golden Sun",
+      "description": "",
+      "author": "z64offline.jc",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2025-crossover/link-in-golden-sun/Link_In_GoldenSun.bps",
+        "filename": "Link_In_GoldenSun.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2025-crossover/link-in-golden-sun/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2025-crossover/link-in-golden-sun/Link_In_GoldenSun.bps",
+          "filename": "Link_In_GoldenSun.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2025-crossover",
+        "modUrl": "https://hylianmodding.com/competitions/2025-crossover/link-in-golden-sun/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "majora's_mask_masked_quest",
+      "name": "Majora's Mask Masked Quest",
+      "description": "This is the second phase of my ultimate version of the game with so many changes in the gameplay, altering many known places like; the pirate fortress, the moon, etc.\n\nFeatures:\n\nSome dungeons modified.\nA new map which replace the Lottery Shop named, “Town Museum”.\nLink and his forms have each individual colors.\nDifficulty increased.\nSun´s song restored.\nThe infamous Moon trial are not optional anymore, with some mask required, perfect for speedruns.\nThe 3 MASKS are required for advance to the next trial to gets into the Final room (Majora), the moon field also requires 2 important items in the game To climb towards where is the Majora masked moon child to accept the final challenge of the game, and talking about of moon children, 10 masks are mandatory for gives to the moon children that reminds me the Ganon trials in the Ganon´s Castle in OOT.\nBeta enemies are back.\nFew Sub Bosses are more harder to fight.\nSome aesthetic changes in stages so do remember to its 3DS counterpart.\nSome text are changed and are added for the items, songs and swords.\nThe transformation masks have special elemental powers in some attacks (ex. Goron Spikes have the ability to burn some enemies and the Fierce Deity Link is capable of kill enemies with his Sword Beam).\nThe Scarecrow´s song, the powder keg and the Elegy are useful.\nLink and his all forms can do manual jump, in 2 different modes, forward and stand jump,\nThe shield crouch stab is disabled.\nFD Link have the Adult Link´s size and can open lifting dungeon doors, and can be usable anywhere with no restrictions of any type, he finally can use regular items & weapons, but he can´t use the hookshot, bow and magic arrows.\nGoron Link have the walking speed to match with MM3D´s Goron Link walking speed.\nThe hookshot range is lightly extended.\nZora Link´s double cutters´ range is extended for long throw the fins.\nNew Prizes from Romani cows and the rupee wallets.\nThe normal wallet has a new digit.\nAnd new gossip stone hints.\nD-PAD can now be used to access all three transformation masks and the ocarina, allowing a total of seven items to be accessible at all times. Note that this means that the map is no longer possible to toggle off.\nWhen using the bow, magic arrows can be cycled in a similar fashion to Wind Waker’s magic arrows by setting one and pressing the C buttons + R\nnew custom enemies add some unique feels and challenging battles and with new obstacles.\nSome enemies´ desc. are restored.",
+      "author": "Garo-Mastah",
+      "version": "2021-01-02",
+      "baseRom": {
+        "name": "Majora's Mask",
+        "gameCode": "NSME",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/majora's_mask_masked_quest/downloads/MajoraMQ.zip",
+        "filename": "MajoraMQ.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/majora's_mask_masked_quest/screenshots/thumbnail.jpg",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/majora's_mask_masked_quest/screenshots/screenshot_0.jpg"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "MM",
+      "compatibility": "",
+      "lastUpdated": "2021-01-02",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/majora's_mask_masked_quest/downloads/MajoraMQ.zip",
+          "filename": "MajoraMQ.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/majora's_mask_masked_quest/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "majora's_mask_master_quest",
+      "name": "Majora's Mask Master Quest",
+      "description": "This mod was made by Deathbasket and it's very similar to Ocarina of Time's Master Quest. However, it goes a step beyond that and modifies more than just the dungeons. However, there are no custom maps. And don't expect it to be easy! It's not.",
+      "author": "DeathBasket",
+      "version": "2016-3-28",
+      "baseRom": {
+        "name": "Majora's Mask",
+        "gameCode": "NSME",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/majora's_mask_master_quest/downloads/LoZMM-MasterQuest.zip",
+        "filename": "LoZMM-MasterQuest.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/majora's_mask_master_quest/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/majora's_mask_master_quest/screenshots/screenshot_0.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "MM",
+      "compatibility": "",
+      "lastUpdated": "2016-3-28",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/majora's_mask_master_quest/downloads/LoZMM-MasterQuest.zip",
+          "filename": "LoZMM-MasterQuest.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/majora's_mask_master_quest/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "mm_transforms_oot",
+      "name": "Majora's Mask Transformation Masks in Ocarina of Time",
+      "description": "Patch to Ocarina of Time v1.0 (U)\nPlease report any bugs you find to me in my [Discord server](https://discord.com/invite/mSN9e5sKfq) and stay tuned for updates!\n",
+      "author": "aegiker",
+      "version": "2026-1-01",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/mm_transforms_oot/downloads/Transformation Masks in OoT v1.0.bps",
+        "filename": "Transformation Masks in OoT v1.0.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/mm_transforms_oot/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/mm_transforms_oot/screenshots/screenshot0.png",
+        "https://hylianmodding.com/mods/mm_transforms_oot/screenshots/screenshot1.png",
+        "https://hylianmodding.com/mods/mm_transforms_oot/screenshots/screenshot2.png",
+        "https://hylianmodding.com/mods/mm_transforms_oot/screenshots/screenshot3.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2026-1-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/mm_transforms_oot/downloads/Transformation Masks in OoT v1.0.bps",
+          "filename": "Transformation Masks in OoT v1.0.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/mm_transforms_oot/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "majora's_mask_chaos_edition",
+      "name": "Majora's Mask: Chaos Edition",
+      "description": "It's Majora's Mask, but the game gets in your way. Inspired by OoT: Chaos Mod, it brings some of its effects in and adds a bunch of unique ones.",
+      "author": "GabrielCNoble",
+      "version": "2025-9-18",
+      "baseRom": {
+        "name": "Majora's Mask",
+        "gameCode": "NSME",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/mods/majora's_mask_chaos_edition/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/majora's_mask_chaos_edition/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/majora's_mask_chaos_edition/screenshots/screenshot_2.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "MM",
+      "compatibility": "",
+      "lastUpdated": "2025-9-18",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": true
+      },
+      "downloadTarget": {
+        "type": "github",
+        "repoUrl": "https://github.com/GabrielCNoble/mm-chaos/releases"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/majora's_mask_chaos_edition/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "mechanical_shrine",
+      "name": "Mechanical Shrine",
+      "description": "",
+      "author": "arthurc",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/hm-jam-1/mechanical_shrine/Mechanical_Shrine_v1.3.bps",
+        "filename": "Mechanical_Shrine_v1.3.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/hm-jam-1/mechanical_shrine/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/hm-jam-1/mechanical_shrine/Mechanical_Shrine_v1.3.bps",
+          "filename": "Mechanical_Shrine_v1.3.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "hm-jam-1",
+        "modUrl": "https://hylianmodding.com/competitions/hm-jam-1/mechanical_shrine/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "minidungeon",
+      "name": "Mini Dungeon",
+      "description": "JeDDyDee: \"So this is my attempt at a map with transition actors. It's really more of a test (first time I've created a multi-room map/used transition actors) then anything so don't expect the puzzles to pose much difficulty. The dungeon is built for adult Link. The map replaces Room 117.\" \n\nPatches over ZELOOTMA.Z64",
+      "author": "JeDDyDee",
+      "version": "2018-12-08",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/mods/minidungeon/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "Complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/minidungeon/screenshots/thumbnail.png"
+      ],
+      "videos": [],
+      "completionStatus": "Complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2018-12-08",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://hylianmodding.com/mods/minidungeon/downloads/minidungeon.ppf"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/minidungeon/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "new_master_quest",
+      "name": "New Master Quest",
+      "description": "The storyline remains the same, but all dungeons have been changed. In short, it is “New Master Quest”. There are basically no changes to the map except for the dungeons, no graphical changes, and no text changes. Enjoy as pure MQ alternative.",
+      "author": "Euler",
+      "version": "2025-4-01",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/new_master_quest/downloads/OoT - New Master Quest.zip",
+        "filename": "OoT - New Master Quest.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/new_master_quest/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/new_master_quest/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/new_master_quest/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/new_master_quest/screenshots/screenshot_2.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2025-4-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/new_master_quest/downloads/OoT - New Master Quest.zip",
+          "filename": "OoT - New Master Quest.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/new_master_quest/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "nimpize_adventure",
+      "name": "Nimpize Adventure",
+      "description": "Nimpize Adventure is an overview of whats possible on Ocarina of Time.\n\nNimpize Adventure is an Ocarina of Time Romhack released on 21st November 2018 for the 20th anniversary of Ocarina of Time.\n\nIt offers a new journey to Link, while mixing custom and regular content.\n\nThe game is pretty difficult overall, it is intended to be beaten without glitches.",
+      "author": "Ostrealava02",
+      "version": "2021-3-16",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/nimpize_adventure/downloads/Nimpize Adventure.bps",
+        "filename": "Nimpize Adventure.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/nimpize_adventure/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=sotmg3OiVfI"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2021-3-16",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": true
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/nimpize_adventure/downloads/Nimpize Adventure.bps",
+          "filename": "Nimpize Adventure.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/nimpize_adventure/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "ocarina_of_time_gold_quest",
+      "name": "Ocarina of Time Gold Quest",
+      "description": "Ocarina of Time - Gold Quest is a ROM hack created by AndiiSyn.\n\nGold Quest is like an expanded Master Quest. Different dungeon & overworld layouts plus many other little gameplay changes.\n\nDesigned with the more experienced OOT player in mind & for those who like to complete 100% of the game. Like Master Quest, it’s the same story, although there are some text changes & cutscenes have generally been made shorter. Text speed has been increased. Dungeon Maps have all been updated for new chest locations with fast chest openings. The intro has been removed (you start in Link’s house).\n\nTested on N64 with an Everdrive. Requires 8mb expansion.\n\nPatches supplied for 1.0 & 1.2 ROMs.",
+      "author": "AndiiSyn",
+      "version": "2022-10-09",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/ocarina_of_time_gold_quest/downloads/Gold Quest Rev2 Patch.zip",
+        "filename": "Gold Quest Rev2 Patch.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/ocarina_of_time_gold_quest/screenshots/thumnail.webp",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/ocarina_of_time_gold_quest/screenshots/screenshot_0.jpg",
+        "https://hylianmodding.com/mods/ocarina_of_time_gold_quest/screenshots/screenshot_1.jpg",
+        "https://hylianmodding.com/mods/ocarina_of_time_gold_quest/screenshots/screenshot_2.jpg",
+        "https://hylianmodding.com/mods/ocarina_of_time_gold_quest/screenshots/screenshot_3.jpg"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2022-10-09",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/ocarina_of_time_gold_quest/downloads/Gold Quest Rev2 Patch.zip",
+          "filename": "Gold Quest Rev2 Patch.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/ocarina_of_time_gold_quest/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "oot_chaos_mod",
+      "name": "OoT: Chaos Mod",
+      "description": "It's OoT except chaos! 80 effects (for now) to spice up an OoT playthrough. Features customization options and different starting points to make your playthrough how you want!  Also supports twitch chat integration.",
+      "author": "Aegiker",
+      "version": "2023-11-09",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/oot_chaos_mod/downloads/OoT Chaos Release 1.0.zip",
+        "filename": "OoT Chaos Release 1.0.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/oot_chaos_mod/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/oot_chaos_mod/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/oot_chaos_mod/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/oot_chaos_mod/screenshots/screenshot_2.png",
+        "https://hylianmodding.com/mods/oot_chaos_mod/screenshots/screenshot_3.png",
+        "https://hylianmodding.com/mods/oot_chaos_mod/screenshots/screenshot_4.png",
+        "https://hylianmodding.com/mods/oot_chaos_mod/screenshots/screenshot_5.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2023-11-09",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/oot_chaos_mod/downloads/OoT Chaos Release 1.0.zip",
+          "filename": "OoT Chaos Release 1.0.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/oot_chaos_mod/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "outset_island",
+      "name": "Outset Island",
+      "description": "Mark Kurko - \"This is a Tech demo I made importing the Outset island model used in my Mod BK The Bear Waker, into OOT engine.\"",
+      "author": "Mark Kurko",
+      "version": "2020-10-28",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/mods/outset_island/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=06w-EaZvJWc",
+        "https://hylianmodding.com/mods/outset_island/screenshots/screenshot1.png",
+        "https://hylianmodding.com/mods/outset_island/screenshots/screenshot2.png",
+        "https://hylianmodding.com/mods/outset_island/screenshots/screenshot3.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2020-10-28",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://hylianmodding.com/mods/outset_island/downloads/Outset Island.rar"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/outset_island/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "pumkin_tower",
+      "name": "Pumkin Tower",
+      "description": "Navigate through a challenging tower with five floors of different terrain with lots of new and returning enemies, and make use of Link’s transformations with level design to complement their abilities. Prepare to feed the Hungry Pumkins and make use of all the clues found throughout the tower to make it out alive!\n\nMade in only 2 months for a Hylian Modding romhacking competition, this hack includes a large amount of Majora items, custom enemies, boss fights, items, and soundtrack. Comes with jokes!\n\nKnown compatibility: Retroarch, PJ64, Mupen\n\nDoes work on console if you are into that kind of thing…",
+      "author": "Chadlight, Corrhaid, Javarooster",
+      "version": "2024-7-30",
+      "baseRom": {
+        "name": "Majora's Mask",
+        "gameCode": "NSME",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/pumkin_tower/downloads/PumkinPatch1.1.1.bps",
+        "filename": "PumkinPatch1.1.1.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/pumkin_tower/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/pumkin_tower/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/pumkin_tower/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/pumkin_tower/screenshots/screenshot_2.png",
+        "https://hylianmodding.com/mods/pumkin_tower/screenshots/screenshot_3.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "MM",
+      "compatibility": "",
+      "lastUpdated": "2024-7-30",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/pumkin_tower/downloads/PumkinPatch1.1.1.bps",
+          "filename": "PumkinPatch1.1.1.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/pumkin_tower/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "reality_estate",
+      "name": "Reality Estate",
+      "description": "",
+      "author": "Jinnosuke, Corrhaid, Chadlight",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/hm-jam-1/reality_estate/RealityEstateV1.1.bps",
+        "filename": "RealityEstateV1.1.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/hm-jam-1/reality_estate/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/hm-jam-1/reality_estate/RealityEstateV1.1.bps",
+          "filename": "RealityEstateV1.1.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "hm-jam-1",
+        "modUrl": "https://hylianmodding.com/competitions/hm-jam-1/reality_estate/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "return_to_stone_tower",
+      "name": "Return To Stone Tower",
+      "description": "",
+      "author": "Nokaubure",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/hm-jam-1/return_to_stone_tower/ReturnToStoneTowerV1.3.bps",
+        "filename": "ReturnToStoneTowerV1.3.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/hm-jam-1/return_to_stone_tower/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/hm-jam-1/return_to_stone_tower/ReturnToStoneTowerV1.3.bps",
+          "filename": "ReturnToStoneTowerV1.3.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "hm-jam-1",
+        "modUrl": "https://hylianmodding.com/competitions/hm-jam-1/return_to_stone_tower/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "romhack-thing",
+      "name": "Romhack Thing",
+      "description": "",
+      "author": "aegiker",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/romhack-thing/aegiker_romhack_thingy_public_version.bps",
+        "filename": "aegiker_romhack_thingy_public_version.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/romhack-thing/romhack-thing.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/romhack-thing/aegiker_romhack_thingy_public_version.bps",
+          "filename": "aegiker_romhack_thingy_public_version.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/romhack-thing/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "silent_hill_in_ocarina_of_time",
+      "name": "Silent Hill in Ocarina of Time",
+      "description": "Silent Hill in Ocarina of Time is a ROM hack created by Akuma Kira.",
+      "author": "Akuma Kira",
+      "version": "2022-9-24",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/silent_hill_in_ocarina_of_time/downloads/SH_V7.bps",
+        "filename": "SH_V7.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/silent_hill_in_ocarina_of_time/screenshots/thumbnail.webp",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/silent_hill_in_ocarina_of_time/screenshots/screensho1.webp",
+        "https://hylianmodding.com/mods/silent_hill_in_ocarina_of_time/screenshots/screensho2.webp",
+        "https://hylianmodding.com/mods/silent_hill_in_ocarina_of_time/screenshots/screensho3.webp"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2022-9-24",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/silent_hill_in_ocarina_of_time/downloads/SH_V7.bps",
+          "filename": "SH_V7.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/silent_hill_in_ocarina_of_time/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "south-island-adventure",
+      "name": "South Island Adventure",
+      "description": "",
+      "author": "PlushimaTitania",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2025-crossover/south-island-adventure/southislandadventure-v1.bps",
+        "filename": "southislandadventure-v1.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2025-crossover/south-island-adventure/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2025-crossover/south-island-adventure/southislandadventure-v1.bps",
+          "filename": "southislandadventure-v1.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2025-crossover",
+        "modUrl": "https://hylianmodding.com/competitions/2025-crossover/south-island-adventure/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "spaceworld_97_experience",
+      "name": "Spaceworld 97 Experience",
+      "description": "This project aims to be a mostly accurate representation of the Nintendo Spaceworld 1997 demo of The Legend of Zelda: Ocarina of Time. Since this project aims to restore an experience that was originally a demo, it cannot be completed from start-to-finish like the final game. Instead, three gameplay “tours” featured in the original Spaceworld 1997 demo are available to choose from, each showcasing various unique flavors of gameplay.\n\n[The original repository with more info can be found here.](https://github.com/z64proto/sw97)",
+      "author": "Zel, Fig, Aegiker, MrCheeze, ZeeRoX, Porcino, Tharo, Xiartic, CDi-Fails, GlitterBerri, Lurondor, louist103, Rankaisija, MelonSpeedruns",
+      "version": "2023-11-15",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/mods/spaceworld_97_experience/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/spaceworld_97_experience/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/spaceworld_97_experience/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/spaceworld_97_experience/screenshots/screenshot_2.png",
+        "https://hylianmodding.com/mods/spaceworld_97_experience/screenshots/screenshot_3.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2023-11-15",
+      "changelog": [
+        {
+          "date": "2022-05-15",
+          "content": "Add feature that allows you to move the cursor on the world map in the pause menu\n    Add the beta skybox textures, and make the skybox always render a full cube, without the bottom missing\n    Update the prerender for outside the Temple of Time\n    Update the prerender for the Market\n    Added short tower variant of the stationary flamethrower for the Fire Temple\n    Added Navi hint target for Fire Temple hammer pillars, and use beta model\n    Switch between regular recoil and lower pitched wall recoil sfx when hitting colliders, and use lower pitched recoil sound for walls\n    Improve animation for unused sword pull animation when Link holds the shield\n    Make lightning in the intro cutscene behave the same way as in Spaceworld\n\n    Fix issue with low pitched heart sound\n    Fix issue with Jabu Jabu exit in Lake Hylia\n    Fix issue with the spin attack that allowed you to use a magic item and crash the game\n    Fix issue that caused Navi to change color in no-clip mode\n    Fix issue that caused the player to take damage after no-clip\n    Fix various issues with the hat physics in some scenarios\n    Fix issue with the Kokiri NPC that let you get around it when it is blocking the door to a house\n    Fix issue that caused the race Poe to dissapear\n    Fix issue with putting away the sword with the Hylian Shield\n    Fix incorrect medallion textures in pause menu\n    Fix turning midair after a walk slash\n    Fix various standalone shield issues\n    Text improvements\n    Fix pausing lag and/or crashing on emulators\n    Fix issue that sometimes made the game's audio mute itself in Hyrule Field\n    Changed Deku Baba behavior to make them vulnerable again after being hit by them or deflecting their attacks\n    Changed standalone shield collider to be only active when Link is not moving\n    Fixed crash from attacking the slime enemy with the bow\n    Fixed message display glitch that sometimes occured after collecting a full heart container\n    Fixed interpolation issue for longer backjump animation\n    Fixed missing waterbox in the Water Temple"
+        }
+      ],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://hylianmodding.com/mods/spaceworld_97_experience/downloads/sw97_r2.7z"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/spaceworld_97_experience/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "spider_mansion",
+      "name": "Spider Mansion",
+      "description": "Spider Mansion is a demo version of the now cancelled ''Sunken Tower'' romhack.",
+      "author": "Rankaisija",
+      "version": "2019-9-08",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/spider_mansion/downloads/Spider Mansion.bps",
+        "filename": "Spider Mansion.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/spider_mansion/screenshots/thumbnail.jpg",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/spider_mansion/screenshots/screenshot1.webp",
+        "https://hylianmodding.com/mods/spider_mansion/screenshots/screenshot1.webp"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2019-9-08",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/spider_mansion/downloads/Spider Mansion.bps",
+          "filename": "Spider Mansion.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/spider_mansion/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "spooky-murder-house",
+      "name": "Spooky Murder House",
+      "description": "",
+      "author": "Le Séducteur, T_nytro_T, Special Thanks: Yanis & Richie",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2024-horror/spooky-murder-house/spooky-murder-house.bps",
+        "filename": "spooky-murder-house.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/spooky-murder-house/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2024-horror/spooky-murder-house/spooky-murder-house.bps",
+          "filename": "spooky-murder-house.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2024-horror",
+        "modUrl": "https://hylianmodding.com/competitions/2024-horror/spooky-murder-house/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "star_fox_64_survival",
+      "name": "Star Fox 64 Survival",
+      "description": "A brand new Ocarina of Time ROM hack in a new setting: You play as Fox, where your Arwing has crash landed on an unknown planet. Do you have what it takes to survive?",
+      "author": "Zel & Kaze",
+      "version": "2020-11-28",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/star_fox_64_survival/downloads/StarFox64SurvivalV14.zip",
+        "filename": "StarFox64SurvivalV14.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/star_fox_64_survival/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=TzqfstBv71I",
+        "https://hylianmodding.com/mods/star_fox_64_survival/screenshots/screenshot1.png",
+        "https://hylianmodding.com/mods/star_fox_64_survival/screenshots/screenshot2.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2020-11-28",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/star_fox_64_survival/downloads/StarFox64SurvivalV14.zip",
+          "filename": "StarFox64SurvivalV14.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/star_fox_64_survival/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "super-mario-93-the-bowser-defeat",
+      "name": "Super Mario 93: The Bowser Defeat",
+      "description": "",
+      "author": "Barjack",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2025-crossover/super-mario-93-the-bowser-defeat/SuperMario93_TheBowserDefeat0.4.bps",
+        "filename": "SuperMario93_TheBowserDefeat0.4.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2025-crossover/super-mario-93-the-bowser-defeat/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2025-crossover/super-mario-93-the-bowser-defeat/SuperMario93_TheBowserDefeat0.4.bps",
+          "filename": "SuperMario93_TheBowserDefeat0.4.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2025-crossover",
+        "modUrl": "https://hylianmodding.com/competitions/2025-crossover/super-mario-93-the-bowser-defeat/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "the-cursed-mansion",
+      "name": "The Cursed Mansion",
+      "description": "",
+      "author": "Recardo",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2024-horror/the-cursed-mansion/the-cursed-mansion.bps",
+        "filename": "the-cursed-mansion.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/the-cursed-mansion/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2024-horror/the-cursed-mansion/the-cursed-mansion.bps",
+          "filename": "the-cursed-mansion.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2024-horror",
+        "modUrl": "https://hylianmodding.com/competitions/2024-horror/the-cursed-mansion/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "the_journey_of_angtherum",
+      "name": "The Journey of Angtherum",
+      "description": "A hack made by z64offline.jc, still in development",
+      "author": "z64offline.jc",
+      "version": "2023-12-31",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/the_journey_of_angtherum/downloads/The Journey Of Angtherum USA.v1.0.bps",
+        "filename": "The Journey Of Angtherum USA.v1.0.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/thumbnail.jpg",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=u8qx4KiPVSQ",
+        "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_1.jpg",
+        "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_2.jpg",
+        "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_3.jpg",
+        "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_4.jpg",
+        "https://hylianmodding.com/mods/the_journey_of_angtherum/screenshots/screenshot_5.jpg"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2023-12-31",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/the_journey_of_angtherum/downloads/The Journey Of Angtherum USA.v1.0.bps",
+          "filename": "The Journey Of Angtherum USA.v1.0.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/the_journey_of_angtherum/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "the-legend-of-the-wind",
+      "name": "The Legend of the Wind",
+      "description": "",
+      "author": "Sunset Tides Interactive",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/competitions/2025-crossover/the-legend-of-the-wind/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://hylianmodding.com/competitions/2025-crossover/the-legend-of-the-wind/the-legend-of-the-wind.7z"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2025-crossover",
+        "modUrl": "https://hylianmodding.com/competitions/2025-crossover/the-legend-of-the-wind/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "the-masca-festival",
+      "name": "The Masca Festival",
+      "description": "",
+      "author": "Asashi64",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2024-horror/the-masca-festival/The Masca Festival (Asahi64 - hotfix1c).bps",
+        "filename": "The Masca Festival (Asahi64 - hotfix1c).bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/the-masca-festival/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2024-horror/the-masca-festival/The Masca Festival (Asahi64 - hotfix1c).bps",
+          "filename": "The Masca Festival (Asahi64 - hotfix1c).bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2024-horror",
+        "modUrl": "https://hylianmodding.com/competitions/2024-horror/the-masca-festival/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "the-withering-mind",
+      "name": "The Withering Mind",
+      "description": "",
+      "author": "Asahi",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/the-withering-mind/The_Withering_Mind_-_1.2_Asahi.bps",
+        "filename": "The_Withering_Mind_-_1.2_Asahi.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/the-withering-mind/the-withering-mind.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/the-withering-mind/The_Withering_Mind_-_1.2_Asahi.bps",
+          "filename": "The_Withering_Mind_-_1.2_Asahi.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/the-withering-mind/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "the-worst-torture",
+      "name": "The Worst Torture",
+      "description": "",
+      "author": "ShuggyTheBuggy",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/the-worst-torture/the-worst-torture.bps",
+        "filename": "the-worst-torture.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/the-worst-torture/the-worst-torture.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/the-worst-torture/the-worst-torture.bps",
+          "filename": "the-worst-torture.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/the-worst-torture/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "trials-and-tribulations",
+      "name": "Trials and Tribulations",
+      "description": "",
+      "author": "The Sour OG",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2023-escape-room/trials-and-tribulations/the-sour-og_trials-and-tribulations.bps",
+        "filename": "the-sour-og_trials-and-tribulations.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/trials-and-tribulations/trials-and-tribulations.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2023-escape-room/trials-and-tribulations/the-sour-og_trials-and-tribulations.bps",
+          "filename": "the-sour-og_trials-and-tribulations.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2023-escape-room",
+        "modUrl": "https://hylianmodding.com/competitions/2023-escape-room/trials-and-tribulations/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "zelda_64_temple_96",
+      "name": "Zelda 64 Temple 96",
+      "description": "A project that aims to remake the Zelda 64 Alpha into a full game experience.",
+      "author": "N64man098",
+      "version": "2023-8-11",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": null,
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda_64_temple_96/screenshots/thumbnail.webp",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=Ja-neQaiycs"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2023-8-11",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://hylianmodding.com/mods/zelda_64_temple_96/downloads/Zelda 64 Temple 96.rar"
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/zelda_64_temple_96/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "zelda64_dawn_and_dusk",
+      "name": "Zelda 64: Dawn and Dusk",
+      "description": "Zelda 64 - Dawn & Dusk is an expansion disk for The Legend of Zelda - Ocarina of Time, created to demonstrate the game's 64DD support. Make your way from the peaceful forests and rivers of the Dawnside to the harrowing chasms and caves of the Duskside in a grand quest to defeat evil! Developed by Captain Seedy-Eye and ported to 64DD by LuigiBlood, this mod is not a recreation of Ura Zelda or Zelda Gaiden, but rather a fanmade disk expansion featuring a short new adventure to play through.",
+      "author": "Captain Seedy-Eye, LuigiBlood, PK-LOVE, BWXIX",
+      "version": "2023-10-14",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/downloads/Zelda64DawnDusk_v2_ROM_Patches.zip",
+        "filename": "Zelda64DawnDusk_v2_ROM_Patches.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/screenshots/thumbnail.jpg",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/screenshots/screenshot_0.jpg",
+        "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/screenshots/screenshot_1.jpg",
+        "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/screenshots/screenshot_2.jpg",
+        "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/screenshots/screenshot_3.jpg",
+        "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/screenshots/screenshot_4.jpg",
+        "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/screenshots/screenshot_5.jpg"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": "2023-10-14",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": "1697285062857",
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/downloads/Zelda64DawnDusk_v2_ROM_Patches.zip",
+          "filename": "Zelda64DawnDusk_v2_ROM_Patches.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/zelda64_dawn_and_dusk/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "zelda_nightmare",
+      "name": "Zelda Nightmare",
+      "description": "A new challenge awaits in the land of Hyrule. Nothing is as it seems. Items are placed in different locations and the whole world feels much darker. Can you overcome all the new dangers?",
+      "author": "Punk7890",
+      "version": "2008-01-01",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/zelda_nightmare/downloads/NIGHTMARE CONSOLE.bps",
+        "filename": "NIGHTMARE CONSOLE.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda_nightmare/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/zelda_nightmare/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/zelda_nightmare/screenshots/screenshot_1.png",
+        "https://hylianmodding.com/mods/zelda_nightmare/screenshots/screenshot_2.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2008-01-01",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/zelda_nightmare/downloads/NIGHTMARE CONSOLE.bps",
+          "filename": "NIGHTMARE CONSOLE.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/zelda_nightmare/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "zelda_puzzling",
+      "name": "Zelda Puzzling",
+      "description": "Traverse through six challenging trials in this mod made by DezZival! Made for Ocarina of Time 1.0, you are tasked with solving a variety of puzzles that will surely stump you. Will you triumph through these challenges, or will you become too puzzled to continue on?",
+      "author": "DezZival",
+      "version": "2019-9-02",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/zelda_puzzling/downloads/1.1.2 OOT PUZZLING.bps",
+        "filename": "1.1.2 OOT PUZZLING.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda_puzzling/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/zelda_puzzling/screenshots/screenshot_0.png",
+        "https://hylianmodding.com/mods/zelda_puzzling/screenshots/screenshot_1.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2019-9-02",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/zelda_puzzling/downloads/1.1.2 OOT PUZZLING.bps",
+          "filename": "1.1.2 OOT PUZZLING.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/zelda_puzzling/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "zelda_revival",
+      "name": "Zelda Revival",
+      "description": "A Majora's Mask romhack with a small world to explore, where link is revive from the dead for a ugly old man.",
+      "author": "Don Camilo",
+      "version": "2023-11-18",
+      "baseRom": {
+        "name": "Majora's Mask",
+        "gameCode": "NSME",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/zelda_revival/downloads/zelda_revival.zip",
+        "filename": "zelda_revival.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda_revival/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://www.youtube.com/watch?v=NOx3vP5GL54",
+        "https://hylianmodding.com/mods/zelda_revival/screenshots/screenshot_1.png",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbFEZi7mpu5Opnu17W1ZZsxvhXZtUHKmJGGA&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm6380VvnS2eiQeaBnZSQU_6LOCzhd6cnbkg&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqf-Fh39nygDj-LQmNtq0uJCQ-38f6hnowTA&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRa-CR6j5e1YtfW_vYmKGVS5FKl-YxWiSg_GQ&s"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "MM",
+      "compatibility": "",
+      "lastUpdated": "2023-11-18",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/zelda_revival/downloads/zelda_revival.zip",
+          "filename": "zelda_revival.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/zelda_revival/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "zelda_sacred_armor_project_izou",
+      "name": "Zelda Sacred Armor Project Izou",
+      "description": "Zelda Sacred Armor: Project Izou is a ROM hack created by Team Izou.\n\nThe demo contains up to the first dungeon, however the project is cancelled to this day.",
+      "author": "Zeldaboy14, Flotonic, Saguinetti/CrookedPoe, Aria Hiro, airikitascave, Ganondork123",
+      "version": "2013-12-08",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/downloads/Izou_Zelda_Patch_One.zip",
+        "filename": "Izou_Zelda_Patch_One.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/screenshots/thumbnail.jpg",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/screenshots/screenshot_0.jpg",
+        "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/screenshots/screenshot_1.jpg",
+        "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/screenshots/screenshot_2.jpg",
+        "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/screenshots/screenshot_3.jpg",
+        "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/screenshots/screenshot_4.jpg",
+        "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/screenshots/screenshot_5.jpg"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2013-12-08",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/downloads/Izou_Zelda_Patch_One.zip",
+          "filename": "Izou_Zelda_Patch_One.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/zelda_sacred_armor_project_izou/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "zelda's_birthday",
+      "name": "Zelda's Birthday",
+      "description": "It features all new actor arrangements, all new text and story line, 3 totally redesigned dungeons, an optional side quest, endings, and hidden goodies.",
+      "author": "jsa",
+      "version": "2008-12-30",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/zelda's_birthday/downloads/Zeldas_Birthday_Hardware_1.0.bps",
+        "filename": "Zeldas_Birthday_Hardware_1.0.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda's_birthday/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/zelda's_birthday/screenshots/screenshot_0.png"
+      ],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2008-12-30",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/zelda's_birthday/downloads/Zeldas_Birthday_Hardware_1.0.bps",
+          "filename": "Zeldas_Birthday_Hardware_1.0.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/zelda's_birthday/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "zelda's_eternal_youth",
+      "name": "Zelda's Eternal Youth",
+      "description": "The land of Hyrule has changed, and the inhabitants of the land seek a new golden goose: eternal life. The hero sleeps restlessly after Navi disappeared, desperately wanting her companionship once more. Things take a strange turn, and old land is changed. Reality or not, the Kokiri have left, and are aging with the Hylians, grown old from the death of the Deku Tree, and rapidly so. Zelda, Link, and the Kokiri are brought to a new land with the inbalance of Hyrule so unstable, Link's world can no longer maintain itself. There are many forces to be explained, but none of which are solely responsible for the collapse of the old land. The hero sets off into a new world, without choice, as if forced to, into a merged world of lands both known or unknown to the hero. Lands and creatures of old and new.\n\nZelda wants no more than to find eternal youth for the Kokiri and herself, for everyone is aging rapidly in the new world. The forces of time are against them. With a new quest for Link, the insanity slowly drives our hero into desperation to seek out the this impossible task, while at the same time searching for Navi. Reality slips from our hero, and no longer is the world as it should be, or as it seems. Not even the hero knows this path, and aimlessly searches for any clues that will help. Without a solution, everyone ages rapidly. The curse, the hero's sanity, and the world are all intertwined. Things deep within the hero's psyche will become reality within a world merged between realms of unknowns.",
+      "author": "Airikitascave",
+      "version": "2015-11-02",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/mods/zelda's_eternal_youth/downloads/zelda's_eternal_youth.zip",
+        "filename": "zelda's_eternal_youth.zip",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda's_eternal_youth/screenshots/thumbnail.png",
+      "tags": [
+        "mod",
+        "Demo"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [
+        "https://hylianmodding.com/mods/zelda's_eternal_youth/screenshots/screenshot_0.png"
+      ],
+      "videos": [],
+      "completionStatus": "Demo",
+      "supportedGames": "OoT",
+      "compatibility": "",
+      "lastUpdated": "2015-11-02",
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": 0,
+        "isUpdate": false
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/mods/zelda's_eternal_youth/downloads/zelda's_eternal_youth.zip",
+          "filename": "zelda's_eternal_youth.zip",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "mods",
+        "modUrl": "https://hylianmodding.com/mods/zelda's_eternal_youth/mod.json",
+        "managed": true
+      }
+    },
+    {
+      "id": "zeldarune",
+      "name": "Zeldarune",
+      "description": "",
+      "author": "Rovertronic",
+      "version": "1.0",
+      "baseRom": {
+        "name": "Ocarina of Time",
+        "gameCode": "CZLE",
+        "versionByte": -1,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "patch": {
+        "url": "https://hylianmodding.com/competitions/2025-crossover/zeldarune/ZELDARUNE-Titan-Bossfight.bps",
+        "filename": "ZELDARUNE-Titan-Bossfight.bps",
+        "size": 0,
+        "checksums": {
+          "crc32": ""
+        }
+      },
+      "coverImageUrl": "https://hylianmodding.com/competitions/2025-crossover/zeldarune/thumbnail.png",
+      "tags": [
+        "complete"
+      ],
+      "compatibleCores": [
+        "mupen64plus_next_gles3",
+        "parallel_n64"
+      ],
+      "storeId": "picks",
+      "sourceCatalogId": "picks",
+      "screenshots": [],
+      "videos": [],
+      "completionStatus": "complete",
+      "supportedGames": "OoT",
+      "compatibility": null,
+      "lastUpdated": null,
+      "changelog": [],
+      "sourceMetadata": {
+        "timestamp": null,
+        "isUpdate": null
+      },
+      "downloadTarget": {
+        "type": "direct",
+        "patch": {
+          "url": "https://hylianmodding.com/competitions/2025-crossover/zeldarune/ZELDARUNE-Titan-Bossfight.bps",
+          "filename": "ZELDARUNE-Titan-Bossfight.bps",
+          "size": 0,
+          "checksums": {
+            "crc32": ""
+          }
+        }
+      },
+      "importSource": {
+        "provider": "Hylian Modding",
+        "catalogId": "2025-crossover",
+        "modUrl": "https://hylianmodding.com/competitions/2025-crossover/zeldarune/mod.json",
+        "managed": true
+      }
     }
   ]
 }

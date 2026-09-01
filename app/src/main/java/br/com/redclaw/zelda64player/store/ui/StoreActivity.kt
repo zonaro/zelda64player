@@ -1,7 +1,6 @@
 package br.com.redclaw.zelda64player.store.ui
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
@@ -10,13 +9,11 @@ import android.text.TextWatcher
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.Spinner
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -30,7 +27,6 @@ import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.databinding.ActivityStoreBinding
 import br.com.redclaw.zelda64player.ocarina.OcarinaGame
-import br.com.redclaw.zelda64player.store.BuiltInStores
 import br.com.redclaw.zelda64player.store.DownloadPhase
 import br.com.redclaw.zelda64player.store.DownloadQueueManager
 import br.com.redclaw.zelda64player.store.ImportPatchInvalid
@@ -42,6 +38,7 @@ import br.com.redclaw.zelda64player.store.ImportRomDuplicate
 import br.com.redclaw.zelda64player.store.ImportRomInvalid
 import br.com.redclaw.zelda64player.store.ImportRomSuccess
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
+import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,9 +51,7 @@ class StoreActivity : AppCompatActivity() {
 
     private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
 
-    companion object {
-        private const val KEY_SELECTED_STORE = "selected_store"
-    }
+    private val backHelper = SwitchBackButton()
 
     /** Sidebar category rows, rebuilt once in [onCreate]. */
     private val categoryRows = mutableListOf<CategoryRowUi>()
@@ -100,9 +95,8 @@ class StoreActivity : AppCompatActivity() {
         SwitchImmersive.enterFullscreen(this)
 
         setSupportActionBar(binding.storeToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setTitle(R.string.store_title)
-        binding.storeToolbar.setNavigationOnClickListener { finish() }
+        backHelper.attach(this, binding.storeBack.root, onBack = { finish() })
 
         viewModel = ViewModelProvider(this)[StoreViewModel::class.java]
 
@@ -121,8 +115,6 @@ class StoreActivity : AppCompatActivity() {
 
         buildCategoryRows()
         binding.storeSearchIcon.setOnClickListener { toggleSearch() }
-
-        setupStoreSelector()
 
         binding.storePrev.setOnClickListener { viewModel.prevPage() }
         binding.storeNext.setOnClickListener { viewModel.nextPage() }
@@ -180,47 +172,14 @@ class StoreActivity : AppCompatActivity() {
         viewModel.refresh()
     }
 
-    /** Top-bar store selector: lists built-in stores, persists the last choice. */
-    private fun setupStoreSelector() {
-        val stores = viewModel.storeList
-        val adapter = ArrayAdapter(
-            this, R.layout.store_spinner_item, stores.map { storeDisplayName(it.id, it.displayName) }
-        )
-        adapter.setDropDownViewResource(R.layout.store_spinner_dropdown_item)
-        binding.storeSelector.adapter = adapter
-
-        // Restore the last-selected store (default Hylian Modding).
-        val prefs = storePrefs()
-        val saved = prefs.getString(KEY_SELECTED_STORE, BuiltInStores.STORE_HYLIANMODDING)
-            ?: BuiltInStores.STORE_HYLIANMODDING
-        val initialIndex = stores.indexOfFirst { it.id == saved }.coerceAtLeast(0)
-        binding.storeSelector.setSelection(initialIndex)
-        if (viewModel.selectedStoreId.value != saved) viewModel.setStore(saved)
-
-        binding.storeSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                val store = stores.getOrNull(pos) ?: return
-                prefs.edit().putString(KEY_SELECTED_STORE, store.id).apply()
-                viewModel.setStore(store.id)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) = Unit
-        }
-    }
-
-    private fun storePrefs(): SharedPreferences =
-        getSharedPreferences("zelda64_store", MODE_PRIVATE)
-
-    /** Localized display name for a store id (falls back to the definition name). */
-    private fun storeDisplayName(id: String, fallback: String): String = when (id) {
-        BuiltInStores.STORE_HYLIANMODDING -> getString(R.string.store_selector_hylian)
-        BuiltInStores.STORE_PICKS -> getString(R.string.store_selector_picks)
-        else -> fallback
-    }
-
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) SwitchImmersive.enterFullscreen(this)
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        backHelper.onTouch(ev)
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun renderPage(state: StorePageState) {

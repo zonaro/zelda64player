@@ -4,12 +4,16 @@
 # Gradle / Build
 *.iml
 .gradle/
+.gradle
 /local.properties
 /.idea
 /app/release
 **/build/
 /.externalNativeBuild
 /.cxx
+**/.cxx/
+.cxx/
+.kotlin/
 *.apk
 *.aab
 *.ap_

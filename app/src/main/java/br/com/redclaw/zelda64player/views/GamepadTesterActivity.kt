@@ -20,6 +20,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.databinding.ActivityGamepadTesterBinding
+import br.com.redclaw.zelda64player.input.InputDeviceUtils
+import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 
 /**
@@ -30,6 +32,7 @@ import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 class GamepadTesterActivity : AppCompatActivity(), InputManager.InputDeviceListener {
     private lateinit var binding: ActivityGamepadTesterBinding
     private lateinit var inputManager: InputManager
+    private val backHelper = SwitchBackButton()
     private var currentDeviceId: Int? = null
     private var connectionLossHandled = false
 
@@ -46,7 +49,7 @@ class GamepadTesterActivity : AppCompatActivity(), InputManager.InputDeviceListe
         binding = ActivityGamepadTesterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.testerBack.setOnClickListener { finish() }
+        backHelper.attach(this, binding.testerBack.root, onBack = { finish() })
         binding.testerPhysical.setOnClickListener { selectMode(GamepadTesterView.Mode.PHYSICAL) }
         binding.testerN64.setOnClickListener { selectMode(GamepadTesterView.Mode.N64) }
         selectMode(GamepadTesterView.Mode.PHYSICAL)
@@ -116,6 +119,11 @@ class GamepadTesterActivity : AppCompatActivity(), InputManager.InputDeviceListe
         if (deviceId == currentDeviceId && !hasCurrentController()) finishForDisconnect()
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        backHelper.onTouch(ev)
+        return super.dispatchTouchEvent(ev)
+    }
+
     private fun selectMode(mode: GamepadTesterView.Mode) {
         binding.testerPhysical.isSelected = mode == GamepadTesterView.Mode.PHYSICAL
         binding.testerN64.isSelected = mode == GamepadTesterView.Mode.N64
@@ -134,11 +142,16 @@ class GamepadTesterActivity : AppCompatActivity(), InputManager.InputDeviceListe
     }
 
     private fun isController(device: InputDevice?): Boolean {
-        return isPhysicalController(device)
+        return InputDeviceUtils.isPhysicalController(device)
     }
 
     private fun hasCurrentController(): Boolean =
-        currentDeviceId?.let(InputDevice::getDevice)?.let(::isPhysicalController) == true
+        currentDeviceId?.let(InputDevice::getDevice)?.let(InputDeviceUtils::isPhysicalController) == true
+
+    private fun findConnectedController(): InputDevice? = InputDevice.getDeviceIds()
+        .asSequence()
+        .mapNotNull(InputDevice::getDevice)
+        .firstOrNull(InputDeviceUtils::isPhysicalController)
 
     private fun finishForDisconnect() {
         if (connectionLossHandled || isFinishing) return
@@ -149,18 +162,6 @@ class GamepadTesterActivity : AppCompatActivity(), InputManager.InputDeviceListe
 
     companion object {
         /** Used by the Home dock to avoid opening an invalid tester screen. */
-        fun hasConnectedController(): Boolean = findConnectedController() != null
-
-        private fun findConnectedController(): InputDevice? = InputDevice.getDeviceIds()
-            .asSequence()
-            .mapNotNull(InputDevice::getDevice)
-            .firstOrNull(::isPhysicalController)
-
-        private fun isPhysicalController(device: InputDevice?): Boolean {
-            val sources = device?.sources ?: return false
-            val controllerSources =
-                InputDevice.SOURCE_GAMEPAD or InputDevice.SOURCE_JOYSTICK or InputDevice.SOURCE_DPAD
-            return (sources and controllerSources) != 0
-        }
+        fun hasConnectedController(): Boolean = InputDeviceUtils.hasConnectedController()
     }
 }

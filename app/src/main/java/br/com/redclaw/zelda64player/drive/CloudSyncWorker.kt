@@ -283,6 +283,6 @@ class CloudSyncWorker(
     /** Resolve a hack id to a display name for notifications / the resolver UI. */
     private fun resolveName(context: Context, hackId: String): String =
         runCatching {
-            InstalledLibrary.entries(context).firstOrNull { it.id == hackId }?.title
+            InstalledLibrary.entries(context).firstOrNull { it.romId == hackId }?.title
         }.getOrNull() ?: hackId
 }

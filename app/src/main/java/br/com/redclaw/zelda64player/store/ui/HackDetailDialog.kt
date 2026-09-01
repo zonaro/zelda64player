@@ -21,6 +21,7 @@ package br.com.redclaw.zelda64player.store.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -34,44 +35,47 @@ import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.data.model.Checksums
 import br.com.redclaw.zelda64player.data.model.HackEntry
 import br.com.redclaw.zelda64player.data.model.PatchRef
+import br.com.redclaw.zelda64player.databinding.DialogHackDetailBinding
+import br.com.redclaw.zelda64player.store.DownloadPhase
+import br.com.redclaw.zelda64player.store.DownloadQueueManager
 import br.com.redclaw.zelda64player.store.DownloadTarget
 import br.com.redclaw.zelda64player.store.GitHubPatchResolver
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.ui.switchui.BadgeBinder
-import br.com.redclaw.zelda64player.databinding.DialogHackDetailBinding
-import br.com.redclaw.zelda64player.store.DownloadPhase
+import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
 import coil.load
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 /**
- * Fullscreen hack-detail dialog (replaces the old bottom sheet). Shows the full
- * metadata, the required base ROM (and whether the user already has a matching
- * one), a screenshots gallery, supported-game/completion badges, an expandable
- * changelog, optional video links, and a download/update button whose behavior
- * is driven by [HackEntry.downloadTarget]:
+ * Fullscreen hack-detail dialog (replaces the old bottom sheet). Shows the full metadata, the
+ * required base ROM (and whether the user already has a matching one), a screenshots gallery,
+ * supported-game/completion badges, an expandable changelog, optional video links, and a
+ * download/update button whose behavior is driven by [HackEntry.downloadTarget]:
  *
- *  - [DownloadTarget.DirectPatch] (or a legacy [HackEntry.patch]) enqueues the
+ * - [DownloadTarget.DirectPatch] (or a legacy [HackEntry.patch]) enqueues the
+ * ```
  *    download + patch pipeline directly.
- *  - [DownloadTarget.GitHubRelease] resolves a concrete patch asset from the
+ * ```
+ * - [DownloadTarget.GitHubRelease] resolves a concrete patch asset from the
+ * ```
  *    GitHub Releases API at click time, then enqueues it; if resolution fails
  *    the source page is opened in a browser.
- *  - [DownloadTarget.ExternalLink] opens the source in a browser.
+ * ```
+ * - [DownloadTarget.ExternalLink] opens the source in a browser.
  *
- * The [StoreViewModel] is obtained from the host [StoreActivity] so it survives
- * configuration changes. The hack is passed as JSON in the arguments for the
- * same reason.
+ * The [StoreViewModel] is obtained from the host [StoreActivity] so it survives configuration
+ * changes. The hack is passed as JSON in the arguments for the same reason.
  */
 class HackDetailDialog : DialogFragment() {
     private var _binding: DialogHackDetailBinding? = null
-    private val binding get() = _binding!!
+    private val binding
+        get() = _binding!!
 
     private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
 
-    private val viewModel: StoreViewModel by lazy {
-        (requireActivity() as StoreActivity).viewModel
-    }
+    private val viewModel: StoreViewModel by lazy { (requireActivity() as StoreActivity).viewModel }
 
     private lateinit var hack: HackEntry
 
@@ -87,9 +91,9 @@ class HackDetailDialog : DialogFragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
         _binding = DialogHackDetailBinding.inflate(inflater, container, false)
         return binding.root
@@ -104,6 +108,10 @@ class HackDetailDialog : DialogFragment() {
             dismiss()
         }
         binding.detailDownload.setOnClickListener {
+            Log.d(
+                    "HackDetailDialog",
+                    "Download button clicked! pendingBrowserUrl=$pendingBrowserUrl, hack.id=${hack.id}"
+            )
             if (pendingBrowserUrl != null) {
                 openBrowser(pendingBrowserUrl!!)
             } else {
@@ -115,6 +123,11 @@ class HackDetailDialog : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
+        // The dialog uses windowIsFloating=false, so it owns its own Window.
+        // Re-enter sticky immersive on the dialog's window so the status/nav
+        // bars don't reappear (the activity's immersive mode doesn't carry over
+        // to a separate dialog window).
+        dialog?.window?.let { SwitchImmersive.enterFullscreen(it) }
         dialog?.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
                 sfx?.back()
@@ -140,28 +153,28 @@ class HackDetailDialog : DialogFragment() {
         }
         if (hack.compatibleCores.isNotEmpty()) {
             binding.detailCores.text =
-                getString(R.string.detail_cores, hack.compatibleCores.joinToString(", "))
+                    getString(R.string.detail_cores, hack.compatibleCores.joinToString(", "))
             binding.detailCores.visibility = View.VISIBLE
         }
 
-        binding.detailBaseInfo.text = getString(
-            R.string.detail_base_info,
-            hack.baseRom.name,
-            hack.baseRom.gameCode,
-            hack.baseRom.versionByte.toString()
-        )
+        binding.detailBaseInfo.text =
+                getString(
+                        R.string.detail_base_info,
+                        hack.baseRom.name,
+                        hack.baseRom.gameCode,
+                        hack.baseRom.versionByte.toString()
+                )
 
-        val matches = viewModel.baseRomMatches(hack.baseRom.checksums.crc32)
-        binding.detailBaseMatch.text = if (matches) {
-            getString(R.string.detail_base_match)
-        } else {
-            getString(R.string.detail_base_no_match)
-        }
+        val matches = viewModel.baseRomMatches(hack)
+        binding.detailBaseMatch.text =
+                if (matches) {
+                    getString(R.string.detail_base_match)
+                } else {
+                    getString(R.string.detail_base_no_match)
+                }
         binding.detailBaseMatch.setTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                if (matches) AccentManager.getAccentColor(requireContext()) else R.color.switch_text_secondary
-            )
+                if (matches) AccentManager.getAccentColor(requireContext())
+                else ContextCompat.getColor(requireContext(), R.color.switch_text_secondary)
         )
 
         if (hack.coverImageUrl != null) {
@@ -187,7 +200,7 @@ class HackDetailDialog : DialogFragment() {
         binding.detailScreenshotsLabel.visibility = View.VISIBLE
         binding.detailScreenshots.visibility = View.VISIBLE
         binding.detailScreenshots.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.detailScreenshots.adapter = ScreenshotAdapter(hack.screenshots)
     }
 
@@ -197,8 +210,8 @@ class HackDetailDialog : DialogFragment() {
             // Family icon badge (OoT / MM / unknown -> generic hack icon), matching the
             // Library tile styling. Replaces the old plain-text supported-game label.
             BadgeBinder.bindFamily(
-                binding.detailGameBadge,
-                BadgeBinder.familyFromSupportedGames(sg)
+                    binding.detailGameBadge,
+                    BadgeBinder.familyFromSupportedGames(sg)
             )
         } else {
             binding.detailGameBadge.visibility = View.GONE
@@ -218,12 +231,18 @@ class HackDetailDialog : DialogFragment() {
                 if (!entry.date.isNullOrBlank()) append("${entry.date}: ")
                 append(entry.content ?: "")
             }
-            val tv = android.widget.TextView(requireContext()).apply {
-                text = line
-                textSize = 13f
-                setTextColor(ContextCompat.getColor(requireContext(), R.color.color_on_surface_variant))
-                setPadding(0, 4, 0, 4)
-            }
+            val tv =
+                    android.widget.TextView(requireContext()).apply {
+                        text = line
+                        textSize = 13f
+                        setTextColor(
+                                ContextCompat.getColor(
+                                        requireContext(),
+                                        R.color.color_on_surface_variant
+                                )
+                        )
+                        setPadding(0, 4, 0, 4)
+                    }
             binding.detailChangelogContainer.addView(tv)
         }
     }
@@ -239,23 +258,25 @@ class HackDetailDialog : DialogFragment() {
         binding.detailVideosLabel.visibility = View.VISIBLE
         binding.detailVideosContainer.visibility = View.VISIBLE
         hack.videos.forEach { url ->
-            val tv = android.widget.TextView(requireContext()).apply {
-                text = url
-                textSize = 13f
-                setTextColor(ContextCompat.getColor(requireContext(), R.color.switch_accent))
-                setPadding(0, 4, 0, 4)
-                isClickable = true
-                isFocusable = true
-                setOnClickListener { openBrowser(url) }
-            }
+            val tv =
+                    android.widget.TextView(requireContext()).apply {
+                        text = url
+                        textSize = 13f
+                        setTextColor(
+                                ContextCompat.getColor(requireContext(), R.color.switch_accent)
+                        )
+                        setPadding(0, 4, 0, 4)
+                        isClickable = true
+                        isFocusable = true
+                        setOnClickListener { openBrowser(url) }
+                    }
             binding.detailVideosContainer.addView(tv)
         }
     }
 
     /**
-     * Shows a subtle "Installed as X (version Y)" note when [hack] is installed
-     * via a different store id (cross-catalog match) rather than its exact id.
-     * Hidden otherwise.
+     * Shows a subtle "Installed as X (version Y)" note when [hack] is installed via a different
+     * store id (cross-catalog match) rather than its exact id. Hidden otherwise.
      */
     private fun showInstalledAsOtherNote() {
         val other = viewModel.installedAsOther(hack)
@@ -263,11 +284,8 @@ class HackDetailDialog : DialogFragment() {
             binding.detailInstalledAsOther.visibility = View.GONE
             return
         }
-        binding.detailInstalledAsOther.text = getString(
-            R.string.store_note_installed_as_other,
-            other.first,
-            other.second
-        )
+        binding.detailInstalledAsOther.text =
+                getString(R.string.store_note_installed_as_other, other.first, other.second)
         binding.detailInstalledAsOther.visibility = View.VISIBLE
     }
 
@@ -280,7 +298,8 @@ class HackDetailDialog : DialogFragment() {
                 binding.detailDownload.isEnabled = true
             }
             is StoreStatus.Installed -> {
-                binding.detailDownload.text = getString(R.string.store_status_installed, status.version)
+                binding.detailDownload.text =
+                        getString(R.string.store_status_installed, status.version)
                 binding.detailDownload.isEnabled = false
             }
             is StoreStatus.UpdateAvailable -> {
@@ -291,6 +310,10 @@ class HackDetailDialog : DialogFragment() {
     }
 
     private fun initiateDownload() {
+        Log.d(
+                "HackDetailDialog",
+                "initiateDownload: downloadTarget=${hack.downloadTarget}, patch=${hack.patch}, hack.id=${hack.id}"
+        )
         sfx?.select()
         when (val target = hack.downloadTarget) {
             is DownloadTarget.DirectPatch -> {
@@ -317,12 +340,21 @@ class HackDetailDialog : DialogFragment() {
             val resolved = runCatching { GitHubPatchResolver().resolve(repoUrl) }.getOrNull()
             launch(Dispatchers.Main) {
                 if (resolved != null) {
-                    val filename = resolved.substringAfterLast('/').takeIf { it.isNotBlank() } ?: "patch.bps"
-                    val patch = PatchRef(
-                        url = resolved, filename = filename, size = 0,
-                        checksums = Checksums("", null, null)
-                    )
-                    val toEnqueue = hack.copy(patch = patch, downloadTarget = DownloadTarget.DirectPatch(patch))
+                    val filename =
+                            resolved.substringAfterLast('/').takeIf { it.isNotBlank() }
+                                    ?: "patch.bps"
+                    val patch =
+                            PatchRef(
+                                    url = resolved,
+                                    filename = filename,
+                                    size = 0,
+                                    checksums = Checksums("", null, null)
+                            )
+                    val toEnqueue =
+                            hack.copy(
+                                    patch = patch,
+                                    downloadTarget = DownloadTarget.DirectPatch(patch)
+                            )
                     viewModel.enqueue(toEnqueue)
                 } else {
                     pendingBrowserUrl = repoUrl
@@ -335,16 +367,25 @@ class HackDetailDialog : DialogFragment() {
 
     private fun openBrowser(url: String) {
         if (url.isBlank()) return
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val intent =
+                Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
         runCatching {
             startActivity(Intent.createChooser(intent, getString(R.string.detail_open_browser)))
         }
     }
 
     private fun observeQueue() {
-        viewModel.queueStateFor(hack.id).observe(viewLifecycleOwner) { ui ->
+        Log.d("HackDetailDialog", "observeQueue: setting up observer for hackId=${hack.id}")
+        // Observe the full queue list and filter by hackId, instead of using
+        // queue.map {} which can silently drop postValue updates from background threads.
+        DownloadQueueManager.queue.observe(viewLifecycleOwner) { list ->
+            val ui = list?.firstOrNull { it.hackId == hack.id }
+            Log.d(
+                    "HackDetailDialog",
+                    "observeQueue callback: hackId=${hack.id}, ui=$ui, phase=${ui?.phase}"
+            )
             if (ui == null) return@observe
             when (ui.phase) {
                 DownloadPhase.QUEUED, DownloadPhase.DOWNLOADING, DownloadPhase.PATCHING -> {
@@ -362,13 +403,14 @@ class HackDetailDialog : DialogFragment() {
                             binding.detailProgress.progress = ui.progressPercent
                             binding.detailProgressText.visibility = View.VISIBLE
                             binding.detailProgressText.text =
-                                getString(R.string.detail_installing, ui.progressPercent)
+                                    getString(R.string.detail_installing, ui.progressPercent)
                         }
                         else -> {
                             binding.detailProgress.isIndeterminate = false
                             binding.detailProgress.progress = 0
                             binding.detailProgressText.visibility = View.VISIBLE
-                            binding.detailProgressText.text = getString(R.string.store_status_queued)
+                            binding.detailProgressText.text =
+                                    getString(R.string.store_status_queued)
                         }
                     }
                 }

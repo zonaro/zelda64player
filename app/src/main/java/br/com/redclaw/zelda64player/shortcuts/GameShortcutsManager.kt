@@ -114,7 +114,7 @@ class GameShortcutsManager(
      * this keeps pins correct the moment one exists.
      */
     private suspend fun reconcilePinned(entries: List<HackLibraryEntry>) {
-        val installedIds = entries.map { it.id }.toSet()
+        val installedRomIds = entries.map { it.romId }.toSet()
         val pinned = runCatching {
             ShortcutManagerCompat.getShortcuts(context, ShortcutManagerCompat.FLAG_MATCH_PINNED)
         }.getOrDefault(emptyList())
@@ -125,7 +125,7 @@ class GameShortcutsManager(
         for (info in pinned) {
             val hackId = info.id.removePrefix(SHORTCUT_ID_PREFIX)
             if (hackId == info.id) continue // not one of ours
-            if (installedIds.contains(hackId)) toEnable.add(info)
+            if (installedRomIds.contains(hackId)) toEnable.add(info)
             else toDisable.add(info.id)
         }
         if (toDisable.isNotEmpty()) {
@@ -144,13 +144,13 @@ class GameShortcutsManager(
 
     /** Build a [ShortcutInfoCompat] for [entry] with the given [rank]. */
     private suspend fun buildShortcut(entry: HackLibraryEntry, rank: Int): ShortcutInfoCompat {
-        val uri = Uri.parse("$SHORTCUT_SCHEME${entry.id}")
+        val uri = Uri.parse("$SHORTCUT_SCHEME${entry.romId}")
         val intent = Intent(Intent.ACTION_VIEW, uri).apply {
             setClass(context, GameActivity::class.java)
-            putExtra(EXTRA_HACK_ID, entry.id)
+            putExtra(EXTRA_HACK_ID, entry.romId)
         }
         val longLabel = context.getString(R.string.shortcut_long_label_play, entry.title)
-        return ShortcutInfoCompat.Builder(context, "$SHORTCUT_ID_PREFIX${entry.id}")
+        return ShortcutInfoCompat.Builder(context, "$SHORTCUT_ID_PREFIX${entry.romId}")
             .setShortLabel(entry.title)
             .setLongLabel(longLabel)
             .setIcon(buildIcon(entry))
@@ -188,10 +188,10 @@ class GameShortcutsManager(
     }
 
     private suspend fun syncInternal(entries: List<HackLibraryEntry>) {
-        val rankedIds = playHistory.recencyRanked(entries.map { it.id })
-        val byId = entries.associateBy { it.id }
+        val rankedIds = playHistory.recencyRanked(entries.map { it.romId })
+        val byRomId = entries.associateBy { it.romId }
         val max = ShortcutManagerCompat.getMaxShortcutCountPerActivity(context).coerceAtLeast(0)
-        val shortcuts = rankedIds.mapNotNull { byId[it] }
+        val shortcuts = rankedIds.mapNotNull { byRomId[it] }
             .take(max)
             .mapIndexed { index, entry -> buildShortcut(entry, rank = index) }
         runCatching { ShortcutManagerCompat.setDynamicShortcuts(context, shortcuts) }

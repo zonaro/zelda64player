@@ -3,6 +3,7 @@ package br.com.redclaw.zelda64player.store.ui
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -11,6 +12,7 @@ import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.databinding.ActivityDownloadQueueBinding
 import br.com.redclaw.zelda64player.store.DownloadQueueManager
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
+import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 
 /**
  * Lists every queued / active / finished download for the Hack Store. Items can
@@ -22,6 +24,8 @@ class DownloadQueueActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDownloadQueueBinding
     private lateinit var adapter: DownloadQueueAdapter
 
+    private val backHelper = SwitchBackButton()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDownloadQueueBinding.inflate(layoutInflater)
@@ -29,9 +33,8 @@ class DownloadQueueActivity : AppCompatActivity() {
         SwitchImmersive.enterFullscreen(this)
 
         setSupportActionBar(binding.downloadQueueToolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setTitle(R.string.download_queue_title)
-        binding.downloadQueueToolbar.setNavigationOnClickListener { finish() }
+        backHelper.attach(this, binding.downloadQueueBack.root, onBack = { finish() })
 
         adapter = DownloadQueueAdapter(
             onCancel = { DownloadQueueManager.cancel(it) },
@@ -61,5 +64,10 @@ class DownloadQueueActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        backHelper.onTouch(ev)
+        return super.dispatchTouchEvent(ev)
     }
 }

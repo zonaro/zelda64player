@@ -1,85 +1,171 @@
 # Hack Catalog Format
 
-This document describes the JSON catalog format consumed by the **Zelda 64
-Player** Hack Store. A catalog is a single JSON document listing the available
-Zelda 64 hacks (BPS patches) and the base ROM each one requires.
+This document describes the JSON catalog consumed by the **Zelda 64 Player**
+Hack Store. The app has one built-in store, **Main Store**. Its catalog can
+contain curated records and public metadata imported from Hylian Modding; Hylian
+Modding is an attribution source, not a separately selectable store.
 
-The app fetches one or more catalog URLs (default:
-`https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/catalog.json`),
-merges them by hack id (later catalog wins), and caches the result on device
-with ETag/If-None-Match conditional GETs.
-
-See `catalog/catalog.json` for the shipped (empty) default catalog and
-`docs/catalog.example.json` for a fully-populated example with two hacks.
+The default catalog is
+`https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/catalog.json`.
+It is cached on device with ETag/If-None-Match conditional requests. See
+`catalog/catalog.json` for the live catalog and `docs/catalog.example.json` for
+a small author-maintained example.
 
 ---
 
 ## Top-level fields
 
-| Field            | Required | Type   | Description |
-|------------------|----------|--------|-------------|
-| `catalogVersion` | Yes      | int    | Schema version for future migrations. |
-| `lastUpdated`    | Yes      | string | ISO 8601 UTC timestamp (e.g. `2026-08-22T10:30:00Z`). |
-| `hacks`          | Yes      | array  | List of hack objects (see below). |
+| Field | Required | Type | Description |
+|---|---:|---|---|
+| `catalogVersion` | Yes | int | Schema version for compatible migrations. The shipped catalog is version 2, which permits `downloadTarget` as an alternative to a direct `patch`. |
+| `storeName` | Recommended | string | Human-readable name. The shipped catalog uses `Main Store`. |
+| `lastUpdated` | Yes | ISO 8601 UTC string | Catalog generation timestamp. |
+| `hacks` | Yes | array | Hack records described below. |
 
----
+## Required hack fields
 
-## Hack object
+Each record needs the following fields. It must provide either a direct
+`patch` or a `downloadTarget`; it may contain both when `downloadTarget.type`
+is `direct`.
 
-| Field                   | Required | Type            | Description |
-|-------------------------|----------|-----------------|-------------|
-| `id`                    | Yes      | string          | Unique slug. Used for cache paths and installed-state keys. |
-| `name`                  | Yes      | string          | Display name shown in the Store. |
-| `description`           | Yes      | string          | Long description shown in the detail sheet. |
-| `author`                | Yes      | string          | Hack author. |
-| `version`               | Yes      | string          | Patch version (semver recommended). Used to detect updates. |
-| `baseRom.name`          | Yes      | string          | Human-readable base ROM name. |
-| `baseRom.gameCode`      | Yes      | string (4 chars)| N64 header game code (e.g. `CZLE`, `NSME`). |
-| `baseRom.versionByte`   | Yes      | int             | Header version byte (0 = v1.0). |
-| `baseRom.checksums.crc32` | Yes    | string          | CRC32 of the normalized big-endian `.z64` base ROM. **Minimum required.** May be prefixed with `0x`. |
-| `baseRom.checksums.md5` | No       | string          | Optional extra validation. |
-| `baseRom.checksums.sha1`| No       | string          | Optional extra validation. |
-| `patch.url`             | Yes      | string (URL)    | Direct URL to the `.bps` file, or to a `.zip` containing it. |
-| `patch.filename`        | Yes      | string          | The `.bps` file name (the file itself, or the entry name inside the zip). |
-| `patch.size`            | Yes      | int (bytes)     | File size, used for download progress. |
-| `patch.checksums.crc32` | Yes      | string          | CRC32 of the downloaded patch file. **Minimum required.** May be prefixed with `0x`. |
-| `patch.checksums.md5`   | No       | string          | Optional extra validation (checked only when present). |
-| `coverImageUrl`         | No       | string (URL)    | Cover image. A placeholder is shown when absent. |
-| `tags`                  | No       | array of string| Free-form tags (future filtering). |
-| `compatibleCores`       | No       | array of string| Libretro core ids known to work. Valid values are `mupen64plus_next_gles3` and `parallel_n64` (the GLES2 core was removed). |
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Stable unique slug. Do not change after publication. |
+| `name` | string | Display name. |
+| `description` | string | Plain-text long description. |
+| `author` | string | One author or a comma-separated author list. |
+| `version` | string | Patch/release version or a source update date. |
+| `baseRom` | object | Required user-owned base ROM; see below. |
+| `patch` **or** `downloadTarget` | object | How the user obtains the patch; see below. |
 
-A malformed individual hack entry (missing required field, bad JSON) is skipped
-at parse time so a single bad entry cannot break the whole catalog.
+### `baseRom`
 
----
+| Field | Type | Description |
+|---|---|---|
+| `name` | string | Human-readable base-ROM name. |
+| `gameCode` | 4-char string | N64 header code, usually `CZLE` (OoT) or `NSME` (MM). |
+| `versionByte` | int | Header version. Use `-1` only when the public source does not disclose it. |
+| `checksums.crc32` | string | Normalized big-endian `.z64` CRC32. It may be empty only when the source does not publish it; the app then falls back to the matching imported game code. |
+| `checksums.md5` / `checksums.sha1` | string | Optional additional known checksums. |
 
-## Hosting guidance
+### Direct `patch`
 
-- **Catalog JSON**: host anywhere reachable over HTTPS. A GitHub raw URL
-  (e.g. `https://raw.githubusercontent.com/<user>/<repo>/main/catalog.json`) is
-  the simplest option and supports ETag conditional requests, which the app uses
-  to avoid re-downloading unchanged catalogs.
-- **Patch files**: distribute the `.bps` (or a `.zip` containing it) via GitHub
-  Releases or any static host. Use a stable, direct download URL in
-  `patch.url`. The `patch.filename` must match the actual `.bps` file name inside
-  the archive when distributing a `.zip`.
-- **Checksums**: compute the patch CRC32 (and optionally MD5) over the final
-  `.bps` bytes and put them in `patch.checksums`. The app validates the
-  downloaded file against these before installing. Base ROM checksums let the app
-  tell the user whether they own the correct ROM version.
-  - **Important BPS quirk**: every spec-compliant `.bps` file ends with its own
-    CRC32 embedded in the last 4 bytes, which forces the full-file CRC32 to the
-    constant `2144df1c` for ALL valid BPS files (mathematical property:
-    `crc32(msg || crc32le(msg)) == 0x2144DF1C`). The CRC32 field therefore acts
-    as a format-consistency check only — **always include `patch.checksums.md5`**
-    so downloads are uniquely fingerprinted.
-- **Covers**: any image URL works; square or 10:7 landscape art is recommended.
-  When omitted, the app shows a generated placeholder.
+Use this for a direct `.bps`, `.ips`, `.xdelta`, or `.zip` URL.
 
----
+| Field | Type | Description |
+|---|---|---|
+| `url` | HTTPS URL | Patch file or archive URL. |
+| `filename` | string | File name, or the expected patch entry inside a ZIP. |
+| `size` | int | Bytes when known. `0` means the public source did not publish a size. |
+| `checksums.crc32` | string | Patch CRC32 when known; an empty string means it was not published. |
+| `checksums.md5` / `checksums.sha1` | string | Optional stronger patch digests. |
 
-## Example
+For valid BPS files the full-file CRC32 is always `2144df1c`, so include MD5
+or SHA-1 whenever independently verified. Do not invent a checksum or size.
 
-See `docs/catalog.example.json` for a complete, ready-to-adapt document
-containing two hacks (an OoT hack distributed as a plain `.bps` and an MM hack
-distributed as a `.zip`).
+### `downloadTarget`
+
+Use `downloadTarget` as an alternative to `patch` when the public entry points
+to a release page or another non-direct source. This preserves a complete
+catalog record without pretending that checksum or size data is known.
+
+| Type | Required fields | Behavior in the app |
+|---|---|---|
+| `direct` | `patch` | Downloads through the normal patch pipeline. Its nested `patch` has the same shape as the direct `patch` above. |
+| `github` | `repoUrl` | Finds a compatible patch asset from GitHub Releases at install time. If resolution fails, opens the release page in the browser. |
+| `external` | `url` | Opens the publisher/source page in the browser so the user can obtain the file there. |
+
+```json
+"downloadTarget": {
+  "type": "github",
+  "repoUrl": "https://github.com/example/project/releases"
+}
+```
+
+An imported Hylian Modding direct link may therefore have `size: 0` and an
+empty checksum, while GitHub and external links have no `patch` object at all.
+The app still validates BPS/Xdelta source data during the explicit install
+flow; source metadata must never be represented as a verified download digest.
+
+## Rich metadata
+
+These optional fields make the detail screen, filters, and future catalog
+tools more useful. Preserve source values as public metadata and use absolute
+HTTPS URLs for remote media.
+
+| Field | Type | Description |
+|---|---|---|
+| `coverImageUrl` | URL | Primary cover/thumbnail image. |
+| `screenshots` | array of URLs | Ordered gallery images. Empty entries are omitted during import. |
+| `tags` | array of strings | Search/filter labels. The importer includes the source category and completion status. |
+| `supportedGames` | string | Source-declared game(s), for example `OoT` or `MM`. |
+| `completionStatus` | string | Source-declared status, such as demo, complete, or in progress. |
+| `compatibility` | string | Source compatibility notes; do not infer this from the base-ROM fallback. |
+| `lastUpdated` | ISO 8601 string | Source-record update time, distinct from the catalog's top-level timestamp. |
+| `changelog` | array of `{ "date", "content" }` | Source release/change notes. Either property may be absent. |
+| `compatibleCores` | array of strings | Known supported core ids: `mupen64plus_next_gles3` and/or `parallel_n64`. |
+| `videos` | array of URLs | Optional source video links. |
+| `ocarinaSongs` | array | Optional per-hack Auto-Ocarina extension. |
+| `retroAchievements` | object | Optional known RetroAchievements metadata. |
+
+### Provenance metadata
+
+Imported records retain enough provenance to refresh them safely and credit the
+source. These fields are metadata only; they never grant permission to
+redistribute a base ROM or patch.
+
+| Field | Type | Description |
+|---|---|---|
+| `importSource.provider` | string | Source name, for example `Hylian Modding`. |
+| `importSource.catalogId` | string | Imported source collection (`mods` or a competition id). |
+| `importSource.modUrl` | URL | Public `mod.json` URL used to obtain the record. |
+| `sourceMetadata.timestamp` | number or string | Source timestamp when supplied. |
+| `sourceMetadata.isUpdate` | boolean | Source update flag when supplied. |
+
+`storeId` and `sourceCatalogId` remain `picks` for the shipped single-store
+catalog. They are compatibility metadata, not a store selector.
+
+## Importing Hylian Modding metadata
+
+Run the importer from the repository root:
+
+```bash
+python3 tools/import_hylian_modding.py
+```
+
+It reads only public Hylian Modding indexes and per-mod `mod.json` documents:
+the main collection plus the 2025 Crossover, 2024 Horror, 2023 Escape Room,
+and HM Jam 1 collections. It does **not** download, cache, or commit patch
+files or base ROMs.
+
+Useful options:
+
+```bash
+python3 tools/import_hylian_modding.py --dry-run
+python3 tools/import_hylian_modding.py --catalog path/to/catalog.json
+python3 tools/import_hylian_modding.py --timeout 30 --workers 6
+```
+
+The importer updates prior Hylian Modding-derived records, preserves manually
+verified direct-patch size/checksums when the URL did not change, leaves curated
+Main Store records authoritative on an id collision, sorts new records,
+and refreshes the top-level `lastUpdated`. Review the resulting JSON and
+validate it before committing.
+
+## Author contribution guidance
+
+Submit a hack only through the repository's **Hack submission** issue form.
+Do not open a pull request to add a hack or edit `catalog/catalog.json` for a
+submission. Maintainers review the issue, validate the supplied metadata, and
+curate accepted records into the catalog.
+
+- Host catalogs and media over HTTPS.
+- Never add a base ROM, BIOS, proprietary asset, or a fabricated checksum.
+- Prefer stable direct patch URLs with independently verified size and MD5 or
+  SHA-1. Use `downloadTarget` instead when the publisher exposes only a release
+  page or external download page.
+- Keep descriptions and changelogs attribution-friendly, and retain
+  `importSource`/`sourceMetadata` on imported records.
+
+A malformed individual entry is skipped at parse time so one record cannot
+break the entire store.
