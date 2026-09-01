@@ -73,6 +73,7 @@
                 link.classList.add('active');
                 document.getElementById(`page-${page}`).classList.add('active');
                 if (page === 'collection') loadCollection();
+                if (page === 'streaming') loadStreaming();
                 if (page === 'settings') loadSettings();
             });
         });
@@ -95,6 +96,27 @@
                 }
             });
         });
+    }
+
+    async function loadStreaming() {
+        const grid = document.getElementById('streamingGrid');
+        if (!grid) return;
+        grid.innerHTML = `<div class="switch-loading">${t('loading')}</div>`;
+        try {
+            const data = await api('/collection');
+            const playable = data.games.filter(game => game.canPlay !== false && game.hasRom);
+            grid.innerHTML = playable.length ? playable.map(game => `
+                <article class="switch-card" tabindex="0">
+                    <div class="switch-card-cover"><img src="${escapeHtml(game.coverUrl || `/covers/${game.hackId}`)}" alt="${escapeHtml(game.name)}"></div>
+                    <div class="switch-card-info"><div class="switch-card-name">${escapeHtml(game.name)}</div>
+                    <button class="switch-btn switch-btn-play" data-stream-play="${escapeHtml(game.hackId)}">▶ ${t('play')}</button></div>
+                </article>`).join('') : `<div class="switch-empty"><p>${t('collection_empty')}</p></div>`;
+            grid.querySelectorAll('[data-stream-play]').forEach(button => button.addEventListener('click', () => {
+                const id = button.getAttribute('data-stream-play');
+                const game = playable.find(item => item.hackId === id);
+                if (game) openPlayer(id, game.name);
+            }));
+        } catch (e) { grid.innerHTML = `<div class="switch-loading">${t('error_loading')}</div>`; }
     }
 
     // ---- Collection (unified grid with Play button) ----
@@ -396,24 +418,93 @@
     }
 
     let webrtcPeer = null;
+    let activeEmulatorHackId = null;
+    let sramSyncTimer = null;
+    let emulatorScript = null;
 
     async function startEmulator(hackId) {
         const placeholder = document.getElementById('emulatorPlaceholder');
         const video = document.getElementById('emulatorVideo');
-        // If EmulatorJS bundle is present, it will handle rendering; otherwise
-        // we show the placeholder and try WebRTC streaming if available.
         showToast(t('player_starting') + ' ' + hackId, 'info');
-        // WebRTC streaming is optional — placeholder stays if not connected
-        // The native app's WebRtcStreamer will push frames via /ws/signaling
-        if (placeholder) placeholder.hidden = false;
         if (video) video.style.display = 'none';
+        if (placeholder) placeholder.hidden = false;
+
+        const game = document.getElementById('emulatorContainer');
+        if (!game) return;
+        // EmulatorJS names its persistent SRAM from EJS_gameName. A stable id per installed ROM
+        // prevents vanilla and patched hacks from ever sharing a browser save.
+        const safeId = `zelda64_${encodeURIComponent(hackId)}`;
+        activeEmulatorHackId = hackId;
+        game.querySelectorAll('.ejs_canvas_parent, .ejs_game, canvas').forEach(node => node.remove());
+
+        // These are the official EmulatorJS boot variables. The ROM endpoint streams the actual
+        // patched file selected by GameRomResolver; it is not a download/redirect endpoint.
+        window.EJS_player = '#emulatorContainer';
+        window.EJS_core = 'n64';
+        window.EJS_gameName = safeId;
+        window.EJS_gameID = safeId;
+        window.EJS_gameUrl = `/api/collection/${encodeURIComponent(hackId)}/play/rom`;
+        window.EJS_pathtodata = '/emulatorjs/data/';
+        window.EJS_startOnLoaded = true;
+        window.EJS_disableDatabases = false;
+        window.EJS_externalFiles = {
+            [`/home/web_user/retroarch/userdata/saves/${safeId}.srm`]:
+                `/api/collection/${encodeURIComponent(hackId)}/play/sram-file`
+        };
+        window.EJS_onGameStart = () => {
+            if (placeholder) placeholder.hidden = true;
+            startSramPersistence(hackId, safeId);
+        };
+        window.EJS_onSaveSave = () => persistSram(hackId, safeId);
+        window.EJS_ready = () => { if (placeholder) placeholder.hidden = true; };
+
+        // The loader must be recreated for every game because it reads its configuration once.
+        if (emulatorScript) emulatorScript.remove();
+        emulatorScript = document.createElement('script');
+        emulatorScript.src = '/emulatorjs/data/loader.js';
+        emulatorScript.async = true;
+        emulatorScript.onerror = () => {
+            showToast(t('player_unavailable'), 'error');
+            if (placeholder) placeholder.hidden = false;
+        };
+        document.head.appendChild(emulatorScript);
+    }
+
+    function startSramPersistence(hackId, gameName) {
+        if (sramSyncTimer) clearInterval(sramSyncTimer);
+        sramSyncTimer = setInterval(() => persistSram(hackId, gameName), 15000);
+    }
+
+    async function persistSram(hackId, gameName) {
+        if (activeEmulatorHackId !== hackId || !window.EJS_emulator?.gameManager?.FS) return;
+        try {
+            const fs = window.EJS_emulator.gameManager.FS;
+            const bytes = fs.readFile(`/home/web_user/retroarch/userdata/saves/${gameName}.srm`);
+            if (!bytes || bytes.length === 0) return;
+            let binary = '';
+            for (let i = 0; i < bytes.length; i += 0x8000) {
+                binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+            }
+            await api(`/collection/${encodeURIComponent(hackId)}/play/sram`, {
+                method: 'POST', body: JSON.stringify({ data: btoa(binary) })
+            });
+        } catch (_) {
+            // A core may not have created SRAM yet. The next save/interval retries safely.
+        }
     }
 
     function stopEmulator() {
+        const hackId = activeEmulatorHackId;
+        const gameName = hackId ? `zelda64_${encodeURIComponent(hackId)}` : null;
+        if (hackId && gameName) persistSram(hackId, gameName);
+        activeEmulatorHackId = null;
+        if (sramSyncTimer) { clearInterval(sramSyncTimer); sramSyncTimer = null; }
         if (webrtcPeer) {
             try { webrtcPeer.close(); } catch (_) {}
             webrtcPeer = null;
         }
+        if (emulatorScript) { emulatorScript.remove(); emulatorScript = null; }
+        delete window.EJS_emulator;
     }
 
     // ---- Settings Page ----
@@ -423,13 +514,18 @@
             const portEl = document.getElementById('settingPort');
             const passEl = document.getElementById('settingPassword');
             const displayEl = document.getElementById('settingDisplayOutput');
+            const displayIdEl = document.getElementById('settingDisplayId');
+            const displayTouchEl = document.getElementById('settingDisplayTouchControls');
             const addrEl = document.getElementById('serverAddress');
             const clientsEl = document.getElementById('clientCount');
             if (portEl) portEl.value = data.port;
             if (passEl) passEl.value = '';
-            if (displayEl) displayEl.value = data.displayOutput;
+            if (displayEl) displayEl.value = /^\d+$/.test(data.displayOutput) ? 'specific' : data.displayOutput;
+            if (displayIdEl) displayIdEl.value = data.displayId;
+            if (displayTouchEl) displayTouchEl.value = data.displayTouchControls;
             if (addrEl) addrEl.textContent = data.address;
             if (clientsEl) clientsEl.textContent = data.connectedClients;
+            renderAppSettings(data.preferences || []);
         } catch (e) {
             showToast(e.message, 'error');
         }
@@ -441,11 +537,18 @@
         btn.addEventListener('click', async () => {
             const port = parseInt(document.getElementById('settingPort').value, 10);
             const password = document.getElementById('settingPassword').value;
-            const displayOutput = document.getElementById('settingDisplayOutput').value;
+            const selectedDisplayOutput = document.getElementById('settingDisplayOutput').value;
+            const displayId = parseInt(document.getElementById('settingDisplayId').value, 10);
+            const displayOutput = selectedDisplayOutput === 'specific' ? String(displayId) : selectedDisplayOutput;
+            const displayTouchControls = document.getElementById('settingDisplayTouchControls').value;
+            const preferences = {};
+            document.querySelectorAll('[data-app-setting]').forEach(input => {
+                preferences[input.dataset.appSetting] = input.type === 'checkbox' ? String(input.checked) : input.value;
+            });
             try {
                 const result = await api('/settings', {
                     method: 'PUT',
-                    body: JSON.stringify({ port, password: password || undefined, displayOutput })
+                    body: JSON.stringify({ port, password: password || undefined, displayOutput, displayId, displayTouchControls, preferences })
                 });
                 showToast(result.message, 'success');
                 if (result.restartRequired) showToast(t('settings_restart_required'), 'info');
@@ -453,6 +556,23 @@
                 showToast(e.message, 'error');
             }
         });
+    }
+
+    function renderAppSettings(preferences) {
+        const root = document.getElementById('appSettings');
+        if (!root) return;
+        root.innerHTML = preferences.map(pref => {
+            const label = t(`settings_${pref.key}`) === `settings_${pref.key}`
+                ? pref.key.replaceAll('_', ' ').replace(/\b\w/g, c => c.toUpperCase())
+                : t(`settings_${pref.key}`);
+            let control;
+            if (pref.type === 'boolean') {
+                control = `<input type="checkbox" data-app-setting="${escapeHtml(pref.key)}" ${pref.value === 'true' ? 'checked' : ''}>`;
+            } else {
+                control = `<select class="switch-input" data-app-setting="${escapeHtml(pref.key)}">${pref.options.map(value => `<option value="${escapeHtml(value)}" ${value === pref.value ? 'selected' : ''}>${escapeHtml(value)}</option>`).join('')}</select>`;
+            }
+            return `<div class="switch-setting-row"><label class="switch-setting-label">${escapeHtml(label)}</label>${control}</div>`;
+        }).join('');
     }
 
     // ---- Server status polling ----

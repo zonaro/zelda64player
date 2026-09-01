@@ -205,17 +205,9 @@ class HackDetailDialog : DialogFragment() {
     }
 
     private fun populateBadges() {
-        val sg = hack.supportedGames
-        if (!sg.isNullOrBlank()) {
-            // Family icon badge (OoT / MM / unknown -> generic hack icon), matching the
-            // Library tile styling. Replaces the old plain-text supported-game label.
-            BadgeBinder.bindFamily(
-                    binding.detailGameBadge,
-                    BadgeBinder.familyFromSupportedGames(sg)
-            )
-        } else {
-            binding.detailGameBadge.visibility = View.GONE
-        }
+        // Always show the family badge: prefer supportedGames, fall back to baseRom.gameCode
+        // so curated PICKS entries without supportedGames still render OoT/MM correctly.
+        BadgeBinder.bindFamily(binding.detailGameBadge, BadgeBinder.familyForHack(hack))
         val completion = hack.completionStatus
         if (!completion.isNullOrBlank()) {
             binding.detailCompletionBadge.text = completion

@@ -32,6 +32,7 @@ These rules are **mandatory** and apply to every agent and every change in this 
 
 15. **No telemetry without opt-in.** No analytics, crash reporting, or network calls except: catalog fetch (user-initiated), patch download (user-initiated), core download (build-time only).
 16. **Validate all inputs:** ROM checksums, patch checksums, catalog JSON schema, downloaded file sizes.
+17. **Dashboard settings parity:** The self-hosted Dashboard's **Settings** tab MUST expose every app configuration. Dashboard changes MUST use the same validation, persistence, and required side effects as the native Settings screen. Sensitive values (for example passwords and credentials) MAY be write-only, but their values MUST never be returned, logged, or exposed to the browser.
 
 ## RetroAchievements Feature
 
@@ -64,6 +65,7 @@ These rules are **mandatory** and apply to every agent and every change in this 
 | 14 | Gamepad layout FROZEN | RadialGamePad layout measured for OoT/MM; no changes without user approval + `plano.md` update. In-game chrome restyled to Switch UI. |
 | 15 | No telemetry without opt-in | No analytics, crash reporting, or network calls except user-initiated catalog fetch, patch download, core download (build-time only). |
 | 16 | Validate all inputs | ROM checksums, patch checksums, catalog JSON schema, downloaded file sizes. |
+| 17 | Dashboard settings parity | The Dashboard Settings tab exposes every app configuration with the same validation, persistence, and side effects as native Settings; sensitive values are write-only. |
 | 20 | RA credentials | Never logged; stored only in `EncryptedSharedPreferences` (`ra_secure_prefs`). |
 | 21 | RA hash from final patched ROM | Computed at install time after BPS/ZPF patch applied and ROM written to `Storage.rom(hackId)`. |
 | 22 | Leaderboards never overlaid on gameplay | Accessible ONLY via GameActivity in-game menu (DialogFragment). |

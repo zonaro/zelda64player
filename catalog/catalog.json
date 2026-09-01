@@ -1,7 +1,7 @@
 {
   "catalogVersion": 2,
   "storeName": "Main Store",
-  "lastUpdated": "2026-09-01T05:26:02Z",
+  "lastUpdated": "2026-09-01T11:34:44Z",
   "hacks": [
     {
       "id": "ocarina_of_time_dx",
@@ -21,12 +21,12 @@
         }
       },
       "patch": {
-        "url": "https://github.com/N64DX/oot-dx/releases/download/release-beta-0.6.0/Ocarina.of.Time.DX.21-9.UWS.Beta.v0.6.0.-.24.August.7.bps",
-        "filename": "Ocarina.of.Time.DX.21-9.UWS.Beta.v0.6.0.-.24.August.7.bps",
-        "size": 12557788,
+        "url": "https://github.com/N64DX/oot-dx/releases/download/release-beta-0.6.0/Ocarina.of.Time.DX.21-9.UWS.Beta.v0.6.0.-.31.August.11.bps",
+        "filename": "Ocarina.of.Time.DX.21-9.UWS.Beta.v0.6.0.-.31.August.11.bps",
+        "size": 12503152,
         "checksums": {
           "crc32": "2144df1c",
-          "md5": "8a9d60aaac244132b0c3c0870a9107c3"
+          "md5": "b144b933930ddd9ea08e798fc61739c0"
         }
       },
       "tags": [
@@ -37,7 +37,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "supportedGames": "OoT"
     },
     {
       "id": "ultimate_trial",
@@ -132,7 +133,12 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "supportedGames": "MM",
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://www.romhacking.net/hacks/5122/"
+      }
     },
     {
       "id": "master_of_time_revisited",
@@ -285,7 +291,12 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "supportedGames": "OoT",
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://www.romhacking.net/hacks/7663/"
+      }
     },
     {
       "id": "dawn_and_dusk",
@@ -319,7 +330,8 @@
       "compatibleCores": [
         "mupen64plus_next_gles3",
         "parallel_n64"
-      ]
+      ],
+      "supportedGames": "OoT"
     },
     {
       "id": "sands_of_time",
@@ -700,7 +712,8 @@
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/zelda's_birthday/screenshots/thumbnail.png"
+      "coverImageUrl": "https://hylianmodding.com/mods/zelda's_birthday/screenshots/thumbnail.png",
+      "supportedGames": "OoT"
     },
     {
       "id": "time_lost",
@@ -872,7 +885,8 @@
         "mupen64plus_next_gles3",
         "parallel_n64"
       ],
-      "coverImageUrl": "https://hylianmodding.com/mods/demon's_quest/screenshots/thumbnail.png"
+      "coverImageUrl": "https://hylianmodding.com/mods/demon's_quest/screenshots/thumbnail.png",
+      "supportedGames": "OoT"
     },
     {
       "id": "the_helix_blade",
@@ -1052,6 +1066,10 @@
         "catalogId": "mods",
         "modUrl": "https://hylianmodding.com/mods/hero_of_law/mod.json",
         "managed": false
+      },
+      "downloadTarget": {
+        "type": "external",
+        "url": "https://newerteam.com/en/hol/index.html"
       }
     },
     {

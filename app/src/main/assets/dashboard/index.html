@@ -19,6 +19,7 @@
             </div>
             <nav class="switch-nav" aria-label="Navegação">
                 <a href="#" class="switch-nav-link active" data-page="collection" data-i18n="nav_collection">Coleção</a>
+                <a href="#" class="switch-nav-link" data-page="streaming" data-i18n="nav_streaming">Streaming</a>
                 <a href="#" class="switch-nav-link" data-page="settings" data-i18n="nav_settings">Configurações</a>
             </nav>
             <div class="switch-status" id="serverStatus">
@@ -87,6 +88,16 @@
             </div>
         </section>
 
+        <!-- Streaming uses the same external-display player contract: the phone hosts the
+             dashboard and this browser becomes its playable display. -->
+        <section class="switch-page" id="page-streaming">
+            <div class="switch-section-head">
+                <h2 data-i18n="nav_streaming">Streaming</h2>
+                <span class="switch-section-sub" data-i18n="streaming_sub">Escolha um jogo para usar este painel como display externo.</span>
+            </div>
+            <div class="switch-grid" id="streamingGrid"></div>
+        </section>
+
         <!-- Settings Page (Switch Side Panel style) -->
         <section class="switch-page" id="page-settings">
             <div class="switch-section-head">
@@ -99,6 +110,7 @@
                     <span data-i18n="settings_panel_title">Servidor</span>
                 </div>
                 <div class="switch-panel-body">
+                    <div id="appSettings" aria-live="polite"></div>
                     <div class="switch-setting-row">
                         <label class="switch-setting-label" for="settingPort" data-i18n="settings_port">Porta</label>
                         <input class="switch-input" type="number" id="settingPort" min="1024" max="65535" value="8080">
@@ -113,6 +125,19 @@
                             <option value="auto" data-i18n="settings_display_auto">Automático (usar secundário)</option>
                             <option value="primary" data-i18n="settings_display_primary">Primário</option>
                             <option value="secondary" data-i18n="settings_display_secondary">Secundário</option>
+                            <option value="specific" data-i18n="settings_display_specific">Display específico</option>
+                        </select>
+                    </div>
+                    <div class="switch-setting-row">
+                        <label class="switch-setting-label" for="settingDisplayId" data-i18n="settings_display_id">ID do display específico</label>
+                        <input class="switch-input" type="number" id="settingDisplayId" min="0" value="0">
+                    </div>
+                    <div class="switch-setting-row">
+                        <label class="switch-setting-label" for="settingDisplayTouchControls" data-i18n="settings_display_touch_controls">Controles touch</label>
+                        <select class="switch-input" id="settingDisplayTouchControls">
+                            <option value="primary" data-i18n="settings_touch_primary">Primário</option>
+                            <option value="secondary" data-i18n="settings_touch_secondary">Secundário</option>
+                            <option value="both" data-i18n="settings_touch_both">Ambos</option>
                         </select>
                     </div>
                     <button class="switch-btn switch-btn-primary switch-btn-block" id="btnSaveSettings">

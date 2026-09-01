@@ -19,6 +19,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.io.File
+import android.util.Base64
 import kotlinx.serialization.Serializable
 
 /**
@@ -137,6 +138,73 @@ internal fun Route.collectionRoutes() {
                         .toString()
         )
         call.respondFile(romFile)
+    }
+
+    /**
+     * GET /api/collection/{hackId}/play/rom — ROM stream for EmulatorJS.
+     *
+     * Unlike the download route this deliberately has no attachment header: EmulatorJS fetches
+     * this URL directly and must receive the patched hack (or the selected vanilla ROM) as a
+     * playable byte stream.
+     */
+    get("/collection/{hackId}/play/rom") {
+        val hackId = call.parameters["hackId"]
+                ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing hackId"))
+        val romFile = GameRomResolver.resolveRomFile(context, hackId)
+                ?: return@get call.respond(HttpStatusCode.NotFound, mapOf("error" to "ROM not installed"))
+        if (!romFile.exists()) {
+            return@get call.respond(HttpStatusCode.NotFound, mapOf("error" to "ROM not installed"))
+        }
+        call.response.header(HttpHeaders.CacheControl, "no-store")
+        call.respondFile(romFile)
+    }
+
+    /** Current SRAM snapshot for a browser EmulatorJS session. */
+    get("/collection/{hackId}/play/sram") {
+        val hackId = call.parameters["hackId"]
+                ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing hackId"))
+        val entry = InstalledLibrary.entries(context).firstOrNull { it.id == hackId }
+        val sram = Storage.getInstance(context).sram(entry?.romId ?: hackId)
+        call.respond(
+                EmulatorSaveResponse(
+                        data = if (sram.exists()) Base64.encodeToString(sram.readBytes(), Base64.NO_WRAP) else null,
+                        modifiedAt = if (sram.exists()) sram.lastModified() else 0L
+                )
+        )
+    }
+
+    /** Raw SRAM file mounted by EmulatorJS before the core starts. */
+    get("/collection/{hackId}/play/sram-file") {
+        val hackId = call.parameters["hackId"]
+                ?: return@get call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing hackId"))
+        val entry = InstalledLibrary.entries(context).firstOrNull { it.id == hackId }
+        val sram = Storage.getInstance(context).sram(entry?.romId ?: hackId)
+        if (!sram.exists()) return@get call.respond(HttpStatusCode.NotFound, mapOf("error" to "No SRAM save"))
+        call.response.header(HttpHeaders.CacheControl, "no-store")
+        call.respondFile(sram)
+    }
+
+    /** Persist an SRAM snapshot uploaded by the browser EmulatorJS session. */
+    post("/collection/{hackId}/play/sram") {
+        val hackId = call.parameters["hackId"]
+                ?: return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Missing hackId"))
+        val snapshot = call.receive<EmulatorSaveRequest>()
+        val bytes = try {
+            Base64.decode(snapshot.data, Base64.DEFAULT)
+        } catch (_: IllegalArgumentException) {
+            return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Invalid SRAM data"))
+        }
+        // SRAM is small (normally 32 KiB). A hard limit prevents the dashboard from becoming an
+        // unauthenticated arbitrary-storage endpoint when no password is configured.
+        if (bytes.size > MAX_SRAM_BYTES) {
+            return@post call.respond(HttpStatusCode.PayloadTooLarge, mapOf("error" to "SRAM is too large"))
+        }
+        val entry = InstalledLibrary.entries(context).firstOrNull { it.id == hackId }
+        val target = Storage.getInstance(context).sram(entry?.romId ?: hackId)
+        target.parentFile?.mkdirs()
+        target.outputStream().use { it.write(bytes) }
+        DashboardManager.notifySramChanged(entry?.romId ?: hackId, bytes)
+        call.respond(mapOf("success" to true, "modifiedAt" to target.lastModified()))
     }
 
     /** GET /api/collection/{hackId}/sram — Download the SRAM save file. */
@@ -340,3 +408,9 @@ internal data class CollectionGame(
 
 @Serializable
 internal data class CollectionResponse(val games: List<CollectionGame>, val total: Int)
+
+@Serializable internal data class EmulatorSaveResponse(val data: String?, val modifiedAt: Long)
+
+@Serializable internal data class EmulatorSaveRequest(val data: String)
+
+private const val MAX_SRAM_BYTES = 2 * 1024 * 1024

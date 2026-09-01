@@ -80,7 +80,7 @@
 
 ## Hard Rules (Summary — Full text in `.agents/RULES.md`)
 
-1. No base ROMs · 2. No copyrighted content · 3. GPL-3.0 compliance · 4. Clean-room BPS · 5. DRY · 6. Modular · 7. No emojis · 8. i18n mandatory · 9. Performance (stream, no full ROM in heap) · 10. RetroView interception (only place bytes reach core) · 11. Storage paths keyed by hackId · 12. Catalog schema versioning · 13. Selective Ludere migration · 14. Gamepad layout FROZEN (Switch UI chrome only) · 15. No telemetry without opt-in · 16. Validate all inputs · 20. RA credentials never logged · 21. RA hash from final patched ROM · 22. Leaderboards never overlaid on gameplay · 23. Hardcore defaults OFF · 24. rcheevos MIT license notice · 25. System notifications opt-in default ON.
+1. No base ROMs · 2. No copyrighted content · 3. GPL-3.0 compliance · 4. Clean-room BPS · 5. DRY · 6. Modular · 7. No emojis · 8. i18n mandatory · 9. Performance (stream, no full ROM in heap) · 10. RetroView interception (only place bytes reach core) · 11. Storage paths keyed by hackId · 12. Catalog schema versioning · 13. Selective Ludere migration · 14. Gamepad layout FROZEN (Switch UI chrome only) · 15. No telemetry without opt-in · 16. Validate all inputs · 17. Dashboard Settings parity for every app configuration (sensitive values write-only) · 20. RA credentials never logged · 21. RA hash from final patched ROM · 22. Leaderboards never overlaid on gameplay · 23. Hardcore defaults OFF · 24. rcheevos MIT license notice · 25. System notifications opt-in default ON.
 
 ---
 

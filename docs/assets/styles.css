@@ -16,21 +16,9 @@
   --dialog-radius: 14px;
   --max-width: 1280px;
   --focus-border: 3px solid var(--accent-focus);
-  --font-title: "Ancient Hylian", serif;
-  --font-heading: "Ancient Hylian", serif;
-  --font-copy: "Hylian 64", sans-serif;
-}
-
-@font-face {
-  font-family: "The Wild Breath of Zelda";
-  src: url("./fonts/The%20Wild%20Breath%20of%20Zelda.otf") format("opentype");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Hylia Serif";
-  src: url("./fonts/Hylia%20Serif%20Beta%20v0-009/HyliaSerifBeta-Regular.otf") format("opentype");
-  font-display: swap;
+  --font-title: "Cairopixel", sans-serif;
+  --font-heading: "Cairopixel", sans-serif;
+  --font-copy: "Cairopixel", sans-serif;
 }
 
 @font-face {
@@ -46,14 +34,9 @@
 }
 
 @font-face {
-  font-family: "Ancient Hylian";
-  src: url("./fonts/AncientHylian.otf") format("opentype");
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Zelda Oracles";
-  src: url("./fonts/ZeldaOracles.ttf") format("truetype");
+  font-family: "Cairopixel";
+  src: url("./fonts/Cairopixel.otf") format("opentype"),
+       url("./fonts/Cairopixel.ttf") format("truetype");
   font-display: swap;
 }
 
@@ -68,24 +51,24 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* The page opens in ancient script. Each zone "decodes" letter by letter into the
-   readable Zelda set, 1s after it enters the viewport. */
+/* The page opens in ancient script. Each zone "decodes" letter by letter into
+   Cairopixel, 1s after it enters the viewport. */
 .type-zone {
-  font-family: var(--font-copy);
+  font-family: "Hylian 64", sans-serif;
 }
 .type-zone .glyph {
   display: inline-block;
-  font-family: var(--font-copy);
+  font-family: "Hylian 64", sans-serif;
   opacity: 0.45;
   transform: translateY(6px) scale(0.96);
 }
 .type-zone.font-awakened {
-  --font-title: "The Wild Breath of Zelda", serif;
-  --font-heading: "Hylia Serif", serif;
-  --font-copy: "Zelda Oracles", sans-serif;
-  --awake-title: "The Wild Breath of Zelda", serif;
-  --awake-heading: "Hylia Serif", serif;
-  --awake-copy: "Zelda Oracles", sans-serif;
+  --font-title: "Cairopixel", sans-serif;
+  --font-heading: "Cairopixel", sans-serif;
+  --font-copy: "Cairopixel", sans-serif;
+  --awake-title: "Cairopixel", sans-serif;
+  --awake-heading: "Cairopixel", sans-serif;
+  --awake-copy: "Cairopixel", sans-serif;
 }
 .type-zone.font-awakened { --glyph-awake-font: var(--awake-copy); }
 .type-zone.font-awakened h1 { --glyph-awake-font: var(--awake-title); }

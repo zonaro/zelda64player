@@ -14,6 +14,7 @@ Index of all major features. Each has a deep-dive doc in this folder.
 | **Nintendo Switch UI** | Shipped | [VISUAL_IDENTITY.md](VISUAL_IDENTITY.md) | Custom native Switch HOME aesthetic across all screens; frozen RadialGamePad layout. |
 | **Screen Capture / Recording / Gallery** | Shipped | [CAPTURE_GALLERY.md](CAPTURE_GALLERY.md) | PixelCopy screenshots (with/without overlay), MediaProjection recording, local Gallery (view/share/delete). |
 | **Save Backup / Restore** | Shipped | — | ZIP backup per hackId (local, no cloud); `drive/` module adds optional Google Drive sync. |
+| **Self-Hosted Dashboard** | In progress | — | Local browser dashboard for the library, backups, streaming, and a Settings tab with parity for every app configuration; sensitive values remain write-only. |
 | **Background Catalog Refresh** | Shipped | [STORE.md](STORE.md) | WorkManager `CatalogRefreshWorker` (12h periodic, CONNECTED network). |
 | **Gamepad Tester** | Shipped | — | `GamepadTesterActivity` visualizes physical/N64 input without starting a core; shared mapping with gameplay. |
 | **i18n (pt-BR/en/es)** | Shipped | [I18N.md](I18N.md) | All user-facing strings externalized; zero hardcoded strings. |
