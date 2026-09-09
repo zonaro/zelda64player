@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import br.com.redclaw.zelda64player.retroachievements.api.RaHttpClient
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
+import br.com.redclaw.zelda64player.retroachievements.data.RaGameIdentity
 import br.com.redclaw.zelda64player.retroachievements.data.RaInstallMetadataStore
 import br.com.redclaw.zelda64player.retroachievements.jni.RaNativeListener
 import br.com.redclaw.zelda64player.retroachievements.jni.RcheevosJni
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -98,7 +100,7 @@ class RaSessionManager(
     private val context: Context,
     private val http: RaHttpClient,
     private val credentials: RaCredentialStore,
-    @Suppress("unused") private val metadataStore: RaInstallMetadataStore
+    private val metadataStore: RaInstallMetadataStore
 ) : RaNativeListener {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -143,6 +145,7 @@ class RaSessionManager(
      */
     fun start(
         romFile: File,
+        hackId: String,
         hardcoreEnabled: Boolean = false,
         memoryRegionProvider: () -> ByteBuffer?
     ) {
@@ -164,7 +167,7 @@ class RaSessionManager(
 
         RcheevosJni.nativeCreateClient(this)
         RcheevosJni.nativeSetHardcoreEnabled(hardcoreEnabled)
-        loginWithToken(username, token, romFile)
+        loginWithToken(username, token, romFile, hackId)
     }
 
     /**
@@ -198,7 +201,7 @@ class RaSessionManager(
     }
 
     /** Silent token re-login, then game identification/loading. */
-    private fun loginWithToken(username: String, token: String, romFile: File) {
+    private fun loginWithToken(username: String, token: String, romFile: File, hackId: String) {
         _state.value = RaSessionState.LoggingIn
         scope.launch {
             val result = awaitOp { opId ->
@@ -206,7 +209,7 @@ class RaSessionManager(
             }
             if (!sessionActive) return@launch
             if (result.isSuccess) {
-                identifyAndLoad(romFile)
+                identifyAndLoad(romFile, hackId)
             } else {
                 Log.w(TAG, "RA token login failed: ${result.error}")
                 _state.value = RaSessionState.Failed(result.error ?: "login failed")
@@ -214,7 +217,7 @@ class RaSessionManager(
         }
     }
 
-    private fun identifyAndLoad(romFile: File) {
+    private fun identifyAndLoad(romFile: File, hackId: String) {
         _state.value = RaSessionState.LoadingGame
         scope.launch {
             val result = awaitOp { opId ->
@@ -222,7 +225,7 @@ class RaSessionManager(
             }
             if (!sessionActive) return@launch
             if (result.isSuccess) {
-                attachMemoryAndRun()
+                attachMemoryAndRun(hackId)
             } else {
                 Log.w(TAG, "RA identify/load failed: ${result.error}")
                 _state.value = RaSessionState.Failed(result.error ?: "load failed")
@@ -230,12 +233,22 @@ class RaSessionManager(
         }
     }
 
-    private fun attachMemoryAndRun() {
+    private suspend fun attachMemoryAndRun(hackId: String) {
         val buffer = memoryRegionProvider?.invoke()
         RcheevosJni.nativeSetMemoryRegion(buffer)
         gameLoaded = buffer != null
-        _state.value = parseGameInfo()?.let { RaSessionState.Running(it) }
-            ?: RaSessionState.Failed("game info unavailable")
+        val game = parseGameInfo()
+        if (game == null) {
+            _state.value = RaSessionState.Failed("game info unavailable")
+            return
+        }
+        // Publish the identity proven by the live client to all library screens.
+        if (game.id > 0L && game.hash.isNotBlank()) {
+            withContext(Dispatchers.IO) {
+                metadataStore.put(hackId, RaGameIdentity(game.hash, game.id, game.title))
+            }
+        }
+        if (sessionActive) _state.value = RaSessionState.Running(game)
     }
 
     // ------------------------------------------------------------------ //

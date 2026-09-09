@@ -44,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- Header card: avatar, username, motto, status, member since, presence -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -86,6 +87,29 @@
                             android:visibility="gone" />
 
                         <TextView
+                            android:id="@+id/ra_profile_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/shape_pill"
+                            android:paddingStart="10dp"
+                            android:paddingTop="3dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="3dp"
+                            android:textColor="@color/switch_accent_focus"
+                            android:textSize="13sp"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/ra_profile_member_since"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textColor="@color/switch_text_secondary"
+                            android:textSize="13sp"
+                            android:visibility="gone" />
+
+                        <TextView
                             android:id="@+id/ra_profile_presence"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -96,22 +120,117 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <!-- Metrics grid (2 columns, built programmatically) -->
+                <LinearLayout
+                    android:id="@+id/ra_profile_metrics"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical" />
+
+                <!-- Last game -->
                 <TextView
+                    android:id="@+id/ra_profile_last_game_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="22dp"
                     android:layout_marginBottom="8dp"
-                    android:text="@string/ra_profile_details"
+                    android:text="@string/ra_profile_last_game"
                     android:textColor="@color/switch_text_primary"
                     android:textSize="@dimen/switch_title_text"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
                 <LinearLayout
-                    android:id="@+id/ra_profile_details"
+                    android:id="@+id/ra_profile_last_game_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/shape_card"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/ra_profile_last_game_image"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:background="@drawable/bg_ra_avatar"
+                        android:contentDescription="@string/ra_profile_last_game_image_description"
+                        android:padding="2dp"
+                        android:scaleType="centerCrop" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/ra_profile_last_game_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/switch_text_primary"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/ra_profile_last_game_console"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/switch_text_secondary"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Recently played -->
+                <TextView
+                    android:id="@+id/ra_profile_recent_games_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/ra_profile_recent_games"
+                    android:textColor="@color/switch_text_primary"
+                    android:textSize="@dimen/switch_title_text"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/ra_profile_recent_games"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical" />
+
+                <!-- Recent achievements -->
+                <TextView
+                    android:id="@+id/ra_profile_recent_achievements_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/ra_profile_recent_achievements"
+                    android:textColor="@color/switch_text_primary"
+                    android:textSize="@dimen/switch_title_text"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/ra_profile_recent_achievements"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <!-- Link to the web profile -->
+                <Button
+                    android:id="@+id/ra_profile_open_web"
+                    style="@style/SwitchButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:text="@string/ra_profile_open_web" />
             </LinearLayout>
         </ScrollView>
 

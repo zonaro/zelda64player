@@ -19,6 +19,14 @@ class RaCatalogParsingTest {
     private val repository = RaCatalogRepository(http = RaHttpClient("zelda64player-tests"))
 
     @Test
+    fun `unlock failures are distinct from zero unlocked achievements`() {
+        assertNull(repository.parseUserUnlocks("null"))
+        assertNull(repository.parseUserUnlocks("{\"Success\":false}"))
+        assertEquals(emptySet<Long>(), repository.parseUserUnlocks("[]"))
+        assertEquals(setOf(111L, 112L), repository.parseUserUnlocks("[111,112]"))
+    }
+
+    @Test
     fun `parses achievements and leaderboards`() {
         val body = """
             {

@@ -14,6 +14,9 @@ import kotlinx.coroutines.launch
 sealed interface RaProfileUiState {
     data object Loading : RaProfileUiState
     data object SignedOut : RaProfileUiState
+
+    /** Signed in but no Web API key stored — the profile cannot be fetched. */
+    data object NeedsApiKey : RaProfileUiState
     data class Content(val profile: RaUserProfile) : RaProfileUiState
     data object Error : RaProfileUiState
 }
@@ -37,6 +40,12 @@ class RaProfileViewModel(application: Application) : AndroidViewModel(applicatio
             _state.value = RaProfileUiState.SignedOut
             return
         }
+        // The profile reads the public Web API, which authenticates with the
+        // Web API key (control panel), not the rcheevos login token.
+        if (!credentials.hasApiKey()) {
+            _state.value = RaProfileUiState.NeedsApiKey
+            return
+        }
         viewModelScope.launch {
             val cached = repository.getCachedProfile()
             if (cached != null) _state.value = RaProfileUiState.Content(cached)
@@ -46,10 +55,9 @@ class RaProfileViewModel(application: Application) : AndroidViewModel(applicatio
             // cached profile is rendered first so the screen remains responsive
             // while this refresh is in flight.
             val result = repository.getProfile(forceRefresh = true)
-            result.onSuccess { _state.value = RaProfileUiState.Content(it) }
-                .onFailure {
-                    if (cached == null) _state.value = RaProfileUiState.Error
-                }
+            result.onSuccess { _state.value = RaProfileUiState.Content(it) }.onFailure {
+                if (cached == null) _state.value = RaProfileUiState.Error
+            }
         }
     }
 }

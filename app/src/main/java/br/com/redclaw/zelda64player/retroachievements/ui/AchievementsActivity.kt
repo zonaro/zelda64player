@@ -1,8 +1,12 @@
 package br.com.redclaw.zelda64player.retroachievements.ui
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.MotionEvent
 import android.view.View
+import android.widget.EditText
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,7 +16,9 @@ import br.com.redclaw.zelda64player.databinding.ActivityAchievementsBinding
 import br.com.redclaw.zelda64player.retroachievements.data.RaGameData
 import br.com.redclaw.zelda64player.retroachievements.data.RaGameIdentity
 import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
+import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
+import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
 import br.com.redclaw.zelda64player.views.InstalledLibrary
 import coil.load
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +53,12 @@ class AchievementsActivity : AppCompatActivity() {
 
     private val backHelper = SwitchBackButton()
 
+    private var currentQuery: String = ""
+    private var currentSort: RaSortMode = RaSortMode.DEFAULT
+    private var singleGameRows: List<RaAchievementRow> = emptyList()
+    private var allGamesData: List<GameAchievements> = emptyList()
+    private var isSingleGame: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAchievementsBinding.inflate(layoutInflater)
@@ -58,6 +70,16 @@ class AchievementsActivity : AppCompatActivity() {
 
         binding.achievementsList.layoutManager = LinearLayoutManager(this)
         binding.achievementsList.adapter = adapter
+
+        binding.achievementsSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                currentQuery = s?.toString().orEmpty()
+                applyFilterAndSort()
+            }
+        })
+        binding.achievementsSort.setOnClickListener { showSortDialog() }
 
         val hackId = intent.getStringExtra(EXTRA_HACK_ID)
         if (hackId.isNullOrBlank()) {
@@ -100,7 +122,9 @@ class AchievementsActivity : AppCompatActivity() {
             showMessage(R.string.ra_loading)
 
             val gameData = withContext(Dispatchers.IO) {
-                repository.fetchGameData(identity.gameId)
+                repository.fetchGameData(
+                    identity.gameId, credentials.getUsername().orEmpty(), credentials.getToken().orEmpty()
+                )
             }
             if (gameData == null) {
                 showMessage(R.string.ra_error_network)
@@ -118,6 +142,10 @@ class AchievementsActivity : AppCompatActivity() {
                 )
             }
 
+            if (unlockedIds == null) {
+                showMessage(R.string.ra_error_network)
+                return@launch
+            }
             render(gameData, unlockedIds, hackTitle(hackId))
         }
     }
@@ -130,14 +158,15 @@ class AchievementsActivity : AppCompatActivity() {
         val title = gameData.title.ifBlank { fallbackTitle }
         binding.achievementsGameTitle.text = title
 
-        val unlockedCount = gameData.achievements.count { it.id in unlockedIds }
-        val totalPoints = gameData.achievements.sumOf { it.points }
+        val achievements = gameData.coreAchievements
+        val unlockedCount = achievements.count { it.id in unlockedIds }
+        val totalPoints = achievements.sumOf { it.points }
         val earnedPoints =
-            gameData.achievements.filter { it.id in unlockedIds }.sumOf { it.points }
+            achievements.filter { it.id in unlockedIds }.sumOf { it.points }
         binding.achievementsProgressSummary.text = getString(
             R.string.ra_progress_summary,
             unlockedCount,
-            gameData.achievements.size,
+            achievements.size,
             earnedPoints,
             totalPoints
         )
@@ -146,17 +175,61 @@ class AchievementsActivity : AppCompatActivity() {
             binding.achievementsGameBadge.load(gameData.imageUrl) { crossfade(true) }
         }
 
-        // Unlocked first (rarest last), then locked alphabetically.
-        val rows = gameData.achievements
-            .map { RaAchievementRow(it, it.id in unlockedIds) }
-            .sortedWith(
-                compareByDescending<RaAchievementRow> { it.unlocked }
-                    .thenBy { it.def.title.lowercase() }
-            )
-        adapter.submitList(rows)
-        if (rows.isEmpty()) {
+        isSingleGame = true
+        singleGameRows = achievements.map { RaAchievementRow(it, it.id in unlockedIds) }
+        binding.achievementsSearchRow.visibility = View.VISIBLE
+        applyFilterAndSort()
+        if (singleGameRows.isEmpty()) {
             showMessage(R.string.ra_empty)
         }
+    }
+
+    private fun applyFilterAndSort() {
+        if (isSingleGame) {
+            val filtered = filterAndSortRows(singleGameRows, currentQuery, currentSort)
+            if (filtered.isEmpty() && singleGameRows.isNotEmpty()) {
+                adapter.submitList(emptyList())
+                binding.achievementsMessage.setText(R.string.ra_no_results)
+                binding.achievementsMessage.visibility = View.VISIBLE
+            } else {
+                binding.achievementsMessage.visibility = View.GONE
+                adapter.submitList(filtered)
+                if (filtered.isEmpty()) showMessage(R.string.ra_empty)
+            }
+        } else {
+            val rows = buildFilteredSectionedRows(allGamesData, currentQuery, currentSort)
+            if (rows.isEmpty() && allGamesData.isNotEmpty()) {
+                adapter.submitList(emptyList())
+                binding.achievementsMessage.setText(R.string.ra_no_results)
+                binding.achievementsMessage.visibility = View.VISIBLE
+            } else {
+                binding.achievementsMessage.visibility = View.GONE
+                adapter.submitList(rows)
+                if (rows.isEmpty()) showMessage(R.string.ra_all_empty)
+            }
+        }
+    }
+
+    private fun showSortDialog() {
+        val labels = listOf(
+            getString(R.string.ra_sort_default),
+            getString(R.string.ra_sort_name_az),
+            getString(R.string.ra_sort_name_za),
+            getString(R.string.ra_sort_points_desc),
+            getString(R.string.ra_sort_points_asc),
+            getString(R.string.ra_sort_rarity_rare),
+            getString(R.string.ra_sort_rarity_common),
+        )
+        val modes = RaSortMode.values()
+        val checked = modes.indexOf(currentSort).coerceAtLeast(0)
+        SwitchDialog(this)
+            .title(getString(R.string.ra_sort_button))
+            .icon(R.drawable.ic_tune)
+            .singleChoice(labels, checked) { index ->
+                currentSort = modes[index]
+                applyFilterAndSort()
+            }
+            .show()
     }
 
     // --- All games mode ---------------------------------------------------
@@ -199,7 +272,7 @@ class AchievementsActivity : AppCompatActivity() {
             for ((gameId, fallbackTitle) in resolvedByGame) {
                 // A failure on one game must not abort the others.
                 val gameData = runCatching {
-                    withContext(Dispatchers.IO) { repository.fetchGameData(gameId) }
+                    withContext(Dispatchers.IO) { repository.fetchGameData(gameId, username, token) }
                 }.getOrNull() ?: continue
                 val unlockedIds = runCatching {
                     withContext(Dispatchers.IO) {
@@ -210,7 +283,7 @@ class AchievementsActivity : AppCompatActivity() {
                             hardcore = false
                         )
                     }
-                }.getOrDefault(emptySet())
+                }.getOrNull() ?: continue
                 loadedGames += GameAchievements(gameId, fallbackTitle, gameData, unlockedIds)
             }
 
@@ -220,9 +293,18 @@ class AchievementsActivity : AppCompatActivity() {
                 return@launch
             }
 
-            val rows = buildSectionedRows(loadedGames)
-            binding.achievementsMessage.visibility = View.GONE
-            adapter.submitList(rows)
+            isSingleGame = false
+            allGamesData = loadedGames
+            binding.achievementsSearchRow.visibility = View.VISIBLE
+            val rows = buildFilteredSectionedRows(loadedGames, currentQuery, currentSort)
+            if (rows.isEmpty() && loadedGames.isNotEmpty()) {
+                binding.achievementsMessage.setText(R.string.ra_no_results)
+                binding.achievementsMessage.visibility = View.VISIBLE
+                adapter.submitList(emptyList())
+            } else {
+                binding.achievementsMessage.visibility = View.GONE
+                adapter.submitList(rows)
+            }
         }
     }
 

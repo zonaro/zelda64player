@@ -9,150 +9,195 @@ import org.json.JSONObject
 
 /** One achievement definition from the RA database. */
 data class RaAchievementDef(
-    val id: Long,
-    val title: String,
-    val description: String,
-    val points: Int,
-    val badgeUrl: String?,
-    val badgeLockedUrl: String?,
-    val category: Int,
-    val type: Int
-)
+        val id: Long,
+        val title: String,
+        val description: String,
+        val points: Int,
+        val badgeUrl: String?,
+        val badgeLockedUrl: String?,
+        val category: Int,
+        val type: Int,
+        val rarity: Float = 0f,
+        val rarityHardcore: Float = 0f
+) {
+    /** True when this achievement can be permanently missed in a playthrough. */
+    val isMissable: Boolean
+        get() = type == 1
+}
 
 /** One leaderboard definition from the RA database. */
 data class RaLeaderboardDef(
-    val id: Long,
-    val title: String,
-    val description: String,
-    val format: Int,
-    val lowerIsBetter: Boolean,
-    val hidden: Boolean
+        val id: Long,
+        val title: String,
+        val description: String,
+        val format: Int,
+        val lowerIsBetter: Boolean,
+        val hidden: Boolean
 )
 
 /** Parsed fetch-game-data response for one game. */
 data class RaGameData(
-    val id: Long,
-    val title: String,
-    val imageUrl: String?,
-    val achievements: List<RaAchievementDef>,
-    val leaderboards: List<RaLeaderboardDef>
-)
+        val id: Long,
+        val title: String,
+        val imageUrl: String?,
+        val achievements: List<RaAchievementDef>,
+        val leaderboards: List<RaLeaderboardDef>
+) {
+    /** Published achievements counted by rc_client_get_user_game_summary (rapi category 3). */
+    val coreAchievements: List<RaAchievementDef>
+        get() = achievements.filter { it.category == 3 }
+}
+
+/** Standalone native protocol adapter, injectable for HTTP pipeline regression tests. */
+internal interface RaCatalogApi {
+    fun gameRequest(username: String, token: String, gameId: Long): Array<String>?
+    fun gameResponse(body: String): String
+    fun unlockRequest(
+            username: String,
+            token: String,
+            gameId: Long,
+            hardcore: Boolean
+    ): Array<String>?
+    fun unlockResponse(body: String): String
+}
+
+private object NativeRaCatalogApi : RaCatalogApi {
+    override fun gameRequest(username: String, token: String, gameId: Long) =
+            RcheevosJni.nativeBuildFetchGameDataRequest(username, token, gameId)
+    override fun gameResponse(body: String) = RcheevosJni.nativeProcessFetchGameDataResponse(body)
+    override fun unlockRequest(username: String, token: String, gameId: Long, hardcore: Boolean) =
+            RcheevosJni.nativeBuildFetchUserUnlocksRequest(username, token, gameId, hardcore)
+    override fun unlockResponse(body: String) =
+            RcheevosJni.nativeProcessFetchUserUnlocksResponse(body)
+}
 
 /**
- * Fetches RetroAchievements catalog data (achievement/leaderboard definitions
- * and the user's unlock set) through the standalone rapi helpers.
+ * Fetches RetroAchievements catalog data (achievement/leaderboard definitions and the user's unlock
+ * set) through the standalone rapi helpers.
  *
- * Used by library-facing screens where no live rc_client session exists.
- * Game data is cached in memory per game id for the process lifetime; unlocks
- * are always fetched fresh (they change during play).
+ * Used by library-facing screens where no live rc_client session exists. Game data is cached in
+ * memory per game id for the process lifetime; unlocks are always fetched fresh (they change during
+ * play).
  *
  * @param http Shared RA HTTP executor.
  */
-class RaCatalogRepository(private val http: RaHttpClient) {
+class RaCatalogRepository
+internal constructor(private val http: RaHttpClient, private val api: RaCatalogApi) {
+    constructor(http: RaHttpClient) : this(http, NativeRaCatalogApi)
 
     private val gameDataCache = HashMap<Long, RaGameData>()
 
     /**
-     * Fetches achievement + leaderboard definitions for [gameId]. Returns null
-     * on network/parse failure. [username]/[apiToken] may be blank (public data).
+     * Fetches achievement + leaderboard definitions for [gameId]. Returns null on network/parse
+     * failure. The rapi endpoint requires [username]/[apiToken].
      */
-    suspend fun fetchGameData(
-        gameId: Long,
-        username: String = "",
-        apiToken: String = ""
-    ): RaGameData? = withContext(Dispatchers.IO) {
-        synchronized(gameDataCache) { gameDataCache[gameId] }?.let { return@withContext it }
+    suspend fun fetchGameData(gameId: Long, username: String, apiToken: String): RaGameData? =
+            withContext(Dispatchers.IO) {
+                synchronized(gameDataCache) { gameDataCache[gameId] }?.let {
+                    return@withContext it
+                }
 
-        val parts = RcheevosJni.nativeBuildFetchGameDataRequest(username, apiToken, gameId)
-            ?: return@withContext null
-        val response = http.execute(parts[0], parts.getOrNull(1))
-        if (!response.isSuccessful) return@withContext null
-        val body = response.bodyAsString() ?: return@withContext null
+                val parts = api.gameRequest(username, apiToken, gameId) ?: return@withContext null
+                val response = http.execute(parts[0], parts.getOrNull(1))
+                if (!response.isSuccessful) return@withContext null
+                val body = response.bodyAsString() ?: return@withContext null
 
-        val parsed = parseGameData(body) ?: return@withContext null
-        synchronized(gameDataCache) { gameDataCache[gameId] = parsed }
-        parsed
-    }
+                val parsed = parseGameData(api.gameResponse(body)) ?: return@withContext null
+                synchronized(gameDataCache) { gameDataCache[gameId] = parsed }
+                parsed
+            }
 
     /**
-     * Fetches the set of achievement ids [username] has unlocked for [gameId].
-     * Empty set on failure or when credentials are missing.
+     * Fetches the set of achievement ids [username] has unlocked for [gameId]. Null on failure or
+     * when credentials are missing; an empty set means no unlocks.
      */
     suspend fun fetchUserUnlocks(
-        gameId: Long,
-        username: String,
-        apiToken: String,
-        hardcore: Boolean
-    ): Set<Long> = withContext(Dispatchers.IO) {
-        if (username.isBlank() || apiToken.isBlank()) return@withContext emptySet()
-        val parts = RcheevosJni.nativeBuildFetchUserUnlocksRequest(
-            username, apiToken, gameId, hardcore
-        ) ?: return@withContext emptySet()
-        val response = http.execute(parts[0], parts.getOrNull(1))
-        if (!response.isSuccessful) return@withContext emptySet()
-        val body = response.bodyAsString() ?: return@withContext emptySet()
+            gameId: Long,
+            username: String,
+            apiToken: String,
+            hardcore: Boolean
+    ): Set<Long>? =
+            withContext(Dispatchers.IO) {
+                if (username.isBlank() || apiToken.isBlank()) return@withContext null
+                val parts =
+                        api.unlockRequest(username, apiToken, gameId, hardcore)
+                                ?: return@withContext null
+                val response = http.execute(parts[0], parts.getOrNull(1))
+                if (!response.isSuccessful) return@withContext null
+                val body = response.bodyAsString() ?: return@withContext null
 
-        runCatching {
-            val array = JSONArray(body)
-            buildSet { for (i in 0 until array.length()) add(array.getLong(i)) }
-        }.getOrDefault(emptySet())
-    }
+                parseUserUnlocks(api.unlockResponse(body))
+            }
+
+    /** Decodes normalized unlocks; null distinguishes failures from zero progress. */
+    internal fun parseUserUnlocks(body: String): Set<Long>? =
+            runCatching {
+                        val array = JSONArray(body)
+                        buildSet { for (i in 0 until array.length()) add(array.getLong(i)) }
+                    }
+                    .getOrNull()
 
     /** Visible for unit tests; not part of the public API. */
-    internal fun parseGameData(body: String): RaGameData? = runCatching {
-        if (body == "null") return null
-        val root = JSONObject(body)
-        val achievements = mutableListOf<RaAchievementDef>()
-        val achArray = root.optJSONArray("achievements") ?: JSONArray()
-        for (i in 0 until achArray.length()) {
-            val a = achArray.getJSONObject(i)
-            achievements.add(
-                RaAchievementDef(
-                    id = a.getLong("id"),
-                    title = a.optString("title"),
-                    description = a.optString("description"),
-                    points = a.optInt("points"),
-                    badgeUrl = mediaUrl(a.optString("badge_url")),
-                    badgeLockedUrl = mediaUrl(a.optString("badge_locked_url")),
-                    category = a.optInt("category"),
-                    type = a.optInt("type")
-                )
-            )
-        }
-        val leaderboards = mutableListOf<RaLeaderboardDef>()
-        val lbdArray = root.optJSONArray("leaderboards") ?: JSONArray()
-        for (i in 0 until lbdArray.length()) {
-            val l = lbdArray.getJSONObject(i)
-            leaderboards.add(
-                RaLeaderboardDef(
-                    id = l.getLong("id"),
-                    title = l.optString("title"),
-                    description = l.optString("description"),
-                    format = l.optInt("format"),
-                    lowerIsBetter = l.optInt("lower_is_better") != 0,
-                    hidden = l.optInt("hidden") != 0
-                )
-            )
-        }
-        RaGameData(
-            id = root.getLong("id"),
-            title = root.optString("title"),
-            imageUrl = mediaUrl(root.optString("image_url")),
-            achievements = achievements,
-            leaderboards = leaderboards
-        )
-    }.getOrNull()
+    internal fun parseGameData(body: String): RaGameData? =
+            runCatching {
+                        if (body == "null") return null
+                        val root = JSONObject(body)
+                        val achievements = mutableListOf<RaAchievementDef>()
+                        val achArray = root.optJSONArray("achievements") ?: JSONArray()
+                        for (i in 0 until achArray.length()) {
+                            val a = achArray.getJSONObject(i)
+                            achievements.add(
+                                    RaAchievementDef(
+                                            id = a.getLong("id"),
+                                            title = a.optString("title"),
+                                            description = a.optString("description"),
+                                            points = a.optInt("points"),
+                                            badgeUrl = mediaUrl(a.optString("badge_url")),
+                                            badgeLockedUrl =
+                                                    mediaUrl(a.optString("badge_locked_url")),
+                                            category = a.optInt("category"),
+                                            type = a.optInt("type"),
+                                            rarity = a.optDouble("rarity", 0.0).toFloat(),
+                                            rarityHardcore =
+                                                    a.optDouble("rarity_hardcore", 0.0).toFloat()
+                                    )
+                            )
+                        }
+                        val leaderboards = mutableListOf<RaLeaderboardDef>()
+                        val lbdArray = root.optJSONArray("leaderboards") ?: JSONArray()
+                        for (i in 0 until lbdArray.length()) {
+                            val l = lbdArray.getJSONObject(i)
+                            leaderboards.add(
+                                    RaLeaderboardDef(
+                                            id = l.getLong("id"),
+                                            title = l.optString("title"),
+                                            description = l.optString("description"),
+                                            format = l.optInt("format"),
+                                            lowerIsBetter = l.optInt("lower_is_better") != 0,
+                                            hidden = l.optInt("hidden") != 0
+                                    )
+                            )
+                        }
+                        RaGameData(
+                                id = root.getLong("id"),
+                                title = root.optString("title"),
+                                imageUrl = mediaUrl(root.optString("image_url")),
+                                achievements = achievements,
+                                leaderboards = leaderboards
+                        )
+                    }
+                    .getOrNull()
 
     /**
-     * rcheevos normally returns absolute image URLs, but some API responses
-     * contain media-host paths. Coil requires a complete URL in either case.
+     * rcheevos normally returns absolute image URLs, but some API responses contain media-host
+     * paths. Coil requires a complete URL in either case.
      */
     private fun mediaUrl(value: String): String? {
         val trimmed = value.trim()
         if (trimmed.isBlank()) return null
         return when {
             trimmed.startsWith("https://", ignoreCase = true) ||
-                trimmed.startsWith("http://", ignoreCase = true) -> trimmed
+                    trimmed.startsWith("http://", ignoreCase = true) -> trimmed
             trimmed.startsWith('/') -> "$MEDIA_HOST$trimmed"
             else -> "$MEDIA_HOST/$trimmed"
         }

@@ -43,7 +43,7 @@ data class GameAchievements(
 fun buildSectionedRows(games: List<GameAchievements>): List<RaListItem> {
     val rows = mutableListOf<RaListItem>()
     for (game in games) {
-        val achievements = game.gameData.achievements
+        val achievements = game.gameData.coreAchievements
         val unlockedCount = achievements.count { it.id in game.unlockedIds }
         val totalPoints = achievements.sumOf { it.points }
         val earnedPoints =

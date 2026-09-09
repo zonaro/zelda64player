@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
+import br.com.redclaw.zelda64player.dashboard.server.DashboardManager
 import br.com.redclaw.zelda64player.data.local.InstalledHacksRepository
 import br.com.redclaw.zelda64player.data.local.SaveBackupManager
 import br.com.redclaw.zelda64player.data.model.BaseRom
@@ -38,7 +39,6 @@ import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
 import br.com.redclaw.zelda64player.settings.SettingsViewModel
 import br.com.redclaw.zelda64player.store.CatalogFetcher
-import br.com.redclaw.zelda64player.dashboard.server.DashboardManager
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
@@ -991,7 +991,8 @@ class SettingsActivity : AppCompatActivity() {
     /**
      * RetroAchievements section: master enable switch plus username/password login. The password is
      * used once for the credential exchange and never persisted; only the issued token is stored
-     * (encrypted).
+     * (encrypted). A separate Web API key (from the RetroAchievements control panel) is stored for
+     * the profile screen, which reads the public Web API.
      */
     private fun setupRetroAchievementsSection() {
         val credentials = Zelda64PlayerApp.raCredentialStore
@@ -1001,6 +1002,11 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsRaEnabledSwitch.setOnCheckedChangeListener { _, checked ->
             CorePrefs.setRetroAchievementsEnabled(this, checked)
             updateRaStatus(credentials)
+        }
+
+        // Prefill the stored Web API key (masked by the password input type).
+        credentials.getApiKey()?.takeIf { it.isNotBlank() }?.let {
+            binding.settingsRaApiKey.setText(it)
         }
 
         binding.settingsRaLogin.setOnClickListener {
@@ -1044,6 +1050,18 @@ class SettingsActivity : AppCompatActivity() {
             updateRaStatus(credentials)
         }
 
+        binding.settingsRaSaveApiKey.setOnClickListener {
+            sfx?.select()
+            val key = binding.settingsRaApiKey.text.toString().trim()
+            if (key.isEmpty()) {
+                binding.settingsRaStatus.setText(R.string.settings_ra_api_key_error_missing)
+                return@setOnClickListener
+            }
+            credentials.setApiKey(key)
+            binding.settingsRaApiKey.text.clear()
+            binding.settingsRaStatus.setText(R.string.settings_ra_api_key_saved)
+        }
+
         updateRaStatus(credentials)
     }
 
@@ -1053,10 +1071,31 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsRaStatus.setText(
                 when {
                     !enabled -> R.string.settings_ra_status_disabled
-                    credentials.hasCredentials() -> R.string.settings_ra_status_logged_in
+                    credentials.hasCredentials() && credentials.hasApiKey() ->
+                            R.string.settings_ra_status_logged_in
+                    credentials.hasCredentials() -> R.string.settings_ra_status_logged_in_no_key
                     else -> R.string.settings_ra_status_logged_out
                 }
         )
+        updateRaEnabledSubtitle(credentials)
+    }
+
+    /**
+     * Shows the connected username as a subtitle under "Ativar RetroAchievements" when RA is signed
+     * in. Hidden when signed out. Shown regardless of the enable toggle so the user always sees
+     * which account is stored.
+     */
+    private fun updateRaEnabledSubtitle(credentials: RaCredentialStore) {
+        val username = credentials.getUsername()?.trim().orEmpty()
+        val showSubtitle = username.isNotEmpty() && credentials.hasCredentials()
+        binding.settingsRaEnabledSubtitle.apply {
+            if (showSubtitle) {
+                text = getString(R.string.settings_ra_enabled_subtitle, username)
+                visibility = View.VISIBLE
+            } else {
+                visibility = View.GONE
+            }
+        }
     }
 
     private fun setupCoreSection() {
@@ -1130,7 +1169,8 @@ class SettingsActivity : AppCompatActivity() {
 
     /** Configures optional voice mixing for future gameplay recordings. */
     private fun setupCaptureSection() {
-        binding.settingsCaptureIncludeMicrophone.isChecked = CorePrefs.getCaptureIncludeMicrophone(this)
+        binding.settingsCaptureIncludeMicrophone.isChecked =
+                CorePrefs.getCaptureIncludeMicrophone(this)
         binding.settingsCaptureIncludeMicrophone.setOnCheckedChangeListener { _, checked ->
             CorePrefs.setCaptureIncludeMicrophone(this, checked)
         }
@@ -1158,7 +1198,8 @@ class SettingsActivity : AppCompatActivity() {
         binding.settingsDashboardPort.setOnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 val port = (view as? android.widget.EditText)?.text?.toString()?.toIntOrNull()
-                if (port != null && port in 1024..65535 && port != CorePrefs.getDashboardPort(this)) {
+                if (port != null && port in 1024..65535 && port != CorePrefs.getDashboardPort(this)
+                ) {
                     CorePrefs.setDashboardPort(this, port)
                     if (CorePrefs.isDashboardEnabled(this)) DashboardManager.restart(this)
                     updateDashboardStatus()
@@ -1195,16 +1236,21 @@ class SettingsActivity : AppCompatActivity() {
                 if (DashboardManager.isRunning) {
                     getString(R.string.dashboard_status_running, CorePrefs.getDashboardPort(this))
                 } else if (enabled && DashboardManager.isStarting) {
-                    binding.root.postDelayed({ updateDashboardStatus() }, DASHBOARD_STATUS_REFRESH_DELAY_MS)
+                    binding.root.postDelayed(
+                            { updateDashboardStatus() },
+                            DASHBOARD_STATUS_REFRESH_DELAY_MS
+                    )
                     getString(R.string.dashboard_status_starting)
                 } else {
                     getString(R.string.dashboard_status_stopped)
                 }
         binding.settingsDashboardUrl.text =
                 if (DashboardManager.isRunning) {
-                    DashboardManager.address?.let { address ->
-                        getString(R.string.dashboard_url_hint, "http://$address")
-                    }.orEmpty()
+                    DashboardManager.address
+                            ?.let { address ->
+                                getString(R.string.dashboard_url_hint, "http://$address")
+                            }
+                            .orEmpty()
                 } else {
                     ""
                 }

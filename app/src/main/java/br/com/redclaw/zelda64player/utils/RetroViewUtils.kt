@@ -2,29 +2,33 @@ package br.com.redclaw.zelda64player.utils
 
 import android.app.Activity
 import android.content.Context
+import android.widget.Toast
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.drive.SyncTrigger
 import br.com.redclaw.zelda64player.repositories.Storage
 import br.com.redclaw.zelda64player.retroview.RetroView
 
 /**
- * Persists and restores emulator state (SRAM, save states, frame speed, audio)
- * for a single hack, keyed by [hackId].
+ * Persists and restores emulator state (SRAM, save states, frame speed, audio) for a single hack,
+ * keyed by [hackId].
  */
 class RetroViewUtils(private val activity: Activity, private val hackId: String) {
     private val storage = Storage.getInstance(activity)
     private val sharedPreferences = activity.getPreferences(Context.MODE_PRIVATE)
-    private val fastForwardSpeed = activity.resources.getInteger(R.integer.config_fast_forward_multiplier)
+    private val fastForwardSpeed =
+            activity.resources.getInteger(R.integer.config_fast_forward_multiplier)
 
     fun restoreEmulatorState(retroView: RetroView) {
-        retroView.view.frameSpeed = sharedPreferences.getInt(activity.getString(R.string.pref_frame_speed), 1)
-        retroView.view.audioEnabled = sharedPreferences.getBoolean(activity.getString(R.string.pref_audio_enabled), true)
+        retroView.view.frameSpeed =
+                sharedPreferences.getInt(activity.getString(R.string.pref_frame_speed), 1)
+        retroView.view.audioEnabled =
+                sharedPreferences.getBoolean(activity.getString(R.string.pref_audio_enabled), true)
     }
 
     fun preserveEmulatorState(retroView: RetroView) {
         saveSRAM(retroView)
 
-        with (sharedPreferences.edit()) {
+        with(sharedPreferences.edit()) {
             putInt(activity.getString(R.string.pref_frame_speed), retroView.view.frameSpeed)
             putBoolean(activity.getString(R.string.pref_audio_enabled), retroView.view.audioEnabled)
             apply()
@@ -32,34 +36,34 @@ class RetroViewUtils(private val activity: Activity, private val hackId: String)
     }
 
     fun saveSRAM(retroView: RetroView) {
-        storage.sram(hackId).outputStream().use {
-            it.write(retroView.view.serializeSRAM())
-        }
+        storage.sram(hackId).outputStream().use { it.write(retroView.view.serializeSRAM()) }
         // Schedule an incremental cloud sync of this SRAM (no-op when disabled).
         SyncTrigger.markDirtySram(activity, hackId)
     }
 
     fun loadState(retroView: RetroView) {
         val stateFile = storage.state(hackId)
-        if (!stateFile.exists())
+        if (!stateFile.exists()) {
+            Toast.makeText(activity, R.string.toast_state_none, Toast.LENGTH_SHORT).show()
             return
-
-        val stateBytes = stateFile.inputStream().use {
-            it.readBytes()
         }
 
-        if (stateBytes.isEmpty())
+        val stateBytes = stateFile.inputStream().use { it.readBytes() }
+
+        if (stateBytes.isEmpty()) {
+            Toast.makeText(activity, R.string.toast_state_none, Toast.LENGTH_SHORT).show()
             return
+        }
 
         retroView.view.unserializeState(stateBytes)
+        Toast.makeText(activity, R.string.toast_state_loaded, Toast.LENGTH_SHORT).show()
     }
 
     fun saveState(retroView: RetroView) {
-        storage.state(hackId).outputStream().use {
-            it.write(retroView.view.serializeState())
-        }
+        storage.state(hackId).outputStream().use { it.write(retroView.view.serializeState()) }
         // Schedule an incremental cloud sync of this save state (no-op when disabled).
         SyncTrigger.markDirtyState(activity, hackId)
+        Toast.makeText(activity, R.string.toast_state_saved, Toast.LENGTH_SHORT).show()
     }
 
     fun fastForward(retroView: RetroView) {

@@ -8,6 +8,9 @@
     <string name="menu_reset">Reiniciar</string>
     <string name="menu_save_state">Guardar Estado</string>
     <string name="menu_load_state">Cargar Estado</string>
+    <string name="toast_state_saved">Estado guardado</string>
+    <string name="toast_state_loaded">Estado cargado</string>
+    <string name="toast_state_none">No hay ningún estado guardado</string>
     <string name="menu_mute">Silenciar</string>
     <string name="menu_fast_forward">Acelerar</string>
     <string name="menu_core">Core</string>
@@ -221,6 +224,7 @@
     <string name="settings_ra_title">RetroAchievements</string>
     <string name="settings_ra_description">Inicia sesión con tu cuenta de RetroAchievements.org para desbloquear logros mientras juegas. Tu contraseña se usa solo una vez; guardamos únicamente el token, cifrado.</string>
     <string name="settings_ra_enabled">Activar RetroAchievements</string>
+    <string name="settings_ra_enabled_subtitle">Conectado como %1$s</string>
     <string name="settings_ra_username_hint">Usuario</string>
     <string name="settings_ra_password_hint">Contraseña</string>
     <string name="settings_ra_login">Iniciar sesión</string>
@@ -232,6 +236,12 @@
     <string name="settings_ra_status_disabled">RetroAchievements desactivado.</string>
     <string name="settings_ra_status_failed">Error al iniciar sesión. Verifica usuario y contraseña.</string>
     <string name="settings_ra_status_failed_detail">Error al iniciar sesión: %1$s</string>
+    <string name="settings_ra_api_key_hint">Clave de la Web API</string>
+    <string name="settings_ra_api_key_help">Pega aquí la clave generada en retroachievements.org > Control Panel > Keys. Necesaria para obtener tu perfil público.</string>
+    <string name="settings_ra_save_api_key">Guardar clave de la API</string>
+    <string name="settings_ra_api_key_saved">¡Clave guardada!</string>
+    <string name="settings_ra_api_key_error_missing">Introduce la clave antes de guardarla.</string>
+    <string name="settings_ra_status_logged_in_no_key">Has iniciado sesión. Agrega la clave de la Web API arriba para ver tu perfil.</string>
 
     <!-- Achievements screen -->
     <string name="achievements_title">Logros</string>
@@ -269,11 +279,40 @@
     <string name="ra_profile_field_permissions">Permisos</string>
     <string name="ra_profile_field_untracked">Cuenta no rastreada</string>
     <string name="ra_profile_field_user_wall_active">Muro del usuario activo</string>
+    <string name="ra_profile_needs_api_key">Ya iniciaste sesión, pero aún falta agregar la clave de la Web API. Ve a Ajustes > RetroAchievements y pega la clave del Panel de Control.</string>
+    <string name="ra_profile_member_since">En la comunidad desde %1$s</string>
+    <string name="ra_profile_last_game">Último juego</string>
+    <string name="ra_profile_last_game_image_description">Icono del último juego</string>
+    <string name="ra_profile_recent_games">Jugados recientemente</string>
+    <string name="ra_profile_recent_achievements">Logros recientes</string>
+    <string name="ra_profile_open_web">Abrir perfil en el navegador</string>
+    <string name="ra_profile_game_image_description">Icono del juego</string>
+    <string name="ra_profile_achievement_badge_description">Insignia del logro</string>
+    <string name="ra_profile_unknown_game">Juego desconocido</string>
+    <string name="ra_profile_unknown_achievement">Logro desconocido</string>
+    <string name="ra_profile_game_progress">%1$d/%2$d logros</string>
+    <string name="ra_profile_game_points">%1$s pts</string>
+    <string name="ra_profile_achievement_points">%1$d pts</string>
+    <string name="ra_profile_achievement_hardcore">Difícil</string>
+    <string name="ra_profile_achievement_softcore">Casual</string>
+    <string name="ra_profile_metric_hardcore_points">Puntos difíciles</string>
+    <string name="ra_profile_metric_true_points">Puntos verdaderos</string>
+    <string name="ra_profile_metric_mastery">Dominios</string>
+    <string name="ra_profile_metric_beaten">Superados</string>
+    <string name="ra_profile_metric_rank_sub">Puesto nº %1$s de %2$s</string>
+    <string name="ra_profile_metric_softcore_sub">%1$s casuales</string>
+    <string name="ra_profile_metric_completion_sub">%1$s conclusiones</string>
+    <string name="ra_profile_metric_beaten_softcore_sub">%1$s casuales</string>
 
     <!-- RetroAchievements in-game overlay and notifications -->
     <string name="ra_unlocked_points">Desbloqueado · %d pts</string>
     <string name="ra_leaderboard_started">¡Leaderboard activo!</string>
+    <string name="ra_leaderboard_failed">Leaderboard falló.</string>
     <string name="ra_leaderboard_submitted">¡Enviado al leaderboard!</string>
+    <string name="ra_game_completed">¡Juego completo! ¡Todos los logros desbloqueados!</string>
+    <string name="ra_subset_completed">¡Conjunto completado!</string>
+    <string name="ra_disconnected">RetroAchievements desconectado — progreso pendiente.</string>
+    <string name="ra_reconnected">¡RetroAchievements reconectado!</string>
     <string name="ra_notification_channel">Logros RetroAchievements</string>
     <string name="ra_notification_channel_description">Notifica cuando un logro se desbloquea durante el juego.</string>
     <string name="ra_notification_title">¡Logro desbloqueado!</string>
@@ -505,6 +544,18 @@
     <!-- ===== Nintendo Switch UI - Todos los Juegos grid (Phase C) ===== -->
     <string name="grid_search_hint">Buscar...</string>
     <string name="grid_no_results">Ningún resultado encontrado</string>
+    <string name="ra_search_hint">Buscar logros…</string>
+    <string name="ra_no_results">No se encontraron logros.</string>
+    <string name="ra_sort_button">Ordenar</string>
+    <string name="ra_sort_default">Predeterminado (desbloqueados primero)</string>
+    <string name="ra_sort_name_az">Nombre (A–Z)</string>
+    <string name="ra_sort_name_za">Nombre (Z–A)</string>
+    <string name="ra_sort_points_desc">Puntos (mayor primero)</string>
+    <string name="ra_sort_points_asc">Puntos (menor primero)</string>
+    <string name="ra_sort_rarity_rare">Rareza (más rara primero)</string>
+    <string name="ra_sort_rarity_common">Rareza (más común primero)</string>
+    <string name="ra_missable">Perdible</string>
+    <string name="ra_rarity">%1$.1f%% de jugadores</string>
     <string name="grid_sort_button">Ordenar</string>
     <string name="grid_sort_last_played">Última vez Jugado</string>
     <string name="grid_sort_download_date">Fecha de Descarga</string>

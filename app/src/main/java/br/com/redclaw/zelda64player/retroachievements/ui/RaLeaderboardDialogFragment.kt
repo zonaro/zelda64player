@@ -8,11 +8,10 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -26,7 +25,6 @@ import kotlinx.coroutines.withContext
  */
 class RaLeaderboardDialogFragment : DialogFragment() {
 
-    private val scope = MainScope()
     private lateinit var container: LinearLayout
 
     override fun onCreateView(
@@ -74,7 +72,7 @@ class RaLeaderboardDialogFragment : DialogFragment() {
     private fun load(gameId: Long) {
         val repository = Zelda64PlayerApp.raCatalogRepository
         val credentials = Zelda64PlayerApp.raCredentialStore
-        scope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             val data = withContext(Dispatchers.IO) {
                 repository.fetchGameData(
                     gameId,
@@ -84,8 +82,13 @@ class RaLeaderboardDialogFragment : DialogFragment() {
             }
             if (!isAdded) return@launch
             container.removeAllViews()
+            container.addView(makeHeader(requireContext()))
 
-            val visible = data?.leaderboards?.filter { !it.hidden }.orEmpty()
+            if (data == null) {
+                addMessage(R.string.ra_error_network)
+                return@launch
+            }
+            val visible = data.leaderboards.filter { !it.hidden }
             if (visible.isEmpty()) {
                 addMessage(R.string.ra_leaderboards_empty)
                 return@launch
@@ -150,11 +153,6 @@ class RaLeaderboardDialogFragment : DialogFragment() {
             (resources.displayMetrics.heightPixels * 0.7).toInt()
         )
         dialog?.window?.setBackgroundDrawableResource(R.drawable.bg_switch_dialog)
-    }
-
-    override fun onDestroyView() {
-        scope.cancel()
-        super.onDestroyView()
     }
 
     companion object {

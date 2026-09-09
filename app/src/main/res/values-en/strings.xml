@@ -8,6 +8,9 @@
     <string name="menu_reset">Reset</string>
     <string name="menu_save_state">Save State</string>
     <string name="menu_load_state">Load State</string>
+    <string name="toast_state_saved">State saved</string>
+    <string name="toast_state_loaded">State loaded</string>
+    <string name="toast_state_none">No saved state found</string>
     <string name="menu_mute">Mute</string>
     <string name="menu_fast_forward">Fast Forward</string>
     <string name="menu_core">Core</string>
@@ -221,6 +224,7 @@
     <string name="settings_ra_title">RetroAchievements</string>
     <string name="settings_ra_description">Sign in with your RetroAchievements.org account to unlock achievements while playing. Your password is used only once; we store only the token, encrypted.</string>
     <string name="settings_ra_enabled">Enable RetroAchievements</string>
+    <string name="settings_ra_enabled_subtitle">Signed in as %1$s</string>
     <string name="settings_ra_username_hint">Username</string>
     <string name="settings_ra_password_hint">Password</string>
     <string name="settings_ra_login">Sign in</string>
@@ -232,6 +236,12 @@
     <string name="settings_ra_status_disabled">RetroAchievements disabled.</string>
     <string name="settings_ra_status_failed">Sign-in failed. Check your username and password.</string>
     <string name="settings_ra_status_failed_detail">Sign-in failed: %1$s</string>
+    <string name="settings_ra_api_key_hint">Web API key</string>
+    <string name="settings_ra_api_key_help">Paste the key generated at retroachievements.org > Control Panel > Keys. Needed to fetch your public profile.</string>
+    <string name="settings_ra_save_api_key">Save API key</string>
+    <string name="settings_ra_api_key_saved">Key saved!</string>
+    <string name="settings_ra_api_key_error_missing">Enter the key before saving.</string>
+    <string name="settings_ra_status_logged_in_no_key">Signed in. Add the Web API key above to view your profile.</string>
 
     <!-- Achievements screen -->
     <string name="achievements_title">Achievements</string>
@@ -269,11 +279,40 @@
     <string name="ra_profile_field_permissions">Permissions</string>
     <string name="ra_profile_field_untracked">Untracked account</string>
     <string name="ra_profile_field_user_wall_active">User wall active</string>
+    <string name="ra_profile_needs_api_key">You\'re signed in, but the Web API key hasn\'t been added yet. Go to Settings > RetroAchievements and paste the key from the Control Panel.</string>
+    <string name="ra_profile_member_since">Community member since %1$s</string>
+    <string name="ra_profile_last_game">Last game</string>
+    <string name="ra_profile_last_game_image_description">Last game icon</string>
+    <string name="ra_profile_recent_games">Recently played</string>
+    <string name="ra_profile_recent_achievements">Recent achievements</string>
+    <string name="ra_profile_open_web">Open profile in browser</string>
+    <string name="ra_profile_game_image_description">Game icon</string>
+    <string name="ra_profile_achievement_badge_description">Achievement badge</string>
+    <string name="ra_profile_unknown_game">Unknown game</string>
+    <string name="ra_profile_unknown_achievement">Unknown achievement</string>
+    <string name="ra_profile_game_progress">%1$d/%2$d achievements</string>
+    <string name="ra_profile_game_points">%1$s pts</string>
+    <string name="ra_profile_achievement_points">%1$d pts</string>
+    <string name="ra_profile_achievement_hardcore">Hardcore</string>
+    <string name="ra_profile_achievement_softcore">Casual</string>
+    <string name="ra_profile_metric_hardcore_points">Hardcore points</string>
+    <string name="ra_profile_metric_true_points">True points</string>
+    <string name="ra_profile_metric_mastery">Masteries</string>
+    <string name="ra_profile_metric_beaten">Beaten</string>
+    <string name="ra_profile_metric_rank_sub">Rank #%1$s of %2$s</string>
+    <string name="ra_profile_metric_softcore_sub">%1$s casual</string>
+    <string name="ra_profile_metric_completion_sub">%1$s completions</string>
+    <string name="ra_profile_metric_beaten_softcore_sub">%1$s casual</string>
 
     <!-- RetroAchievements in-game overlay and notifications -->
     <string name="ra_unlocked_points">Unlocked · %d pts</string>
     <string name="ra_leaderboard_started">Leaderboard active!</string>
+    <string name="ra_leaderboard_failed">Leaderboard failed.</string>
     <string name="ra_leaderboard_submitted">Submitted to the leaderboard!</string>
+    <string name="ra_game_completed">Mastery! All achievements unlocked!</string>
+    <string name="ra_subset_completed">Subset completed!</string>
+    <string name="ra_disconnected">RetroAchievements disconnected — progress pending.</string>
+    <string name="ra_reconnected">RetroAchievements reconnected!</string>
     <string name="ra_notification_channel">RetroAchievements unlocks</string>
     <string name="ra_notification_channel_description">Notifies when an achievement is unlocked during play.</string>
     <string name="ra_notification_title">Achievement unlocked!</string>
@@ -505,6 +544,18 @@
     <!-- ===== Nintendo Switch UI - All Games grid (Phase C) ===== -->
     <string name="grid_search_hint">Search...</string>
     <string name="grid_no_results">No results found</string>
+    <string name="ra_search_hint">Search achievements…</string>
+    <string name="ra_no_results">No achievements found.</string>
+    <string name="ra_sort_button">Sort</string>
+    <string name="ra_sort_default">Default (unlocked first)</string>
+    <string name="ra_sort_name_az">Name (A–Z)</string>
+    <string name="ra_sort_name_za">Name (Z–A)</string>
+    <string name="ra_sort_points_desc">Points (highest first)</string>
+    <string name="ra_sort_points_asc">Points (lowest first)</string>
+    <string name="ra_sort_rarity_rare">Rarity (rarest first)</string>
+    <string name="ra_sort_rarity_common">Rarity (most common first)</string>
+    <string name="ra_missable">Missable</string>
+    <string name="ra_rarity">%1$.1f%% of players</string>
     <string name="grid_sort_button">Sort</string>
     <string name="grid_sort_last_played">Last Played</string>
     <string name="grid_sort_download_date">Download Date</string>

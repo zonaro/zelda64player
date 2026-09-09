@@ -51,6 +51,21 @@ class RaAchievementSectionsTest {
     )
 
     @Test
+    fun `only published achievements contribute rows counts and points`() {
+        val published = ach(1, "Published", 5, false).first
+        val unofficial = ach(2, "Unofficial", 100, true).first.copy(category = 5)
+        val data = gameData(100, "Test", listOf(published, unofficial))
+        assertEquals(listOf(published), data.coreAchievements)
+        val rows = buildSectionedRows(listOf(GameAchievements(100, "Test", data, setOf(2L))))
+        val header = rows.first() as RaSectionItem
+        assertEquals(1, header.totalCount)
+        assertEquals(0, header.unlockedCount)
+        assertEquals(5, header.totalPoints)
+        assertEquals(0, header.earnedPoints)
+        assertEquals(listOf(1L), rows.filterIsInstance<RaAchievementRow>().map { it.def.id })
+    }
+
+    @Test
     fun `buildSectionedRows emits one header then its rows, unlocked first`() {
         val (a, aUnlocked) = ach(1, "Alpha", 5, unlocked = false)
         val (b, bUnlocked) = ach(2, "Beta", 10, unlocked = true)

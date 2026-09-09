@@ -29,206 +29,234 @@ data class PadPlacement(
 )
 
 class GamePadConfig(context: Context, private val resources: Resources) {
-    companion object {
-        private val themeBlue =
-                RadialGamePadTheme(
-                        primaryDialBackground = Color.TRANSPARENT,
-                        textColor = Color.WHITE,
-                        normalColor = 0xFF2196F3.toInt(),
-                        pressedColor = 0xFF1565C0.toInt()
-                )
-
-        private val themeGreen =
-                RadialGamePadTheme(
-                        primaryDialBackground = Color.TRANSPARENT,
-                        textColor = Color.WHITE,
-                        normalColor = 0xFF4CAF50.toInt(),
-                        pressedColor = 0xFF2E7D32.toInt()
-                )
-
-        private val themeYellow =
-                RadialGamePadTheme(
-                        primaryDialBackground = Color.TRANSPARENT,
-                        textColor = Color.DKGRAY,
-                        normalColor = 0xFFFFEB3B.toInt(),
-                        pressedColor = 0xFFF9A825.toInt()
-                )
-
-        private val themeRed =
-                RadialGamePadTheme(
-                        primaryDialBackground = Color.TRANSPARENT,
-                        textColor = Color.WHITE,
-                        normalColor = 0xFFF44336.toInt(),
-                        pressedColor = 0xFFC62828.toInt()
-                )
-
-        val BUTTON_START =
-                ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_START, label = "S", theme = themeRed)
-
-        val BUTTON_SELECT = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_SELECT, label = "L")
-
-        val BUTTON_L1 =
-                ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_L1, label = "C◀", theme = themeYellow)
-
-        val BUTTON_R1 =
-                ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_R1, label = "C▶", theme = themeYellow)
-
-        val BUTTON_L2 = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_L2, label = "Z")
-
-        val BUTTON_R2 = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_R2, label = "R")
-
-        val BUTTON_A = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_A, label = "A", theme = themeBlue)
-
-        val BUTTON_B = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_B, label = "B", theme = themeGreen)
-
-        val BUTTON_X =
-                ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_X, label = "C▼", theme = themeYellow)
-
-        val BUTTON_Y =
-                ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_Y, label = "C▲", theme = themeYellow)
-
-        /* The reference layout's own buttons read as too small as real touch targets */
-        private const val SIZE_SCALE = 1.7f
-
-        /* Placement for the standalone ButtonStick: empty area below the C-right/C-down
-        diagonal, left of Z and right of A -- a bit bigger than the regular C-buttons
-        since it doubles as an analog nub. */
-        const val BUTTON_STICK_GRAVITY_X = 0.735f
-        const val BUTTON_STICK_GRAVITY_Y = 0.900f
-        const val BUTTON_STICK_SIZE_FRACTION = 0.15f
-
-        /* FloatingJoystick capture region: the empty lower-left area of the screen (fractions of
-        the overlay's width/height). Real buttons (Select, D-pad) are added on top of it later
-        and naturally claim their own touches first via view z-order, so the region can be
-        generous without stealing input from them. The hint circle marks the analog stick's old
-        fixed spot so it still visually reads as a stick when idle. */
-        const val FLOATING_JOYSTICK_REGION_RIGHT_FRACTION = 0.60f
-        const val FLOATING_JOYSTICK_HINT_GRAVITY_X = 0.212f
-        const val FLOATING_JOYSTICK_HINT_GRAVITY_Y = 0.787f
-        const val FLOATING_JOYSTICK_HINT_SIZE_FRACTION = 0.164f * SIZE_SCALE
-        const val FLOATING_JOYSTICK_MAX_REACH_FRACTION = 0.075f
-    }
-
-    private val radialGamePadTheme =
-            RadialGamePadTheme(
-                    primaryDialBackground = Color.TRANSPARENT,
-                    textColor = Color.WHITE,
-                    normalColor = 0x44FFFFFF.toInt(),
-                    pressedColor = 0x88FFFFFF.toInt()
-            )
-
-    /**
-     * Wrap a single primary dial (no secondaries) in its own config, so it can be placed
-     * independently anywhere on screen via [PadPlacement.gravityX]/[PadPlacement.gravityY].
-     */
-    private fun single(primary: PrimaryDialConfig) =
-            RadialGamePadConfig(
-                    haptic =
-                            if (resources.getBoolean(R.bool.config_gamepad_haptic))
-                                    HapticConfig.PRESS
-                            else HapticConfig.OFF,
-                    theme = radialGamePadTheme,
-                    sockets = 1,
-                    primaryDial = primary,
-                    secondaryDials = emptyList()
-            )
-
-    private fun singleButton(button: ButtonConfig) =
-            single(PrimaryDialConfig.PrimaryButtons(dials = emptyList(), center = button))
-
-    /**
-     * Every on-screen control, positioned to match the button centers measured from referencia.png
-     * (fractions of the full-screen overlay's width/height). Sizes are the measured reference
-     * diameter scaled up by [SIZE_SCALE] -- the reference's own buttons read as too small as real
-     * touch targets.
-     */
-    val placements: List<PadPlacement> =
-            listOfNotNull(
-                    /* When the left analog stick is enabled, it's rendered as a standalone FloatingJoystick
-                    (see GameActivityViewModel.setupGamePads) instead of a RadialGamePad placement here. */
-                    if (!resources.getBoolean(R.bool.config_left_analog)) {
-                        PadPlacement(
-                                single(PrimaryDialConfig.Cross(CrossConfig(0))),
-                                0.212f,
-                                0.787f,
-                                0.164f * SIZE_SCALE
+        companion object {
+                private val themeBlue =
+                        RadialGamePadTheme(
+                                primaryDialBackground = Color.TRANSPARENT,
+                                textColor = Color.WHITE,
+                                normalColor = 0xFF2196F3.toInt(),
+                                pressedColor = 0xFF1565C0.toInt()
                         )
-                    } else null,
-                    PadPlacement(
-                                    single(PrimaryDialConfig.Cross(CrossConfig(0))),
-                                    0.067f,
-                                    0.558f,
-                                    0.121f * SIZE_SCALE
-                            )
-                            .takeIf { resources.getBoolean(R.bool.config_left_analog) },
-                    PadPlacement(singleButton(BUTTON_SELECT), 0.017f, 0.408f, 0.093f * SIZE_SCALE)
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_select) },
-                    PadPlacement(
-                                    singleButton(BUTTON_A),
-                                    TouchControlLayout.a.x,
-                                    TouchControlLayout.a.y,
-                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE
-                            )
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_a) },
-                    PadPlacement(
-                                    singleButton(BUTTON_B),
-                                    TouchControlLayout.b.x,
-                                    TouchControlLayout.b.y,
-                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE
-                            )
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_b) },
-                    PadPlacement(
-                                    singleButton(BUTTON_R2),
-                                    TouchControlLayout.r.x,
-                                    TouchControlLayout.r.y,
-                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE,
-                            )
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_r2) },
-                    PadPlacement(
-                                    singleButton(BUTTON_L2),
-                                    0.956f,
-                                    0.902f,
-                                    0.093f * SIZE_SCALE,
-                                    KeyEvent.KEYCODE_BUTTON_L2
-                            )
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_l2) },
-                    PadPlacement(singleButton(BUTTON_Y), 0.956f, 0.481f, 0.052f * SIZE_SCALE)
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_y) },
-                    /* Exact midpoint of R and B, so R -> C-right -> B is an evenly-spaced
-                    diagonal. */
-                    PadPlacement(
-                                    singleButton(BUTTON_R1),
-                                    TouchControlLayout.cRight.x,
-                                    TouchControlLayout.cRight.y,
-                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE,
-                                    KeyEvent.KEYCODE_BUTTON_R1
-                            )
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_r1) },
-                    /* Exact midpoint of C-left and A, so C-left -> C-down -> A is the other
-                    evenly-spaced diagonal. */
-                    PadPlacement(
-                                    singleButton(BUTTON_X),
-                                    TouchControlLayout.cDown.x,
-                                    TouchControlLayout.cDown.y,
-                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE,
-                                    KeyEvent.KEYCODE_BUTTON_X
-                            )
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_x) },
-                    PadPlacement(
-                                    singleButton(BUTTON_L1),
-                                    TouchControlLayout.cLeft.x,
-                                    TouchControlLayout.cLeft.y,
-                                    TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE,
-                                    KeyEvent.KEYCODE_BUTTON_L1
-                            )
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_l1) },
-                    PadPlacement(
-                                    singleButton(BUTTON_START),
-                                    0.475f,
-                                    0.907f,
-                                    0.092f * SIZE_SCALE,
-                                    KeyEvent.KEYCODE_BUTTON_START
-                            )
-                            .takeIf { resources.getBoolean(R.bool.config_gamepad_start) },
-            )
+
+                private val themeGreen =
+                        RadialGamePadTheme(
+                                primaryDialBackground = Color.TRANSPARENT,
+                                textColor = Color.WHITE,
+                                normalColor = 0xFF4CAF50.toInt(),
+                                pressedColor = 0xFF2E7D32.toInt()
+                        )
+
+                private val themeYellow =
+                        RadialGamePadTheme(
+                                primaryDialBackground = Color.TRANSPARENT,
+                                textColor = Color.DKGRAY,
+                                normalColor = 0xFFFFEB3B.toInt(),
+                                pressedColor = 0xFFF9A825.toInt()
+                        )
+
+                private val themeRed =
+                        RadialGamePadTheme(
+                                primaryDialBackground = Color.TRANSPARENT,
+                                textColor = Color.WHITE,
+                                normalColor = 0xFFF44336.toInt(),
+                                pressedColor = 0xFFC62828.toInt()
+                        )
+
+                val BUTTON_START =
+                        ButtonConfig(
+                                id = KeyEvent.KEYCODE_BUTTON_START,
+                                label = "S",
+                                theme = themeRed
+                        )
+
+                val BUTTON_SELECT = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_SELECT, label = "L")
+
+                val BUTTON_L1 =
+                        ButtonConfig(
+                                id = KeyEvent.KEYCODE_BUTTON_L1,
+                                label = "C◀",
+                                theme = themeYellow
+                        )
+
+                val BUTTON_R1 =
+                        ButtonConfig(
+                                id = KeyEvent.KEYCODE_BUTTON_R1,
+                                label = "C▶",
+                                theme = themeYellow
+                        )
+
+                val BUTTON_L2 = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_L2, label = "Z")
+
+                val BUTTON_R2 = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_R2, label = "R")
+
+                val BUTTON_A =
+                        ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_A, label = "A", theme = themeBlue)
+
+                val BUTTON_B =
+                        ButtonConfig(
+                                id = KeyEvent.KEYCODE_BUTTON_B,
+                                label = "B",
+                                theme = themeGreen
+                        )
+
+                val BUTTON_X =
+                        ButtonConfig(
+                                id = KeyEvent.KEYCODE_BUTTON_X,
+                                label = "C▼",
+                                theme = themeYellow
+                        )
+
+                val BUTTON_Y =
+                        ButtonConfig(
+                                id = KeyEvent.KEYCODE_BUTTON_Y,
+                                label = "C▲",
+                                theme = themeYellow
+                        )
+
+                /* The reference layout's own buttons read as too small as real touch targets */
+                private const val SIZE_SCALE = 1.7f
+
+                /* FloatingJoystick capture region: the empty lower-left area of the screen (fractions of
+                the overlay's width/height). Real buttons (Select, D-pad) are added on top of it later
+                and naturally claim their own touches first via view z-order, so the region can be
+                generous without stealing input from them. The hint circle marks the analog stick's old
+                fixed spot so it still visually reads as a stick when idle. */
+                const val FLOATING_JOYSTICK_REGION_RIGHT_FRACTION = 0.60f
+                const val FLOATING_JOYSTICK_HINT_GRAVITY_X = 0.212f
+                const val FLOATING_JOYSTICK_HINT_GRAVITY_Y = 0.787f
+                const val FLOATING_JOYSTICK_HINT_SIZE_FRACTION = 0.164f * SIZE_SCALE
+                const val FLOATING_JOYSTICK_MAX_REACH_FRACTION = 0.075f
+        }
+
+        private val radialGamePadTheme =
+                RadialGamePadTheme(
+                        primaryDialBackground = Color.TRANSPARENT,
+                        textColor = Color.WHITE,
+                        normalColor = 0x44FFFFFF.toInt(),
+                        pressedColor = 0x88FFFFFF.toInt()
+                )
+
+        /**
+         * Wrap a single primary dial (no secondaries) in its own config, so it can be placed
+         * independently anywhere on screen via [PadPlacement.gravityX]/[PadPlacement.gravityY].
+         */
+        private fun single(primary: PrimaryDialConfig) =
+                RadialGamePadConfig(
+                        haptic =
+                                if (resources.getBoolean(R.bool.config_gamepad_haptic))
+                                        HapticConfig.PRESS
+                                else HapticConfig.OFF,
+                        theme = radialGamePadTheme,
+                        sockets = 1,
+                        primaryDial = primary,
+                        secondaryDials = emptyList()
+                )
+
+        private fun singleButton(button: ButtonConfig) =
+                single(PrimaryDialConfig.PrimaryButtons(dials = emptyList(), center = button))
+
+        /**
+         * Every on-screen control, positioned to match the button centers measured from
+         * referencia.png (fractions of the full-screen overlay's width/height). Sizes are the
+         * measured reference diameter scaled up by [SIZE_SCALE] -- the reference's own buttons read
+         * as too small as real touch targets.
+         */
+        val placements: List<PadPlacement> =
+                listOfNotNull(
+                        /* When the left analog stick is enabled, it's rendered as a standalone FloatingJoystick
+                        (see GameActivityViewModel.setupGamePads) instead of a RadialGamePad placement here. */
+                        if (!resources.getBoolean(R.bool.config_left_analog)) {
+                                PadPlacement(
+                                        single(PrimaryDialConfig.Cross(CrossConfig(0))),
+                                        0.212f,
+                                        0.787f,
+                                        0.164f * SIZE_SCALE
+                                )
+                        } else null,
+                        PadPlacement(
+                                        single(PrimaryDialConfig.Cross(CrossConfig(0))),
+                                        0.067f,
+                                        0.558f,
+                                        0.121f * SIZE_SCALE
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_left_analog) },
+                        PadPlacement(
+                                        singleButton(BUTTON_SELECT),
+                                        0.017f,
+                                        0.408f,
+                                        0.093f * SIZE_SCALE
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_select) },
+                        PadPlacement(
+                                        singleButton(BUTTON_A),
+                                        TouchControlLayout.a.x,
+                                        TouchControlLayout.a.y,
+                                        TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_a) },
+                        PadPlacement(
+                                        singleButton(BUTTON_B),
+                                        TouchControlLayout.b.x,
+                                        TouchControlLayout.b.y,
+                                        TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION * SIZE_SCALE
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_b) },
+                        PadPlacement(
+                                        singleButton(BUTTON_R2),
+                                        TouchControlLayout.r.x,
+                                        TouchControlLayout.r.y,
+                                        TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION *
+                                                SIZE_SCALE,
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_r2) },
+                        PadPlacement(
+                                        singleButton(BUTTON_L2),
+                                        0.956f,
+                                        0.902f,
+                                        0.093f * SIZE_SCALE,
+                                        KeyEvent.KEYCODE_BUTTON_L2
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_l2) },
+                        PadPlacement(singleButton(BUTTON_Y), 0.956f, 0.481f, 0.052f * SIZE_SCALE)
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_y) },
+                        /* Exact midpoint of R and B, so R -> C-right -> B is an evenly-spaced
+                        diagonal. */
+                        PadPlacement(
+                                        singleButton(BUTTON_R1),
+                                        TouchControlLayout.cRight.x,
+                                        TouchControlLayout.cRight.y,
+                                        TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION *
+                                                SIZE_SCALE,
+                                        KeyEvent.KEYCODE_BUTTON_R1
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_r1) },
+                        /* Exact midpoint of C-left and A, so C-left -> C-down -> A is the other
+                        evenly-spaced diagonal. */
+                        PadPlacement(
+                                        singleButton(BUTTON_X),
+                                        TouchControlLayout.cDown.x,
+                                        TouchControlLayout.cDown.y,
+                                        TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION *
+                                                SIZE_SCALE,
+                                        KeyEvent.KEYCODE_BUTTON_X
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_x) },
+                        PadPlacement(
+                                        singleButton(BUTTON_L1),
+                                        TouchControlLayout.cLeft.x,
+                                        TouchControlLayout.cLeft.y,
+                                        TouchControlLayout.CLUSTER_BUTTON_SIZE_FRACTION *
+                                                SIZE_SCALE,
+                                        KeyEvent.KEYCODE_BUTTON_L1
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_l1) },
+                        PadPlacement(
+                                        singleButton(BUTTON_START),
+                                        0.475f,
+                                        0.907f,
+                                        0.092f * SIZE_SCALE,
+                                        KeyEvent.KEYCODE_BUTTON_START
+                                )
+                                .takeIf { resources.getBoolean(R.bool.config_gamepad_start) },
+                )
 }

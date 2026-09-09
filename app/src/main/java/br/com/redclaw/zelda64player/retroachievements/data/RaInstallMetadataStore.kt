@@ -103,7 +103,7 @@ class RaInstallMetadataStore(private val context: Context) {
     }
 
     /** Returns the stored identity for [hackId], or null when never computed. */
-    fun get(hackId: String): RaGameIdentity? = load()[hackId]
+    fun get(hackId: String): RaGameIdentity? = synchronized(this) { load()[hackId] }
 
     /** Stores (or replaces) the identity for [hackId]. */
     fun put(hackId: String, identity: RaGameIdentity) {
@@ -236,7 +236,7 @@ class RaHashService(
 
             // Persist only when something improved, never downgrading.
             if (identity != stored) {
-                val merged = mergeIdentity(stored, identity)
+                val merged = mergeIdentity(identity, metadataStore.get(hackId) ?: identity)
                 metadataStore.put(hackId, merged)
                 return@withContext merged
             }

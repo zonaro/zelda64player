@@ -4,7 +4,17 @@
 
 ## 1. Overview
 
-Full RetroAchievements support: users log in with their RA account, see unlocked/pending achievements per installed game, receive in-game unlock notifications (custom toast + badge), and access leaderboards **only inside the in-game menu** (GameActivity menu — never as an overlay over gameplay). Integration uses **rcheevos** (MIT, ANSI C) via JNI, with the vendored LibretroDroid 0.13.2 exposing core memory (RDRAM) pointers to rcheevos.
+RetroAchievements integration: users log in with their RA account, see unlocked/pending achievements per installed game, receive in-game unlock notifications (custom toast + badge), and access leaderboards **only inside the in-game menu** (GameActivity menu — never as an overlay over gameplay). Integration uses **rcheevos** (MIT, ANSI C) via JNI, with the vendored LibretroDroid 0.13.2 exposing core memory (RDRAM) pointers to rcheevos.
+
+### Current identity and catalog flow
+
+- `RaSessionManager.start` receives the library `hackId`. After the live rcheevos client identifies the final playable ROM, the session writes its verified hash, game ID and title to the shared `Zelda64PlayerApp.raInstallMetadataStore` before publishing `Running`. This applies to patched hacks and original games (`vanilla_<crc32>`); original games use the user's normalized playable ROM.
+- Profile/achievement screens resolve identity through `RaHashService.ensureIdentity` and the same shared metadata store. Lazy resolution merges with the latest stored identity so a failed lookup does not discard an identity already supplied by the live session. Original games no longer launch a separate competing hash request alongside session identification.
+- `RaCatalogRepository` builds authenticated standalone rapi requests using the stored username/token. HTTP response bodies pass through `nativeProcessFetchGameDataResponse` or `nativeProcessFetchUserUnlocksResponse` before Kotlin parses the normalized JSON. The raw service payload is not the app's data model.
+- An unlock request failure returns `null`; a successful empty set means zero unlocked achievements. Achievement detail reports request failures, while the profile skips games whose data could not be loaded. The leaderboard dialog reports a failed request separately from a successful response with no visible leaderboards.
+- **Leaderboard UI scope:** `RaLeaderboardDialogFragment` currently displays visible leaderboard definitions (title and description) in the in-game menu. It does not fetch or display ranking entries, player positions or scores; that portion of the original scope remains outstanding.
+
+These describe the implementation contract, not evidence of successful device validation or a verified achievement unlock.
 
 ## 2. User Decisions (Final)
 
@@ -57,7 +67,9 @@ For N64 + mupen64plus-next, `RETRO_MEMORY_SYSTEM_RAM` is **RDRAM** (8MB with exp
 ### rapi (standalone requests)
 Headers `rc_api_user.h`, `rc_api_runtime.h` allow building standalone requests (login, fetch_game_data, fetch_user_unlocks, resolve_hash, fetch_leaderboards, fetch_leaderboard_entries) — useful for showing data of **non-running** games without booting cores.
 
-## 4. Package Structure (`retroachievements/`)
+## 4. Original Package Plan (`retroachievements/`)
+
+This historical plan includes proposed classes and ranking-entry UI. For the implemented identity/catalog flow and current leaderboard scope, see section 1 above.
 
 ```
 retroachievements/
@@ -122,16 +134,21 @@ retroachievements/
 - `catalogVersion` bumped to **2** (graceful migration: missing field = `supported=false`).
 - `gameId` optional in catalog (may be resolved at install via hash); if present, Store shows RA badge immediately.
 
-### Install-time Storage (per Hack)
-Local: `filesDir/ra_metadata.json` (JSON array of `RaGameMetadata` keyed by hackId)
+### Shared Identity Storage (per Library Game)
+
+`RaInstallMetadataStore` persists `filesDir/ra_metadata.json` as an object keyed by `hackId`, shared by installation, lazy identity resolution and live session identification:
+
 ```json
 {
-  "schemaVersion": 1,
-  "entries": [
-    { "hackId": "ocarina_of_time_dx", "raHash": "...", "raGameId": 12345, "raTitle": "Ocarina of Time DX", "badgeUrl": "https://...", "consoleId": 1 }
-  ]
+  "ocarina_of_time_dx": {
+    "raHash": "...",
+    "gameId": 12345,
+    "title": "Ocarina of Time DX"
+  }
 }
 ```
+
+Original games use `vanilla_<crc32>` keys in the same document. `gameId: 0` represents an unresolved identity; the title may be null. The hash always describes the final playable ROM supplied to the core.
 
 ### Settings Keys (CorePrefs Convention)
 | Key | Type | Default | Description |
@@ -152,11 +169,13 @@ Local: `filesDir/ra_metadata.json` (JSON array of `RaGameMetadata` keyed by hack
 ## 8. Navigation Entry Point (LibraryActivity)
 `LibraryActivity` header has buttons: Settings, Store, **+ Achievements (trophy icon)**. `binding.libraryAchievements` → `startActivity(Intent(this, AchievementsActivity::class.java))`. Icon: Dolfi-generated trophy SVG (Material Icons outlined style, 24dp).
 
-## 9. Implementation Phases (Completed)
+## 9. Historical Implementation Phases
+
+The list below records the original phase breakdown, not current verification results. B5 ranking-entry display is still incomplete; see section 1.
 
 - **B1 Foundation:** Vendored LibretroDroid + rcheevos native + JNI bridge; `rc_client_create` + `rc_client_do_frame` per frame (log "RA frame tick").
 - **B2 Auth + Session + Install-time Hash:** `RaCredentialStore`, `RaSessionManager`, `RaLoginFragment`, `RaHttpClient` complete, `RaRepository`, `RaHashService`; integrated into DownloadManager install flow; Store RA badge.
-- **B3 Achievements Screens:** `AchievementsActivity` + `AchievementsViewModel`, `AchievementDetailActivity` + ViewModel, `RaApiModels`/`RaApiException`; i18n; accessibility; Chululu visual QA.
+- **B3 Achievements Screens:** `AchievementsActivity` + `AchievementsViewModel`, `AchievementDetailActivity` + ViewModel, `RaApiModels`/`RaApiException`; i18n; accessibility; planned Chululu visual QA.
 - **B4 In-Game Overlay + Notifications + Indicators:** `InGameRaViewModel`, `InGameAchievementOverlay`, system notification, Settings RA section, hardcore toggle.
 - **B5 Leaderboards (In-Game Menu Only) + Catalog Integration + Polish:** `LeaderboardDialog`, in-game menu "Conquistas" category, catalog v2, Store RA badge, i18n, third-party license notices (rcheevos MIT).
 

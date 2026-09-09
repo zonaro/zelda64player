@@ -51,13 +51,12 @@ import br.com.redclaw.zelda64player.retroachievements.RaNotificationHelper
 import br.com.redclaw.zelda64player.retroachievements.api.RaHttpClient
 import br.com.redclaw.zelda64player.retroachievements.api.RaUserAgent
 import br.com.redclaw.zelda64player.retroachievements.auth.RaCredentialStore
-import br.com.redclaw.zelda64player.retroachievements.data.RaInstallMetadataStore
 import br.com.redclaw.zelda64player.retroachievements.jni.RcheevosJni
 import br.com.redclaw.zelda64player.retroachievements.session.RaClientEvent
 import br.com.redclaw.zelda64player.retroachievements.session.RaGameSummary
 import br.com.redclaw.zelda64player.retroachievements.session.RaSessionManager
 import br.com.redclaw.zelda64player.retroachievements.session.RaSessionState
-import br.com.redclaw.zelda64player.retroachievements.ui.AchievementsActivity
+import br.com.redclaw.zelda64player.retroachievements.ui.RaAchievementsDialogFragment
 import br.com.redclaw.zelda64player.retroachievements.ui.RaLeaderboardDialogFragment
 import br.com.redclaw.zelda64player.retroachievements.ui.RaOverlayView
 import br.com.redclaw.zelda64player.retroview.RetroView
@@ -1287,7 +1286,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                         context = app,
                         http = RaHttpClient(RaUserAgent.build(app)),
                         credentials = RaCredentialStore(app),
-                        metadataStore = RaInstallMetadataStore(app)
+                        metadataStore = Zelda64PlayerApp.raInstallMetadataStore
                 )
         raSession = session
 
@@ -1351,24 +1350,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                     }
                 }
 
-        session.start(romFile, hardcoreEnabled = CorePrefs.getRaHardcore(appContext)) {
+        session.start(romFile, hackId, hardcoreEnabled = CorePrefs.getRaHardcore(appContext)) {
             view.getMemoryRegion(LibretroDroid.MEMORY_SYSTEM_RAM)
-        }
-
-        /* Vanilla base ROMs have no install step, so their RetroAchievements
-        identity (hash + game id) is computed lazily on first play. Store hacks
-        already get it at install time via DownloadManager, so we skip them here.
-
-        Per project Rule 21 the RA hash is computed ONLY from the final playable
-        ROM. For vanilla games that final ROM IS the normalized base ROM file
-        resolved above (no patch is applied), so hashing it directly is correct. */
-        if (hackId.startsWith(GameRomResolver.VANILLA_PREFIX)) {
-            viewModelScope.launch {
-                runCatching { Zelda64PlayerApp.raHashService.computeAndResolve(hackId, romFile) }
-                        .onFailure { e ->
-                            Log.w(TAG, "RA identity computation failed for vanilla $hackId", e)
-                        }
-            }
         }
 
         // System notifications are opt-in default ON; on API 33+ they need
@@ -1492,6 +1475,9 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
 
     /** Stop the emulator-only recording and reset the toggle state. */
     fun stopRecording() {
+        // Do nothing if no recording is active — avoids the "Gravação parada"
+        // toast when simply leaving emulation without a live capture.
+        if (_isRecording.value != true) return
         val context = activityContext ?: return
         retroView?.stopVideoRecording {
             _isRecording.value = false
@@ -1537,14 +1523,12 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 .show(activity.supportFragmentManager, "ra_leaderboards")
     }
 
-    /** Opens the achievements list for the running game. */
+    /** Opens the achievements list for the running game as a popup (no Activity switch). */
     private fun openRaAchievements() {
         val hackId = currentHackId ?: return
-        val activity = activityContext ?: return
-        activity.startActivity(
-                android.content.Intent(activity, AchievementsActivity::class.java)
-                        .putExtra(AchievementsActivity.EXTRA_HACK_ID, hackId)
-        )
+        val activity = activityContext as? androidx.fragment.app.FragmentActivity ?: return
+        RaAchievementsDialogFragment.newInstance(hackId)
+                .show(activity.supportFragmentManager, "ra_achievements")
     }
 
     /** Routes one client event to the overlay and/or a system notification. */
@@ -1571,8 +1555,44 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                     overlay?.showMessage(appContext.getString(R.string.ra_leaderboard_started))
                 }
             }
+            RcheevosJni.Events.LEADERBOARD_FAILED -> {
+                overlay?.showMessage(appContext.getString(R.string.ra_leaderboard_failed))
+            }
             RcheevosJni.Events.LEADERBOARD_SUBMITTED -> {
                 overlay?.showMessage(appContext.getString(R.string.ra_leaderboard_submitted))
+            }
+            RcheevosJni.Events.LEADERBOARD_TRACKER_SHOW,
+            RcheevosJni.Events.LEADERBOARD_TRACKER_UPDATE -> {
+                if (CorePrefs.getRaShowChallengeIndicators(appContext)) {
+                    overlay?.updateProgressIndicator(event.payloadJson, visible = true)
+                }
+            }
+            RcheevosJni.Events.LEADERBOARD_TRACKER_HIDE -> {
+                overlay?.updateProgressIndicator(event.payloadJson, visible = false)
+            }
+            RcheevosJni.Events.LEADERBOARD_SCOREBOARD -> {
+                // Scoreboard payload contains submitted_score/best_score/new_rank.
+                // Surface as a transient message; detailed ranking stays in the menu dialog.
+                overlay?.showMessage(appContext.getString(R.string.ra_leaderboard_submitted))
+            }
+            RcheevosJni.Events.GAME_COMPLETED -> {
+                overlay?.showMessage(appContext.getString(R.string.ra_game_completed))
+            }
+            RcheevosJni.Events.SUBSET_COMPLETED -> {
+                overlay?.showMessage(appContext.getString(R.string.ra_subset_completed))
+            }
+            RcheevosJni.Events.RESET -> {
+                // Hardcore toggle requested a reset — clear transient indicators.
+                overlay?.clearAll()
+            }
+            RcheevosJni.Events.SERVER_ERROR -> {
+                android.util.Log.w("GameActivityVM", "RA server error: ${event.payloadJson}")
+            }
+            RcheevosJni.Events.DISCONNECTED -> {
+                overlay?.showMessage(appContext.getString(R.string.ra_disconnected))
+            }
+            RcheevosJni.Events.RECONNECTED -> {
+                overlay?.showMessage(appContext.getString(R.string.ra_reconnected))
             }
             else -> Unit
         }
@@ -1841,7 +1861,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                             when (centerId) {
                                                 KeyEvent.KEYCODE_BUTTON_A -> StickButton.BLUE_THEME
                                                 KeyEvent.KEYCODE_BUTTON_B -> StickButton.GREEN_THEME
-                                                KeyEvent.KEYCODE_BUTTON_R2 -> StickButton.NEUTRAL_THEME
+                                                KeyEvent.KEYCODE_BUTTON_R2 ->
+                                                        StickButton.NEUTRAL_THEME
                                                 else -> StickButton.YELLOW_THEME
                                             }
                                     val sizePx =
@@ -1866,7 +1887,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                                     supportsAnalogDrag =
                                                             centerId != KeyEvent.KEYCODE_BUTTON_R2,
                                                     hapticEnabled =
-                                                            centerId != KeyEvent.KEYCODE_BUTTON_R2 ||
+                                                            centerId !=
+                                                                    KeyEvent.KEYCODE_BUTTON_R2 ||
                                                                     resources.getBoolean(
                                                                             R.bool.config_gamepad_haptic
                                                                     )

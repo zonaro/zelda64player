@@ -8,6 +8,9 @@
     <string name="menu_reset">Reiniciar</string>
     <string name="menu_save_state">Salvar Estado</string>
     <string name="menu_load_state">Carregar Estado</string>
+    <string name="toast_state_saved">Estado salvo</string>
+    <string name="toast_state_loaded">Estado carregado</string>
+    <string name="toast_state_none">Nenhum estado salvo encontrado</string>
     <string name="menu_mute">Silenciar</string>
     <string name="menu_fast_forward">Acelerar</string>
     <string name="menu_core">Core</string>
@@ -226,6 +229,7 @@
     <string name="settings_ra_title">RetroAchievements</string>
     <string name="settings_ra_description">Entre com sua conta da RetroAchievements.org para desbloquear conquistas ao jogar. Sua senha é usada apenas uma vez; guardamos somente o token, de forma criptografada.</string>
     <string name="settings_ra_enabled">Ativar RetroAchievements</string>
+    <string name="settings_ra_enabled_subtitle">Conectado como %1$s</string>
     <string name="settings_ra_username_hint">Usuário</string>
     <string name="settings_ra_password_hint">Senha</string>
     <string name="settings_ra_login">Entrar</string>
@@ -237,6 +241,12 @@
     <string name="settings_ra_status_disabled">RetroAchievements desativado.</string>
     <string name="settings_ra_status_failed">Falha no login. Verifique usuário e senha.</string>
     <string name="settings_ra_status_failed_detail">Falha no login: %1$s</string>
+    <string name="settings_ra_api_key_hint">Chave da Web API</string>
+    <string name="settings_ra_api_key_help">Cole aqui a chave gerada em retroachievements.org > Control Panel > Keys. Necessária para buscar seu perfil público.</string>
+    <string name="settings_ra_save_api_key">Salvar chave da API</string>
+    <string name="settings_ra_api_key_saved">Chave salva!</string>
+    <string name="settings_ra_api_key_error_missing">Digite a chave antes de salvar.</string>
+    <string name="settings_ra_status_logged_in_no_key">Conectado. Adicione a chave da Web API acima para ver o perfil.</string>
 
     <!-- Achievements screen -->
     <string name="achievements_title">Conquistas</string>
@@ -248,6 +258,18 @@
     <string name="ra_all_empty">Nenhum jogo instalado foi identificado na RetroAchievements.</string>
     <string name="ra_error_untracked">Não foi possível identificar este jogo na RetroAchievements.</string>
     <string name="ra_error_network">Não foi possível conectar à RetroAchievements. Verifique sua conexão e tente de novo.</string>
+    <string name="ra_search_hint">Buscar conquistas…</string>
+    <string name="ra_no_results">Nenhuma conquista encontrada.</string>
+    <string name="ra_sort_button">Ordenar</string>
+    <string name="ra_sort_default">Padrão (desbloqueadas primeiro)</string>
+    <string name="ra_sort_name_az">Nome (A–Z)</string>
+    <string name="ra_sort_name_za">Nome (Z–A)</string>
+    <string name="ra_sort_points_desc">Pontos (maior primeiro)</string>
+    <string name="ra_sort_points_asc">Pontos (menor primeiro)</string>
+    <string name="ra_sort_rarity_rare">Raridade (mais rara primeiro)</string>
+    <string name="ra_sort_rarity_common">Raridade (mais comum primeiro)</string>
+    <string name="ra_missable">Perdível</string>
+    <string name="ra_rarity">%1$.1f%% dos jogadores</string>
 
     <!-- RetroAchievements player profile -->
     <string name="ra_profile_title">Perfil RetroAchievements</string>
@@ -274,11 +296,40 @@
     <string name="ra_profile_field_permissions">Permissões</string>
     <string name="ra_profile_field_untracked">Conta não rastreada</string>
     <string name="ra_profile_field_user_wall_active">Mural do usuário ativo</string>
+    <string name="ra_profile_needs_api_key">Você entrou, mas ainda falta adicionar a chave da Web API. Abra Configurações > RetroAchievements e cole a chave do Painel de Controle.</string>
+    <string name="ra_profile_member_since">Na comunidade desde %1$s</string>
+    <string name="ra_profile_last_game">Último jogo</string>
+    <string name="ra_profile_last_game_image_description">Ícone do último jogo</string>
+    <string name="ra_profile_recent_games">Jogados recentemente</string>
+    <string name="ra_profile_recent_achievements">Conquistas recentes</string>
+    <string name="ra_profile_open_web">Abrir perfil no navegador</string>
+    <string name="ra_profile_game_image_description">Ícone do jogo</string>
+    <string name="ra_profile_achievement_badge_description">Emblema da conquista</string>
+    <string name="ra_profile_unknown_game">Jogo desconhecido</string>
+    <string name="ra_profile_unknown_achievement">Conquista desconhecida</string>
+    <string name="ra_profile_game_progress">%1$d/%2$d conquistas</string>
+    <string name="ra_profile_game_points">%1$s pts</string>
+    <string name="ra_profile_achievement_points">%1$d pts</string>
+    <string name="ra_profile_achievement_hardcore">Modo difícil</string>
+    <string name="ra_profile_achievement_softcore">Casual</string>
+    <string name="ra_profile_metric_hardcore_points">Pontos difíceis</string>
+    <string name="ra_profile_metric_true_points">Pontos verdadeiros</string>
+    <string name="ra_profile_metric_mastery">Maestrias</string>
+    <string name="ra_profile_metric_beaten">Finalizados</string>
+    <string name="ra_profile_metric_rank_sub">Posição nº %1$s de %2$s</string>
+    <string name="ra_profile_metric_softcore_sub">%1$s casuais</string>
+    <string name="ra_profile_metric_completion_sub">%1$s conclusões</string>
+    <string name="ra_profile_metric_beaten_softcore_sub">%1$s casuais</string>
 
     <!-- RetroAchievements in-game overlay and notifications -->
     <string name="ra_unlocked_points">Desbloqueada · %d pts</string>
     <string name="ra_leaderboard_started">Leaderboard ativo!</string>
+    <string name="ra_leaderboard_failed">Leaderboard falhou.</string>
     <string name="ra_leaderboard_submitted">Enviado ao leaderboard!</string>
+    <string name="ra_game_completed">Jogo completo! Todas as conquistas desbloqueadas!</string>
+    <string name="ra_subset_completed">Conjunto completo!</string>
+    <string name="ra_disconnected">RetroAchievements desconectado — progresso pendente.</string>
+    <string name="ra_reconnected">RetroAchievements reconectado!</string>
     <string name="ra_notification_channel">Conquistas RetroAchievements</string>
     <string name="ra_notification_channel_description">Notifica quando uma conquista é desbloqueada durante o jogo.</string>
     <string name="ra_notification_title">Conquista desbloqueada!</string>
