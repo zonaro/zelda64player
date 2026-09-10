@@ -44,6 +44,6 @@ object DmaTableOffsets {
             }
 
     /** DMA file index of `icon_item_static` (OoT) / `icon_item_24_static` (MM). */
-    const val OOT_ICON_FILE_INDEX = 2
-    const val MM_ICON_FILE_INDEX = 2
+    const val OOT_ICON_FILE_INDEX = 8
+    const val MM_ICON_FILE_INDEX = 8
 }

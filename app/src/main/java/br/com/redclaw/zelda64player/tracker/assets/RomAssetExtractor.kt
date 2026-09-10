@@ -115,6 +115,14 @@ class RomAssetExtractor(
                             val pixels =
                                     when (mapping.format) {
                                         br.com.redclaw.zelda64player.tracker.assets.graphics
+                                                .N64TextureFormat.RGBA32 ->
+                                                TextureDecoder.decodeRGBA32(
+                                                        archiveBytes,
+                                                        mapping.offset,
+                                                        mapping.width,
+                                                        mapping.height
+                                                )
+                                        br.com.redclaw.zelda64player.tracker.assets.graphics
                                                 .N64TextureFormat.RGBA16 ->
                                                 TextureDecoder.decodeRGBA16(
                                                         archiveBytes,

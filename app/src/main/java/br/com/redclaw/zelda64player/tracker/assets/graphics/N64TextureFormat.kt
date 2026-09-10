@@ -12,6 +12,9 @@ package br.com.redclaw.zelda64player.tracker.assets.graphics
 
 /** N64 texture formats used for item icons. */
 enum class N64TextureFormat {
+    /** 32-bit RGBA 8888: 8R + 8G + 8B + 8A, 4 bytes/pixel. Used by icon_item_static. */
+    RGBA32,
+
     /** 16-bit RGBA 5551: 5R + 5G + 5B + 1A, 2 bytes/pixel. */
     RGBA16,
 

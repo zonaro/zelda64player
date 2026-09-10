@@ -10,73 +10,63 @@
 
 package br.com.redclaw.zelda64player.tracker.assets.mapping
 
+import br.com.redclaw.zelda64player.tracker.assets.graphics.N64TextureFormat
+
 /**
- * Maps OoT tracker item ids to their location inside `icon_item_static`.
+ * Maps OoT tracker item ids to their location inside `icon_item_static` (DMA 8).
  *
- * Each icon is 32x32 RGBA16 = 2048 bytes (0x800). Offsets are sequential. Source: zeldaret/oot
- * `assets/xml/icon_item_static.xml` + OoTMM. TODO: confirm exact offsets and dmaFileIndex via
- * Calamari/Puffy.
+ * Each icon is 32x32 RGBA32 = 4096 bytes (0x1000). Offsets from zeldaret/oot
+ * `assets/xml/textures/icon_item_static.xml` (Segment 8, Format rgba32).
+ * Medallions live in `icon_item_dungeon_static` — not mapped here, will use fallback.
  */
 object OotIconMap {
 
     private const val ICON = DmaTableOffsets.OOT_ICON_FILE_INDEX
-    private const val STRIDE = 0x800 // 32*32*2
 
     val entries: List<IconMapping> =
             listOf(
-                    IconMapping("deku_stick", ICON, 0x0000),
-                    IconMapping("deku_nut", ICON, 0x0800),
-                    IconMapping("bomb_bag", ICON, 0x1000),
-                    IconMapping("bow", ICON, 0x1800),
-                    IconMapping("fire_arrows", ICON, 0x2000),
-                    IconMapping("din_fire", ICON, 0x2800),
-                    IconMapping("slingshot", ICON, 0x3000),
-                    IconMapping(
-                            "ocarina",
-                            ICON,
-                            0x3800
-                    ), // fairy ocarina / ocarina of time share slot
-                    IconMapping("bombchu", ICON, 0x4800),
-                    IconMapping("hookshot_longshot", ICON, 0x5000),
-                    IconMapping("ice_arrows", ICON, 0x5800),
-                    IconMapping("farore_wind", ICON, 0x6000),
-                    IconMapping("boomerang", ICON, 0x6800),
-                    IconMapping("lens_of_truth", ICON, 0x7000),
-                    IconMapping("megaton_hammer", ICON, 0x7800),
-                    IconMapping("light_arrows", ICON, 0x8000),
-                    IconMapping("nayru_love", ICON, 0x8800),
-                    // Tunics / shields / boots — may live in a different file (e.g.
-                    // icon_item_dungeon)
-                    // For now map to the same archive; adjust dmaFileIndex when validated.
-                    IconMapping("kokiri_sword", ICON, 0x9000),
-                    IconMapping("master_sword", ICON, 0x9800),
-                    IconMapping("biggoron_sword", ICON, 0xA000),
-                    IconMapping("deku_shield", ICON, 0xA800),
-                    IconMapping("hylian_shield", ICON, 0xB000),
-                    IconMapping("mirror_shield", ICON, 0xB800),
-                    IconMapping("iron_boots", ICON, 0xC000),
-                    IconMapping("hover_boots", ICON, 0xC800),
-                    IconMapping("strength", ICON, 0xD000),
-                    IconMapping("magic", ICON, 0xD800),
-                    IconMapping("scale", ICON, 0xE000),
-                    IconMapping("kokiri_tunic", ICON, 0xE800),
-                    IconMapping("goron_tunic", ICON, 0xF000),
-                    IconMapping("zora_tunic", ICON, 0xF800),
-                    IconMapping("rupees", ICON, 0x10000),
-                    IconMapping("forest_medallion", ICON, 0x10800),
-                    IconMapping("fire_medallion", ICON, 0x11000),
-                    IconMapping("water_medallion", ICON, 0x11800),
-                    IconMapping("spirit_medallion", ICON, 0x12000),
-                    IconMapping("shadow_medallion", ICON, 0x12800),
-                    IconMapping("light_medallion", ICON, 0x13000),
-                    IconMapping("keaton_mask", ICON, 0x13800),
-                    IconMapping("skull_mask", ICON, 0x14000),
-                    IconMapping("spooky_mask", ICON, 0x14800),
-                    IconMapping("bunny_hood", ICON, 0x15000),
-                    IconMapping("goron_mask", ICON, 0x15800),
-                    IconMapping("zora_mask", ICON, 0x16000),
-                    IconMapping("gerudo_mask", ICON, 0x16800),
-                    IconMapping("mask_of_truth", ICON, 0x17000),
+                    IconMapping("deku_stick", ICON, 0x0000, format = N64TextureFormat.RGBA32),
+                    IconMapping("deku_nut", ICON, 0x1000, format = N64TextureFormat.RGBA32),
+                    IconMapping("bomb_bag", ICON, 0x4D000, format = N64TextureFormat.RGBA32),
+                    IconMapping("bow", ICON, 0x3000, format = N64TextureFormat.RGBA32),
+                    IconMapping("fire_arrows", ICON, 0x4000, format = N64TextureFormat.RGBA32),
+                    IconMapping("din_fire", ICON, 0x5000, format = N64TextureFormat.RGBA32),
+                    IconMapping("slingshot", ICON, 0x6000, format = N64TextureFormat.RGBA32),
+                    IconMapping("ocarina", ICON, 0x7000, format = N64TextureFormat.RGBA32),
+                    IconMapping("bombchu", ICON, 0x9000, format = N64TextureFormat.RGBA32),
+                    IconMapping("hookshot_longshot", ICON, 0xA000, format = N64TextureFormat.RGBA32),
+                    IconMapping("ice_arrows", ICON, 0xC000, format = N64TextureFormat.RGBA32),
+                    IconMapping("farore_wind", ICON, 0xD000, format = N64TextureFormat.RGBA32),
+                    IconMapping("boomerang", ICON, 0xE000, format = N64TextureFormat.RGBA32),
+                    IconMapping("lens_of_truth", ICON, 0xF000, format = N64TextureFormat.RGBA32),
+                    IconMapping("megaton_hammer", ICON, 0x11000, format = N64TextureFormat.RGBA32),
+                    IconMapping("light_arrows", ICON, 0x12000, format = N64TextureFormat.RGBA32),
+                    IconMapping("nayru_love", ICON, 0x13000, format = N64TextureFormat.RGBA32),
+                    IconMapping("kokiri_sword", ICON, 0x3B000, format = N64TextureFormat.RGBA32),
+                    IconMapping("master_sword", ICON, 0x3C000, format = N64TextureFormat.RGBA32),
+                    IconMapping("biggoron_sword", ICON, 0x3D000, format = N64TextureFormat.RGBA32),
+                    IconMapping("deku_shield", ICON, 0x3E000, format = N64TextureFormat.RGBA32),
+                    IconMapping("hylian_shield", ICON, 0x3F000, format = N64TextureFormat.RGBA32),
+                    IconMapping("mirror_shield", ICON, 0x40000, format = N64TextureFormat.RGBA32),
+                    IconMapping("iron_boots", ICON, 0x45000, format = N64TextureFormat.RGBA32),
+                    IconMapping("hover_boots", ICON, 0x46000, format = N64TextureFormat.RGBA32),
+                    IconMapping("strength", ICON, 0x50000, format = N64TextureFormat.RGBA32),
+                    IconMapping("magic", ICON, 0x50000, format = N64TextureFormat.RGBA32),
+                    IconMapping("scale", ICON, 0x53000, format = N64TextureFormat.RGBA32),
+                    IconMapping("kokiri_tunic", ICON, 0x41000, format = N64TextureFormat.RGBA32),
+                    IconMapping("goron_tunic", ICON, 0x42000, format = N64TextureFormat.RGBA32),
+                    IconMapping("zora_tunic", ICON, 0x43000, format = N64TextureFormat.RGBA32),
+                    IconMapping("rupees", ICON, 0x56000, format = N64TextureFormat.RGBA32),
+                    // Medallions are in icon_item_dungeon_static — fallback for now
+                    // forest/fire/water/spirit/shadow/light medallions not in icon_item_static
+                    IconMapping("keaton_mask", ICON, 0x24000, format = N64TextureFormat.RGBA32),
+                    IconMapping("skull_mask", ICON, 0x25000, format = N64TextureFormat.RGBA32),
+                    IconMapping("spooky_mask", ICON, 0x26000, format = N64TextureFormat.RGBA32),
+                    IconMapping("bunny_hood", ICON, 0x27000, format = N64TextureFormat.RGBA32),
+                    IconMapping("goron_mask", ICON, 0x28000, format = N64TextureFormat.RGBA32),
+                    IconMapping("zora_mask", ICON, 0x29000, format = N64TextureFormat.RGBA32),
+                    IconMapping("gerudo_mask", ICON, 0x2A000, format = N64TextureFormat.RGBA32),
+                    IconMapping("mask_of_truth", ICON, 0x2B000, format = N64TextureFormat.RGBA32),
             )
 
     val byId: Map<String, IconMapping> = entries.associateBy { it.itemId }

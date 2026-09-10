@@ -20,6 +20,28 @@ import java.io.File
 object TextureDecoder {
 
     /**
+     * Decode an RGBA32 (8b per channel) texture to ARGB_8888 pixels.
+     *
+     * Each pixel is 4 bytes: R G B A.
+     */
+    fun decodeRGBA32(data: ByteArray, offset: Int, width: Int, height: Int): IntArray {
+        val count = width * height
+        require(offset + count * 4 <= data.size) {
+            "RGBA32: not enough data (need ${count * 4}, have ${data.size - offset})"
+        }
+        val pixels = IntArray(count)
+        var idx = offset
+        for (i in 0 until count) {
+            val r = data[idx++].toInt() and 0xFF
+            val g = data[idx++].toInt() and 0xFF
+            val b = data[idx++].toInt() and 0xFF
+            val a = data[idx++].toInt() and 0xFF
+            pixels[i] = (a shl 24) or (r shl 16) or (g shl 8) or b
+        }
+        return pixels
+    }
+
+    /**
      * Decode an RGBA16 (5551) texture to ARGB_8888 pixels.
      *
      * Each pixel is 2 bytes BE: RRRRR GGGGG BBBBB A.

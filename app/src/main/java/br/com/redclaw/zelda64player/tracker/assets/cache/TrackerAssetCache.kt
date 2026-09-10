@@ -22,6 +22,10 @@ import org.json.JSONObject
  */
 class TrackerAssetCache(private val context: Context) {
 
+    companion object {
+        const val CACHE_VERSION = 2 // bump to invalidate old RGBA16/stride 0x800 cache
+    }
+
     private fun dirFor(crc32: String): File =
             File(context.filesDir, "tracker_assets/$crc32").apply { mkdirs() }
 
@@ -36,6 +40,9 @@ class TrackerAssetCache(private val context: Context) {
         return try {
             val obj = JSONObject(meta.readText())
             val count = obj.optInt("count", -1)
+            val version = obj.optInt("version", 0)
+            // Bump version when extraction logic changes to force re-extraction
+            if (version != CACHE_VERSION) return false
             val pngCount = dir.listFiles { f -> f.extension == "png" }?.size ?: 0
             count == expectedCount && pngCount == expectedCount
         } catch (_: Exception) {
@@ -50,6 +57,7 @@ class TrackerAssetCache(private val context: Context) {
                 JSONObject().apply {
                     put("game", game)
                     put("count", count)
+                    put("version", CACHE_VERSION)
                     put("extractedAt", System.currentTimeMillis())
                 }
         meta.writeText(obj.toString(2))
