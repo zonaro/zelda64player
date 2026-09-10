@@ -14,10 +14,13 @@ import android.content.Context
 import br.com.redclaw.zelda64player.patcher.n64.ChecksumCalculator
 import br.com.redclaw.zelda64player.patcher.n64.RomHeader
 import br.com.redclaw.zelda64player.tracker.assets.cache.TrackerAssetCache
+import br.com.redclaw.zelda64player.tracker.assets.compression.YarDecompressor
 import br.com.redclaw.zelda64player.tracker.assets.compression.Yaz0Decompressor
 import br.com.redclaw.zelda64player.tracker.assets.dma.DmaTableParser
 import br.com.redclaw.zelda64player.tracker.assets.graphics.TextureDecoder
 import br.com.redclaw.zelda64player.tracker.assets.mapping.DmaTableOffsets
+import br.com.redclaw.zelda64player.tracker.assets.mapping.IconArchiveFormat
+import br.com.redclaw.zelda64player.tracker.assets.mapping.IconMapping
 import br.com.redclaw.zelda64player.tracker.assets.mapping.MmIconMap
 import br.com.redclaw.zelda64player.tracker.assets.mapping.OotIconMap
 import br.com.redclaw.zelda64player.tracker.model.TrackerGame
@@ -42,6 +45,16 @@ class RomAssetExtractor(
         private val cache: TrackerAssetCache = TrackerAssetCache(context),
 ) {
 
+        companion object {
+                fun mappingCount(game: TrackerGame): Int = mappingsFor(game).size
+
+                private fun mappingsFor(game: TrackerGame): List<IconMapping> =
+                        when (game) {
+                                TrackerGame.OOT -> OotIconMap.entries
+                                TrackerGame.MM -> MmIconMap.entries
+                        }
+        }
+
         suspend fun extractAll(baseRomFile: File, game: TrackerGame): Result<ExtractReport> =
                 withContext(Dispatchers.IO) {
                         runCatching {
@@ -50,11 +63,7 @@ class RomAssetExtractor(
                                 }
 
                                 val crc32 = ChecksumCalculator.crc32(baseRomFile)
-                                val mappings =
-                                        when (game) {
-                                                TrackerGame.OOT -> OotIconMap.entries
-                                                TrackerGame.MM -> MmIconMap.entries
-                                        }
+                                val mappings = mappingsFor(game)
 
                                 if (cache.hasValidCache(crc32, mappings.size)) {
                                         return@runCatching ExtractReport(
@@ -62,6 +71,7 @@ class RomAssetExtractor(
                                                 extracted = mappings.size
                                         )
                                 }
+                                cache.clear(crc32)
 
                                 val header = RomHeader.fromNormalizedZ64(baseRomFile)
                                 android.util.Log.d(
@@ -87,21 +97,32 @@ class RomAssetExtractor(
                                 val entries = parser.parseEntries()
 
                                 // Cache decompressed archives by DMA index to avoid re-reading
-                                val archiveCache = mutableMapOf<Int, ByteArray>()
-                                fun getArchive(dmaIndex: Int): ByteArray =
-                                        archiveCache.getOrPut(dmaIndex) {
+                                val archiveCache =
+                                        mutableMapOf<Pair<Int, IconArchiveFormat>, ByteArray>()
+                                fun getArchive(mapping: IconMapping): ByteArray =
+                                        archiveCache.getOrPut(
+                                                mapping.dmaFileIndex to mapping.archiveFormat
+                                        ) {
                                                 val entry =
-                                                        entries.getOrNull(dmaIndex)
+                                                        entries.getOrNull(mapping.dmaFileIndex)
                                                                 ?: error(
-                                                                        "DMA entry $dmaIndex not found (table size ${entries.size})"
+                                                                        "DMA entry ${mapping.dmaFileIndex} not found (table size ${entries.size})"
                                                                 )
                                                 require(entry.exists) {
-                                                        "DMA entry $dmaIndex does not exist"
+                                                        "DMA entry ${mapping.dmaFileIndex} does not exist"
                                                 }
                                                 val raw = parser.readEntryBytes(entry)
-                                                if (entry.isCompressed)
-                                                        Yaz0Decompressor.decompress(raw)
-                                                else raw
+                                                val dmaBytes =
+                                                        if (entry.isCompressed) {
+                                                                Yaz0Decompressor.decompress(raw)
+                                                        } else {
+                                                                raw
+                                                        }
+                                                when (mapping.archiveFormat) {
+                                                        IconArchiveFormat.RAW -> dmaBytes
+                                                        IconArchiveFormat.YAR ->
+                                                                YarDecompressor.decompress(dmaBytes)
+                                                }
                                         }
 
                                 var extracted = 0
@@ -110,7 +131,7 @@ class RomAssetExtractor(
 
                                 for (mapping in mappings) {
                                         try {
-                                                val archiveBytes = getArchive(mapping.dmaFileIndex)
+                                                val archiveBytes = getArchive(mapping)
                                                 val pixels =
                                                         when (mapping.format) {
                                                                 br.com.redclaw.zelda64player.tracker

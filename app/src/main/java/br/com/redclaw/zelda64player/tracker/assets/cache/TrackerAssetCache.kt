@@ -23,8 +23,7 @@ import org.json.JSONObject
 class TrackerAssetCache(private val context: Context) {
 
     companion object {
-        const val CACHE_VERSION =
-                5 // bump to invalidate old cache (pedras espirituais)
+        const val CACHE_VERSION = 6 // MM now resolves and decompresses its YAR icon archives
     }
 
     private fun dirFor(crc32: String): File =

@@ -78,13 +78,13 @@ class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: Stri
         val crc = _assetCrc.value
         android.util.Log.d(
                 "TrackerAssets",
-                "ensureAssetsExtracted game=$game crc=$crc expected=${items.size}"
+                "ensureAssetsExtracted game=$game crc=$crc expected=${RomAssetExtractor.mappingCount(game)}"
         )
         if (crc == null) {
             android.util.Log.w("TrackerAssets", "No CRC for $game — no base ROM imported?")
             return
         }
-        val expectedCount = items.size
+        val expectedCount = RomAssetExtractor.mappingCount(game)
         if (assetCache.hasValidCache(crc, expectedCount)) {
             android.util.Log.d("TrackerAssets", "Cache valid for $crc, skipping extraction")
             return
@@ -100,7 +100,7 @@ class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: Stri
                         }
         android.util.Log.d(
                 "TrackerAssets",
-                "Extracting ${items.size} icons from ${romFile.name} for $game"
+                "Extracting $expectedCount icons from ${romFile.name} for $game"
         )
         _isExtracting.value = true
         try {
