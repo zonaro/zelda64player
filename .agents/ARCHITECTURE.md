@@ -220,3 +220,9 @@ app/
 - **RadialGamePad:** https://github.com/Swordfish90/RadialGamePad
 - **Hylian Modding:** https://hylianmodding.com
 - **GitHub Releases API:** https://docs.github.com/en/rest/releases/releases
+
+## Automatic item tracking
+
+`tracker/autotracker` reads the loaded core's RAM alias under the existing frame lock, at most every 100 ms. `GameActivityViewModel` acquires the alias outside the frame callback (`getMemoryRegion` locks a non-recursive mutex), installs a composite RA/tracker callback, and removes it before native destruction. Only immutable scalar snapshots are dispatched to Main; a session generation discards stale deliveries. Tracking works independently of RA login/enabling.
+
+`SaveContextParser` supports the fixed OoT NTSC 1.0 / MM US 1.0 offsets and compatible hacks. Save signatures identify byte lanes; bounds, health capacity and game mode reject incompatible/uninitialized RAM. MM has its own inventory/quest layout. `AutoTrackerMapper` merges discoveries additively into the same live `TrackerState` used by manual UI; repository revisions refresh existing cells. The global opt-in lives in CorePrefs and is exposed by the tracker Switch and Dashboard settings, while progress remains per hack. See `.github/prompts/plan-autoTrackingOotMm.prompt.md` for limitations and validation.

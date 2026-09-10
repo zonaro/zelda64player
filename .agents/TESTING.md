@@ -44,3 +44,12 @@
 - 100% of `patcher/` module (pure Kotlin, fast, no Android).
 - 100% of `public`/`internal` classes, functions, sealed classes in non-UI modules have KDoc (Wally).
 - Visual QA (Chululu) on every screen before release candidates — see `.agents/chululu.md` checklist.
+
+
+## Auto-tracker validation (2026-09-10)
+
+Current tracker tests use JUnit 4, matching `app/build.gradle.kts`. `AutoTrackerTest` covers both save layouts, all supported byte lanes, bounds/signature/title rejection, empty/unknown inventory, catalog consistency, additive merge, and time-based polling including toggle invalidation. `TrackerRepositoryTest` covers shared gameplay/dialog state, persisted combined fields, and per-hack isolation. Fixtures contain only synthetic RAM.
+
+`./gradlew :app:testDebugUnitTest :app:assembleRelease --offline` is the delivery check. Android UI and real-ROM pickups remain a separate requirement: the SM-A055M accepted an initial release update, but ADB over Wi-Fi became unavailable (`No route to host`) before final visual/runtime validation. Do not treat those builds/tests as proof of OoT/MM or randomizer pickups on hardware.
+
+Deploy posterior confirmado por USB no SM-A055M: release `26.253.0647` (`262530647`), `adb install -r` com sucesso, versão instalada conferida e processo do app iniciado. Isso confirma build/instalação/startup; não substitui o cenário de coleta real de itens.

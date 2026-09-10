@@ -40,6 +40,7 @@ class ItemsTab : Fragment() {
     private lateinit var viewModel: TrackerViewModel
     private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
     private lateinit var container: LinearLayout
+    private val cells = mutableListOf<Pair<ItemIconView, TrackerItem>>()
 
     override fun onCreateView(inflater: LayoutInflater, parent: ViewGroup?, state: Bundle?): View {
         val scroll = ScrollView(requireContext())
@@ -66,6 +67,11 @@ class ItemsTab : Fragment() {
         }
         viewModel = parent.viewModel
         buildGrid()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.stateChanges.collect {
+                cells.forEach { (cell, item) -> rebindCell(cell, item) }
+            }
+        }
         // Trigger on-demand extraction from base ROM (if needed) and rebuild when done
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.ensureAssetsExtracted()
@@ -75,6 +81,7 @@ class ItemsTab : Fragment() {
 
     private fun buildGrid() {
         container.removeAllViews()
+        cells.clear()
         val items = viewModel.items
         val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         val columns = if (isLandscape) 6 else 3
@@ -94,6 +101,7 @@ class ItemsTab : Fragment() {
                 )
             }
             val cell = ItemIconView(requireContext())
+            cells.add(cell to item)
             cell.bind(
                     item,
                     getString(item.nameRes),

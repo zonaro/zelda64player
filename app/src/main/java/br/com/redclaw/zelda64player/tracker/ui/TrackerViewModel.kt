@@ -19,6 +19,9 @@
 package br.com.redclaw.zelda64player.tracker.ui
 
 import android.content.Context
+import br.com.redclaw.zelda64player.tracker.autotracker.mapper.AutoTrackerMapper
+import br.com.redclaw.zelda64player.tracker.autotracker.model.AutoTrackerSnapshot
+import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.data.local.AppRepositories
 import br.com.redclaw.zelda64player.tracker.assets.RomAssetExtractor
 import br.com.redclaw.zelda64player.tracker.assets.cache.TrackerAssetCache
@@ -131,6 +134,15 @@ class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: Stri
         get() = OotItemDatabase.forGame(game).locations
     val songs: List<TrackerSong>
         get() = OotItemDatabase.forGame(game).songs
+    /** Revision shared with the gameplay tracker, including while this dialog is closed. */
+    val stateChanges: StateFlow<Long> get() = repository.stateChanges
+
+    /** Applies an immutable RAM snapshot on the main thread, preserving manual progress. */
+    fun applyAutoSnapshot(snapshot: AutoTrackerSnapshot) {
+        if (!CorePrefs.getTrackerAutoTracking(appContext)) return
+        if (AutoTrackerMapper.apply(snapshot, state)) save()
+    }
+
     // ---- Items ----
     fun isItemObtained(id: String) = (state.obtainedItems[id] ?: 0) > 0
     fun getItemCount(id: String) = state.obtainedItems[id] ?: 0

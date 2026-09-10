@@ -19,6 +19,10 @@
 package br.com.redclaw.zelda64player.tracker.ui
 
 import android.app.Dialog
+import android.content.Context
+import android.content.SharedPreferences
+import android.content.res.ColorStateList
+import android.widget.Switch
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -46,15 +50,27 @@ import br.com.redclaw.zelda64player.tracker.ui.tabs.ItemsTab
 import br.com.redclaw.zelda64player.tracker.ui.tabs.LocationsTab
 import br.com.redclaw.zelda64player.tracker.ui.tabs.SongsTab
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
+import br.com.redclaw.zelda64player.utils.CorePrefs
 
 /**
- * Switch-style modal hosting the manual item tracker. A tab strip switches between five child
+ * Switch-style modal hosting the item tracker. A tab strip switches between four child
  * fragments (Items / Locations / Songs / Hints) and an integrated run timer lives at the bottom. No
- * core RAM is read.
+ * core RAM is read by this dialog; gameplay owns optional automatic updates.
  */
 class TrackerDialogFragment : DialogFragment() {
 
+    private var contentView: View? = null
     lateinit var viewModel: TrackerViewModel
+    private val autoTrackingPreferenceListener =
+            SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                if (key == CorePrefs.PREF_TRACKER_AUTO_TRACKING) syncAutoTrackingSwitch()
+            }
+
+    private fun syncAutoTrackingSwitch() {
+        dialog?.findViewById<Switch>(R.id.tracker_auto_tracking)?.isChecked =
+                CorePrefs.getTrackerAutoTracking(requireContext())
+    }
+
     private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
 
     private val tabFactories =
@@ -93,7 +109,7 @@ class TrackerDialogFragment : DialogFragment() {
                         TrackerExporter.importFromJson(json) ?: return@registerForActivityResult
                 viewModel.importState(imported)
                 selectTab(selected)
-                view?.findViewById<TrackerTimerView>(R.id.tracker_timer)?.bind(viewModel)
+                contentView?.findViewById<TrackerTimerView>(R.id.tracker_timer)?.bind(viewModel)
             }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -103,6 +119,8 @@ class TrackerDialogFragment : DialogFragment() {
 
         val dialog = AppCompatDialog(requireContext(), R.style.SwitchDialogTheme)
         val view = LayoutInflater.from(dialog.context).inflate(R.layout.tracker_dialog, null)
+        contentView = view
+        tabButtons.clear()
         dialog.setContentView(view)
         dialog.window?.setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -117,15 +135,30 @@ class TrackerDialogFragment : DialogFragment() {
             val minW = resources.getDimensionPixelSize(R.dimen.switch_side_panel_min_width)
             val maxW = resources.getDimensionPixelSize(R.dimen.dialog_menu_max_width)
             val target = (dm.widthPixels * 0.94f).toInt().coerceIn(minW, maxW)
-            // Keep height wrap; width constrained via FrameLayout.LayoutParams.
+            // Bound the weighted tab content to the visible window in either orientation.
             val lp = box.layoutParams as? FrameLayout.LayoutParams
             if (lp != null) {
-                lp.width = target
+                lp.width = target.coerceAtMost(dm.widthPixels)
+                lp.height = (dm.heightPixels * 0.9f).toInt()
                 box.layoutParams = lp
             }
         }
 
         val accent = AccentManager.getAccentColor(requireContext())
+        view.findViewById<Switch>(R.id.tracker_auto_tracking).apply {
+            val states = arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf())
+            thumbTintList = ColorStateList(states, intArrayOf(accent,
+                    requireContext().getColor(R.color.switch_text_primary)))
+            trackTintList = ColorStateList(states, intArrayOf(accent,
+                    requireContext().getColor(R.color.switch_text_secondary)))
+            isChecked = CorePrefs.getTrackerAutoTracking(requireContext())
+            setOnCheckedChangeListener { _, checked ->
+                if (checked != CorePrefs.getTrackerAutoTracking(requireContext())) {
+                    CorePrefs.setTrackerAutoTracking(requireContext(), checked)
+                    sfx?.select()
+                }
+            }
+        }
         view.findViewById<ImageView>(R.id.tracker_icon)?.setColorFilter(accent)
         val titleRes =
                 if (game == TrackerGame.OOT) R.string.tracker_title_oot
@@ -194,6 +227,9 @@ class TrackerDialogFragment : DialogFragment() {
      */
     override fun onStart() {
         super.onStart()
+        requireContext().getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+                .registerOnSharedPreferenceChangeListener(autoTrackingPreferenceListener)
+        syncAutoTrackingSwitch()
         // Window is MATCH_PARENT for scrim; box is sized in onCreateDialog.
         // Defer the first tab selection to after onStart() fully completes.
         // Calling childFragmentManager.commitNow() inside onStart() triggers
@@ -201,7 +237,9 @@ class TrackerDialogFragment : DialogFragment() {
         // which can throw IllegalStateException and crash the tracker.
         // Posting to the view and using an async commit avoids the race.
         if (childFragmentManager.findFragmentByTag("tab_$selected") == null) {
-            view?.post { selectTab(selected) }
+            contentView?.post {
+                if (isAdded && !childFragmentManager.isStateSaved) selectTab(selected)
+            }
         }
         // Kick off ROM asset extraction early (before ItemsTab is created) so
         // the cache is ready when the grid builds. Use lifecycleScope (not
@@ -215,6 +253,7 @@ class TrackerDialogFragment : DialogFragment() {
     }
 
     private fun selectTab(index: Int) {
+        if (!isAdded || childFragmentManager.isStateSaved) return
         selected = index
         sfx?.select()
         val accent = AccentManager.getAccentColor(requireContext())
@@ -263,8 +302,16 @@ class TrackerDialogFragment : DialogFragment() {
                 cornerRadius = 4f
             }
 
+    override fun onStop() {
+        requireContext().getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+                .unregisterOnSharedPreferenceChangeListener(autoTrackingPreferenceListener)
+        super.onStop()
+    }
+
     override fun onDestroyView() {
-        view?.findViewById<TrackerTimerView>(R.id.tracker_timer)?.stop()
+        contentView?.findViewById<TrackerTimerView>(R.id.tracker_timer)?.stop()
+        contentView = null
+        tabButtons.clear()
         super.onDestroyView()
     }
 

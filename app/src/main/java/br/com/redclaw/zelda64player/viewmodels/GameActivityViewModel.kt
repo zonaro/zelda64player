@@ -1,9 +1,11 @@
 package br.com.redclaw.zelda64player.viewmodels
 
-import br.com.redclaw.zelda64player.retroachievements.RaEmulatorStateBridge
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
+import br.com.redclaw.zelda64player.tracker.autotracker.AutoTrackerPoller
+import br.com.redclaw.zelda64player.tracker.ui.TrackerViewModel
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
@@ -48,6 +50,7 @@ import br.com.redclaw.zelda64player.ocarina.ui.OcarinaHudView
 import br.com.redclaw.zelda64player.patcher.n64.RomHeader
 import br.com.redclaw.zelda64player.repositories.GameRomResolver
 import br.com.redclaw.zelda64player.repositories.Storage
+import br.com.redclaw.zelda64player.retroachievements.RaEmulatorStateBridge
 import br.com.redclaw.zelda64player.retroachievements.RaNotificationHelper
 import br.com.redclaw.zelda64player.retroachievements.api.RaHttpClient
 import br.com.redclaw.zelda64player.retroachievements.api.RaUserAgent
@@ -346,9 +349,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                             retroView?.view?.frameSpeed == fastForwardSpeed
                                         },
                                         badgeRes = R.string.badge_r3
-                                ) {
-                                    retroView?.let { retroViewUtils?.fastForward(it) }
-                                }
+                                ) { retroView?.let { retroViewUtils?.fastForward(it) } }
                         )
                 )
         val controls =
@@ -359,6 +360,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                         "auto_z",
                                         R.string.menu_auto_z,
                                         R.drawable.ic_target,
+                                        isToggle = true,
+                                        isActive = { autoZEnabled },
                                         badgeRes = R.string.badge_lt
                                 ) {
                                     autoZEnabled = !autoZEnabled
@@ -1262,6 +1265,48 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
 
     // ---- RetroAchievements session ----
 
+    private var autoTracker: AutoTrackerPoller? = null
+    private var autoTrackerState: TrackerViewModel? = null
+    private var trackerGeneration = 0L
+    @Volatile private var autoTrackingEnabled = false
+    private val trackerPreferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == CorePrefs.PREF_TRACKER_AUTO_TRACKING) {
+            autoTrackingEnabled = CorePrefs.getTrackerAutoTracking(appContext)
+            autoTracker?.invalidate()
+        }
+    }
+
+    /** Captures the core-owned RAM alias once, outside the non-reentrant frame lock. */
+    private fun startFrameTracking(hackId: String) {
+        val game = when (ocarinaGame) {
+            OcarinaGame.OOT -> TrackerGame.OOT
+            OcarinaGame.MM -> TrackerGame.MM
+            else -> null
+        }
+        autoTrackingEnabled = CorePrefs.getTrackerAutoTracking(appContext)
+        appContext.getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+                .registerOnSharedPreferenceChangeListener(trackerPreferenceListener)
+        val generation = ++trackerGeneration
+        val memory = retroView?.view?.getMemoryRegion(LibretroDroid.MEMORY_SYSTEM_RAM)
+        if (game != null && memory != null) {
+            val tracker = TrackerViewModel(appContext, game, hackId)
+            autoTrackerState = tracker
+            autoTracker = AutoTrackerPoller(memory, game, { autoTrackingEnabled }, { snapshot ->
+                viewModelScope.launch {
+                    if (generation == trackerGeneration && autoTrackingEnabled) {
+                        tracker.applyAutoSnapshot(snapshot)
+                    }
+                }
+            })
+        }
+        val session = raSession
+        val poller = autoTracker
+        LibretroDroid.setFrameCallback(Runnable {
+            session?.onFrame()
+            poller?.onFrame()
+        })
+    }
+
     /**
      * Starts the RetroAchievements session once the first frame rendered and the core is running.
      * No-op when the feature is disabled in settings or already active. The memory region is
@@ -1319,7 +1364,11 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                         else R.string.ra_toast_untracked,
                                         state.game.numUnlockedAchievements,
                                         total,
-                                        appContext.getString(if (RcheevosJni.nativeIsHardcore()) R.string.ra_mode_hardcore else R.string.ra_mode_casual)
+                                        appContext.getString(
+                                                if (RcheevosJni.nativeIsHardcore())
+                                                        R.string.ra_mode_hardcore
+                                                else R.string.ra_mode_casual
+                                        )
                                 )
                             }
                             is RaSessionState.NotLoggedIn ->
@@ -1347,7 +1396,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
             view.getMemoryRegion(LibretroDroid.MEMORY_SYSTEM_RAM)
         }
 
-        LibretroDroid.setFrameCallback(Runnable { session.onFrame() })
 
         // System notifications are opt-in default ON; on API 33+ they need
         // the POST_NOTIFICATIONS runtime permission. Ask once as soon as the
@@ -1537,14 +1585,18 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 RaNotificationHelper.postUnlock(appContext, event.payloadJson, gameTitle)
             }
             RcheevosJni.Events.CHALLENGE_INDICATOR_SHOW ->
-                    if (RcheevosJni.nativeIsHardcore() || CorePrefs.getRaShowChallengeIndicators(appContext))
-                        overlay?.showChallengeIndicator(event.payloadJson)
+                    if (RcheevosJni.nativeIsHardcore() ||
+                                    CorePrefs.getRaShowChallengeIndicators(appContext)
+                    )
+                            overlay?.showChallengeIndicator(event.payloadJson)
             RcheevosJni.Events.CHALLENGE_INDICATOR_HIDE ->
                     overlay?.hideChallengeIndicator(event.payloadJson)
             RcheevosJni.Events.PROGRESS_INDICATOR_SHOW,
             RcheevosJni.Events.PROGRESS_INDICATOR_UPDATE ->
-                    if (RcheevosJni.nativeIsHardcore() || CorePrefs.getRaShowChallengeIndicators(appContext))
-                        overlay?.updateProgressIndicator(event.payloadJson, visible = true)
+                    if (RcheevosJni.nativeIsHardcore() ||
+                                    CorePrefs.getRaShowChallengeIndicators(appContext)
+                    )
+                            overlay?.updateProgressIndicator(event.payloadJson, visible = true)
             RcheevosJni.Events.PROGRESS_INDICATOR_HIDE ->
                     overlay?.updateProgressIndicator(event.payloadJson, visible = false)
             RcheevosJni.Events.LEADERBOARD_STARTED -> {
@@ -1573,7 +1625,9 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 retroView?.view?.queueEvent { LibretroDroid.reset() }
             }
             RcheevosJni.Events.SERVER_ERROR -> {
-                val api = runCatching { org.json.JSONObject(event.payloadJson).optString("api") }.getOrDefault("")
+                val api =
+                        runCatching { org.json.JSONObject(event.payloadJson).optString("api") }
+                                .getOrDefault("")
                 if (api == "award_achievement") {
                     overlay?.showMessage(appContext.getString(R.string.ra_award_sync_failed))
                 }
@@ -1594,6 +1648,11 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      */
     fun stopRaSession() {
         LibretroDroid.setFrameCallback(null)
+        ++trackerGeneration
+        autoTracker = null
+        autoTrackerState = null
+        appContext.getSharedPreferences("ludere_prefs", Context.MODE_PRIVATE)
+                .unregisterOnSharedPreferenceChangeListener(trackerPreferenceListener)
         LibretroDroid.setStateCallback(null)
         raEventCollector?.cancel()
         raEventCollector = null
@@ -1611,7 +1670,11 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
     private fun announceRaStatus(messageRes: Int, arg1: Int = 0, arg2: Int = 0, mode: String = "") {
         if (raAnnounced) return
         raAnnounced = true
-        Toast.makeText(appContext, appContext.getString(messageRes, arg1, arg2, mode), Toast.LENGTH_LONG)
+        Toast.makeText(
+                        appContext,
+                        appContext.getString(messageRes, arg1, arg2, mode),
+                        Toast.LENGTH_LONG
+                )
                 .show()
     }
 
@@ -1646,6 +1709,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 retroViewUtils?.restoreEmulatorState(retroView)
 
                 startRaSessionIfNeeded(hackId)
+                startFrameTracking(hackId)
 
                 /* A background-return recreate was deferred while the core was still
                 loading (see handleBackgroundReturn). Now that a frame has rendered

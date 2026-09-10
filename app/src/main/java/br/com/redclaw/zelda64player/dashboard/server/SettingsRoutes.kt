@@ -133,6 +133,7 @@ private fun appSettings(context: Context): List<DashboardPreference> =
                 bool("ra_system_notifications", CorePrefs.getRaSystemNotifications(context)),
                 bool("ra_challenge_indicators", CorePrefs.getRaShowChallengeIndicators(context)),
                 bool("ra_progress_indicators", CorePrefs.getRaShowProgressIndicators(context)),
+                bool("tracker_auto_tracking", CorePrefs.getTrackerAutoTracking(context)),
                 bool("ocarina_auto_open", CorePrefs.getOcarinaAutoOpen(context)),
                 choice("language", LanguageManager.getLanguage(context), LanguageManager.CODES),
                 choice("switch_theme", CorePrefs.getSwitchTheme(context), listOf("dark", "light")),
@@ -202,6 +203,7 @@ private fun applySetting(context: Context, key: String, value: String) {
         "ra_challenge_indicators" ->
                 bool?.let { CorePrefs.setRaShowChallengeIndicators(context, it) }
         "ra_progress_indicators" -> bool?.let { CorePrefs.setRaShowProgressIndicators(context, it) }
+        "tracker_auto_tracking" -> bool?.let { CorePrefs.setTrackerAutoTracking(context, it) }
         "ocarina_auto_open" -> bool?.let { CorePrefs.setOcarinaAutoOpen(context, it) }
         "language" ->
                 if (value in LanguageManager.CODES) LanguageManager.setLanguage(context, value)

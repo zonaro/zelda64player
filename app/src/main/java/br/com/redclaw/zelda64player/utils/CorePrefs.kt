@@ -27,6 +27,21 @@ object CorePrefs {
         // Auto-Ocarina auto-open preference (default off).
         private const val PREF_OCARINA_AUTO_OPEN = "pref_ocarina_auto_open"
 
+        /** Global opt-in for additive OoT/MM item tracking. */
+        const val PREF_TRACKER_AUTO_TRACKING = "pref_tracker_auto_tracking"
+
+        /** Whether compatible running games automatically add tracker progress (default off). */
+        fun getTrackerAutoTracking(context: Context): Boolean =
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                        .getBoolean(PREF_TRACKER_AUTO_TRACKING, false)
+
+        fun setTrackerAutoTracking(context: Context, enabled: Boolean) {
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                        .edit()
+                        .putBoolean(PREF_TRACKER_AUTO_TRACKING, enabled)
+                        .apply()
+        }
+
         // Nintendo Switch UI preferences.
         private const val PREF_SWITCH_THEME = "pref_switch_theme"
         private const val PREF_SWITCH_SFX_ENABLED = "pref_switch_sfx_enabled"

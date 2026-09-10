@@ -1123,4 +1123,6 @@
     <string name="mm_item_mask_of_truth">Máscara da Verdade</string>
     <string name="mm_item_mask_of_scents">Máscara dos Aromas</string>
     <string name="mm_item_keaton_mask">Máscara Keaton</string>
+    <string name="tracker_auto_tracking">Rastreamento automático</string>
+    <string name="tracker_auto_tracking_desc">Global: adiciona itens e músicas de jogos compatíveis com NTSC 1.0. Nunca remove progresso; a edição manual continua disponível.</string>
 </resources>

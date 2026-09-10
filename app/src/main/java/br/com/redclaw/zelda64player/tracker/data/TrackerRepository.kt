@@ -26,14 +26,18 @@ import br.com.redclaw.zelda64player.tracker.model.TrackerSettings
 import br.com.redclaw.zelda64player.tracker.model.TrackerState
 import br.com.redclaw.zelda64player.tracker.model.VisibilityMode
 import java.io.File
+import java.lang.ref.WeakReference
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONArray
 import org.json.JSONObject
 
 /**
  * Persists per-hack tracker state and global settings as JSON files in the app's private
  * [Context.getFilesDir]. Keyed by hack so each ROM hack keeps an independent checklist and run
- * timer; when no hack id is available it falls back to the game name (OoT / MM). No core RAM is
- * read — this is a manual tracker.
+ * timer; when no hack id is available it falls back to the game name (OoT / MM). Live holders share
+ * the same state so automatic discoveries and manual edits cannot overwrite one another.
+ * State mutations and saves are confined to the main thread.
  */
 class TrackerRepository(private val context: Context) {
 
@@ -46,18 +50,27 @@ class TrackerRepository(private val context: Context) {
 
     private fun settingsFile(): File = File(context.filesDir, "tracker_settings.json")
 
+    /** Shared revision observed by live tracker tabs; RAM is never retained here. */
+    val stateChanges: StateFlow<Long> get() = changes
+
+    /** Loads one shared, main-thread-owned state for each persisted tracker key. */
     fun load(game: TrackerGame, hackId: String? = null): TrackerState {
         val file = stateFile(game, hackId)
-        if (!file.exists()) return TrackerState(game)
-        return try {
-            parseState(game, JSONObject(file.readText()))
+        val key = file.absolutePath + ":" + game.name
+        liveStates.entries.removeAll { it.value.get() == null }
+        liveStates[key]?.get()?.let { return it }
+        val state = try {
+            if (file.exists()) parseState(game, JSONObject(file.readText())) else TrackerState(game)
         } catch (_: Exception) {
             TrackerState(game)
         }
+        liveStates[key] = WeakReference(state)
+        return state
     }
 
     fun save(state: TrackerState, hackId: String? = null) {
         runCatching { stateFile(state.game, hackId).writeText(serializeState(state).toString()) }
+        changes.value += 1
     }
 
     fun loadSettings(): TrackerSettings {
@@ -81,6 +94,11 @@ class TrackerRepository(private val context: Context) {
             val obj = JSONObject().apply { put("visibility", settings.visibility.name) }
             settingsFile().writeText(obj.toString())
         }
+    }
+
+    companion object {
+        private val liveStates = mutableMapOf<String, WeakReference<TrackerState>>()
+        private val changes = MutableStateFlow(0L)
     }
 
     private fun parseState(game: TrackerGame, obj: JSONObject): TrackerState {

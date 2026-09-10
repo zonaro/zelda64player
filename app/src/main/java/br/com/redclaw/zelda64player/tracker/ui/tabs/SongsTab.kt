@@ -28,6 +28,8 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.tracker.ui.TrackerDialogFragment
@@ -40,6 +42,7 @@ class SongsTab : Fragment() {
         private lateinit var viewModel: TrackerViewModel
         private val sfx = runCatching { Zelda64PlayerApp.sfxManager }.getOrNull()
         private lateinit var container: LinearLayout
+        private val toggles = mutableMapOf<String, TextView>()
 
         override fun onCreateView(
                 inflater: LayoutInflater,
@@ -66,10 +69,19 @@ class SongsTab : Fragment() {
                 val parent = parentFragment as? TrackerDialogFragment ?: return
                 viewModel = parent.viewModel
                 buildList()
+                viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.stateChanges.collect {
+                                toggles.forEach { (id, toggle) ->
+                                        toggle.setText(if (viewModel.isSongFound(id))
+                                                R.string.tracker_found else R.string.tracker_not_found)
+                                }
+                        }
+                }
         }
 
         private fun buildList() {
                 container.removeAllViews()
+                toggles.clear()
                 val gap = (6 * resources.displayMetrics.density).toInt()
 
                 val songsHeader = sectionHeader(getString(R.string.tracker_songs))
@@ -116,6 +128,7 @@ class SongsTab : Fragment() {
                                                         getString(R.string.tracker_found)
                                                 else getString(R.string.tracker_not_found)
                                 }
+                        toggles[song.id] = toggle
                         row.addView(name)
                         row.addView(toggle)
                         row.setOnClickListener {

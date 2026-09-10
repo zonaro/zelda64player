@@ -1084,4 +1084,6 @@
     <string name="mm_item_mask_of_truth">Mask of Truth</string>
     <string name="mm_item_mask_of_scents">Mask of Scents</string>
     <string name="mm_item_keaton_mask">Keaton Mask</string>
+    <string name="tracker_auto_tracking">Automatic tracking</string>
+    <string name="tracker_auto_tracking_desc">Global: adds items and songs from games compatible with NTSC 1.0. Never removes progress; manual editing remains available.</string>
 </resources>

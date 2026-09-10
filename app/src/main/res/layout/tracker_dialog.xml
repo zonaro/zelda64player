@@ -87,6 +87,25 @@
             android:alpha="0.3"
             android:background="@color/switch_text_secondary" />
 
+        <Switch
+            android:id="@+id/tracker_auto_tracking"
+            style="@style/SwitchSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:focusable="true"
+            android:background="@drawable/bg_settings_nav_row"
+            android:text="@string/tracker_auto_tracking"
+            android:textColor="@color/switch_text_primary"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tracker_auto_tracking_desc"
+            android:textColor="@color/switch_text_secondary"
+            android:textSize="12sp" />
+
         <LinearLayout
             android:id="@+id/tracker_tabs"
             android:layout_width="match_parent"
