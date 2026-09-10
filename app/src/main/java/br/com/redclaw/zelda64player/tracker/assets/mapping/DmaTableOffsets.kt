@@ -43,8 +43,9 @@ object DmaTableOffsets {
                 else -> null
             }
 
-    /** DMA file index of `icon_item_static` (OoT) / `icon_item_24_static` (MM). */
+    /** DMA file indexes of the icon archives in each game's US 1.0 dmadata table. */
     const val OOT_ICON_FILE_INDEX = 8
     const val OOT_QUEST_ICON_FILE_INDEX = 9 // icon_item_24_static: medallions + magic jars (24x24)
-    const val MM_ICON_FILE_INDEX = 8
+    const val MM_ICON_FILE_INDEX = 19 // icon_item_static_yar
+    const val MM_QUEST_ICON_FILE_INDEX = 20 // icon_item_24_static_yar
 }

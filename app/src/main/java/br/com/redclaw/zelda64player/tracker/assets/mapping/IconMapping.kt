@@ -31,4 +31,12 @@ data class IconMapping(
         val height: Int = 32,
         val format: N64TextureFormat = N64TextureFormat.RGBA16,
         val tlutOffset: Int? = null,
+        val archiveFormat: IconArchiveFormat = IconArchiveFormat.RAW,
 )
+
+/** Container used by the DMA entry before texture bytes can be addressed by [IconMapping.offset]. */
+enum class IconArchiveFormat {
+        RAW,
+        /** Majora's Mask YAR: an offset table followed by independently compressed Yaz0 blocks. */
+        YAR
+}

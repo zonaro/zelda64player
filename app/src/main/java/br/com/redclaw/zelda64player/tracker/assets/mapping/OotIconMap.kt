@@ -130,6 +130,30 @@ object OotIconMap {
                             height = 24,
                             format = N64TextureFormat.RGBA32
                     ),
+                    IconMapping(
+                            "kokiri_emerald",
+                            QUEST,
+                            0x3600,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
+                    IconMapping(
+                            "goron_ruby",
+                            QUEST,
+                            0x3F00,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
+                    IconMapping(
+                            "zora_sapphire",
+                            QUEST,
+                            0x4800,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
                     IconMapping("keaton_mask", ICON, 0x24000, format = N64TextureFormat.RGBA32),
                     IconMapping("skull_mask", ICON, 0x25000, format = N64TextureFormat.RGBA32),
                     IconMapping("spooky_mask", ICON, 0x26000, format = N64TextureFormat.RGBA32),

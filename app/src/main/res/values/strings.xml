@@ -1069,6 +1069,9 @@
     <string name="oot_item_spirit_medallion">Medalhão do Espírito</string>
     <string name="oot_item_shadow_medallion">Medalhão da Sombra</string>
     <string name="oot_item_light_medallion">Medalhão da Luz</string>
+    <string name="oot_item_kokiri_emerald">Esmeralda Kokiri</string>
+    <string name="oot_item_goron_ruby">Rubi Goron</string>
+    <string name="oot_item_zora_sapphire">Safira Zora</string>
     <string name="oot_item_keaton_mask">Máscara Keaton</string>
     <string name="oot_item_skull_mask">Máscara da Caveira</string>
     <string name="oot_item_spooky_mask">Máscara Assustadora</string>

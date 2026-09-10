@@ -49,8 +49,8 @@ import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 
 /**
  * Switch-style modal hosting the manual item tracker. A tab strip switches between five child
- * fragments (Items / Locations / Songs / Hints) and an integrated run timer lives at the
- * bottom. No core RAM is read.
+ * fragments (Items / Locations / Songs / Hints) and an integrated run timer lives at the bottom. No
+ * core RAM is read.
  */
 class TrackerDialogFragment : DialogFragment() {
 

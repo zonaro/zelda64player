@@ -1030,6 +1030,9 @@
     <string name="oot_item_spirit_medallion">Spirit Medallion</string>
     <string name="oot_item_shadow_medallion">Shadow Medallion</string>
     <string name="oot_item_light_medallion">Light Medallion</string>
+    <string name="oot_item_kokiri_emerald">Kokiri Emerald</string>
+    <string name="oot_item_goron_ruby">Goron Ruby</string>
+    <string name="oot_item_zora_sapphire">Zora Sapphire</string>
     <string name="oot_item_keaton_mask">Keaton Mask</string>
     <string name="oot_item_skull_mask">Skull Mask</string>
     <string name="oot_item_spooky_mask">Spooky Mask</string>
