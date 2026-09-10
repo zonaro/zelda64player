@@ -38,7 +38,7 @@ class GossipStoneView(context: Context) : FrameLayout(context) {
         val iconSize = (28 * resources.displayMetrics.density).toInt()
         iconView =
                 ImageView(context).apply {
-                    setImageResource(R.drawable.gossip_stone)
+                    setImageResource(R.drawable.ic_gossip_stone)
                     scaleType = ImageView.ScaleType.FIT_CENTER
                 }
         textView =

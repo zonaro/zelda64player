@@ -24,7 +24,7 @@ class TrackerAssetCache(private val context: Context) {
 
     companion object {
         const val CACHE_VERSION =
-                3 // bump to invalidate old cache (magia/medalhões/ocarina/scale/strength)
+                4 // bump to invalidate old cache (gossip stone vector + MM RGBA32 stride fix)
     }
 
     private fun dirFor(crc32: String): File =
