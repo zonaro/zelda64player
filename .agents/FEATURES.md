@@ -17,6 +17,7 @@ Index of all major features. Each has a deep-dive doc in this folder.
 | **Self-Hosted Dashboard** | In progress | — | Local browser dashboard for the library, backups, streaming, and a Settings tab with parity for every app configuration; sensitive values remain write-only. |
 | **Background Catalog Refresh** | Shipped | [STORE.md](STORE.md) | WorkManager `CatalogRefreshWorker` (12h periodic, CONNECTED network). |
 | **Gamepad Tester** | Shipped | — | `GamepadTesterActivity` visualizes physical/N64 input without starting a core; shared mapping with gameplay. |
+| **Item Tracker — ROM Asset Extraction** | Shipped | — | On-device extraction of 32×32 item icons (RGBA16/CI8) from user-imported OoT/MM ROMs (DMA→Yaz0→TextureDecoder→PNG cache in `filesDir/tracker_assets/<crc32>`); Coil File loading with CC0 vector fallback (`ic_tracker_fallback`); 97 embedded PNGs removed (~812K saved). |
 | **i18n (pt-BR/en/es)** | Shipped | [I18N.md](I18N.md) | All user-facing strings externalized; zero hardcoded strings. |
 
 ---

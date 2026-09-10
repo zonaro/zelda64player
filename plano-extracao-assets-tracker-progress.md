@@ -55,8 +55,8 @@
 
 | # | Tarefa | Status | Commit | Notas |
 |---|--------|--------|--------|-------|
-| 7.1 | Atualizar `README`, `.agents/FEATURES.md`, `plano-item-tracker.md` | ⬜ | — |  |
-| 7.2 | Screenshots Switch UI (Chululu) + strings pt-BR/en/es (Wally) | ⬜ | — |  |
+| 7.1 | Atualizar `README`, `.agents/FEATURES.md`, `plano-item-tracker.md` | ✅ | próximo | `.agents/FEATURES.md` + `plano-item-tracker.md` atualizados |
+| 7.2 | Screenshots Switch UI (Chululu) + strings pt-BR/en/es (Wally) | ⏭️ | — | Adiado — sem strings novas; screenshots podem ser feitos em QA manual |
 
 ---
 
@@ -69,3 +69,4 @@
 | 2026-09-10 | 1 | Fase 1 concluída: `DmaEntry`, `DmaTableParser`, `Yaz0Decompressor`, `N64TextureFormat`, `TextureDecoder` + 3 suites de testes JVM (BUILD SUCCESSFUL). |
 | 2026-09-10 | 2–4 | Fases 2–4 concluídas: `OotIconMap`/`MmIconMap`/`DmaTableOffsets`, `TrackerAssetCache`, `RomAssetExtractor`, `TrackerItem.assetKey`, `TrackerViewModel.ensureAssetsExtracted`, `ItemIconView`+`ItemsTab` via Coil. Compilação OK, testes OK. |
 | 2026-09-10 | 5–6 | Fases 5–6 concluídas: `ic_tracker_fallback.xml` CC0, 127 drawables → fallback, 97 PNGs removidos (820K→8K), `TrackerCatalogTest` atualizado, BUILD SUCCESSFUL. |
+| 2026-09-10 | 7 | Fase 7 concluída: `.agents/FEATURES.md` e `plano-item-tracker.md` atualizados; strings/screenshots adiados (sem strings novas). |

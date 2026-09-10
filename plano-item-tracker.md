@@ -10,12 +10,7 @@ from any Randomizer functionality (which was removed from the project).
 - Per-hack persistence (each ROM hack keeps its own independent checklist + timer) via JSON in `filesDir`, keyed by `hackId` (falls back to the game name when no hack id is available)
 - Integrated run timer (start/pause/reset), persisted per hack and kept counting across dialog close / app restart
 - No core RAM is read — manual tracking only (race-legal)
-- Item icons: **temporarily copied as PNG** placeholders into `app/src/main/res/drawable-nodpi/`:
-  - OoT items → from `Draeko/ootr_gst` (`TrackerOOT/Resources/`)
-  - MM items → from `griesenj/ZeldaTracker` (`src/img/`, the colored ` 1.png` variants),
-    sanitized with an `mm_` prefix; missing MM icons fall back to the OoT drawables
-    (e.g. `iron_boots`, `hover_boots`, `magic`).
-  These are **placeholder assets** and will be replaced by original icons later (see §Icons).
+- Item icons: **extraídos on-device da ROM base OoT/MM importada pelo usuário** (DMA→Yaz0→RGBA16→PNG cache em `filesDir/tracker_assets/<crc32>` via `tracker/assets/`); fallback vetorial CC0 (`ic_tracker_fallback.xml`) quando sem ROM. Os 97 PNGs embarcados em `drawable-nodpi/` foram removidos (~812K economizados). Ver `plano-extracao-assets-tracker.md`.
 
 # Item Tracker Integration Plan — Zelda 64 Player
 
