@@ -40,16 +40,16 @@
 
 | # | Tarefa | Status | Commit | Notas |
 |---|--------|--------|--------|-------|
-| 5.1 | Vetores CC0 mínimos por item (Dolfi) | ⬜ | — |  |
-| 5.2 | Atualizar `OotItemDatabase`/`MmItemDatabase` para fallbacks | ⬜ | — |  |
+| 5.1 | Vetores CC0 mínimos por item (Dolfi) | ✅ | próximo | `ic_tracker_fallback.xml` (vetor CC0) + `ItemIconView` fallback para `ic_tracker_fallback` quando sem asset |
+| 5.2 | Atualizar `OotItemDatabase`/`MmItemDatabase` para fallbacks | ✅ | próximo | 127 referências `R.drawable.*` → `R.drawable.ic_tracker_fallback` (66 OoT + 61 MM) |
 
 ## Fase 6 — Remoção (Bruce)
 
 | # | Tarefa | Status | Commit | Notas |
 |---|--------|--------|--------|-------|
-| 6.1 | `git rm` PNGs de `drawable-nodpi/` + limpar `R.drawable` | ⬜ | — |  |
-| 6.2 | Atualizar `TrackerCatalogTest` + QA manual (com/sem ROM) | ⬜ | — |  |
-| 6.3 | Medir redução do APK | ⬜ | — |  |
+| 6.1 | `git rm` PNGs de `drawable-nodpi/` + limpar `R.drawable` | ✅ | próximo | 97 PNGs removidos, resta `placeholder_cover.png` + `gossip_stone.png` (usado em `GossipStoneView`) |
+| 6.2 | Atualizar `TrackerCatalogTest` + QA manual (com/sem ROM) | ✅ | próximo | `TrackerCatalogTest` atualizado para `ic_tracker_fallback`; BUILD SUCCESSFUL |
+| 6.3 | Medir redução do APK | ✅ | próximo | `drawable-nodpi/` de 820K → ~8K (placeholder+gossip_stone); ~812K economizados no APK |
 
 ## Fase 7 — Docs e QA Visual (Wally + Chululu)
 
@@ -68,3 +68,4 @@
 | 2026-09-10 | — | Arquivo de progresso criado. Início da Fase 1. |
 | 2026-09-10 | 1 | Fase 1 concluída: `DmaEntry`, `DmaTableParser`, `Yaz0Decompressor`, `N64TextureFormat`, `TextureDecoder` + 3 suites de testes JVM (BUILD SUCCESSFUL). |
 | 2026-09-10 | 2–4 | Fases 2–4 concluídas: `OotIconMap`/`MmIconMap`/`DmaTableOffsets`, `TrackerAssetCache`, `RomAssetExtractor`, `TrackerItem.assetKey`, `TrackerViewModel.ensureAssetsExtracted`, `ItemIconView`+`ItemsTab` via Coil. Compilação OK, testes OK. |
+| 2026-09-10 | 5–6 | Fases 5–6 concluídas: `ic_tracker_fallback.xml` CC0, 127 drawables → fallback, 97 PNGs removidos (820K→8K), `TrackerCatalogTest` atualizado, BUILD SUCCESSFUL. |

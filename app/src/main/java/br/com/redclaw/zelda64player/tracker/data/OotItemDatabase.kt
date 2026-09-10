@@ -43,65 +43,65 @@ object OotItemDatabase : TrackerContent {
                         TrackerItem(
                                 "kokiri_sword",
                                 R.string.oot_item_kokiri_sword,
-                                iconRes = R.drawable.kokiri_sword,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 1
                         ),
                         TrackerItem(
                                 "master_sword",
                                 R.string.oot_item_master_sword,
-                                iconRes = R.drawable.master_sword
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "biggoron_sword",
                                 R.string.oot_item_biggoron_sword,
-                                iconRes = R.drawable.biggoron
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "deku_shield",
                                 R.string.oot_item_deku_shield,
-                                iconRes = R.drawable.kokiri_shield
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "hylian_shield",
                                 R.string.oot_item_hylian_shield,
-                                iconRes = R.drawable.hylian_shield
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "mirror_shield",
                                 R.string.oot_item_mirror_shield,
-                                iconRes = R.drawable.mirror_shield
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "iron_boots",
                                 R.string.oot_item_iron_boots,
-                                iconRes = R.drawable.iron_boots
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "hover_boots",
                                 R.string.oot_item_hover_boots,
-                                iconRes = R.drawable.hover_boots
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "hookshot_longshot",
                                 R.string.oot_item_hookshot_longshot,
-                                iconRes = R.drawable.hookshot,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 2,
                                 cycleLabels =
                                         listOf(
                                                 R.string.oot_item_hookshot,
                                                 R.string.oot_item_longshot
                                         ),
-                                cycleIcons = listOf(R.drawable.hookshot, R.drawable.longshot)
+                                cycleIcons = listOf(R.drawable.ic_tracker_fallback, R.drawable.ic_tracker_fallback)
                         ),
                         TrackerItem(
                                 "boomerang",
                                 R.string.oot_item_boomerang,
-                                iconRes = R.drawable.boomerang
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "bow",
                                 R.string.oot_item_bow,
-                                iconRes = R.drawable.bow,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 3,
                                 cycleLabels =
                                         listOf(
@@ -109,59 +109,59 @@ object OotItemDatabase : TrackerContent {
                                                 R.string.oot_item_bow_level_2,
                                                 R.string.oot_item_bow_level_3
                                         ),
-                                cycleIcons = listOf(R.drawable.bow, R.drawable.bow, R.drawable.bow)
+                                cycleIcons = listOf(R.drawable.ic_tracker_fallback, R.drawable.ic_tracker_fallback, R.drawable.ic_tracker_fallback)
                         ),
                         TrackerItem(
                                 "bomb_bag",
                                 R.string.oot_item_bomb_bag,
-                                iconRes = R.drawable.mm_bomb_bag,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 3
                         ),
                         TrackerItem(
                                 "slingshot",
                                 R.string.oot_item_slingshot,
-                                iconRes = R.drawable.slingshot,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 3
                         ),
                         TrackerItem(
                                 "deku_stick",
                                 R.string.oot_item_deku_stick,
-                                iconRes = R.drawable.deku_stick,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 2,
                                 cycleLabels =
                                         listOf(
                                                 R.string.oot_item_deku_stick_level_1,
                                                 R.string.oot_item_deku_stick_level_2
                                         ),
-                                cycleIcons = listOf(R.drawable.deku_stick, R.drawable.deku_stick)
+                                cycleIcons = listOf(R.drawable.ic_tracker_fallback, R.drawable.ic_tracker_fallback)
                         ),
                         TrackerItem(
                                 "deku_nut",
                                 R.string.oot_item_deku_nut,
-                                iconRes = R.drawable.deku_nut,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 2,
                                 cycleLabels =
                                         listOf(
                                                 R.string.oot_item_deku_nut_level_1,
                                                 R.string.oot_item_deku_nut_level_2
                                         ),
-                                cycleIcons = listOf(R.drawable.deku_nut, R.drawable.deku_nut)
+                                cycleIcons = listOf(R.drawable.ic_tracker_fallback, R.drawable.ic_tracker_fallback)
                         ),
-                        TrackerItem("bombchu", R.string.oot_item_bombchu, iconRes = R.drawable.bombchu),
+                        TrackerItem("bombchu", R.string.oot_item_bombchu, iconRes = R.drawable.ic_tracker_fallback),
                         TrackerItem(
                                 "lens_of_truth",
                                 R.string.oot_item_lens_of_truth,
-                                iconRes = R.drawable.mm_lens_of_truth
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "megaton_hammer",
                                 R.string.oot_item_megaton_hammer,
-                                iconRes = R.drawable.hammer
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "ocarina",
                                 R.string.oot_item_ocarina_cycle,
-                                iconRes = R.drawable.ocarina_of_time,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 2,
                                 cycleLabels =
                                         listOf(
@@ -170,44 +170,44 @@ object OotItemDatabase : TrackerContent {
                                         ),
                                 cycleIcons =
                                         listOf(
-                                                R.drawable.ocarina_of_time,
-                                                R.drawable.ocarina_of_time
+                                                R.drawable.ic_tracker_fallback,
+                                                R.drawable.ic_tracker_fallback
                                         )
                         ),
                         TrackerItem(
                                 "fire_arrows",
                                 R.string.oot_item_fire_arrows,
-                                iconRes = R.drawable.mm_fire_arrow
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "ice_arrows",
                                 R.string.oot_item_ice_arrows,
-                                iconRes = R.drawable.mm_ice_arrow
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "light_arrows",
                                 R.string.oot_item_light_arrows,
-                                iconRes = R.drawable.mm_light_arrow
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "din_fire",
                                 R.string.oot_item_din_fire,
-                                iconRes = R.drawable.dins_fire
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "farore_wind",
                                 R.string.oot_item_farore_wind,
-                                iconRes = R.drawable.farores_wind
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "nayru_love",
                                 R.string.oot_item_nayru_love,
-                                iconRes = R.drawable.nairus_love
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "strength",
                                 R.string.oot_item_strength,
-                                iconRes = R.drawable.strength,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 3,
                                 cycleLabels =
                                         listOf(
@@ -217,76 +217,76 @@ object OotItemDatabase : TrackerContent {
                                         ),
                                 cycleIcons =
                                         listOf(
-                                                R.drawable.strength,
-                                                R.drawable.strength2,
-                                                R.drawable.strength3
+                                                R.drawable.ic_tracker_fallback,
+                                                R.drawable.ic_tracker_fallback,
+                                                R.drawable.ic_tracker_fallback
                                         )
                         ),
                         TrackerItem(
                                 "magic",
                                 R.string.oot_item_magic,
-                                iconRes = R.drawable.magic,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 2,
                                 cycleLabels =
                                         listOf(
                                                 R.string.oot_item_magic_level_1,
                                                 R.string.oot_item_magic_level_2
                                         ),
-                                cycleIcons = listOf(R.drawable.magic, R.drawable.magic)
+                                cycleIcons = listOf(R.drawable.ic_tracker_fallback, R.drawable.ic_tracker_fallback)
                         ),
                         TrackerItem(
                                 "scale",
                                 R.string.oot_item_scale,
-                                iconRes = R.drawable.scale,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 2,
                                 cycleLabels =
                                         listOf(
                                                 R.string.oot_item_scale_silver,
                                                 R.string.oot_item_scale_golden
                                         ),
-                                cycleIcons = listOf(R.drawable.scale, R.drawable.scale)
+                                cycleIcons = listOf(R.drawable.ic_tracker_fallback, R.drawable.ic_tracker_fallback)
                         ),
                         TrackerItem(
                                 "kokiri_tunic",
                                 R.string.oot_item_kokiri_tunic,
-                                iconRes = R.drawable.green_tunic
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "goron_tunic",
                                 R.string.oot_item_goron_tunic,
-                                iconRes = R.drawable.goron_tunic
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "zora_tunic",
                                 R.string.oot_item_zora_tunic,
-                                iconRes = R.drawable.zora_tunic
+                                iconRes = R.drawable.ic_tracker_fallback
                         ),
                         TrackerItem(
                                 "rupees",
                                 R.string.oot_item_rupees,
-                                iconRes = R.drawable.wallet,
+                                iconRes = R.drawable.ic_tracker_fallback,
                                 maxCount = 2,
                                 cycleLabels =
                                         listOf(
                                                 R.string.oot_item_wallet_adult,
                                                 R.string.oot_item_wallet_giant
                                         ),
-                                cycleIcons = listOf(R.drawable.wallet2, R.drawable.wallet3)
+                                cycleIcons = listOf(R.drawable.ic_tracker_fallback, R.drawable.ic_tracker_fallback)
                         ),
-                        TrackerItem("forest_medallion", R.string.oot_item_forest_medallion, R.drawable.oot_medallion_forest),
-                        TrackerItem("fire_medallion", R.string.oot_item_fire_medallion, R.drawable.oot_medallion_fire),
-                        TrackerItem("water_medallion", R.string.oot_item_water_medallion, R.drawable.oot_medallion_water),
-                        TrackerItem("spirit_medallion", R.string.oot_item_spirit_medallion, R.drawable.oot_medallion_spirit),
-                        TrackerItem("shadow_medallion", R.string.oot_item_shadow_medallion, R.drawable.oot_medallion_shadow),
-                        TrackerItem("light_medallion", R.string.oot_item_light_medallion, R.drawable.oot_medallion_light),
-                        TrackerItem("keaton_mask", R.string.oot_item_keaton_mask, R.drawable.oot_mask_keaton),
-                        TrackerItem("skull_mask", R.string.oot_item_skull_mask, R.drawable.oot_mask_skull),
-                        TrackerItem("spooky_mask", R.string.oot_item_spooky_mask, R.drawable.oot_mask_spooky),
-                        TrackerItem("bunny_hood", R.string.oot_item_bunny_hood, R.drawable.oot_mask_bunny_hood),
-                        TrackerItem("goron_mask", R.string.oot_item_goron_mask, R.drawable.oot_mask_goron),
-                        TrackerItem("zora_mask", R.string.oot_item_zora_mask, R.drawable.oot_mask_zora),
-                        TrackerItem("gerudo_mask", R.string.oot_item_gerudo_mask, R.drawable.oot_mask_gerudo),
-                        TrackerItem("mask_of_truth", R.string.oot_item_mask_of_truth, R.drawable.oot_mask_truth)
+                        TrackerItem("forest_medallion", R.string.oot_item_forest_medallion, R.drawable.ic_tracker_fallback),
+                        TrackerItem("fire_medallion", R.string.oot_item_fire_medallion, R.drawable.ic_tracker_fallback),
+                        TrackerItem("water_medallion", R.string.oot_item_water_medallion, R.drawable.ic_tracker_fallback),
+                        TrackerItem("spirit_medallion", R.string.oot_item_spirit_medallion, R.drawable.ic_tracker_fallback),
+                        TrackerItem("shadow_medallion", R.string.oot_item_shadow_medallion, R.drawable.ic_tracker_fallback),
+                        TrackerItem("light_medallion", R.string.oot_item_light_medallion, R.drawable.ic_tracker_fallback),
+                        TrackerItem("keaton_mask", R.string.oot_item_keaton_mask, R.drawable.ic_tracker_fallback),
+                        TrackerItem("skull_mask", R.string.oot_item_skull_mask, R.drawable.ic_tracker_fallback),
+                        TrackerItem("spooky_mask", R.string.oot_item_spooky_mask, R.drawable.ic_tracker_fallback),
+                        TrackerItem("bunny_hood", R.string.oot_item_bunny_hood, R.drawable.ic_tracker_fallback),
+                        TrackerItem("goron_mask", R.string.oot_item_goron_mask, R.drawable.ic_tracker_fallback),
+                        TrackerItem("zora_mask", R.string.oot_item_zora_mask, R.drawable.ic_tracker_fallback),
+                        TrackerItem("gerudo_mask", R.string.oot_item_gerudo_mask, R.drawable.ic_tracker_fallback),
+                        TrackerItem("mask_of_truth", R.string.oot_item_mask_of_truth, R.drawable.ic_tracker_fallback)
                 )
 
         override val locations: List<TrackerLocation> =

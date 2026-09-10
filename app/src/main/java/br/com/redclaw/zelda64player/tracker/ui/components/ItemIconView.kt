@@ -142,15 +142,17 @@ class ItemIconView(context: Context) : FrameLayout(context) {
                 else displayName
         if (assetFile != null) {
             iconView.load(assetFile) {
-                placeholder(effectiveIcon.takeIf { it != 0 } ?: R.drawable.placeholder_cover)
-                error(effectiveIcon.takeIf { it != 0 } ?: R.drawable.placeholder_cover)
+                placeholder(effectiveIcon.takeIf { it != 0 } ?: R.drawable.ic_tracker_fallback)
+                error(effectiveIcon.takeIf { it != 0 } ?: R.drawable.ic_tracker_fallback)
             }
             iconView.visibility = VISIBLE
         } else if (effectiveIcon != 0) {
             iconView.setImageResource(effectiveIcon)
             iconView.visibility = VISIBLE
         } else {
-            iconView.visibility = GONE
+            // No embedded icon and no extracted asset — show CC0 fallback
+            iconView.setImageResource(R.drawable.ic_tracker_fallback)
+            iconView.visibility = VISIBLE
         }
         nameView.text = effectiveLabel
         val nameLp = nameView.layoutParams as LayoutParams
