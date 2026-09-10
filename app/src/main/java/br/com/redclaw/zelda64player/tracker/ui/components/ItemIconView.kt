@@ -26,7 +26,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import br.com.redclaw.zelda64player.R
-import br.com.redclaw.zelda64player.tracker.assets.cache.TrackerAssetCache
 import br.com.redclaw.zelda64player.tracker.model.TrackerItem
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import coil.load
@@ -127,11 +126,20 @@ class ItemIconView(context: Context) : FrameLayout(context) {
         (checkView.layoutParams as LayoutParams).gravity = Gravity.TOP or Gravity.START
     }
 
-    fun bind(item: TrackerItem, displayName: String, obtained: Boolean, count: Int, assetCrc: String? = null) {
+    fun bind(
+            item: TrackerItem,
+            displayName: String,
+            obtained: Boolean,
+            count: Int,
+            assetCrc: String? = null
+    ) {
         // Try ROM-extracted PNG first (Coil File), fall back to embedded drawable.
-        val assetFile: File? = assetCrc?.let { crc ->
-            File(context.filesDir, "tracker_assets/$crc/${item.assetKey}.png").takeIf { it.exists() }
-        }
+        val assetFile: File? =
+                assetCrc?.let { crc ->
+                    File(context.filesDir, "tracker_assets/$crc/${item.assetKey}.png").takeIf {
+                        it.exists()
+                    }
+                }
         // Cyclic items (hookshot, ocarina) show the variant icon/label for the current count.
         val effectiveIcon =
                 if (item.isCyclic && count in 1..item.cycleIcons.size) item.cycleIcons[count - 1]

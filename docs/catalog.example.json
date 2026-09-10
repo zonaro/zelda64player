@@ -33,10 +33,6 @@
         "restoration",
         "enhancement"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "developerLinks": [
         {
           "label": "GitHub",
@@ -74,10 +70,6 @@
       "tags": [
         "new-content",
         "achievements"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "developerLinks": [
         {

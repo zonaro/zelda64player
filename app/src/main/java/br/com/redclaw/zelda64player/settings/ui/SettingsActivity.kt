@@ -135,7 +135,6 @@ class SettingsActivity : AppCompatActivity() {
         setupBaseRomList()
         setupCatalogSection()
         setupRetroAchievementsSection()
-        setupCoreSection()
         setupBackupSection()
         setupGdriveSection()
         setupCloudSyncSection()
@@ -178,7 +177,6 @@ class SettingsActivity : AppCompatActivity() {
                         binding.settingsNavBaseroms to binding.settingsSectionBaseroms,
                         binding.settingsNavCatalog to binding.settingsSectionCatalog,
                         binding.settingsNavRa to binding.settingsSectionRa,
-                        binding.settingsNavCore to binding.settingsSectionCore,
                         binding.settingsNavBackup to binding.settingsSectionBackup,
                         binding.settingsNavCloudsync to binding.settingsSectionCloudsync,
                         binding.settingsNavLanguage to binding.settingsSectionLanguage,
@@ -227,7 +225,6 @@ class SettingsActivity : AppCompatActivity() {
                         binding.settingsNavBaseroms,
                         binding.settingsNavCatalog,
                         binding.settingsNavRa,
-                        binding.settingsNavCore,
                         binding.settingsNavBackup,
                         binding.settingsNavCloudsync,
                         binding.settingsNavLanguage,
@@ -431,7 +428,6 @@ class SettingsActivity : AppCompatActivity() {
                         binding.settingsCatalogAdd,
                         binding.settingsRaLogin,
                         binding.settingsRaLogout,
-                        binding.settingsCoreButton,
                         binding.settingsGdriveConnect,
                         binding.settingsGdriveBackupNow,
                         binding.settingsGdriveView,
@@ -1077,51 +1073,6 @@ class SettingsActivity : AppCompatActivity() {
                     else -> R.string.settings_ra_status_logged_out
                 }
         )
-        updateRaEnabledSubtitle(credentials)
-    }
-
-    /**
-     * Shows the connected username as a subtitle under "Ativar RetroAchievements" when RA is signed
-     * in. Hidden when signed out. Shown regardless of the enable toggle so the user always sees
-     * which account is stored.
-     */
-    private fun updateRaEnabledSubtitle(credentials: RaCredentialStore) {
-        val username = credentials.getUsername()?.trim().orEmpty()
-        val showSubtitle = username.isNotEmpty() && credentials.hasCredentials()
-        binding.settingsRaEnabledSubtitle.apply {
-            if (showSubtitle) {
-                text = getString(R.string.settings_ra_enabled_subtitle, username)
-                visibility = View.VISIBLE
-            } else {
-                visibility = View.GONE
-            }
-        }
-    }
-
-    private fun setupCoreSection() {
-        updateCoreLabel()
-        binding.settingsCoreButton.setOnClickListener {
-            sfx?.select()
-            showCoreDialog()
-        }
-    }
-
-    private fun updateCoreLabel() {
-        val index = CorePrefs.getSelectedCoreIndex(this)
-        val name = CorePrefs.options.getOrElse(index) { CorePrefs.options[0] }
-        binding.settingsCoreCurrent.text = getString(R.string.settings_core_current, name)
-    }
-
-    private fun showCoreDialog() {
-        val currentIndex = CorePrefs.getSelectedCoreIndex(this)
-        SwitchDialog(this)
-                .title(getString(R.string.settings_core_change))
-                .singleChoice(CorePrefs.options.toList(), currentIndex) { which ->
-                    CorePrefs.setSelectedCoreIndex(this, which)
-                    updateCoreLabel()
-                }
-                .negativeButton(getString(android.R.string.cancel))
-                .show()
     }
 
     private fun setupLanguageSection() {

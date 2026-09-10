@@ -112,8 +112,8 @@ const I18N = {
 
 const FEATURE_KEYS = ["discover", "library", "ocarina", "achievements", "controls", "memories"];
 const FEATURE_ICONS = { discover: "a", library: "i", ocarina: "e", achievements: "f", controls: "j", memories: "o" };
-const LIVE_CATALOG_URL = "https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/catalog.json";
-const FALLBACK_CATALOG_URL = "./catalog.json";
+const LIVE_CATALOG_URL = "https://cdn.jsdelivr.net/gh/zonaro/zelda64player@main/catalog/catalog.json";
+const FALLBACK_CATALOG_URL = "https://raw.githubusercontent.com/zonaro/zelda64player/main/catalog/catalog.json";
 let currentLang = "pt";
 
 function detectLang() {
@@ -258,10 +258,6 @@ function openHackPopup(hack) {
       var el = document.createElement("span"); el.className = "hack-popup-badge hack-popup-badge--accent";
       el.textContent = b.label + ": " + b.value; badgesEl.appendChild(el);
     });
-    if (Array.isArray(hack.compatibleCores) && hack.compatibleCores.length) {
-      var cores = document.createElement("span"); cores.className = "hack-popup-badge";
-      cores.textContent = hack.compatibleCores.join(", "); badgesEl.appendChild(cores);
-    }
   }
   if (videosEl) {
     videosEl.innerHTML = "";

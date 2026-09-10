@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -70,6 +71,7 @@ class RaAuthService(
                     // Persist for silent token re-login during gameplay sessions.
                     // The token is secret: stored encrypted, never logged.
                     credentials.setCredentials(username, result.token)
+                    br.com.redclaw.zelda64player.Zelda64PlayerApp.raAwardOutbox.onLogin(username)
                     Result.success(Unit)
                 }
             }
@@ -94,13 +96,16 @@ class RaAuthService(
     }
 
     override fun onAsyncResult(opId: Int, resultCode: Int, errorMessage: String?) {
-        pending.remove(opId)?.complete(
-            RaLoginResult(
-                success = resultCode == RC_OK,
-                token = extractToken(),
-                error = errorMessage
+        // Native callbacks hold the client mutex; read user info only after returning to Java.
+        scope.launch(Dispatchers.Main) {
+            pending.remove(opId)?.complete(
+                RaLoginResult(
+                    success = resultCode == RC_OK,
+                    token = extractToken(),
+                    error = errorMessage
+                )
             )
-        )
+        }
     }
 
     override fun onClientEvent(eventType: Int, payloadJson: String) = Unit

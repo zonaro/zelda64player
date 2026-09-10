@@ -54,6 +54,7 @@
             android:id="@+id/capture_viewer_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:adjustViewBounds="true"
             android:contentDescription="@string/gallery_image_content_description"
             android:scaleType="fitCenter"
@@ -63,6 +64,7 @@
             android:id="@+id/capture_viewer_video"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="center"
             android:focusable="false"
             android:visibility="gone" />
 

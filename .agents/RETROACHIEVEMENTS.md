@@ -28,11 +28,12 @@ These describe the implementation contract, not evidence of successful device va
 ## 3. rcheevos + LibretroDroid (Vendored)
 
 ### Why vendor LibretroDroid 0.13.2?
-LibretroDroid 0.13.2 (JitPack `com.github.swordfish90:libretrodroid`) does **not** expose core memory to app code. However, its `GLRetroView` emits `GLRetroEvents.FrameRendered` **every frame** (Flow, emitted post-frame from GL thread to main dispatcher) — usable as a per-frame tick **without forking**.
+LibretroDroid 0.13.2 (JitPack `com.github.swordfish90:libretrodroid`) does **not** expose core memory to app code. Its `GLRetroEvents.FrameRendered` Flow describes rendered frames and is not the achievement evaluation clock. The vendored core loop provides a synchronous callback after each `retro_run`, including extra iterations during fast-forward.
 
-**Decision:** Vendor LibretroDroid 0.13.2 source in local Gradle module `:libretrodroid` and add **two minimal JNI passthroughs**:
+**Decision:** Vendor LibretroDroid 0.13.2 source in local Gradle module `:libretrodroid` and expose core memory plus synchronous frame observation:
 - `LibretroDroid.getMemoryData(id: Int): ByteBuffer?` — direct buffer wrapping `retro_get_memory_data`
 - `LibretroDroid.getMemorySize(id: Int): Int` — region size
+- Frame observer — evaluates the RA session immediately after each `retro_run` while `coreLock` remains held.
 
 For N64 + mupen64plus-next, `RETRO_MEMORY_SYSTEM_RAM` is **RDRAM** (8MB with expansion pak) at a stable address while the game loads; RA N64 addresses map **directly into RDRAM**.
 
@@ -102,21 +103,30 @@ retroachievements/
     └── RaInstallRepository.kt      # Persists install-time RA metadata alongside existing install metadata
 ```
 
-## 5. Threading Model
+## 5. Runtime Evaluation and Threading
 
-| Component | Thread | Details |
-|-----------|--------|---------|
-| `rc_client_do_frame` | **Main thread** | Driven by `GLRetroEvents.FrameRendered` Flow (already on main dispatcher). 1× per frame. |
-| `read_memory` callback | **rcheevos thread** (background) | Reads via `LibretroDroidMemoryJni.getMemoryData(RETRO_MEMORY_SYSTEM_RAM)` → `ByteBuffer` → copy to output. Pointer valid only while core running. |
-| `server_call` callback | **Any thread** (OkHttp callback) | `RaHttpClient` async OkHttp; on response invokes C callback via JNI `nativeServerCallComplete(requestPtr, responseBody, httpStatus)`. Marshaling thread-safe (`AttachCurrentThread` if needed). |
-| `event_handler` callbacks | **rcheevos thread** | Events posted to Main via `Handler(Looper.getMainLooper())` or `runOnUiThread` → `InGameRaViewModel` → overlay/notification. |
-| `RaHttpClient` (rapi standalone) | **Dispatchers.IO** | Coroutines + OkHttp. Used by AchievementsActivity/ViewModel to fetch without core running. |
-| Teardown / GL destroy | **Main thread** | Order: `super.onDestroy()` BEFORE `dispose()` → dispatch ON_DESTROY frees ~90MB natives. `RaSessionManager` calls `rc_client_unload_game` + `rc_client_destroy` **before** core destroyed. `InGameRaViewModel.onCleared()` cleans up. |
+| Component | Execution | Details |
+|-----------|-----------|---------|
+| `rc_client_do_frame` | Emulation/GL thread | Synchronous observer after every `retro_run`, under LibretroDroid's `coreLock`; includes fast-forward iterations. No asynchronous rendered-frame Flow is used for achievement evaluation. |
+| `read_memory` callback | Calling rcheevos operation's thread | Reads the attached direct SYSTEM_RAM buffer; frame evaluation observes memory before the next emulated frame can mutate it. |
+| Live client JNI operations | Serialized by `g_client_mutex` | Frame evaluation, HTTP response completion, idle processing and teardown cannot concurrently mutate the rcheevos client. |
+| HTTP bridge | Asynchronous request completion | Network work runs outside frame evaluation; response completion re-enters the native client under its mutex. |
+| `rc_client_idle` | Session coroutine, once per second | Processes pending work/retries even when gameplay is paused; it does not emulate frames. Cancelled when the session stops. |
+| UI notifications | Main dispatcher | Native events are relayed through the session to UI collectors for toast/notification updates. |
+| Standalone catalog requests | `Dispatchers.IO` | Fetch definitions and user unlocks without starting a core. |
 
-### Invalid Pointer Guard (game unload/reload)
-- `rc_client_unload_game` called in `InGameRaViewModel.onCleared()` (ViewModel cleared when GameActivity destroyed).
-- `read_memory` **may** be called after unload if rcheevos still processing previous frame → **defense:** `getMemoryData` returns `null` if core not initialized; `read_memory` returns 0 bytes read (rcheevos treats as read failure, no crash).
-- **Torn reads** (main thread during achievement evaluation): acceptable in v1, documented. RDRAM not atomic; rcheevos reads 1–4 byte words. Low probability, visual impact only (achievement triggers 1 frame late). Future mitigation: pause emulation during `do_frame` (needs LibretroDroid fork).
+### Memory and lifecycle
+
+The session obtains and attaches SYSTEM_RAM before login/game loading, because achievement activation can inspect memory before the game-load callback completes. Missing memory fails startup. The direct buffer remains valid only while the core owns that ROM. Session stop disables evaluation, cancels idle work, detaches memory and unloads/destroys the native client before core disposal. Native reads with no attached memory return zero bytes.
+
+### Verification scope and remaining work
+
+- `python3 scripts/test-ra-runtime.py` builds the actual JNI bridge with vendored rcheevos on Linux, using synthetic RAM, a synthetic ROM and a simulated server without network access. Its assertions cover condition-triggered unlock, softcore award requests, retry through idle while paused, summary/list refresh, duplicate prevention, restored server unlocks, detached memory, serialized hit counts, resets, delayed callback teardown and replay signing. This is protocol/runtime regression coverage, not proof of an award accepted by the real service.
+- `libretrodroid/src/test/cpp/frameiteration_test.cpp` checks the shared frame-iteration helper, including observer ordering and multiple fast-forward iterations. Android/core/device execution requires separate validation.
+- No newly earned achievement on the user's real account has been verified by this work yet. Successful identification or a displayed achievement count does not establish unlock/submission completeness.
+- Save-state integration stores core bytes, RA hit-count progress and ROM hash in one checksummed record, written using AtomicFile. Core-locked callbacks capture both in the same frame and restore RA only after successful core restoration. Legacy states reset RA progress; mismatched/corrupt pairs are rejected. Core reset calls `rc_client_reset`.
+- Hardcore policy rejects state loading and cheats at the core boundary, blocks Auto-Ocarina input playback, enforces the native pause gate (forced lifecycle pauses downgrade to Casual), and handles native reset requests. Saving states is allowed. Fast-forward is allowed with per-emulated-frame evaluation; slowdown below 1x is prevented. These technical controls do not imply official User-Agent approval by RetroAchievements.
+- `RaAwardOutbox` journals actual native awards synchronously in encrypted preferences before HTTP. WorkManager retries after session/process termination using the same account, original mode/hash/time and the official rapi builder with a fresh elapsed offset. Tokens are never persisted in the journal. Only an acknowledgment for the exact achievement removes it. Definitive rejections remain recorded and are surfaced; a fresh login permits retry. Late native callbacks are drained before client destruction to avoid accessing a freed session.
 
 ## 6. Data Model Changes
 
@@ -185,6 +195,8 @@ The list below records the original phase breakdown, not current verification re
 | rcheevos native build fails on an ABI | Medium | High | Pin rcheevos tag; test all 4 ABIs in CI |
 | `read_memory` called after unload → crash | Low | High | Null-guard in `getMemoryData`; return 0 bytes |
 | Hardcore unlock rejected (UA not validated) | High | Low | Default OFF; show notice until RAdmin validates |
-| Torn reads cause missed/late achievement | Low | Low | Documented v1 limitation; future pause-during-frame |
+| Missed evaluation during fast-forward | Low | High | Observe every `retro_run` synchronously under `coreLock`; exercise device/core behavior separately |
+| Process exit loses pending offline awards | Medium | High | Encrypted synchronous journal and network-constrained WorkManager replay; exact-id acknowledgment |
+| Hardcore approval pending | High | Medium | Technical restrictions implemented; default OFF pending external User-Agent validation |
 | Token expiry mid-session | Medium | Medium | `RaSessionManager` auto-refresh; silent re-login |
 | Notification permission denied (API 33+) | Medium | Low | Graceful degrade to in-game toast only |

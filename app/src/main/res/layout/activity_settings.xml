@@ -94,11 +94,6 @@
                     android:text="@string/settings_ra_title" />
 
                 <TextView
-                    android:id="@+id/settings_nav_core"
-                    style="@style/SwitchSettingsNavigationRow"
-                    android:text="@string/settings_core_title" />
-
-                <TextView
                     android:id="@+id/settings_nav_backup"
                     style="@style/SwitchSettingsNavigationRow"
                     android:text="@string/backup_title" />
@@ -345,30 +340,13 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/settings_ra_enabled_label"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/settings_ra_enabled"
-                            android:textColor="@color/switch_text_primary"
-                            android:textSize="15sp" />
-
-                        <TextView
-                            android:id="@+id/settings_ra_enabled_subtitle"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:textColor="@color/switch_text_secondary"
-                            android:textSize="12sp"
-                            android:visibility="gone" />
-
-                    </LinearLayout>
+                        android:text="@string/settings_ra_enabled"
+                        android:textColor="@color/switch_text_primary"
+                        android:textSize="15sp" />
 
                     <Switch
                         android:id="@+id/settings_ra_enabled_switch"
@@ -469,39 +447,6 @@
                     android:layout_marginTop="8dp"
                     android:textColor="@color/switch_text_secondary"
                     android:textSize="13sp" />
-            </LinearLayout>
-
-            <!-- Section D: emulator core -->
-            <LinearLayout
-                android:id="@+id/settings_section_core"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="0dp"
-                android:background="@drawable/bg_settings_section"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    style="@style/SwitchSectionHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_core_title" />
-
-                <TextView
-                    android:id="@+id/settings_core_current"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@color/switch_text_secondary"
-                    android:textSize="13sp" />
-
-                <Button
-                    android:id="@+id/settings_core_button"
-                    style="@style/SwitchButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/settings_core_change" />
             </LinearLayout>
 
             <!-- Section Backups -->

@@ -56,22 +56,27 @@ class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: Stri
     private fun resolveAssetCrc(): String? {
         val roms = AppRepositories.baseRomRepository(appContext).getAll()
         // Prefer a ROM matching the current game (OoT vs MM via gameCode)
-        val gameCodes = when (game) {
-            TrackerGame.OOT -> setOf("CZLE", "CZLP")
-            TrackerGame.MM -> setOf("NZSE", "NZSP")
-        }
-        return roms.firstOrNull { it.gameCode in gameCodes }?.crc32
-            ?: roms.firstOrNull()?.crc32
+        val gameCodes =
+                when (game) {
+                    TrackerGame.OOT -> setOf("CZLE", "CZLP")
+                    TrackerGame.MM -> setOf("NZSE", "NZSP")
+                }
+        return roms.firstOrNull { it.gameCode in gameCodes }?.crc32 ?: roms.firstOrNull()?.crc32
     }
 
-    /** Ensure icons for [game] are extracted from the base ROM if needed. Call from UI (IO-safe). */
+    /**
+     * Ensure icons for [game] are extracted from the base ROM if needed. Call from UI (IO-safe).
+     */
     suspend fun ensureAssetsExtracted() {
         val crc = _assetCrc.value ?: return
         val expectedCount = items.size
         if (assetCache.hasValidCache(crc, expectedCount)) return
-        val romFile = AppRepositories.baseRomRepository(appContext).getAll()
-            .firstOrNull { it.crc32.equals(crc, ignoreCase = true) }
-            ?.let { File(it.path) } ?: return
+        val romFile =
+                AppRepositories.baseRomRepository(appContext)
+                        .getAll()
+                        .firstOrNull { it.crc32.equals(crc, ignoreCase = true) }
+                        ?.let { File(it.path) }
+                        ?: return
         _isExtracting.value = true
         try {
             assetExtractor.extractAll(romFile, game)

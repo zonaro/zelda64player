@@ -16,11 +16,11 @@ import java.nio.ByteOrder
 /**
  * Yaz0 (LZSS variant) decompressor used by N64 Zelda ROMs.
  *
- * Header (16 bytes): magic "Yaz0" + uncompressedSize (BE u32) + 8 reserved bytes.
- * Body: code byte (8 flags) interleaved with literals and back-references.
+ * Header (16 bytes): magic "Yaz0" + uncompressedSize (BE u32) + 8 reserved bytes. Body: code byte
+ * (8 flags) interleaved with literals and back-references.
  *
- * Pure Kotlin, no Android dependency — unit-testable on JVM.
- * All bounds are validated (Regra 16) to avoid OOB on corrupted data.
+ * Pure Kotlin, no Android dependency — unit-testable on JVM. All bounds are validated (Regra 16) to
+ * avoid OOB on corrupted data.
  */
 object Yaz0Decompressor {
 
@@ -30,7 +30,9 @@ object Yaz0Decompressor {
         require(magic == "Yaz0") { "Invalid Yaz0 magic: $magic" }
 
         val uncompressedSize = ByteBuffer.wrap(src, 4, 4).order(ByteOrder.BIG_ENDIAN).int
-        require(uncompressedSize in 1..32_000_000) { "Yaz0: invalid uncompressed size $uncompressedSize" }
+        require(uncompressedSize in 1..32_000_000) {
+            "Yaz0: invalid uncompressed size $uncompressedSize"
+        }
 
         val dst = ByteArray(uncompressedSize)
         var srcPos = 16
@@ -55,15 +57,21 @@ object Yaz0Decompressor {
                 val dist = ((byte1 and 0x0F) shl 8) or byte2
                 var copyLen = byte1 ushr 4
                 if (copyLen == 0) {
-                    require(srcPos < src.size) { "Yaz0: truncated extended length at srcPos=$srcPos" }
+                    require(srcPos < src.size) {
+                        "Yaz0: truncated extended length at srcPos=$srcPos"
+                    }
                     copyLen = (src[srcPos++].toInt() and 0xFF) + 0x12
                 } else {
                     copyLen += 2
                 }
                 val copyFrom = dstPos - dist - 1
                 require(copyFrom >= 0) { "Yaz0: invalid copy distance dist=$dist dstPos=$dstPos" }
-                require(dstPos + copyLen <= dst.size) { "Yaz0: copy would overflow dst (len=$copyLen dstPos=$dstPos size=${dst.size})" }
-                require(copyFrom + copyLen <= dstPos || copyFrom >= 0) { "Yaz0: invalid copy range" }
+                require(dstPos + copyLen <= dst.size) {
+                    "Yaz0: copy would overflow dst (len=$copyLen dstPos=$dstPos size=${dst.size})"
+                }
+                require(copyFrom + copyLen <= dstPos || copyFrom >= 0) {
+                    "Yaz0: invalid copy range"
+                }
                 for (i in 0 until copyLen) {
                     dst[dstPos++] = dst[copyFrom + i]
                 }

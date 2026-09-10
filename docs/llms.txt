@@ -1,7 +1,7 @@
 # Zelda 64 Player — LLM Context File
 
 ## Project Overview
-**Zelda 64 Player** is a native Android (Kotlin) emulator frontend for fan-made Nintendo 64 Zelda ROM hacks (Ocarina of Time, Majora's Mask). Users provide their own legally-owned base ROMs; the app applies BPS/IPS patches on-the-fly and plays them via Libretro cores (mupen64plus-next GLES3 and parallel-n64). No ROMs are embedded or distributed.
+**Zelda 64 Player** is a native Android (Kotlin) emulator frontend for fan-made Nintendo 64 Zelda ROM hacks (Ocarina of Time, Majora's Mask). Users provide their own legally-owned base ROMs; the app applies BPS/IPS patches on-the-fly and plays them via the Libretro core mupen64plus-next GLES3. No ROMs are embedded or distributed.
 
 **Website:** https://zonaro.github.io/zelda64player/
 **Repository:** https://github.com/zonaro/zelda64player
@@ -174,7 +174,7 @@ Required fields for catalog entry:
 - `id`, `name`, `description`, `author`, `version`
 - `baseRom.name`, `baseRom.gameCode`, `baseRom.versionByte`, `baseRom.checksums.crc32`
 - `patch.url`, `patch.filename`, `patch.size`, `patch.checksums.crc32`
-- Optional: `coverImageUrl`, `tags`, `compatibleCores`, `ocarinaSongs`
+- Optional: `coverImageUrl`, `tags`, `ocarinaSongs`
 
 Submit hacks only through the repository's Hack submission issue form. Do not
 open a pull request to add a hack or edit `catalog/catalog.json`; maintainers
@@ -190,9 +190,7 @@ cd zelda64player
 ./gradlew assembleDebug
 ```
 
-First build downloads Libretro cores to `app/src/main/jniLibs` (needs internet):
-- `mupen64plus_next` (GLES3) from buildbot.libretro.com
-- `parallel_n64` from self-built rolling release (GitHub Actions) or buildbot nightly fallback
+First build downloads the Libretro core `mupen64plus_next` (GLES3) to `app/src/main/jniLibs` (needs internet) from buildbot.libretro.com.
 
 ---
 
@@ -208,9 +206,8 @@ First build downloads Libretro cores to `app/src/main/jniLibs` (needs internet):
 
 ## Credits
 
-- Libretro / RetroArch cores (mupen64plus-next, parallel-n64)
+- Libretro / RetroArch core mupen64plus-next GLES3
 - mupen64plus — original emulation engine
-- parallel-n64 — accuracy-focused Libretro core
 - RadialGamePad — custom touch gamepad library
 - LibretroDroid — Android embedding framework
 - rcheevos (MIT) — RetroAchievements client library

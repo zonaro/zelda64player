@@ -147,11 +147,11 @@ class GamepadTesterView @JvmOverloads constructor(
 
         drawDpad(canvas, x + w * .16f, y + h * .49f, min(w, h) * .095f, physical = true)
         drawStick(canvas, x + w * .37f, y + h * .62f, min(w, h) * .115f, leftX, leftY, label(R.string.tester_l3), KeyEvent.KEYCODE_BUTTON_THUMBL)
-        drawControl(canvas, RectF(x + w * .47f, y + h * .54f, x + w * .55f, y + h * .64f), label(R.string.tester_select), KeyEvent.KEYCODE_BUTTON_SELECT)
-        drawControl(canvas, RectF(x + w * .55f, y + h * .54f, x + w * .63f, y + h * .64f), label(R.string.tester_start), KeyEvent.KEYCODE_BUTTON_START)
+        drawControl(canvas, RectF(x + w * .46f, y + h * .42f, x + w * .54f, y + h * .52f), label(R.string.tester_select), KeyEvent.KEYCODE_BUTTON_SELECT)
+        drawControl(canvas, RectF(x + w * .56f, y + h * .42f, x + w * .64f, y + h * .52f), label(R.string.tester_start), KeyEvent.KEYCODE_BUTTON_START)
         drawStick(canvas, x + w * .65f, y + h * .62f, min(w, h) * .115f, rightX, rightY, label(R.string.tester_r3), KeyEvent.KEYCODE_BUTTON_THUMBR)
 
-        val faceRadius = min(w, h) * .06f
+        val faceRadius = min(w, h) * .065f
         drawControl(canvas, circle(x + w * .84f, y + h * .48f, faceRadius), label(R.string.tester_y), KeyEvent.KEYCODE_BUTTON_Y)
         drawControl(canvas, circle(x + w * .78f, y + h * .59f, faceRadius), label(R.string.tester_x), KeyEvent.KEYCODE_BUTTON_X)
         drawControl(canvas, circle(x + w * .90f, y + h * .59f, faceRadius), label(R.string.tester_b), KeyEvent.KEYCODE_BUTTON_B)
@@ -258,8 +258,16 @@ class GamepadTesterView @JvmOverloads constructor(
         }
         outlinePaint.color = if (amber) amberColor else focusColor
         outlinePaint.strokeWidth = min(bounds.width(), bounds.height()) * .055f
-        canvas.drawRoundRect(bounds, bounds.height() * .24f, bounds.height() * .24f, backgroundPaint)
-        canvas.drawRoundRect(bounds, bounds.height() * .24f, bounds.height() * .24f, outlinePaint)
+        val isCircle = kotlin.math.abs(bounds.width() - bounds.height()) < 1f
+        if (isCircle) {
+            val radius = bounds.width() / 2f
+            canvas.drawCircle(bounds.centerX(), bounds.centerY(), radius, backgroundPaint)
+            canvas.drawCircle(bounds.centerX(), bounds.centerY(), radius - outlinePaint.strokeWidth / 2f, outlinePaint)
+        } else {
+            val radius = bounds.height() / 2f
+            canvas.drawRoundRect(bounds, radius, radius, backgroundPaint)
+            canvas.drawRoundRect(bounds, radius, radius, outlinePaint)
+        }
         textPaint.textSize = labelSize
         drawText(
             canvas,

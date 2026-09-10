@@ -114,6 +114,9 @@ object RcheevosJni {
     /** Advances achievement/leaderboard evaluation by one frame. */
     external fun nativeDoFrame()
 
+    /** Services submission retries and keep-alives while emulation is paused. */
+    external fun nativeIdle()
+
     /**
      * Delivers an HTTP response previously requested via [RaNativeListener.onServerRequest]. Call
      * from any thread. [statusCode] 0 with a non-null [errorMessage] marks a retryable transport
@@ -183,4 +186,17 @@ object RcheevosJni {
 
     /** Parses a fetch-user-unlocks response into a JSON id array ("null" on failure). */
     external fun nativeProcessFetchUserUnlocksResponse(responseBody: String): String
+    /** Captures RA trigger progress alongside the core save state; unavailable in Hardcore. */
+    external fun nativeSerializeProgress(): ByteArray?
+    /** Restores progress; null or invalid input resets triggers instead of carrying stale hits. */
+    external fun nativeDeserializeProgress(bytes: ByteArray?): Boolean
+    /** Clears trigger/hit progress after a core reset. */
+    external fun nativeResetProgress()
+    /** Authoritative native session mode, including server/runtime changes. */
+    external fun nativeIsHardcore(): Boolean
+    /** Enforces rcheevos Hardcore pause cooldown. */
+    external fun nativeCanPause(): Boolean
+    /** Rebuilds a previously earned award with current credentials and its real elapsed time. */
+    external fun nativeBuildAwardRequest(username: String, token: String, achievementId: Long,
+                                        hardcore: Boolean, hash: String, seconds: Long): Array<String>?
 }

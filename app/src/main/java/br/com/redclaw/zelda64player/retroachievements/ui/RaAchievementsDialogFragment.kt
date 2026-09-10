@@ -35,13 +35,16 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatDialog
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.retroachievements.data.RaGameData
+import br.com.redclaw.zelda64player.retroachievements.data.liveUnlocks
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
+import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.views.InstalledLibrary
 import coil.load
 import kotlinx.coroutines.Dispatchers
@@ -76,9 +79,11 @@ class RaAchievementsDialogFragment : DialogFragment() {
     private var summaryView: TextView? = null
     private var searchRow: View? = null
     private var searchInput: EditText? = null
+    private var viewToggle: ImageButton? = null
 
     private var currentQuery: String = ""
     private var currentSort: RaSortMode = RaSortMode.DEFAULT
+    private var viewMode: RaViewMode = RaViewMode.LIST
     private var singleGameRows: List<RaAchievementRow> = emptyList()
     private var allGamesData: List<GameAchievements> = emptyList()
     private var isSingleGame: Boolean = true
@@ -114,7 +119,6 @@ class RaAchievementsDialogFragment : DialogFragment() {
         messageView = view.findViewById(R.id.dialog_achievements_message)
         listView =
                 view.findViewById<RecyclerView>(R.id.dialog_achievements_list).apply {
-                    layoutManager = LinearLayoutManager(requireContext())
                     adapter = this@RaAchievementsDialogFragment.adapter
                 }
         titleView = view.findViewById(R.id.dialog_achievements_title)
@@ -130,19 +134,40 @@ class RaAchievementsDialogFragment : DialogFragment() {
         )
 
         searchRow = view.findViewById(R.id.dialog_achievements_search_row)
-        searchInput = view.findViewById<EditText>(R.id.dialog_achievements_search).apply {
-            addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    currentQuery = s?.toString().orEmpty()
-                    applyFilterAndSort()
+        searchInput =
+                view.findViewById<EditText>(R.id.dialog_achievements_search).apply {
+                    addTextChangedListener(
+                            object : TextWatcher {
+                                override fun beforeTextChanged(
+                                        s: CharSequence?,
+                                        start: Int,
+                                        count: Int,
+                                        after: Int
+                                ) {}
+                                override fun onTextChanged(
+                                        s: CharSequence?,
+                                        start: Int,
+                                        before: Int,
+                                        count: Int
+                                ) {}
+                                override fun afterTextChanged(s: Editable?) {
+                                    currentQuery = s?.toString().orEmpty()
+                                    applyFilterAndSort()
+                                }
+                            }
+                    )
                 }
-            })
-        }
         view.findViewById<ImageButton>(R.id.dialog_achievements_sort)?.setOnClickListener {
             showSortDialog()
         }
+
+        viewToggle = view.findViewById(R.id.dialog_achievements_view_toggle)
+        viewToggle?.setOnClickListener { showViewModeDialog() }
+
+        viewMode =
+                if (CorePrefs.getRaAchievementsGrid(requireContext())) RaViewMode.GRID
+                else RaViewMode.LIST
+        applyViewMode()
 
         val accent = AccentManager.getAccentColor(requireContext())
         val closeBtn = view.findViewById<Button>(R.id.dialog_achievements_close)
@@ -190,12 +215,13 @@ class RaAchievementsDialogFragment : DialogFragment() {
 
             val unlockedIds =
                     withContext(Dispatchers.IO) {
-                        repository.fetchUserUnlocks(
-                                gameId = identity.gameId,
-                                username = credentials.getUsername().orEmpty(),
-                                apiToken = credentials.getToken().orEmpty(),
-                                hardcore = false
-                        )
+                        liveUnlocks(identity)
+                                ?: repository.fetchUserUnlocks(
+                                        gameId = identity.gameId,
+                                        username = credentials.getUsername().orEmpty(),
+                                        apiToken = credentials.getToken().orEmpty(),
+                                        hardcore = false
+                                )
                     }
             if (unlockedIds == null) {
                 showMessage(R.string.ra_error_network)
@@ -267,25 +293,76 @@ class RaAchievementsDialogFragment : DialogFragment() {
     }
 
     private fun showSortDialog() {
-        val labels = listOf(
-            getString(R.string.ra_sort_default),
-            getString(R.string.ra_sort_name_az),
-            getString(R.string.ra_sort_name_za),
-            getString(R.string.ra_sort_points_desc),
-            getString(R.string.ra_sort_points_asc),
-            getString(R.string.ra_sort_rarity_rare),
-            getString(R.string.ra_sort_rarity_common),
-        )
+        val labels =
+                listOf(
+                        getString(R.string.ra_sort_default),
+                        getString(R.string.ra_sort_name_az),
+                        getString(R.string.ra_sort_name_za),
+                        getString(R.string.ra_sort_points_desc),
+                        getString(R.string.ra_sort_points_asc),
+                        getString(R.string.ra_sort_rarity_rare),
+                        getString(R.string.ra_sort_rarity_common),
+                )
         val modes = RaSortMode.values()
         val checked = modes.indexOf(currentSort).coerceAtLeast(0)
         SwitchDialog(requireContext())
-            .title(getString(R.string.ra_sort_button))
-            .icon(R.drawable.ic_tune)
-            .singleChoice(labels, checked) { index ->
-                currentSort = modes[index]
-                applyFilterAndSort()
-            }
-            .show()
+                .title(getString(R.string.ra_sort_button))
+                .icon(R.drawable.ic_tune)
+                .singleChoice(labels, checked) { index ->
+                    currentSort = modes[index]
+                    applyFilterAndSort()
+                }
+                .show()
+    }
+
+    // --- View mode (list / grid) ------------------------------------------
+
+    /** Applies the current [viewMode] to the list: layout manager + adapter mode + icon. */
+    private fun applyViewMode() {
+        val lm =
+                if (viewMode == RaViewMode.GRID) {
+                    GridLayoutManager(requireContext(), computeGridSpanCount())
+                } else {
+                    LinearLayoutManager(requireContext())
+                }
+        listView?.layoutManager = lm
+        adapter.configureLayoutManager(lm)
+        adapter.viewMode = viewMode
+        updateViewToggleIcon()
+    }
+
+    /** Opens the view-mode picker (List / Grid), mirroring the sort dialog. */
+    private fun showViewModeDialog() {
+        val labels = listOf(getString(R.string.ra_view_list), getString(R.string.ra_view_grid))
+        val checked = if (viewMode == RaViewMode.GRID) 1 else 0
+        SwitchDialog(requireContext())
+                .title(getString(R.string.ra_view_mode_dialog_title))
+                .icon(R.drawable.ic_view_grid)
+                .singleChoice(labels, checked) { index ->
+                    viewMode = if (index == 1) RaViewMode.GRID else RaViewMode.LIST
+                    CorePrefs.setRaAchievementsGrid(requireContext(), viewMode == RaViewMode.GRID)
+                    applyViewMode()
+                    applyFilterAndSort()
+                }
+                .show()
+    }
+
+    /** The button shows the icon of the current mode. */
+    private fun updateViewToggleIcon() {
+        val icon =
+                if (viewMode == RaViewMode.GRID) R.drawable.ic_view_grid
+                else R.drawable.ic_view_list
+        viewToggle?.apply {
+            setImageResource(icon)
+            contentDescription = getString(R.string.ra_view_mode)
+        }
+    }
+
+    /** Responsive grid columns: ~96dp target cells, at least 2. */
+    private fun computeGridSpanCount(): Int {
+        val density = resources.displayMetrics.density
+        val widthDp = resources.displayMetrics.widthPixels / density
+        return maxOf(2, (widthDp / 96).toInt())
     }
 
     // --- All games mode ---------------------------------------------------

@@ -121,7 +121,6 @@
     <string name="detail_base_match">Tienes una ROM base compatible.</string>
     <string name="detail_base_no_match">Ninguna ROM base compatible importada.</string>
     <string name="detail_tags">Etiquetas: %1$s</string>
-    <string name="detail_cores">Cores compatibles: %1$s</string>
     <string name="detail_download">Descargar</string>
     <string name="detail_update">Actualizar</string>
     <string name="detail_installing">Instalando… %1$d%%</string>
@@ -208,11 +207,6 @@
     <string name="settings_catalog_remove_confirm_title">¿Eliminar URL de catálogo?</string>
 
 
-    <!-- Settings: emulator core -->
-    <string name="settings_core_title">Core emulador</string>
-    <string name="settings_core_current">Actual: %1$s</string>
-    <string name="settings_core_change">Cambiar core</string>
-
     <!-- Settings: about -->
     <string name="settings_about_title">Acerca de</string>
     <string name="settings_about_version">Versión: %1$s</string>
@@ -242,6 +236,8 @@
     <string name="settings_ra_api_key_saved">¡Clave guardada!</string>
     <string name="settings_ra_api_key_error_missing">Introduce la clave antes de guardarla.</string>
     <string name="settings_ra_status_logged_in_no_key">Has iniciado sesión. Agrega la clave de la Web API arriba para ver tu perfil.</string>
+    <string name="settings_ra_credentials_title">Credenciales de RetroAchievements</string>
+    <string name="settings_ra_credentials_desc">Esta pantalla está protegida contra capturas. Tu contraseña se usa solo una vez; guardamos solo el token, cifrado.</string>
 
     <!-- Achievements screen -->
     <string name="achievements_title">Logros</string>
@@ -329,8 +325,19 @@
     <string name="ra_toast_disabled">RetroAchievements desactivado. Actívalo en los ajustes.</string>
     <string name="ra_toast_not_logged_in">Inicia sesión con tu cuenta de RetroAchievements en los ajustes para rastrear logros.</string>
     <string name="ra_toast_progress">RetroAchievements: %1$d de %2$d logros desbloqueados</string>
+    <string name="ra_toast_progress_mode">RetroAchievements: %1$d de %2$d logros desbloqueados · %3$s</string>
     <string name="ra_toast_untracked">Este juego no tiene logros en RetroAchievements.</string>
     <string name="ra_toast_connect_failed">No se pudo conectar a RetroAchievements.</string>
+    <string name="ra_mode_hardcore">Hardcore</string>
+    <string name="ra_mode_casual">Casual</string>
+    <string name="ra_hardcore_state_blocked">Estados guardados bloqueados en modo Hardcore.</string>
+    <string name="ra_hardcore_pause_disabled">Pausa bloqueada en Hardcore — cambiando a Casual.</string>
+    <string name="ra_hardcore_macro_blocked">Ocarina automática bloqueada en modo Hardcore.</string>
+    <string name="ra_award_sync_failed">Error al sincronizar logro.</string>
+    <string name="ra_award_sync_rejected">Logro rechazado por el servidor.</string>
+    <string name="toast_state_load_failed">Error al cargar estado.</string>
+    <string name="toast_state_save_failed">Error al guardar estado.</string>
+    <string name="toast_fast_forward_blocked_ra">Avance rápido bloqueado en el modo Hardcore de RetroAchievements.</string>
 
     <!-- Settings: backups (local save export/import) -->
     <string name="backup_title">Copias de seguridad</string>
@@ -556,6 +563,11 @@
     <string name="ra_sort_rarity_common">Rareza (más común primero)</string>
     <string name="ra_missable">Perdible</string>
     <string name="ra_rarity">%1$.1f%% de jugadores</string>
+    <string name="ra_view_list">Lista</string>
+    <string name="ra_view_grid">Cuadrícula</string>
+    <string name="ra_view_mode">Modo de vista</string>
+    <string name="ra_view_mode_dialog_title">Vista</string>
+    <string name="ra_grid_cell_desc">Logro: %1$s · %2$d pts</string>
     <string name="grid_sort_button">Ordenar</string>
     <string name="grid_sort_last_played">Última vez Jugado</string>
     <string name="grid_sort_download_date">Fecha de Descarga</string>

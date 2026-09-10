@@ -1,6 +1,7 @@
 package br.com.redclaw.zelda64player.ocarina
 
 import android.view.KeyEvent
+import br.com.redclaw.zelda64player.retroachievements.jni.RcheevosJni
 import br.com.redclaw.zelda64player.input.InputMapper
 import com.swordfish.libretrodroid.GLRetroView
 import kotlinx.coroutines.CoroutineScope
@@ -50,12 +51,20 @@ class OcarinaMacroPlayer(
      */
     fun play(song: OcarinaSong, callbacks: OcarinaMacroCallbacks) {
         cancel()
+        if (RcheevosJni.nativeIsHardcore()) {
+            callbacks.onFinished()
+            return
+        }
         this.callbacks = callbacks
         job = scope.launch {
             try {
                 delay(INITIAL_DELAY_MS)
                 callbacks.onStarted(song)
                 song.notes.forEachIndexed { index, note ->
+                    if (RcheevosJni.nativeIsHardcore()) {
+                        callbacks.onFinished()
+                        return@launch
+                    }
                     val mapped = InputMapper.mapKeyCode(note.touchKeyCode)
                     heldKeyCode = mapped
                     callbacks.onNoteStart(index)

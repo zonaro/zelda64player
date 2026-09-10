@@ -222,11 +222,6 @@ class LibraryActivity : AppCompatActivity() {
         binding.libraryRaAvatar.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) Zelda64PlayerApp.sfxManager.focusMove()
         }
-        // Apply theme-adaptive tint to the placeholder icon (user glyph).
-        // switch_text_primary resolves to dark gray in light mode, white in dark mode.
-        binding.libraryRaAvatar.setColorFilter(
-            androidx.core.content.ContextCompat.getColor(this, R.color.switch_text_primary)
-        )
         loadProfileAvatar()
     }
 
@@ -234,23 +229,54 @@ class LibraryActivity : AppCompatActivity() {
     private fun loadProfileAvatar() {
         val credentials = Zelda64PlayerApp.raCredentialStore
         if (!credentials.hasCredentials()) {
-            binding.libraryRaAvatar.setImageResource(R.drawable.ic_user)
+            showPlaceholderAvatar()
             return
         }
 
         val repository = Zelda64PlayerApp.raUserProfileRepository
-        repository.cachedAvatarUrl()?.let(::displayProfileAvatar)
+        // Deterministic fallback (https://media.retroachievements.org/UserPic/<user>.png)
+        // guarantees the avatar shows even when the Web API key is not configured
+        // or the profile has never been fetched.
+        repository.cachedAvatarUrlOrFallback()?.let(::displayProfileAvatar)
+            ?: showPlaceholderAvatar()
+
+        // Refresh from the Web API only when a key is available; otherwise the
+        // deterministic URL above is already the best we can show.
+        if (!credentials.hasApiKey()) return
         lifecycleScope.launch {
             repository.refreshProfile().getOrNull()?.avatarUrl?.let(::displayProfileAvatar)
         }
     }
 
+    private fun showPlaceholderAvatar() {
+        binding.libraryRaAvatar.setImageResource(R.drawable.ic_user)
+        binding.libraryRaAvatar.setColorFilter(
+            androidx.core.content.ContextCompat.getColor(this, R.color.switch_text_primary)
+        )
+    }
+
     private fun displayProfileAvatar(url: String) {
+        // Clear the placeholder tint so the photo is shown with its original colors.
+        binding.libraryRaAvatar.clearColorFilter()
         binding.libraryRaAvatar.load(url) {
             crossfade(true)
-            placeholder(R.drawable.ic_trophy)
-            error(R.drawable.ic_trophy)
+            placeholder(R.drawable.ic_user)
+            error(R.drawable.ic_user)
             transformations(CircleCropTransformation())
+            listener(
+                onError = { _, _ ->
+                    // Restore theme-adaptive tint if the avatar fails to load.
+                    binding.libraryRaAvatar.setColorFilter(
+                        androidx.core.content.ContextCompat.getColor(
+                            this@LibraryActivity,
+                            R.color.switch_text_primary
+                        )
+                    )
+                },
+                onSuccess = { _, _ ->
+                    binding.libraryRaAvatar.clearColorFilter()
+                }
+            )
         }
     }
 

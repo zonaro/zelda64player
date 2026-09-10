@@ -178,7 +178,7 @@ class RaOverlayView(context: Context) : FrameLayout(context) {
             }
             val text =
                     payload.optString("measured_progress").ifBlank {
-                        "${(payload.optDouble("measured_percent", 0.0) * 100).toInt()}%"
+                        "${payload.optDouble("measured_percent", 0.0).coerceIn(0.0, 100.0).toInt()}%"
                     }
             val row =
                     progressRow

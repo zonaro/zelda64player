@@ -17,13 +17,13 @@ import org.json.JSONObject
 /**
  * File cache for tracker icons extracted from the user's base ROM.
  *
- * Layout: `filesDir/tracker_assets/<crc32>/<itemId>.png` + `.meta.json`.
- * Keyed by ROM CRC32 so vanilla and hacks sharing the same base reuse the cache.
+ * Layout: `filesDir/tracker_assets/<crc32>/<itemId>.png` + `.meta.json`. Keyed by ROM CRC32 so
+ * vanilla and hacks sharing the same base reuse the cache.
  */
 class TrackerAssetCache(private val context: Context) {
 
     private fun dirFor(crc32: String): File =
-        File(context.filesDir, "tracker_assets/$crc32").apply { mkdirs() }
+            File(context.filesDir, "tracker_assets/$crc32").apply { mkdirs() }
 
     fun fileFor(itemId: String, crc32: String): File = File(dirFor(crc32), "$itemId.png")
 
@@ -46,11 +46,12 @@ class TrackerAssetCache(private val context: Context) {
     fun writeMeta(crc32: String, game: String, count: Int) {
         val dir = dirFor(crc32)
         val meta = File(dir, ".meta.json")
-        val obj = JSONObject().apply {
-            put("game", game)
-            put("count", count)
-            put("extractedAt", System.currentTimeMillis())
-        }
+        val obj =
+                JSONObject().apply {
+                    put("game", game)
+                    put("count", count)
+                    put("extractedAt", System.currentTimeMillis())
+                }
         meta.writeText(obj.toString(2))
     }
 

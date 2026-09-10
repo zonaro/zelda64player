@@ -26,7 +26,9 @@ object TextureDecoder {
      */
     fun decodeRGBA16(data: ByteArray, offset: Int, width: Int, height: Int): IntArray {
         val count = width * height
-        require(offset + count * 2 <= data.size) { "RGBA16: not enough data (need ${count * 2}, have ${data.size - offset})" }
+        require(offset + count * 2 <= data.size) {
+            "RGBA16: not enough data (need ${count * 2}, have ${data.size - offset})"
+        }
         val pixels = IntArray(count)
         var idx = offset
         for (i in 0 until count) {
@@ -51,16 +53,18 @@ object TextureDecoder {
      * @param tlutOffset offset into [tlutData]
      */
     fun decodeCI8(
-        pixelData: ByteArray,
-        pixelOffset: Int,
-        width: Int,
-        height: Int,
-        tlutData: ByteArray,
-        tlutOffset: Int,
+            pixelData: ByteArray,
+            pixelOffset: Int,
+            width: Int,
+            height: Int,
+            tlutData: ByteArray,
+            tlutOffset: Int,
     ): IntArray {
         val count = width * height
         require(pixelOffset + count <= pixelData.size) { "CI8: not enough pixel data" }
-        require(tlutOffset + 512 <= tlutData.size) { "CI8: not enough TLUT data (need 512, have ${tlutData.size - tlutOffset})" }
+        require(tlutOffset + 512 <= tlutData.size) {
+            "CI8: not enough TLUT data (need 512, have ${tlutData.size - tlutOffset})"
+        }
         val palette = decodeRGBA16(tlutData, tlutOffset, 256, 1)
         return IntArray(count) { i ->
             val index = pixelData[pixelOffset + i].toInt() and 0xFF
@@ -68,11 +72,15 @@ object TextureDecoder {
         }
     }
 
-    /**
-     * Save ARGB pixels as a PNG file. Android-only (uses `android.graphics.Bitmap`).
-     */
+    /** Save ARGB pixels as a PNG file. Android-only (uses `android.graphics.Bitmap`). */
     fun saveAsPng(pixels: IntArray, width: Int, height: Int, outFile: File) {
-        val bmp = android.graphics.Bitmap.createBitmap(pixels, width, height, android.graphics.Bitmap.Config.ARGB_8888)
+        val bmp =
+                android.graphics.Bitmap.createBitmap(
+                        pixels,
+                        width,
+                        height,
+                        android.graphics.Bitmap.Config.ARGB_8888
+                )
         outFile.outputStream().use { out ->
             bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, out)
         }

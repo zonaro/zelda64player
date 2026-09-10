@@ -175,12 +175,7 @@ JNIEXPORT jboolean JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_unseri
     jbyteArray state
 ) {
     try {
-        jboolean isCopy = JNI_FALSE;
-        jbyte* data = env->GetByteArrayElements(state, &isCopy);
-        jsize size = env->GetArrayLength(state);
-
-        bool result = LibretroDroid::getInstance().unserializeState(data, size);
-        env->ReleaseByteArrayElements(state, data, JNI_ABORT);
+        bool result = LibretroDroid::getInstance().unserializeState(env, state);
 
         return result ? JNI_TRUE : JNI_FALSE;
 
@@ -196,12 +191,7 @@ JNIEXPORT jbyteArray JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_seri
     jclass obj
 ) {
     try {
-        auto [data, size] = LibretroDroid::getInstance().serializeState();
-
-        jbyteArray result = env->NewByteArray(size);
-        env->SetByteArrayRegion(result, 0, size, data);
-
-        return result;
+        return LibretroDroid::getInstance().serializeState(env);
 
     } catch (std::exception &exception) {
         LOGE("Error in serializeState: %s", exception.what());
@@ -220,7 +210,7 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setCheat(
 ) {
     try {
         auto codeString = JniString(env, code);
-        LibretroDroid::getInstance().setCheat(index, enabled, codeString.stdString());
+        LibretroDroid::getInstance().setCheat(env, index, enabled, codeString.stdString());
     } catch (std::exception &exception) {
         LOGE("Error in setCheat: %s", exception.what());
         JavaUtils::throwRetroException(env, ERROR_CHEAT);
@@ -305,7 +295,7 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_reset(
     jclass obj
 ) {
     try {
-        LibretroDroid::getInstance().reset();
+        LibretroDroid::getInstance().reset(env);
     } catch (std::exception &exception) {
         LOGE("Error in clear: %s", exception.what());
         JavaUtils::throwRetroException(env, ERROR_GENERIC);
@@ -512,6 +502,8 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_destroy(
     jclass obj
 ) {
     try {
+        LibretroDroid::getInstance().setFrameCallback(env, nullptr);
+        LibretroDroid::getInstance().setStateCallback(env, nullptr);
         LibretroDroid::getInstance().destroy();
     } catch (std::exception &exception) {
         LOGE("Error in destroy: %s", exception.what());
@@ -536,11 +528,23 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_pause(
     jclass obj
 ) {
     try {
-        LibretroDroid::getInstance().pause();
+        LibretroDroid::getInstance().pause(env);
     } catch (std::exception &exception) {
         LOGE("Error in pause: %s", exception.what());
         JavaUtils::throwRetroException(env, ERROR_GENERIC);
     }
+}
+
+JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setStateCallback(
+    JNIEnv* env, jclass obj, jobject callback
+) {
+    LibretroDroid::getInstance().setStateCallback(env, callback);
+}
+
+JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setFrameCallback(
+    JNIEnv* env, jclass obj, jobject callback
+) {
+    LibretroDroid::getInstance().setFrameCallback(env, callback);
 }
 
 JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_step(
@@ -548,7 +552,7 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_step(
     jclass obj,
     jobject glRetroView
 ) {
-    LibretroDroid::getInstance().step();
+    LibretroDroid::getInstance().step(env);
 
     if (LibretroDroid::getInstance().requiresVideoRefresh()) {
         LibretroDroid::getInstance().clearRequiresVideoRefresh();
@@ -579,7 +583,7 @@ JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setFrameSp
     jclass obj,
     jint speed
 ) {
-    LibretroDroid::getInstance().setFrameSpeed(speed);
+    LibretroDroid::getInstance().setFrameSpeed(std::max(1, std::min(16, (int)speed)));
 }
 
 JNIEXPORT void JNICALL Java_com_swordfish_libretrodroid_LibretroDroid_setAudioEnabled(

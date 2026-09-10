@@ -122,7 +122,6 @@ body {
 #catalog-grid .hack-desc,
 #catalog-grid .hack-meta,
 #catalog-grid .chip,
-#catalog-grid .hack-cores,
 #catalog-count,
 #catalog-state {
   font-family: "Cairopixel", sans-serif;
@@ -789,17 +788,6 @@ a:hover {
   border-radius: 999px;
   padding: 3px 10px;
   font-size: 14.5px;
-  font-weight: 600;
-}
-
-.hack-cores {
-  font-size: 15px;
-  color: var(--text-secondary);
-  margin-top: auto;
-}
-
-.hack-cores .core {
-  color: var(--accent-amber);
   font-weight: 600;
 }
 

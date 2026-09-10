@@ -13,11 +13,11 @@
 
 O Item Tracker manual (5 abas: Items, Locations, Songs, Hints, Upgrades) está **funcional**, mas usa **~97 PNGs embarcados** em `app/src/main/res/drawable-nodpi/` como placeholders:
 
-| Origem | Exemplos | Licença / Risco |
-|---|---|---|
-| `Draeko/ootr_gst` (`TrackerOOT/Resources/`) | `kokiri_sword.png`, `master_sword.png`, `bow.png`, `bombs.png` | Sem licença explícita, redistribuição questionável |
-| `griesenj/ZeldaTracker` (`src/img/` variantes ` 1.png`) | `mm_mask_*`, `mm_sword_*.png`, `mm_shield*.png` | Idem |
-| Fallbacks cruzados | `iron_boots`, `hover_boots`, `magic` reutilizam OoT para MM | Inconsistência visual |
+| Origem                                                  | Exemplos                                                       | Licença / Risco                                    |
+| ------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
+| `Draeko/ootr_gst` (`TrackerOOT/Resources/`)             | `kokiri_sword.png`, `master_sword.png`, `bow.png`, `bombs.png` | Sem licença explícita, redistribuição questionável |
+| `griesenj/ZeldaTracker` (`src/img/` variantes ` 1.png`) | `mm_mask_*`, `mm_sword_*.png`, `mm_shield*.png`                | Idem                                               |
+| Fallbacks cruzados                                      | `iron_boots`, `hover_boots`, `magic` reutilizam OoT para MM    | Inconsistência visual                              |
 
 **Problemas:**
 - **APK maior** (~2–4 MB só de ícones) — cada PNG 32×32 RGBA.
@@ -136,13 +136,13 @@ O guia genérico lista offsets fixos, mas o projeto precisa **detectar versão**
 
 **Offsets da DMA Table por versão (confirmar via Calamari/Puffy antes de implementar):**
 
-| ROM | GameCode | Version | DMA Offset |
-|---|---|---|---|
-| OoT NTSC 1.0 (USA) | `CZLE` | 0x00 | `0x00007430` |
-| OoT NTSC 1.1 | `CZLE` | 0x01 | `0x00007430` (verificar) |
-| OoT PAL 1.0 | `CZLE` | — | `0x00007950` |
-| MM NTSC 1.0 (USA) | `NZSE` | 0x00 | `0x0001A500` |
-| MM PAL | `NZSP` | — | a confirmar |
+| ROM                | GameCode | Version | DMA Offset               |
+| ------------------ | -------- | ------- | ------------------------ |
+| OoT NTSC 1.0 (USA) | `CZLE`   | 0x00    | `0x00007430`             |
+| OoT NTSC 1.1       | `CZLE`   | 0x01    | `0x00007430` (verificar) |
+| OoT PAL 1.0        | `CZLE`   | —       | `0x00007950`             |
+| MM NTSC 1.0 (USA)  | `NZSE`   | 0x00    | `0x0001A500`             |
+| MM PAL             | `NZSP`   | —       | a confirmar              |
 
 **Implementação adaptada:**
 
@@ -486,15 +486,15 @@ wallet*.png (3), zora_tunic.png
 
 ## 6. Roadmap e Delegação
 
-| Fase | Tarefas | Agente | Estimativa |
-|---|---|---|---|
-| **1 — Fundação** | `DmaEntry`, `DmaTableParser` (FileChannel), `Yaz0Decompressor` (com bounds checks), `TextureDecoder` (RGBA16/CI8), `N64TextureFormat`, testes JVM com fixtures sintéticas | **Bruce** | 1 semana |
-| **2 — Mapeamento** | `OotIconMap`/`MmIconMap` completos (40+ OoT, 30+ MM), validar offsets via `zeldaret/oot` `assets/xml/`, confirmar `dmaFileIndex` e `dmaTableOffset` por versão com Calamari/Puffy | **Bruce + Calamari + Puffy** | 1 semana |
-| **3 — Cache e Extrator** | `TrackerAssetCache`, `RomAssetExtractor` (coroutine, streaming, `.meta.json`), integração com `BaseRomRepository`/`ChecksumCalculator`/`RomHeader` | **Bruce** | 1 semana |
-| **4 — UI** | Atualizar `TrackerItem.assetKey`, `ItemIconView` (Coil File), `ItemsTab`/`TrackerViewModel` (`isExtracting`, `ensureAssetsExtracted`), spinner Switch UI | **Bruce** | 1 semana |
-| **5 — Fallback** | Vetores CC0 mínimos (Dolfi) para cada item, atualizar `OotItemDatabase`/`MmItemDatabase` | **Dolfi + Bruce** | 3–5 dias |
-| **6 — Remoção** | `git rm` PNGs, limpar `R.drawable`, atualizar `TrackerCatalogTest`, QA manual (com/sem ROM), medir APK | **Bruce** | 2–3 dias |
-| **7 — Docs e QA visual** | Atualizar `README`, `.agents/FEATURES.md`, `plano-item-tracker.md`, screenshots Switch UI (Chululu), strings pt-BR/en/es (Wally) | **Wally + Chululu** | 3–5 dias |
+| Fase                     | Tarefas                                                                                                                                                                           | Agente                       | Estimativa |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | ---------- |
+| **1 — Fundação**         | `DmaEntry`, `DmaTableParser` (FileChannel), `Yaz0Decompressor` (com bounds checks), `TextureDecoder` (RGBA16/CI8), `N64TextureFormat`, testes JVM com fixtures sintéticas         | **Bruce**                    | 1 semana   |
+| **2 — Mapeamento**       | `OotIconMap`/`MmIconMap` completos (40+ OoT, 30+ MM), validar offsets via `zeldaret/oot` `assets/xml/`, confirmar `dmaFileIndex` e `dmaTableOffset` por versão com Calamari/Puffy | **Bruce + Calamari + Puffy** | 1 semana   |
+| **3 — Cache e Extrator** | `TrackerAssetCache`, `RomAssetExtractor` (coroutine, streaming, `.meta.json`), integração com `BaseRomRepository`/`ChecksumCalculator`/`RomHeader`                                | **Bruce**                    | 1 semana   |
+| **4 — UI**               | Atualizar `TrackerItem.assetKey`, `ItemIconView` (Coil File), `ItemsTab`/`TrackerViewModel` (`isExtracting`, `ensureAssetsExtracted`), spinner Switch UI                          | **Bruce**                    | 1 semana   |
+| **5 — Fallback**         | Vetores CC0 mínimos (Dolfi) para cada item, atualizar `OotItemDatabase`/`MmItemDatabase`                                                                                          | **Dolfi + Bruce**            | 3–5 dias   |
+| **6 — Remoção**          | `git rm` PNGs, limpar `R.drawable`, atualizar `TrackerCatalogTest`, QA manual (com/sem ROM), medir APK                                                                            | **Bruce**                    | 2–3 dias   |
+| **7 — Docs e QA visual** | Atualizar `README`, `.agents/FEATURES.md`, `plano-item-tracker.md`, screenshots Switch UI (Chululu), strings pt-BR/en/es (Wally)                                                  | **Wally + Chululu**          | 3–5 dias   |
 
 **Total estimado:** 4–6 semanas (complexidade média-alta; maior risco é mapeamento de offsets).
 
@@ -502,12 +502,12 @@ wallet*.png (3), zora_tunic.png
 
 ## 7. Testes
 
-| Camada | Ferramenta | O que testar |
-|---|---|---|
-| **Unit (JVM)** | JUnit 5 + fixtures sintéticas | `Yaz0Decompressor` (round-trip: comprimir sintético → descomprimir → assert), `TextureDecoder.decodeRGBA16` (pixel 0xFFFF → ARGB), `DmaTableParser` (buffer fake com 3 entries + terminador zero), `TrackerAssetCache` (put/has/clear com `TemporaryFolder`) |
-| **Integration (JVM)** | JUnit 5 + `BaseRomRepository` temp dirs | `RomAssetExtractor` com ROM fake mínima (header + DMA + Yaz0 block sintético) — sem ROM real commitada (Regra 1) |
-| **Instrumented** | Espresso / Compose Test (se migrar) | `ItemsTab` mostra `ImageView` com drawable correto (mock cache) |
-| **Manual QA** | Device físico | Importar OoT 1.0 USA real → Tracker → ícones idênticos ao jogo; importar MM → idem; sem ROM → fallbacks; reimportar ROM diferente → cache invalidado e re-extraído |
+| Camada                | Ferramenta                              | O que testar                                                                                                                                                                                                                                                 |
+| --------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Unit (JVM)**        | JUnit 5 + fixtures sintéticas           | `Yaz0Decompressor` (round-trip: comprimir sintético → descomprimir → assert), `TextureDecoder.decodeRGBA16` (pixel 0xFFFF → ARGB), `DmaTableParser` (buffer fake com 3 entries + terminador zero), `TrackerAssetCache` (put/has/clear com `TemporaryFolder`) |
+| **Integration (JVM)** | JUnit 5 + `BaseRomRepository` temp dirs | `RomAssetExtractor` com ROM fake mínima (header + DMA + Yaz0 block sintético) — sem ROM real commitada (Regra 1)                                                                                                                                             |
+| **Instrumented**      | Espresso / Compose Test (se migrar)     | `ItemsTab` mostra `ImageView` com drawable correto (mock cache)                                                                                                                                                                                              |
+| **Manual QA**         | Device físico                           | Importar OoT 1.0 USA real → Tracker → ícones idênticos ao jogo; importar MM → idem; sem ROM → fallbacks; reimportar ROM diferente → cache invalidado e re-extraído                                                                                           |
 
 **Fixtures:** nunca commitar ROMs nem trechos de ROM (Regra 1/2). Usar dados sintéticos: `Yaz0` block com `uncompressedSize=4` e payload `0x41 0x42 0x43 0x44`, `RGBA16` buffer com 2 pixels conhecidos.
 
@@ -521,15 +521,15 @@ Comandos:
 
 ## 8. Riscos e Mitigações
 
-| Risco | Impacto | Mitigação |
-|---|---|---|
+| Risco                                                    | Impacto                                  | Mitigação                                                                                                                                                              |
+| -------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **DMA offset varia por versão** (1.0 vs 1.1, USA vs PAL) | Extração falha silenciosa, ícones pretos | Detectar `gameCode`+`versionByte` via `RomHeader`; tabela de offsets versionada; fallback para erro amigável ("ROM não suportada para extração, usando ícones padrão") |
-| **Arquivo `icon_item_static` comprimido vs não** | `romEnd==0` vs `!=0` mal interpretado | Respeitar `DmaEntry.isCompressed` (Regra do guia: `romEnd != 0` → comprimido) |
-| **CI8 sem TLUT** | Cores erradas | Mapear `tlutOffset` por item; se ausente, assumir RGBA16 |
-| **ROM corrompida / Yaz0 truncado** | Crash OOB | Bounds checks em `Yaz0Decompressor` + `Result` com `PatcherException`-like typed errors; UI mostra fallback |
-| **Performance em device low-end** | ANR se extrair na main thread | Sempre `Dispatchers.IO`, `FileChannel`, nunca `ByteArray` da ROM inteira; extração one-shot com progresso |
-| **APK sem ROM importada** | Tracker vazio | Fallbacks vetoriais CC0 garantem UX degradada mas funcional; mensagem "Importe uma ROM OoT/MM para ver ícones originais" |
-| **Mudança de `zeldaret/oot` offsets** | Mapeamento desatualizado | Versionar `OotIconMap` com `catalogVersion`-like; testes de regressão com ROMs conhecidas (CRC32) |
+| **Arquivo `icon_item_static` comprimido vs não**         | `romEnd==0` vs `!=0` mal interpretado    | Respeitar `DmaEntry.isCompressed` (Regra do guia: `romEnd != 0` → comprimido)                                                                                          |
+| **CI8 sem TLUT**                                         | Cores erradas                            | Mapear `tlutOffset` por item; se ausente, assumir RGBA16                                                                                                               |
+| **ROM corrompida / Yaz0 truncado**                       | Crash OOB                                | Bounds checks em `Yaz0Decompressor` + `Result` com `PatcherException`-like typed errors; UI mostra fallback                                                            |
+| **Performance em device low-end**                        | ANR se extrair na main thread            | Sempre `Dispatchers.IO`, `FileChannel`, nunca `ByteArray` da ROM inteira; extração one-shot com progresso                                                              |
+| **APK sem ROM importada**                                | Tracker vazio                            | Fallbacks vetoriais CC0 garantem UX degradada mas funcional; mensagem "Importe uma ROM OoT/MM para ver ícones originais"                                               |
+| **Mudança de `zeldaret/oot` offsets**                    | Mapeamento desatualizado                 | Versionar `OotIconMap` com `catalogVersion`-like; testes de regressão com ROMs conhecidas (CRC32)                                                                      |
 
 ---
 

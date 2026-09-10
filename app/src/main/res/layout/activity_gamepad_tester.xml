@@ -45,37 +45,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="@string/gamepad_tester_disconnected"
                 android:textColor="@color/switch_text_secondary"
                 android:textSize="@dimen/switch_hint_text" />
         </LinearLayout>
-
-        <Button
-            android:id="@+id/tester_physical"
-            android:layout_width="wrap_content"
-            android:layout_height="42dp"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/bg_gamepad_tester_mode"
-            android:contentDescription="@string/gamepad_tester_mode_physical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:text="@string/gamepad_tester_mode_physical"
-            android:textAllCaps="false"
-            android:textColor="@color/switch_text_primary"
-            android:textSize="@dimen/switch_hint_text" />
-
-        <Button
-            android:id="@+id/tester_n64"
-            android:layout_width="wrap_content"
-            android:layout_height="42dp"
-            android:background="@drawable/bg_gamepad_tester_mode"
-            android:contentDescription="@string/gamepad_tester_mode_n64"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:text="@string/gamepad_tester_mode_n64"
-            android:textAllCaps="false"
-            android:textColor="@color/switch_text_primary"
-            android:textSize="@dimen/switch_hint_text" />
     </LinearLayout>
 
     <View
@@ -83,11 +58,55 @@
         android:layout_height="1dp"
         android:background="@color/switch_text_secondary" />
 
+    <!-- Segmented pill tabs — centered, Switch-style, fully round -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp">
+
+        <Button
+            android:id="@+id/tester_physical"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_gamepad_tester_mode"
+            android:contentDescription="@string/gamepad_tester_mode_physical"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:minWidth="148dp"
+            android:paddingStart="22dp"
+            android:paddingEnd="22dp"
+            android:text="@string/gamepad_tester_mode_physical"
+            android:textAllCaps="false"
+            android:textColor="@color/switch_text_primary"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/tester_n64"
+            android:layout_width="wrap_content"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_gamepad_tester_mode"
+            android:contentDescription="@string/gamepad_tester_mode_n64"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:minWidth="148dp"
+            android:paddingStart="22dp"
+            android:paddingEnd="22dp"
+            android:text="@string/gamepad_tester_mode_n64"
+            android:textAllCaps="false"
+            android:textColor="@color/switch_text_primary"
+            android:textSize="13sp" />
+    </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:paddingStart="@dimen/switch_screen_margin"
-        android:paddingTop="8dp"
+        android:paddingTop="2dp"
         android:paddingEnd="@dimen/switch_screen_margin"
         android:paddingBottom="8dp"
         android:text="@string/gamepad_tester_hint"

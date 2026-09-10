@@ -65,6 +65,7 @@ import java.util.concurrent.TimeUnit
         scheduleDriveBackup()
         syncGameShortcuts()
         logRcheevosVersion()
+        raAwardOutbox.schedule()
     }
 
     /**
@@ -158,6 +159,11 @@ import java.util.concurrent.TimeUnit
         /** Shared RetroAchievements HTTP executor (User-Agent contract). */
         val raHttpClient: RaHttpClient by lazy {
             RaHttpClient(RaUserAgent.build(instance.applicationContext))
+        }
+
+        /** Encrypted durable recovery of awards emitted by rcheevos before network submission. */
+        val raAwardOutbox: br.com.redclaw.zelda64player.retroachievements.sync.RaAwardOutbox by lazy {
+            br.com.redclaw.zelda64player.retroachievements.sync.RaAwardOutbox(instance, raCredentialStore, raHttpClient)
         }
 
         /** Interactive RA login/logout service (settings screen). */

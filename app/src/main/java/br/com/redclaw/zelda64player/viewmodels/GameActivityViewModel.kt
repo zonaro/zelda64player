@@ -1,5 +1,6 @@
 package br.com.redclaw.zelda64player.viewmodels
 
+import br.com.redclaw.zelda64player.retroachievements.RaEmulatorStateBridge
 import android.app.Activity
 import android.app.Application
 import android.content.Context
@@ -71,7 +72,6 @@ import br.com.redclaw.zelda64player.utils.MenuGridBuilder
 import br.com.redclaw.zelda64player.utils.MenuSection
 import br.com.redclaw.zelda64player.utils.MenuToggleEntry
 import br.com.redclaw.zelda64player.utils.RetroViewUtils
-import com.swordfish.libretrodroid.GLRetroView
 import com.swordfish.libretrodroid.LibretroDroid
 import io.reactivex.disposables.CompositeDisposable
 import java.io.File
@@ -106,7 +106,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      * dies (see stopRaSession, called from GameActivity.onDestroy ahead of super.onDestroy()).
      */
     private var raSession: RaSessionManager? = null
-    private var raFrameCollector: Job? = null
     private var raEventCollector: Job? = null
     private var raStateCollector: Job? = null
 
@@ -312,6 +311,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                         "load_state",
                                         R.string.menu_load_state,
                                         R.drawable.ic_load_state,
+                                        isEnabled = { !RcheevosJni.nativeIsHardcore() },
                                         badgeRes = R.string.badge_start
                                 ) { retroView?.let { retroViewUtils?.loadState(it) } },
                                 MenuActionItem(
@@ -346,7 +346,9 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                                             retroView?.view?.frameSpeed == fastForwardSpeed
                                         },
                                         badgeRes = R.string.badge_r3
-                                ) { retroView?.let { retroViewUtils?.fastForward(it) } }
+                                ) {
+                                    retroView?.let { retroViewUtils?.fastForward(it) }
+                                }
                         )
                 )
         val controls =
@@ -714,9 +716,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         val sections = menuSections ?: return
         for (section in sections) {
             section.items.firstOrNull { it.id == id }?.let { item ->
-                /* Disabled items (e.g. greyed RetroAchievements buttons) must not
-                respond to direct-id activation (physical keys). Skip silently:
-                no action, no dismiss. */
                 if (!item.isEnabled()) return
                 item.action()
                 if (item.isToggle) updateToggleStates()
@@ -802,6 +801,10 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      * by [OcarinaMacroPlayer.play].
      */
     private fun playOcarinaSong(song: OcarinaSong) {
+        if (RcheevosJni.nativeIsHardcore()) {
+            Toast.makeText(appContext, R.string.ra_hardcore_macro_blocked, Toast.LENGTH_LONG).show()
+            return
+        }
         val rv = retroView?.view ?: return
         ocarinaHud?.show(song)
         ocarinaPlayer =
@@ -1266,6 +1269,7 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      * ROM).
      */
     private fun startRaSessionIfNeeded(hackId: String) {
+        LibretroDroid.setStateCallback(RaEmulatorStateBridge(appContext))
         if (!CorePrefs.getRetroAchievementsEnabled(appContext)) {
             announceRaStatus(R.string.ra_toast_disabled)
             return
@@ -1290,18 +1294,6 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 )
         raSession = session
 
-        /* Per-frame evaluation ticks: FrameRendered fires on the main thread
-        for every rendered frame; the session gates internally on a loaded
-        game, so this stays cheap while achievements are inactive. */
-        raFrameCollector =
-                viewModelScope.launch {
-                    view.getGLRetroEvents().collect { event ->
-                        if (event is GLRetroView.GLRetroEvents.FrameRendered) {
-                            session.onFrame()
-                        }
-                    }
-                }
-
         /* Client events (unlocks, indicators, leaderboards) drive the overlay
         and system notifications. */
         raEventCollector =
@@ -1323,10 +1315,11 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                             is RaSessionState.Running -> {
                                 val total = state.game.numCoreAchievements
                                 announceRaStatus(
-                                        if (total > 0) R.string.ra_toast_progress
+                                        if (total > 0) R.string.ra_toast_progress_mode
                                         else R.string.ra_toast_untracked,
                                         state.game.numUnlockedAchievements,
-                                        total
+                                        total,
+                                        appContext.getString(if (RcheevosJni.nativeIsHardcore()) R.string.ra_mode_hardcore else R.string.ra_mode_casual)
                                 )
                             }
                             is RaSessionState.NotLoggedIn ->
@@ -1353,6 +1346,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
         session.start(romFile, hackId, hardcoreEnabled = CorePrefs.getRaHardcore(appContext)) {
             view.getMemoryRegion(LibretroDroid.MEMORY_SYSTEM_RAM)
         }
+
+        LibretroDroid.setFrameCallback(Runnable { session.onFrame() })
 
         // System notifications are opt-in default ON; on API 33+ they need
         // the POST_NOTIFICATIONS runtime permission. Ask once as soon as the
@@ -1542,12 +1537,14 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 RaNotificationHelper.postUnlock(appContext, event.payloadJson, gameTitle)
             }
             RcheevosJni.Events.CHALLENGE_INDICATOR_SHOW ->
-                    overlay?.showChallengeIndicator(event.payloadJson)
+                    if (RcheevosJni.nativeIsHardcore() || CorePrefs.getRaShowChallengeIndicators(appContext))
+                        overlay?.showChallengeIndicator(event.payloadJson)
             RcheevosJni.Events.CHALLENGE_INDICATOR_HIDE ->
                     overlay?.hideChallengeIndicator(event.payloadJson)
             RcheevosJni.Events.PROGRESS_INDICATOR_SHOW,
             RcheevosJni.Events.PROGRESS_INDICATOR_UPDATE ->
-                    overlay?.updateProgressIndicator(event.payloadJson, visible = true)
+                    if (RcheevosJni.nativeIsHardcore() || CorePrefs.getRaShowChallengeIndicators(appContext))
+                        overlay?.updateProgressIndicator(event.payloadJson, visible = true)
             RcheevosJni.Events.PROGRESS_INDICATOR_HIDE ->
                     overlay?.updateProgressIndicator(event.payloadJson, visible = false)
             RcheevosJni.Events.LEADERBOARD_STARTED -> {
@@ -1562,19 +1559,9 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 overlay?.showMessage(appContext.getString(R.string.ra_leaderboard_submitted))
             }
             RcheevosJni.Events.LEADERBOARD_TRACKER_SHOW,
-            RcheevosJni.Events.LEADERBOARD_TRACKER_UPDATE -> {
-                if (CorePrefs.getRaShowChallengeIndicators(appContext)) {
-                    overlay?.updateProgressIndicator(event.payloadJson, visible = true)
-                }
-            }
-            RcheevosJni.Events.LEADERBOARD_TRACKER_HIDE -> {
-                overlay?.updateProgressIndicator(event.payloadJson, visible = false)
-            }
-            RcheevosJni.Events.LEADERBOARD_SCOREBOARD -> {
-                // Scoreboard payload contains submitted_score/best_score/new_rank.
-                // Surface as a transient message; detailed ranking stays in the menu dialog.
-                overlay?.showMessage(appContext.getString(R.string.ra_leaderboard_submitted))
-            }
+            RcheevosJni.Events.LEADERBOARD_TRACKER_UPDATE,
+            RcheevosJni.Events.LEADERBOARD_TRACKER_HIDE,
+            RcheevosJni.Events.LEADERBOARD_SCOREBOARD -> Unit // Rankings stay inside the menu.
             RcheevosJni.Events.GAME_COMPLETED -> {
                 overlay?.showMessage(appContext.getString(R.string.ra_game_completed))
             }
@@ -1582,11 +1569,14 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
                 overlay?.showMessage(appContext.getString(R.string.ra_subset_completed))
             }
             RcheevosJni.Events.RESET -> {
-                // Hardcore toggle requested a reset — clear transient indicators.
                 overlay?.clearAll()
+                retroView?.view?.queueEvent { LibretroDroid.reset() }
             }
             RcheevosJni.Events.SERVER_ERROR -> {
-                android.util.Log.w("GameActivityVM", "RA server error: ${event.payloadJson}")
+                val api = runCatching { org.json.JSONObject(event.payloadJson).optString("api") }.getOrDefault("")
+                if (api == "award_achievement") {
+                    overlay?.showMessage(appContext.getString(R.string.ra_award_sync_failed))
+                }
             }
             RcheevosJni.Events.DISCONNECTED -> {
                 overlay?.showMessage(appContext.getString(R.string.ra_disconnected))
@@ -1603,8 +1593,8 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      * calls this ahead of super.onDestroy()) because the aliased memory region dies with the core.
      */
     fun stopRaSession() {
-        raFrameCollector?.cancel()
-        raFrameCollector = null
+        LibretroDroid.setFrameCallback(null)
+        LibretroDroid.setStateCallback(null)
         raEventCollector?.cancel()
         raEventCollector = null
         raStateCollector?.cancel()
@@ -1618,10 +1608,10 @@ class GameActivityViewModel(application: Application) : AndroidViewModel(applica
      * Shows the one-shot game-start RetroAchievements toast. Safe to call repeatedly; only the
      * first call per game session takes effect.
      */
-    private fun announceRaStatus(messageRes: Int, arg1: Int = 0, arg2: Int = 0) {
+    private fun announceRaStatus(messageRes: Int, arg1: Int = 0, arg2: Int = 0, mode: String = "") {
         if (raAnnounced) return
         raAnnounced = true
-        Toast.makeText(appContext, appContext.getString(messageRes, arg1, arg2), Toast.LENGTH_LONG)
+        Toast.makeText(appContext, appContext.getString(messageRes, arg1, arg2, mode), Toast.LENGTH_LONG)
                 .show()
     }
 

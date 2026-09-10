@@ -5,20 +5,19 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.databinding.ActivityAchievementsBinding
 import br.com.redclaw.zelda64player.retroachievements.data.RaGameData
 import br.com.redclaw.zelda64player.retroachievements.data.RaGameIdentity
-import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
-import br.com.redclaw.zelda64player.ui.switchui.AccentManager
 import br.com.redclaw.zelda64player.ui.switchui.SwitchBackButton
 import br.com.redclaw.zelda64player.ui.switchui.SwitchDialog
+import br.com.redclaw.zelda64player.ui.switchui.SwitchImmersive
+import br.com.redclaw.zelda64player.utils.CorePrefs
 import br.com.redclaw.zelda64player.views.InstalledLibrary
 import coil.load
 import kotlinx.coroutines.Dispatchers
@@ -28,23 +27,24 @@ import kotlinx.coroutines.withContext
 /**
  * RetroAchievements screen, opened in one of two modes:
  *
- *  - Single game (EXTRA_HACK_ID present): shows only the achievements of that
+ * - Single game (EXTRA_HACK_ID present): shows only the achievements of that
+ * ```
  *    installed hack, identified the same way the core identifies a game at
  *    launch — by hashing the FINAL playable ROM (see RaHashService.ensureIdentity).
  *    The per-game header card is shown.
- *
- *  - All games (no extra): iterates every installed Library entry, resolves each
+ * ```
+ * - All games (no extra): iterates every installed Library entry, resolves each
+ * ```
  *    identity lazily, de-duplicates by RA game id and renders one section per
  *    tracked game with its achievement rows beneath. The big per-game header
  *    card is hidden in this mode because each section carries its own header
  *    (cleaner than an aggregate total and zero extra layout work). Games that
  *    cannot be identified are silently skipped; a network failure on one game
  *    never aborts the others.
- *
- * Data comes from the standalone rapi endpoints (no live session required):
- * the identity supplies the game id, catalog definitions come from
- * fetch-game-data and the user's unlock set from fetch-user-unlocks (only when
- * credentials exist). All network/parse work runs on Dispatchers.IO.
+ * ```
+ * Data comes from the standalone rapi endpoints (no live session required): the identity supplies
+ * the game id, catalog definitions come from fetch-game-data and the user's unlock set from
+ * fetch-user-unlocks (only when credentials exist). All network/parse work runs on Dispatchers.IO.
  */
 class AchievementsActivity : AppCompatActivity() {
 
@@ -55,6 +55,7 @@ class AchievementsActivity : AppCompatActivity() {
 
     private var currentQuery: String = ""
     private var currentSort: RaSortMode = RaSortMode.DEFAULT
+    private var viewMode: RaViewMode = RaViewMode.LIST
     private var singleGameRows: List<RaAchievementRow> = emptyList()
     private var allGamesData: List<GameAchievements> = emptyList()
     private var isSingleGame: Boolean = true
@@ -68,18 +69,32 @@ class AchievementsActivity : AppCompatActivity() {
         setSupportActionBar(binding.achievementsToolbar)
         backHelper.attach(this, binding.achievementsBack.root, onBack = { finish() })
 
-        binding.achievementsList.layoutManager = LinearLayoutManager(this)
         binding.achievementsList.adapter = adapter
+        viewMode = if (CorePrefs.getRaAchievementsGrid(this)) RaViewMode.GRID else RaViewMode.LIST
+        applyViewMode()
 
-        binding.achievementsSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                currentQuery = s?.toString().orEmpty()
-                applyFilterAndSort()
-            }
-        })
+        binding.achievementsSearch.addTextChangedListener(
+                object : TextWatcher {
+                    override fun beforeTextChanged(
+                            s: CharSequence?,
+                            start: Int,
+                            count: Int,
+                            after: Int
+                    ) {}
+                    override fun onTextChanged(
+                            s: CharSequence?,
+                            start: Int,
+                            before: Int,
+                            count: Int
+                    ) {}
+                    override fun afterTextChanged(s: Editable?) {
+                        currentQuery = s?.toString().orEmpty()
+                        applyFilterAndSort()
+                    }
+                }
+        )
         binding.achievementsSort.setOnClickListener { showSortDialog() }
+        binding.achievementsViewToggle.setOnClickListener { showViewModeDialog() }
 
         val hackId = intent.getStringExtra(EXTRA_HACK_ID)
         if (hackId.isNullOrBlank()) {
@@ -111,9 +126,13 @@ class AchievementsActivity : AppCompatActivity() {
             // Lazily (re)resolve identity from the final playable ROM, exactly as
             // the core does at launch. Falls back to stored metadata when no ROM
             // is present.
-            val identity = withContext(Dispatchers.IO) {
-                Zelda64PlayerApp.raHashService.ensureIdentity(this@AchievementsActivity, hackId)
-            }
+            val identity =
+                    withContext(Dispatchers.IO) {
+                        Zelda64PlayerApp.raHashService.ensureIdentity(
+                                this@AchievementsActivity,
+                                hackId
+                        )
+                    }
             if (identity == null || !identity.isResolved) {
                 showMessage(R.string.ra_error_untracked)
                 return@launch
@@ -121,26 +140,30 @@ class AchievementsActivity : AppCompatActivity() {
 
             showMessage(R.string.ra_loading)
 
-            val gameData = withContext(Dispatchers.IO) {
-                repository.fetchGameData(
-                    identity.gameId, credentials.getUsername().orEmpty(), credentials.getToken().orEmpty()
-                )
-            }
+            val gameData =
+                    withContext(Dispatchers.IO) {
+                        repository.fetchGameData(
+                                identity.gameId,
+                                credentials.getUsername().orEmpty(),
+                                credentials.getToken().orEmpty()
+                        )
+                    }
             if (gameData == null) {
                 showMessage(R.string.ra_error_network)
                 return@launch
             }
 
-            val unlockedIds = withContext(Dispatchers.IO) {
-                val username = credentials.getUsername().orEmpty()
-                val token = credentials.getToken().orEmpty()
-                repository.fetchUserUnlocks(
-                    gameId = identity.gameId,
-                    username = username,
-                    apiToken = token,
-                    hardcore = false
-                )
-            }
+            val unlockedIds =
+                    withContext(Dispatchers.IO) {
+                        val username = credentials.getUsername().orEmpty()
+                        val token = credentials.getToken().orEmpty()
+                        repository.fetchUserUnlocks(
+                                gameId = identity.gameId,
+                                username = username,
+                                apiToken = token,
+                                hardcore = false
+                        )
+                    }
 
             if (unlockedIds == null) {
                 showMessage(R.string.ra_error_network)
@@ -161,15 +184,15 @@ class AchievementsActivity : AppCompatActivity() {
         val achievements = gameData.coreAchievements
         val unlockedCount = achievements.count { it.id in unlockedIds }
         val totalPoints = achievements.sumOf { it.points }
-        val earnedPoints =
-            achievements.filter { it.id in unlockedIds }.sumOf { it.points }
-        binding.achievementsProgressSummary.text = getString(
-            R.string.ra_progress_summary,
-            unlockedCount,
-            achievements.size,
-            earnedPoints,
-            totalPoints
-        )
+        val earnedPoints = achievements.filter { it.id in unlockedIds }.sumOf { it.points }
+        binding.achievementsProgressSummary.text =
+                getString(
+                        R.string.ra_progress_summary,
+                        unlockedCount,
+                        achievements.size,
+                        earnedPoints,
+                        totalPoints
+                )
 
         if (gameData.imageUrl != null) {
             binding.achievementsGameBadge.load(gameData.imageUrl) { crossfade(true) }
@@ -211,25 +234,74 @@ class AchievementsActivity : AppCompatActivity() {
     }
 
     private fun showSortDialog() {
-        val labels = listOf(
-            getString(R.string.ra_sort_default),
-            getString(R.string.ra_sort_name_az),
-            getString(R.string.ra_sort_name_za),
-            getString(R.string.ra_sort_points_desc),
-            getString(R.string.ra_sort_points_asc),
-            getString(R.string.ra_sort_rarity_rare),
-            getString(R.string.ra_sort_rarity_common),
-        )
+        val labels =
+                listOf(
+                        getString(R.string.ra_sort_default),
+                        getString(R.string.ra_sort_name_az),
+                        getString(R.string.ra_sort_name_za),
+                        getString(R.string.ra_sort_points_desc),
+                        getString(R.string.ra_sort_points_asc),
+                        getString(R.string.ra_sort_rarity_rare),
+                        getString(R.string.ra_sort_rarity_common),
+                )
         val modes = RaSortMode.values()
         val checked = modes.indexOf(currentSort).coerceAtLeast(0)
         SwitchDialog(this)
-            .title(getString(R.string.ra_sort_button))
-            .icon(R.drawable.ic_tune)
-            .singleChoice(labels, checked) { index ->
-                currentSort = modes[index]
-                applyFilterAndSort()
-            }
-            .show()
+                .title(getString(R.string.ra_sort_button))
+                .icon(R.drawable.ic_tune)
+                .singleChoice(labels, checked) { index ->
+                    currentSort = modes[index]
+                    applyFilterAndSort()
+                }
+                .show()
+    }
+
+    // --- View mode (list / grid) ------------------------------------------
+
+    /** Applies the current [viewMode] to the list: layout manager + adapter mode + icon. */
+    private fun applyViewMode() {
+        val lm =
+                if (viewMode == RaViewMode.GRID) {
+                    GridLayoutManager(this, computeGridSpanCount())
+                } else {
+                    LinearLayoutManager(this)
+                }
+        binding.achievementsList.layoutManager = lm
+        adapter.configureLayoutManager(lm)
+        adapter.viewMode = viewMode
+        updateViewToggleIcon()
+    }
+
+    /** Opens the view-mode picker (List / Grid), mirroring the sort dialog. */
+    private fun showViewModeDialog() {
+        val labels = listOf(getString(R.string.ra_view_list), getString(R.string.ra_view_grid))
+        val checked = if (viewMode == RaViewMode.GRID) 1 else 0
+        SwitchDialog(this)
+                .title(getString(R.string.ra_view_mode_dialog_title))
+                .icon(R.drawable.ic_view_grid)
+                .singleChoice(labels, checked) { index ->
+                    viewMode = if (index == 1) RaViewMode.GRID else RaViewMode.LIST
+                    CorePrefs.setRaAchievementsGrid(this, viewMode == RaViewMode.GRID)
+                    applyViewMode()
+                    applyFilterAndSort()
+                }
+                .show()
+    }
+
+    /** The button shows the icon of the current mode. */
+    private fun updateViewToggleIcon() {
+        val icon =
+                if (viewMode == RaViewMode.GRID) R.drawable.ic_view_grid
+                else R.drawable.ic_view_list
+        binding.achievementsViewToggle.setImageResource(icon)
+        binding.achievementsViewToggle.contentDescription = getString(R.string.ra_view_mode)
+    }
+
+    /** Responsive grid columns: ~96dp target cells, at least 2. */
+    private fun computeGridSpanCount(): Int {
+        val density = resources.displayMetrics.density
+        val widthDp = resources.displayMetrics.widthPixels / density
+        return maxOf(2, (widthDp / 96).toInt())
     }
 
     // --- All games mode ---------------------------------------------------
@@ -243,21 +315,26 @@ class AchievementsActivity : AppCompatActivity() {
         showMessage(R.string.ra_loading)
 
         lifecycleScope.launch {
-            val entries = withContext(Dispatchers.IO) {
-                InstalledLibrary.entries(this@AchievementsActivity)
-            }
+            val entries =
+                    withContext(Dispatchers.IO) {
+                        InstalledLibrary.entries(this@AchievementsActivity)
+                    }
 
             // Lazily resolve every entry's identity (mupen-style: hash the final
             // playable ROM). Best-effort per entry; unresolved ones are skipped.
-            val identities = withContext(Dispatchers.IO) {
-                buildMap<String, RaGameIdentity> {
-                    for (entry in entries) {
-                        val identity = Zelda64PlayerApp.raHashService
-                            .ensureIdentity(this@AchievementsActivity, entry.romId)
-                        if (identity != null) put(entry.romId, identity)
+            val identities =
+                    withContext(Dispatchers.IO) {
+                        buildMap<String, RaGameIdentity> {
+                            for (entry in entries) {
+                                val identity =
+                                        Zelda64PlayerApp.raHashService.ensureIdentity(
+                                                this@AchievementsActivity,
+                                                entry.romId
+                                        )
+                                if (identity != null) put(entry.romId, identity)
+                            }
+                        }
                     }
-                }
-            }
 
             val resolvedByGame = collectResolvedGames(entries, identities)
             if (resolvedByGame.isEmpty()) {
@@ -271,19 +348,27 @@ class AchievementsActivity : AppCompatActivity() {
             val loadedGames = mutableListOf<GameAchievements>()
             for ((gameId, fallbackTitle) in resolvedByGame) {
                 // A failure on one game must not abort the others.
-                val gameData = runCatching {
-                    withContext(Dispatchers.IO) { repository.fetchGameData(gameId, username, token) }
-                }.getOrNull() ?: continue
-                val unlockedIds = runCatching {
-                    withContext(Dispatchers.IO) {
-                        repository.fetchUserUnlocks(
-                            gameId = gameId,
-                            username = username,
-                            apiToken = token,
-                            hardcore = false
-                        )
-                    }
-                }.getOrNull() ?: continue
+                val gameData =
+                        runCatching {
+                                    withContext(Dispatchers.IO) {
+                                        repository.fetchGameData(gameId, username, token)
+                                    }
+                                }
+                                .getOrNull()
+                                ?: continue
+                val unlockedIds =
+                        runCatching {
+                                    withContext(Dispatchers.IO) {
+                                        repository.fetchUserUnlocks(
+                                                gameId = gameId,
+                                                username = username,
+                                                apiToken = token,
+                                                hardcore = false
+                                        )
+                                    }
+                                }
+                                .getOrNull()
+                                ?: continue
                 loadedGames += GameAchievements(gameId, fallbackTitle, gameData, unlockedIds)
             }
 
@@ -310,7 +395,7 @@ class AchievementsActivity : AppCompatActivity() {
 
     /** Installed-hack display name for the header fallback. */
     private fun hackTitle(hackId: String): String =
-        InstalledLibrary.entries(this).firstOrNull { it.id == hackId }?.title.orEmpty()
+            InstalledLibrary.entries(this).firstOrNull { it.id == hackId }?.title.orEmpty()
 
     private fun showMessage(resId: Int) {
         binding.achievementsHeader.visibility = View.GONE

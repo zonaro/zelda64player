@@ -25,6 +25,7 @@
 #include <unordered_set>
 
 #include "libretrodroid.h"
+#include "frameiteration.h"
 #include "utils/libretrodroidexception.h"
 #include "log.h"
 #include "core.h"
@@ -144,10 +145,33 @@ void LibretroDroid::setControllerType(unsigned int port, unsigned int type) {
     core->retro_set_controller_port_device(port, type);
 }
 
-bool LibretroDroid::unserializeState(int8_t *data, size_t size) {
+bool LibretroDroid::unserializeState(JNIEnv* env, jbyteArray state) {
     std::lock_guard<std::mutex> lock(coreLock);
-
-    return core->retro_unserialize(data, size);
+    jbyteArray decoded = state;
+    jclass cls = nullptr;
+    if (stateCallback) {
+        cls = env->GetObjectClass(stateCallback);
+        auto method = env->GetMethodID(cls, "onDecode", "([B)[B");
+        decoded = (jbyteArray)env->CallObjectMethod(stateCallback, method, state);
+        if (env->ExceptionCheck() || !decoded) {
+            env->DeleteLocalRef(cls);
+            return false;
+        }
+    }
+    auto* data = env->GetByteArrayElements(decoded, nullptr);
+    const auto size = env->GetArrayLength(decoded);
+    bool result = data && core->retro_unserialize(data, size);
+    if (data) env->ReleaseByteArrayElements(decoded, data, JNI_ABORT);
+    if (stateCallback) {
+        if (result) {
+            auto method = env->GetMethodID(cls, "onLoaded", "([B)V");
+            env->CallVoidMethod(stateCallback, method, state);
+            result = !env->ExceptionCheck();
+        }
+        env->DeleteLocalRef(decoded);
+        env->DeleteLocalRef(cls);
+    }
+    return result;
 }
 
 JNIEXPORT jboolean JNICALL LibretroDroid::unserializeSRAM(int8_t* data, size_t size) {
@@ -448,14 +472,38 @@ void LibretroDroid::resume() {
     refreshAspectRatio();
 }
 
-void LibretroDroid::pause() {
+void LibretroDroid::pause(JNIEnv* env) {
+    std::lock_guard<std::mutex> lock(coreLock);
+    if (stateCallback) {
+        jclass cls = env->GetObjectClass(stateCallback);
+        env->CallVoidMethod(stateCallback, env->GetMethodID(cls, "onPause", "()V"));
+        env->DeleteLocalRef(cls);
+    }
     LOGD("Performing libretrodroid pause");
     audio->stop();
 
     input = nullptr;
 }
 
-void LibretroDroid::step() {
+void LibretroDroid::setStateCallback(JNIEnv* env, jobject callback) {
+    std::lock_guard<std::mutex> lock(coreLock);
+    if (stateCallback) env->DeleteGlobalRef(stateCallback);
+    stateCallback = callback ? env->NewGlobalRef(callback) : nullptr;
+}
+
+void LibretroDroid::setFrameCallback(JNIEnv* env, jobject callback) {
+    std::lock_guard<std::mutex> lock(coreLock);
+    if (frameCallback) env->DeleteGlobalRef(frameCallback);
+    frameCallback = callback ? env->NewGlobalRef(callback) : nullptr;
+    frameCallbackRun = nullptr;
+    if (frameCallback) {
+        jclass cls = env->GetObjectClass(frameCallback);
+        frameCallbackRun = env->GetMethodID(cls, "run", "()V");
+        env->DeleteLocalRef(cls);
+    }
+}
+
+void LibretroDroid::step(JNIEnv* env) {
     std::lock_guard<std::mutex> lock(coreLock);
 
     LOGD("Stepping into retro_run()");
@@ -468,8 +516,12 @@ void LibretroDroid::step() {
         frames = std::min(requestedFrames, 2u);
     }
 
-    for (size_t i = 0; i < frames * frameSpeed; i++)
-        core->retro_run();
+    runObservedFrames(frames * frameSpeed, [this] { core->retro_run(); }, [this, env] {
+        if (frameCallback && frameCallbackRun)
+            env->CallVoidMethod(frameCallback, frameCallbackRun);
+        return !env->ExceptionCheck();
+    });
+    if (env->ExceptionCheck()) return;
 
     if (video && !video->rendersInVideoCallback()) {
         video->renderFrame();
@@ -520,7 +572,7 @@ bool LibretroDroid::isRumbleEnabled() const {
 }
 
 void LibretroDroid::setFrameSpeed(unsigned int speed) {
-    frameSpeed = speed;
+    frameSpeed = std::max(1u, speed);
     updateAudioSampleRateMultiplier();
 }
 
@@ -625,21 +677,32 @@ uintptr_t LibretroDroid::handleGetCurrentFrameBuffer() {
     return 0;
 }
 
-void LibretroDroid::reset() {
+void LibretroDroid::reset(JNIEnv* env) {
     std::lock_guard<std::mutex> lock(coreLock);
 
     core->retro_reset();
+    if (stateCallback) {
+        jclass cls = env->GetObjectClass(stateCallback);
+        env->CallVoidMethod(stateCallback, env->GetMethodID(cls, "onReset", "()V"));
+        env->DeleteLocalRef(cls);
+    }
 }
 
-std::pair<int8_t*, size_t> LibretroDroid::serializeState() {
+jbyteArray LibretroDroid::serializeState(JNIEnv* env) {
     std::lock_guard<std::mutex> lock(coreLock);
-
-    size_t size = core->retro_serialize_size();
-    auto data = new int8_t[size];
-
-    core->retro_serialize(data, size);
-
-    return std::pair(data, size);
+    const size_t size = core->retro_serialize_size();
+    std::vector<int8_t> data(size);
+    if (!size || !core->retro_serialize(data.data(), size)) return nullptr;
+    jbyteArray coreState = env->NewByteArray(size);
+    if (!coreState) return nullptr;
+    env->SetByteArrayRegion(coreState, 0, size, data.data());
+    if (!stateCallback) return coreState;
+    jclass cls = env->GetObjectClass(stateCallback);
+    auto method = env->GetMethodID(cls, "onSave", "([B)[B");
+    auto result = (jbyteArray)env->CallObjectMethod(stateCallback, method, coreState);
+    env->DeleteLocalRef(cls);
+    env->DeleteLocalRef(coreState);
+    return result;
 }
 
 void LibretroDroid::resetCheat() {
@@ -648,9 +711,15 @@ void LibretroDroid::resetCheat() {
     core->retro_cheat_reset();
 }
 
-void LibretroDroid::setCheat(unsigned index, bool enabled, const std::string& code) {
+void LibretroDroid::setCheat(JNIEnv* env, unsigned index, bool enabled, const std::string& code) {
     std::lock_guard<std::mutex> lock(coreLock);
 
+    if (enabled && stateCallback) {
+        jclass cls = env->GetObjectClass(stateCallback);
+        bool allowed = env->CallBooleanMethod(stateCallback, env->GetMethodID(cls, "allowCheat", "()Z"));
+        env->DeleteLocalRef(cls);
+        if (env->ExceptionCheck() || !allowed) return;
+    }
     core->retro_cheat_set(index, enabled, Utils::cloneToCString(code));
 }
 

@@ -65,11 +65,11 @@ private:
     LibretroDroid() {}
 
 public:
-    void setCheat(unsigned index, bool enabled, const std::string& code);
+    void setCheat(JNIEnv* env, unsigned index, bool enabled, const std::string& code);
     void resetCheat();
 
-    std::pair<int8_t*, size_t> serializeState();
-    bool unserializeState(int8_t *data, size_t size);
+    jbyteArray serializeState(JNIEnv* env);
+    bool unserializeState(JNIEnv* env, jbyteArray state);
 
     std::pair<int8_t *, size_t> serializeSRAM();
     jboolean unserializeSRAM(int8_t *data, size_t size);
@@ -99,11 +99,15 @@ public:
         const std::string& language
     );
     void resume();
-    void step();
-    void pause();
+    void step(JNIEnv* env);
+
+    /** Runs after every emulated frame while core memory is stable. */
+    void setFrameCallback(JNIEnv* env, jobject callback);
+    void setStateCallback(JNIEnv* env, jobject callback);
+    void pause(JNIEnv* env);
     void destroy();
 
-    void reset();
+    void reset(JNIEnv* env);
 
     void loadGameFromPath(const std::string &gamePath);
     void loadGameFromBytes(const int8_t *data, size_t size);
@@ -189,6 +193,9 @@ private:
     bool dirtyVideo = false;
 
     std::mutex coreLock;
+    jobject stateCallback = nullptr;
+    jobject frameCallback = nullptr;
+    jmethodID frameCallbackRun = nullptr;
 
     std::unique_ptr<Core> core;
     std::unique_ptr<Audio> audio;

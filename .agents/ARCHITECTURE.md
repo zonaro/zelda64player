@@ -18,27 +18,27 @@ Native Android (Kotlin) emulator frontend for Nintendo 64 **Zelda ROM hacks** (O
 
 ## 2. Stack Decisions (Final)
 
-| Layer | Technology | Version | Notes |
-|-------|------------|---------|-------|
-| Language | Kotlin | 1.9+ | JVM target 1.8 |
-| Min SDK | Android API | 24 (Nougat) | Raised from 21; <1% API 21-23 share |
-| Target SDK | Android API | 35 | Play Store requirement (Aug 2025+) |
-| Compile SDK | Android API | 35 | Required for Material Components 1.14.0 (technical base only) |
-| Build System | Gradle | 8.x | Kotlin DSL (`build.gradle.kts`), version catalogs (`libs.versions.toml`) |
-| Architecture | MVC-ish | — | View (Activity+ViewBinding) → ViewModel (AndroidViewModel) → Model (Repository+UseCase) |
-| DI | Manual Service Locator | — | `AppContainer` in `Application` subclass; no Dagger/Hilt |
-| Emulation | LibretroDroid | 0.13.2 | **Vendored local module `:libretrodroid`** (source from tag 0.13.2) + 2 JNI passthroughs for memory access; cores fetched at build time |
-| Touch Controls | RadialGamePad | 0.6.0 | Included as module or AAR |
-| Networking | OkHttp | 4.12+ | Already transitive via LibretroDroid |
-| Image Loading | Coil | 2.6+ | Kotlin-first, coroutines, lightweight |
-| Persistence | JSON (files) + Room (optional) | — | BaseRomRepository: JSON in `filesDir`; PatchRepository: files in `cacheDir`; RA metadata: JSON in `filesDir` |
-| Coroutines | kotlinx-coroutines | 1.8+ | `lifecycle-runtime-ktx` for ViewModelScope |
-| Reactive | RxJava/RxAndroid | 2.x | KEPT as-is: frozen `gamepad/` package depends on it (`CompositeDisposable`, `pad.events()`). New code uses coroutines/Flow; do NOT refactor gamepad to Flow |
-| Native | CMake + NDK | r26+ | `externalNativeBuild` for rcheevos (MIT) + JNI bridge; ABIs: x86, x86_64, armeabi-v7a, arm64-v8a |
-| RetroAchievements | rcheevos | ~12.x (master tag) | MIT licensed, ANSI C; git subtree in `app/src/main/cpp/rcheevos/`; provides `rc_client_t` high-level API + `rapi` standalone |
-| Material Components | material3 | 1.14.0 | **Technical base only — visual standard is custom Switch skin (overrides M3 Expressive)** |
-| Background Tasks | WorkManager | 2.9.0 | `CatalogRefreshWorker` (12h periodic, CONNECTED network) |
-| Testing | JUnit 5, MockK, Turbine | — | Unit + Instrumented |
+| Layer               | Technology                     | Version            | Notes                                                                                                                                                       |
+| ------------------- | ------------------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Language            | Kotlin                         | 1.9+               | JVM target 1.8                                                                                                                                              |
+| Min SDK             | Android API                    | 24 (Nougat)        | Raised from 21; <1% API 21-23 share                                                                                                                         |
+| Target SDK          | Android API                    | 35                 | Play Store requirement (Aug 2025+)                                                                                                                          |
+| Compile SDK         | Android API                    | 35                 | Required for Material Components 1.14.0 (technical base only)                                                                                               |
+| Build System        | Gradle                         | 8.x                | Kotlin DSL (`build.gradle.kts`), version catalogs (`libs.versions.toml`)                                                                                    |
+| Architecture        | MVC-ish                        | —                  | View (Activity+ViewBinding) → ViewModel (AndroidViewModel) → Model (Repository+UseCase)                                                                     |
+| DI                  | Manual Service Locator         | —                  | `AppContainer` in `Application` subclass; no Dagger/Hilt                                                                                                    |
+| Emulation           | LibretroDroid                  | 0.13.2             | **Vendored local module `:libretrodroid`** (source from tag 0.13.2) + 2 JNI passthroughs for memory access; cores fetched at build time                     |
+| Touch Controls      | RadialGamePad                  | 0.6.0              | Included as module or AAR                                                                                                                                   |
+| Networking          | OkHttp                         | 4.12+              | Already transitive via LibretroDroid                                                                                                                        |
+| Image Loading       | Coil                           | 2.6+               | Kotlin-first, coroutines, lightweight                                                                                                                       |
+| Persistence         | JSON (files) + Room (optional) | —                  | BaseRomRepository: JSON in `filesDir`; PatchRepository: files in `cacheDir`; RA metadata: JSON in `filesDir`                                                |
+| Coroutines          | kotlinx-coroutines             | 1.8+               | `lifecycle-runtime-ktx` for ViewModelScope                                                                                                                  |
+| Reactive            | RxJava/RxAndroid               | 2.x                | KEPT as-is: frozen `gamepad/` package depends on it (`CompositeDisposable`, `pad.events()`). New code uses coroutines/Flow; do NOT refactor gamepad to Flow |
+| Native              | CMake + NDK                    | r26+               | `externalNativeBuild` for rcheevos (MIT) + JNI bridge; ABIs: x86, x86_64, armeabi-v7a, arm64-v8a                                                            |
+| RetroAchievements   | rcheevos                       | ~12.x (master tag) | MIT licensed, ANSI C; git subtree in `app/src/main/cpp/rcheevos/`; provides `rc_client_t` high-level API + `rapi` standalone                                |
+| Material Components | material3                      | 1.14.0             | **Technical base only — visual standard is custom Switch skin (overrides M3 Expressive)**                                                                   |
+| Background Tasks    | WorkManager                    | 2.9.0              | `CatalogRefreshWorker` (12h periodic, CONNECTED network)                                                                                                    |
+| Testing             | JUnit 5, MockK, Turbine        | —                  | Unit + Instrumented                                                                                                                                         |
 
 ---
 
@@ -147,7 +147,7 @@ GameRomResolver.resolve(libraryEntryId)  →  path to patched ROM (or vanilla ba
 RetroView.kt  →  GLRetroViewData.gameFilePath  ← ONLY place ROM bytes reach the core (Rule 10)
    │
    ▼
-Libretro core (mupen64plus-next GLES3 / parallel-n64) emulates
+Libretro core (mupen64plus-next GLES3) emulates
 ```
 
 **Rule 10 (RetroView interception):** The ONLY place ROM bytes reach the core is `RetroView.kt` → `GLRetroViewData.gameFilePath` (or `gameFileBytes`). Default `config_load_bytes=false` (stream from file).
@@ -158,14 +158,14 @@ Libretro core (mupen64plus-next GLES3 / parallel-n64) emulates
 
 ## 5. Threading Model
 
-| Component | Thread | Details |
-|-----------|--------|---------|
-| `rc_client_do_frame` (RA) | **Main thread** | Driven by `GLRetroEvents.FrameRendered` Flow (already on main dispatcher). Called 1× per frame. |
-| `read_memory` callback (RA) | **rcheevos thread** (background) | Reads via `LibretroDroidMemoryJni.getMemoryData(RETRO_MEMORY_SYSTEM_RAM)` → `ByteBuffer` → copy to output buffer. Pointer valid only while core running. |
-| `server_call` callback (RA) | **Any thread** (OkHttp callback) | `RaHttpClient` does async OkHttp; on response invokes C callback via JNI `nativeServerCallComplete`. Marshaling thread-safe (`AttachCurrentThread` if needed). |
-| `event_handler` callbacks (RA) | **rcheevos thread** | Events posted to Main via `Handler(Looper.getMainLooper())` → `InGameRaViewModel` → overlay/notification. |
-| `RaHttpClient` (rapi standalone) | **Dispatchers.IO** | Coroutines + OkHttp. Used by AchievementsActivity/ViewModel to fetch without a running core. |
-| Teardown / GL destroy | **Main thread** | Order: `super.onDestroy()` BEFORE `dispose()` → dispatch ON_DESTROY frees ~90MB natives. `RaSessionManager` calls `rc_client_unload_game` + `rc_client_destroy` BEFORE core destroyed. `InGameRaViewModel.onCleared()` cleans up. |
+| Component                        | Thread                           | Details                                                                                                                                                                                                                           |
+| -------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rc_client_do_frame` (RA)        | **Main thread**                  | Driven by `GLRetroEvents.FrameRendered` Flow (already on main dispatcher). Called 1× per frame.                                                                                                                                   |
+| `read_memory` callback (RA)      | **rcheevos thread** (background) | Reads via `LibretroDroidMemoryJni.getMemoryData(RETRO_MEMORY_SYSTEM_RAM)` → `ByteBuffer` → copy to output buffer. Pointer valid only while core running.                                                                          |
+| `server_call` callback (RA)      | **Any thread** (OkHttp callback) | `RaHttpClient` does async OkHttp; on response invokes C callback via JNI `nativeServerCallComplete`. Marshaling thread-safe (`AttachCurrentThread` if needed).                                                                    |
+| `event_handler` callbacks (RA)   | **rcheevos thread**              | Events posted to Main via `Handler(Looper.getMainLooper())` → `InGameRaViewModel` → overlay/notification.                                                                                                                         |
+| `RaHttpClient` (rapi standalone) | **Dispatchers.IO**               | Coroutines + OkHttp. Used by AchievementsActivity/ViewModel to fetch without a running core.                                                                                                                                      |
+| Teardown / GL destroy            | **Main thread**                  | Order: `super.onDestroy()` BEFORE `dispose()` → dispatch ON_DESTROY frees ~90MB natives. `RaSessionManager` calls `rc_client_unload_game` + `rc_client_destroy` BEFORE core destroyed. `InGameRaViewModel.onCleared()` cleans up. |
 
 **Invalid pointer guard (game unload/reload):** `read_memory` may be called after unload if rcheevos still processing a previous frame → defense: `getMemoryData` returns `null` if core not initialized; `read_memory` returns 0 bytes read (rcheevos treats as read failure, no crash). Torn reads from main thread during achievement evaluation are acceptable in v1 (documented).
 

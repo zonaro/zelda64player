@@ -55,9 +55,10 @@ class RaProfileViewModel(application: Application) : AndroidViewModel(applicatio
             // cached profile is rendered first so the screen remains responsive
             // while this refresh is in flight.
             val result = repository.getProfile(forceRefresh = true)
-            result.onSuccess { _state.value = RaProfileUiState.Content(it) }.onFailure {
-                if (cached == null) _state.value = RaProfileUiState.Error
-            }
+            result.onSuccess { _state.value = RaProfileUiState.Content(it) }
+                .onFailure {
+                    if (cached == null) _state.value = RaProfileUiState.Error
+                }
         }
     }
 }

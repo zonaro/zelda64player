@@ -150,11 +150,6 @@ class HackDetailDialog : DialogFragment() {
             binding.detailTags.text = getString(R.string.detail_tags, hack.tags.joinToString(", "))
             binding.detailTags.visibility = View.VISIBLE
         }
-        if (hack.compatibleCores.isNotEmpty()) {
-            binding.detailCores.text =
-                    getString(R.string.detail_cores, hack.compatibleCores.joinToString(", "))
-            binding.detailCores.visibility = View.VISIBLE
-        }
 
         binding.detailBaseInfo.text =
                 getString(

@@ -24,11 +24,11 @@ import br.com.redclaw.zelda64player.tracker.assets.graphics.N64TextureFormat
  * @param tlutOffset byte offset of the TLUT inside the same file (CI8 only)
  */
 data class IconMapping(
-    val itemId: String,
-    val dmaFileIndex: Int,
-    val offset: Int,
-    val width: Int = 32,
-    val height: Int = 32,
-    val format: N64TextureFormat = N64TextureFormat.RGBA16,
-    val tlutOffset: Int? = null,
+        val itemId: String,
+        val dmaFileIndex: Int,
+        val offset: Int,
+        val width: Int = 32,
+        val height: Int = 32,
+        val format: N64TextureFormat = N64TextureFormat.RGBA16,
+        val tlutOffset: Int? = null,
 )

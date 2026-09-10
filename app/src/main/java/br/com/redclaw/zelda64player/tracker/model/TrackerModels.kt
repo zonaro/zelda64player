@@ -34,7 +34,10 @@ data class TrackerItem(
         val id: String,
         @StringRes val nameRes: Int,
         @DrawableRes val iconRes: Int = 0,
-        /** Cache key for ROM-extracted PNG (defaults to [id]). When a cached PNG exists it is used instead of [iconRes]. */
+        /**
+         * Cache key for ROM-extracted PNG (defaults to [id]). When a cached PNG exists it is used
+         * instead of [iconRes].
+         */
         val assetKey: String = id,
         val maxCount: Int = 1,
         /** When non-empty, the item cycles through these label/icon variants (0 = off). */

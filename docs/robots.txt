@@ -20,7 +20,6 @@ Disallow: /assets/styles.css
 Disallow: /catalog.example.json
 
 # Allow important files
-Allow: /catalog.json
 Allow: /CATALOG.md
 Allow: /llms.txt
 Allow: /sitemap.xml

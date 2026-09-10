@@ -275,6 +275,25 @@ static pending_request_t *remove_pending_request(int id)
     return found;
 }
 
+/* Settle callbacks while their client still exists. Durable awards remain in Kotlin's journal. */
+static void cancel_pending_requests(void)
+{
+    for (;;) {
+        pthread_mutex_lock(&g_pending_mutex);
+        pending_request_t *request = g_pending;
+        if (request) g_pending = request->next;
+        pthread_mutex_unlock(&g_pending_mutex);
+        if (!request) break;
+        const char *body = "{\"Success\":false,\"Error\":\"Session ended\"}";
+        rc_api_server_response_t response = {0};
+        response.body = body;
+        response.body_length = strlen(body);
+        response.http_status_code = 400;
+        request->callback(&response, request->callback_data);
+        free(request);
+    }
+}
+
 static void client_event_handler(const rc_client_event_t *event, rc_client_t *client)
 {
     (void)client;
@@ -460,6 +479,8 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeCreate
         if (g_client != NULL)
         {
             rc_client_set_event_handler(g_client, client_event_handler);
+            /* Memory is valid only during the core-synchronized frame callback. */
+            rc_client_set_allow_background_memory_reads(g_client, 0);
             /* Hardcore stays disabled until the User-Agent is validated by RAdmin. */
             rc_client_set_hardcore_enabled(g_client, 0);
         }
@@ -477,8 +498,11 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeDestro
     pthread_mutex_lock(&g_client_mutex);
     if (g_client != NULL)
     {
+        cancel_pending_requests();
         rc_client_destroy(g_client);
         g_client = NULL;
+        g_mem_base = NULL;
+        g_mem_size = 0;
     }
     if (g_listener != NULL)
     {
@@ -624,6 +648,7 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeUnload
     pthread_mutex_lock(&g_client_mutex);
     if (g_client != NULL && rc_client_is_game_loaded(g_client))
     {
+        cancel_pending_requests();
         rc_client_unload_game(g_client);
     }
     pthread_mutex_unlock(&g_client_mutex);
@@ -634,14 +659,11 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeSetMem
     JNIEnv *env, jobject thiz, jobject byte_buffer)
 {
     (void)thiz;
-    if (byte_buffer == NULL)
-    {
-        g_mem_base = NULL;
-        g_mem_size = 0;
-        return;
-    }
-    g_mem_base = (*env)->GetDirectBufferAddress(env, byte_buffer);
-    g_mem_size = (size_t)(*env)->GetDirectBufferCapacity(env, byte_buffer);
+    pthread_mutex_lock(&g_client_mutex);
+    g_mem_base = byte_buffer ? (*env)->GetDirectBufferAddress(env, byte_buffer) : NULL;
+    const jlong capacity = byte_buffer ? (*env)->GetDirectBufferCapacity(env, byte_buffer) : 0;
+    g_mem_size = g_mem_base && capacity > 0 ? (size_t)capacity : 0;
+    pthread_mutex_unlock(&g_client_mutex);
 }
 
 JNIEXPORT void JNICALL
@@ -650,13 +672,24 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeDoFram
 {
     (void)env;
     (void)thiz;
-    /* Lock-free fast path: rc_client_do_frame only touches client state owned
-       by the calling thread's evaluation cycle; g_client teardown happens on
-       the same (main) thread in practice. */
-    if (g_client != NULL)
+    /* Serializes the GL frame with HTTP completion, idle and teardown. */
+    pthread_mutex_lock(&g_client_mutex);
+    if (g_client != NULL && g_mem_base != NULL)
     {
         rc_client_do_frame(g_client);
     }
+    pthread_mutex_unlock(&g_client_mutex);
+}
+
+JNIEXPORT void JNICALL
+Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeIdle(
+    JNIEnv *env, jobject thiz)
+{
+    (void)env;
+    (void)thiz;
+    pthread_mutex_lock(&g_client_mutex);
+    if (g_client != NULL) rc_client_idle(g_client);
+    pthread_mutex_unlock(&g_client_mutex);
 }
 
 JNIEXPORT void JNICALL
@@ -666,9 +699,11 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeComple
 {
     (void)thiz;
 
+    pthread_mutex_lock(&g_client_mutex);
     pending_request_t *found = remove_pending_request((int)request_id);
     if (found == NULL)
     {
+        pthread_mutex_unlock(&g_client_mutex);
         return;
     }
 
@@ -711,6 +746,7 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeComple
         (*env)->ReleaseStringUTFChars(env, error_message, error_cstr);
     }
     free(found);
+    pthread_mutex_unlock(&g_client_mutex);
 }
 
 /* ---------------------------------------------------------------------------
@@ -1158,5 +1194,102 @@ Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeProces
     rc_api_destroy_fetch_user_unlocks_response(&response);
     jstring result = (*env)->NewStringUTF(env, sb.data);
     free(sb.data);
+    return result;
+}
+
+JNIEXPORT jbyteArray JNICALL
+Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeSerializeProgress(JNIEnv *env, jobject thiz)
+{
+    (void)thiz;
+    pthread_mutex_lock(&g_client_mutex);
+    jbyteArray result = NULL;
+    if (g_client && rc_client_is_game_loaded(g_client) && !rc_client_get_hardcore_enabled(g_client)) {
+        size_t size = rc_client_progress_size(g_client);
+        if (size > 0 && size <= 16 * 1024 * 1024) {
+            uint8_t *data = (uint8_t *)malloc(size);
+            if (data && rc_client_serialize_progress_sized(g_client, data, size) == RC_OK) {
+                result = (*env)->NewByteArray(env, (jsize)size);
+                if (result) (*env)->SetByteArrayRegion(env, result, 0, (jsize)size, (jbyte *)data);
+            }
+            free(data);
+        }
+    }
+    pthread_mutex_unlock(&g_client_mutex);
+    return result;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeDeserializeProgress(JNIEnv *env, jobject thiz, jbyteArray bytes)
+{
+    (void)thiz;
+    pthread_mutex_lock(&g_client_mutex);
+    jboolean success = JNI_FALSE;
+    if (g_client && rc_client_is_game_loaded(g_client) && !rc_client_get_hardcore_enabled(g_client)) {
+        if (!bytes) {
+            rc_client_reset(g_client);
+            success = JNI_TRUE;
+        } else {
+            jsize size = (*env)->GetArrayLength(env, bytes);
+            jbyte *data = size > 0 && size <= 16 * 1024 * 1024 ? (*env)->GetByteArrayElements(env, bytes, NULL) : NULL;
+            success = data && rc_client_deserialize_progress_sized(g_client, (const uint8_t *)data, (size_t)size) == RC_OK;
+            if (data) (*env)->ReleaseByteArrayElements(env, bytes, data, JNI_ABORT);
+            if (!success) rc_client_reset(g_client);
+        }
+    }
+    pthread_mutex_unlock(&g_client_mutex);
+    return success;
+}
+
+JNIEXPORT void JNICALL
+Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeResetProgress(JNIEnv *env, jobject thiz)
+{
+    (void)env; (void)thiz;
+    pthread_mutex_lock(&g_client_mutex);
+    if (g_client) rc_client_reset(g_client);
+    pthread_mutex_unlock(&g_client_mutex);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeIsHardcore(JNIEnv *env, jobject thiz)
+{
+    (void)env; (void)thiz;
+    pthread_mutex_lock(&g_client_mutex);
+    jboolean result = g_client && rc_client_get_hardcore_enabled(g_client);
+    pthread_mutex_unlock(&g_client_mutex);
+    return result;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeCanPause(JNIEnv *env, jobject thiz)
+{
+    (void)env; (void)thiz;
+    pthread_mutex_lock(&g_client_mutex);
+    jboolean result = !g_client || !rc_client_get_hardcore_enabled(g_client) || rc_client_can_pause(g_client, NULL);
+    pthread_mutex_unlock(&g_client_mutex);
+    return result;
+}
+
+JNIEXPORT jobjectArray JNICALL
+Java_br_com_redclaw_zelda64player_retroachievements_jni_RcheevosJni_nativeBuildAwardRequest(
+    JNIEnv *env, jobject thiz, jstring username, jstring token, jlong achievement_id, jboolean hardcore, jstring hash, jlong seconds)
+{
+    (void)thiz;
+    if (achievement_id <= 0 || achievement_id > UINT32_MAX || seconds < 0 || seconds > UINT32_MAX) return NULL;
+    rc_api_award_achievement_request_t params;
+    memset(&params, 0, sizeof(params));
+    params.username = (*env)->GetStringUTFChars(env, username, NULL);
+    params.api_token = (*env)->GetStringUTFChars(env, token, NULL);
+    params.game_hash = (*env)->GetStringUTFChars(env, hash, NULL);
+    params.achievement_id = (uint32_t)achievement_id;
+    params.hardcore = hardcore ? 1 : 0;
+    params.seconds_since_unlock = (uint32_t)seconds;
+    rc_api_request_t request;
+    memset(&request, 0, sizeof(request));
+    int rc = rc_api_init_award_achievement_request(&request, &params);
+    (*env)->ReleaseStringUTFChars(env, username, params.username);
+    (*env)->ReleaseStringUTFChars(env, token, params.api_token);
+    (*env)->ReleaseStringUTFChars(env, hash, params.game_hash);
+    jobjectArray result = rc == RC_OK ? build_request_array(env, &request) : NULL;
+    rc_api_destroy_request(&request);
     return result;
 }

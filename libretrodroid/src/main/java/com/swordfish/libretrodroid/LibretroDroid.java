@@ -105,6 +105,20 @@ public class LibretroDroid {
     public static native void pause();
     public static native void destroy();
 
+    /** Callback after each retro_run, on GL thread under the core lock; never reenter core APIs. */
+    public static native void setFrameCallback(Runnable callback);
+
+    /** State/policy hooks run under the core lock and must never call another core API. */
+    public interface StateCallback {
+        byte[] onSave(byte[] coreState);
+        byte[] onDecode(byte[] savedState);
+        void onLoaded(byte[] savedState);
+        void onReset();
+        boolean allowCheat();
+        void onPause();
+    }
+    public static native void setStateCallback(StateCallback callback);
+
     public static native void step(GLRetroView retroView);
 
     public static native void reset();

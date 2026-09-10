@@ -46,7 +46,8 @@ class TextureDecoderTest {
         val tlut = ByteArray(512)
         // entry 0: 0x0000 (already zero)
         // entry 1: 0xFFFF
-        tlut[2] = 0xFF.toByte(); tlut[3] = 0xFF.toByte()
+        tlut[2] = 0xFF.toByte()
+        tlut[3] = 0xFF.toByte()
         val pixels = byteArrayOf(0x00, 0x01, 0x01, 0x00) // 2x2
         val out = TextureDecoder.decodeCI8(pixels, 0, 2, 2, tlut, 0)
         assertEquals(4, out.size)
@@ -59,12 +60,17 @@ class TextureDecoderTest {
     @Test
     fun `decodeRGBA16 2x2 image`() {
         // 4 pixels: white, black, red, transparent black
-        val data = byteArrayOf(
-            0xFF.toByte(), 0xFF.toByte(), // white
-            0x00, 0x00, // black transparent
-            0xF8.toByte(), 0x01, // red
-            0x00, 0x00, // black transparent
-        )
+        val data =
+                byteArrayOf(
+                        0xFF.toByte(),
+                        0xFF.toByte(), // white
+                        0x00,
+                        0x00, // black transparent
+                        0xF8.toByte(),
+                        0x01, // red
+                        0x00,
+                        0x00, // black transparent
+                )
         val pixels = TextureDecoder.decodeRGBA16(data, 0, 2, 2)
         assertEquals(4, pixels.size)
         assertEquals(0xFFFFFFFF.toInt(), pixels[0])

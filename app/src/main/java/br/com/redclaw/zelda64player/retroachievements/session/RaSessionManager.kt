@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -82,7 +84,7 @@ data class RaClientEvent(val eventType: Int, val payloadJson: String)
  * ViewModel dispose path).
  *
  * Threading contract:
- * - [start]/[stop]/[onFrame] run on the main thread (GameActivity lifecycle).
+ * - [start]/[stop] run on main; [onFrame] runs synchronously on GL after each core frame.
  * - HTTP responses complete on OkHttp worker threads through
  *   [RcheevosJni.nativeCompleteServerRequest]; rcheevos re-enters our event
  *   handler there, which only posts to flows (thread-safe).
@@ -129,6 +131,8 @@ class RaSessionManager(
     @Volatile
     private var gameLoaded = false
 
+    private var idleJob: Job? = null
+
     private data class PendingOp(val deferred: kotlinx.coroutines.CompletableDeferred<RaOpResult>)
 
     // ------------------------------------------------------------------ //
@@ -166,13 +170,26 @@ class RaSessionManager(
         }
 
         RcheevosJni.nativeCreateClient(this)
+        // Activation may read memory before the load callback completes.
+        val buffer = memoryRegionProvider()
+        if (buffer == null || !buffer.hasRemaining()) {
+            _state.value = RaSessionState.Failed("core memory unavailable")
+            return
+        }
+        RcheevosJni.nativeSetMemoryRegion(buffer)
         RcheevosJni.nativeSetHardcoreEnabled(hardcoreEnabled)
         loginWithToken(username, token, romFile, hackId)
+        idleJob = scope.launch {
+            while (sessionActive) {
+                delay(1000)
+                if (sessionActive) RcheevosJni.nativeIdle()
+            }
+        }
     }
 
     /**
      * Advances achievement/leaderboard evaluation by one frame. Cheap no-op
-     * unless a game is loaded; safe to call for every rendered frame.
+     * unless a game is loaded; invoked after each emulated frame while core memory is locked.
      */
     fun onFrame() {
         if (gameLoaded) {
@@ -187,8 +204,12 @@ class RaSessionManager(
     fun stop() {
         if (!sessionActive) return
         sessionActive = false
+        idleJob?.cancel()
+        idleJob = null
         gameLoaded = false
         memoryRegionProvider = null
+        pendingOps.values.forEach { it.deferred.cancel() }
+        pendingOps.clear()
 
         try {
             RcheevosJni.nativeSetMemoryRegion(null)
@@ -234,11 +255,9 @@ class RaSessionManager(
     }
 
     private suspend fun attachMemoryAndRun(hackId: String) {
-        val buffer = memoryRegionProvider?.invoke()
-        RcheevosJni.nativeSetMemoryRegion(buffer)
-        gameLoaded = buffer != null
         val game = parseGameInfo()
         if (game == null) {
+            gameLoaded = false
             _state.value = RaSessionState.Failed("game info unavailable")
             return
         }
@@ -248,7 +267,10 @@ class RaSessionManager(
                 metadataStore.put(hackId, RaGameIdentity(game.hash, game.id, game.title))
             }
         }
-        if (sessionActive) _state.value = RaSessionState.Running(game)
+        if (sessionActive) {
+            _state.value = RaSessionState.Running(game)
+            gameLoaded = true
+        }
     }
 
     // ------------------------------------------------------------------ //
@@ -279,17 +301,29 @@ class RaSessionManager(
     // ------------------------------------------------------------------ //
 
     override fun onServerRequest(requestId: Int, url: String, postData: String?) {
-        executeServerRequest(scope, http, requestId, url, postData)
+        executeServerRequest(scope, http, requestId, url, postData,
+            br.com.redclaw.zelda64player.Zelda64PlayerApp.raAwardOutbox)
     }
 
     override fun onAsyncResult(opId: Int, resultCode: Int, errorMessage: String?) {
-        pendingOps.remove(opId)?.deferred?.complete(
-            RaOpResult(isSuccess = resultCode == RC_OK, error = errorMessage)
-        )
+        scope.launch(Dispatchers.Main) {
+            pendingOps.remove(opId)?.deferred?.complete(
+                RaOpResult(isSuccess = resultCode == RC_OK, error = errorMessage)
+            )
+        }
     }
 
     override fun onClientEvent(eventType: Int, payloadJson: String) {
-        _events.tryEmit(RaClientEvent(eventType, payloadJson))
+        // Native callbacks may hold the client mutex: defer getters until the callback returns.
+        scope.launch(Dispatchers.Main) {
+            if (!sessionActive) return@launch
+            if (eventType == RcheevosJni.Events.ACHIEVEMENT_TRIGGERED ||
+                eventType == RcheevosJni.Events.GAME_COMPLETED ||
+                eventType == RcheevosJni.Events.SUBSET_COMPLETED) {
+                parseGameInfo()?.let { _state.value = RaSessionState.Running(it) }
+            }
+            _events.emit(RaClientEvent(eventType, payloadJson))
+        }
     }
 
     // ------------------------------------------------------------------ //

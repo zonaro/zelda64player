@@ -16,11 +16,9 @@ cd zelda64player
 ./gradlew assembleDebug
 ```
 
-The first build runs a `prepareCore` Gradle task that downloads the two Libretro cores into `app/src/main/jniLibs`:
-- `mupen64plus_next` (GLES3) — zip from buildbot.libretro.com
-- `parallel_n64` — self-built rolling release (see `.github/workflows/build-parallel-n64.yml`, builds updated dynarec binaries from libretro/parallel-n64 with current NDK), falls back to buildbot nightly zip if unavailable
+The first build runs a `prepareCore` Gradle task that downloads the Libretro core `mupen64plus_next` (GLES3) into `app/src/main/jniLibs` as a zip from buildbot.libretro.com.
 
-Cores already present in `jniLibs` are not re-downloaded; any core unavailable for a given ABI is skipped gracefully.
+The core already present in `jniLibs` is not re-downloaded; any core unavailable for a given ABI is skipped gracefully.
 
 ## 3. Gradle Structure
 

@@ -350,7 +350,6 @@ def hylian_entry(source: Source, slug: str, document: dict[str, Any]) -> dict[st
         "patch": patch,
         "coverImageUrl": thumb_url,
         "tags": tags,
-        "compatibleCores": ["mupen64plus_next_gles3", "parallel_n64"],
         "storeId": "picks",
         "sourceCatalogId": "picks",
         "screenshots": screenshot_urls,

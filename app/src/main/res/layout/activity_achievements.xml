@@ -108,6 +108,16 @@
             android:contentDescription="@string/ra_sort_button"
             android:src="@drawable/ic_tune"
             android:tint="@color/switch_accent" />
+
+        <ImageButton
+            android:id="@+id/achievements_view_toggle"
+            android:layout_width="@dimen/icon_button_size"
+            android:layout_height="@dimen/icon_button_size"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/bg_icon_button"
+            android:contentDescription="@string/ra_view_mode"
+            android:src="@drawable/ic_view_list"
+            android:tint="@color/switch_accent" />
     </LinearLayout>
 
     <TextView

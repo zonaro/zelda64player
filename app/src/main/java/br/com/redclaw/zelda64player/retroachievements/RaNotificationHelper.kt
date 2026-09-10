@@ -102,6 +102,7 @@ object RaNotificationHelper {
                             .setContentText(text)
                             .setCategory(NotificationCompat.CATEGORY_EVENT)
                             .setAutoCancel(true)
+                            .setOnlyAlertOnce(true)
             if (description.isNotBlank()) {
                 builder.setStyle(NotificationCompat.BigTextStyle().bigText(description))
             }
@@ -122,6 +123,19 @@ object RaNotificationHelper {
             val bitmap = loadBadgeBitmap(appContext, badgeUrl)
             if (bitmap != null) buildAndNotify(bitmap)
         }
+    }
+
+    /** Reports a definitive server rejection without exposing credentials or raw server payloads. */
+    fun postSyncFailure(context: Context) {
+        if (!canPost(context)) return
+        ensureChannel(context)
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_trophy)
+            .setContentTitle(context.getString(R.string.ra_notification_channel))
+            .setContentText(context.getString(R.string.ra_award_sync_rejected))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.ra_award_sync_rejected)))
+            .setAutoCancel(true).setOnlyAlertOnce(true).build()
+        runCatching { NotificationManagerCompat.from(context).notify(BASE_NOTIFICATION_ID - 1, notification) }
     }
 
     private suspend fun loadBadgeBitmap(context: Context, url: String): Bitmap? =

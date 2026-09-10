@@ -10,3 +10,7 @@
 -keep class br.com.redclaw.zelda64player.retroachievements.jni.RaNativeListener {
     *;
 }
+
+# LibretroDroid resolves these state/policy callbacks by name through JNI.
+-keep interface com.swordfish.libretrodroid.LibretroDroid$StateCallback { *; }
+-keepclassmembers class * implements com.swordfish.libretrodroid.LibretroDroid$StateCallback { *; }

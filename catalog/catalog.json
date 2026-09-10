@@ -34,10 +34,6 @@
         "restoration",
         "enhancement"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "supportedGames": "OoT",
       "developerLinks": [
         {
@@ -77,10 +73,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "screenshots": [
         "https://hylianmodding.com/mods/ultimate_trial/screenshots/screenshot_1.png",
@@ -146,10 +138,6 @@
       "tags": [
         "quality-of-life"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "supportedGames": "MM",
       "downloadTarget": {
         "type": "external",
@@ -193,10 +181,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "screenshots": [
         "https://hylianmodding.com/mods/master_of_time_revisited/screenshots/screenshot_1.png",
@@ -253,10 +237,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "screenshots": [
         "https://hylianmodding.com/mods/the_missing_link/screenshots/screenshot_0.png",
@@ -322,10 +302,6 @@
         "story",
         "new-content"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "supportedGames": "OoT",
       "downloadTarget": {
         "type": "external",
@@ -369,10 +345,6 @@
       "tags": [
         "new-content"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "supportedGames": "OoT",
       "developerLinks": [
         {
@@ -410,10 +382,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -483,10 +451,6 @@
         "mod",
         "Demo"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -552,10 +516,6 @@
       "tags": [
         "mod",
         "Complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -625,10 +585,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -694,10 +650,6 @@
       "tags": [
         "mod",
         "Demo"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -765,10 +717,6 @@
         "new-content",
         "dungeon"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "coverImageUrl": "https://hylianmodding.com/mods/zelda's_birthday/screenshots/thumbnail.png",
       "supportedGames": "OoT",
       "developerLinks": [],
@@ -802,10 +750,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -874,10 +818,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -944,10 +884,6 @@
         "difficulty",
         "new-content"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "coverImageUrl": "https://hylianmodding.com/mods/demon's_quest/screenshots/thumbnail.png",
       "supportedGames": "OoT",
       "developerLinks": [
@@ -987,10 +923,6 @@
       "tags": [
         "mod",
         "Demo"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "coverImageUrl": "https://hylianmodding.com/mods/the_helix_blade/screenshots/thumbnail.jpg",
       "screenshots": [
@@ -1043,10 +975,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -1114,10 +1042,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "coverImageUrl": "https://hylianmodding.com/mods/hero_of_law/screenshots/thumbnail.png",
       "screenshots": [
         "https://hylianmodding.com/mods/hero_of_law/screenshots/screenshot_1.png",
@@ -1182,10 +1106,6 @@
         "mod",
         "Demo"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -1248,10 +1168,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -1303,10 +1219,6 @@
       "tags": [
         "mod",
         "Demo"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -1360,10 +1272,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/hm-jam-1/barjacks_merda/thumbnail.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -1423,10 +1331,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -1484,10 +1388,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/burger-quest/burger-quest.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -1547,10 +1447,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -1608,10 +1504,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/corruptions-embrace/thumbnail.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -1671,10 +1563,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -1732,10 +1620,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/crystal-clocks/crystal-clocks.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -1795,10 +1679,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -1856,10 +1736,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/dampes-quest/thumbnail.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -1919,10 +1795,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -1974,10 +1846,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -2037,10 +1905,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -2103,10 +1967,6 @@
         "mod",
         "Demo"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -2167,10 +2027,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -2228,10 +2084,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/escape-from-the-facility/escape-from-the-facility.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -2291,10 +2143,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -2352,10 +2200,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/escaping-souls/escaping-souls.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -2415,10 +2259,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -2477,10 +2317,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -2542,10 +2378,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -2604,10 +2436,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -2659,10 +2487,6 @@
       "tags": [
         "mod",
         "Demo"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -2716,10 +2540,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/horrors-of-arcadia/thumbnail.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -2779,10 +2599,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -2852,10 +2668,6 @@
         "mod",
         "Demo"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -2916,10 +2728,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -2977,10 +2785,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2025-crossover/link-in-golden-sun/thumbnail.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -3040,10 +2844,6 @@
       "tags": [
         "mod",
         "Demo"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -3106,10 +2906,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -3170,10 +2966,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -3237,10 +3029,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -3300,10 +3088,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -3355,10 +3139,6 @@
       "tags": [
         "mod",
         "Complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -3413,10 +3193,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -3481,10 +3257,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -3545,10 +3317,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -3614,10 +3382,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -3677,10 +3441,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -3738,10 +3498,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -3806,10 +3562,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -3867,10 +3619,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/hm-jam-1/return_to_stone_tower/thumbnail.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -3930,10 +3678,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -3992,10 +3736,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -4059,10 +3799,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -4114,10 +3850,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -4186,10 +3918,6 @@
         "mod",
         "Demo"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -4250,10 +3978,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -4312,10 +4036,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -4380,10 +4100,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -4441,10 +4157,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/the-cursed-mansion/thumbnail.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -4505,10 +4217,6 @@
         "mod",
         "Demo"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -4568,10 +4276,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -4622,10 +4326,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2024-horror/the-masca-festival/thumbnail.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -4685,10 +4385,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -4746,10 +4442,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2023-escape-room/the-worst-torture/the-worst-torture.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -4809,10 +4501,6 @@
       "tags": [
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [],
@@ -4864,10 +4552,6 @@
       "tags": [
         "mod",
         "Demo"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -4922,10 +4606,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -4993,10 +4673,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -5060,10 +4736,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -5125,10 +4797,6 @@
       "tags": [
         "mod",
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
@@ -5197,10 +4865,6 @@
         "mod",
         "Demo"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -5267,10 +4931,6 @@
         "mod",
         "complete"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -5332,10 +4992,6 @@
         "mod",
         "Demo"
       ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
-      ],
       "storeId": "picks",
       "sourceCatalogId": "picks",
       "screenshots": [
@@ -5395,10 +5051,6 @@
       "coverImageUrl": "https://hylianmodding.com/competitions/2025-crossover/zeldarune/thumbnail.png",
       "tags": [
         "complete"
-      ],
-      "compatibleCores": [
-        "mupen64plus_next_gles3",
-        "parallel_n64"
       ],
       "storeId": "picks",
       "sourceCatalogId": "picks",

@@ -168,7 +168,6 @@ data class HackEntry(
         val patch: PatchRef? = null,
         val coverImageUrl: String? = null,
         val tags: List<String> = emptyList(),
-        val compatibleCores: List<String> = emptyList(),
         /** Optional Ocarina songs contributed by a downloaded hack (catalog extension). */
         val ocarinaSongs: List<OcarinaSong> = emptyList(),
         /**
@@ -224,7 +223,6 @@ data class HackEntry(
                         put("patch", patch?.toJson() ?: JSONObject.NULL)
                         put("coverImageUrl", coverImageUrl)
                         put("tags", JSONArray(tags))
-                        put("compatibleCores", JSONArray(compatibleCores))
                         put("ocarinaSongs", JSONArray(ocarinaSongs.map { it.toJson() }))
                         if (retroAchievements != null) {
                                 put("retroAchievements", retroAchievements.toJson())
@@ -285,12 +283,6 @@ data class HackEntry(
                                 tags =
                                         if (o.has("tags")) jsonToStringList(o.getJSONArray("tags"))
                                         else emptyList(),
-                                compatibleCores =
-                                        if (o.has("compatibleCores")) {
-                                                jsonToStringList(o.getJSONArray("compatibleCores"))
-                                        } else {
-                                                emptyList()
-                                        },
                                 ocarinaSongs =
                                         if (o.has("ocarinaSongs")) {
                                                 val arr = o.getJSONArray("ocarinaSongs")

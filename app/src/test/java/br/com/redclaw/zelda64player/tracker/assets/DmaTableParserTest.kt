@@ -18,7 +18,9 @@ class DmaTableParserTest {
 
     private fun writeDmaTable(entries: List<DmaEntry>, terminator: Boolean = true): File {
         val file = tmp.newFile("rom.z64")
-        val buf = ByteBuffer.allocate((entries.size + if (terminator) 1 else 0) * 16).order(ByteOrder.BIG_ENDIAN)
+        val buf =
+                ByteBuffer.allocate((entries.size + if (terminator) 1 else 0) * 16)
+                        .order(ByteOrder.BIG_ENDIAN)
         for (e in entries) {
             buf.putInt(e.vromStart)
             buf.putInt(e.vromEnd)
@@ -26,7 +28,10 @@ class DmaTableParserTest {
             buf.putInt(e.romEnd)
         }
         if (terminator) {
-            buf.putInt(0); buf.putInt(0); buf.putInt(0); buf.putInt(0)
+            buf.putInt(0)
+            buf.putInt(0)
+            buf.putInt(0)
+            buf.putInt(0)
         }
         file.writeBytes(buf.array())
         return file
@@ -34,10 +39,11 @@ class DmaTableParserTest {
 
     @Test
     fun `parse entries until terminator`() {
-        val entries = listOf(
-            DmaEntry(0, 0x1000, 0x2000, 0x1000, 0),
-            DmaEntry(1, 0x2000, 0x3000, 0x2000, 0x2800),
-        )
+        val entries =
+                listOf(
+                        DmaEntry(0, 0x1000, 0x2000, 0x1000, 0),
+                        DmaEntry(1, 0x2000, 0x3000, 0x2000, 0x2800),
+                )
         val file = writeDmaTable(entries)
         val parser = DmaTableParser(file, 0L)
         val parsed = parser.parseEntries()
@@ -69,10 +75,15 @@ class DmaTableParserTest {
         val entries = listOf(DmaEntry(0, 0x1000, 0x2000, 0x1000, 0))
         val tableBuf = ByteBuffer.allocate(32).order(ByteOrder.BIG_ENDIAN)
         for (e in entries) {
-            tableBuf.putInt(e.vromStart); tableBuf.putInt(e.vromEnd)
-            tableBuf.putInt(e.romStart); tableBuf.putInt(e.romEnd)
+            tableBuf.putInt(e.vromStart)
+            tableBuf.putInt(e.vromEnd)
+            tableBuf.putInt(e.romStart)
+            tableBuf.putInt(e.romEnd)
         }
-        tableBuf.putInt(0); tableBuf.putInt(0); tableBuf.putInt(0); tableBuf.putInt(0)
+        tableBuf.putInt(0)
+        tableBuf.putInt(0)
+        tableBuf.putInt(0)
+        tableBuf.putInt(0)
         file.writeBytes(padding + tableBuf.array())
         val parser = DmaTableParser(file, 0x100L)
         val parsed = parser.parseEntries()
@@ -86,8 +97,14 @@ class DmaTableParserTest {
         val header = ByteArray(0x1000)
         // DMA entry 0: vrom 0x1000-0x1010, rom 0x1000-0x1010 (uncompressed, 16 bytes)
         val dma = ByteBuffer.allocate(32).order(ByteOrder.BIG_ENDIAN)
-        dma.putInt(0x1000); dma.putInt(0x1010); dma.putInt(0x1000); dma.putInt(0)
-        dma.putInt(0); dma.putInt(0); dma.putInt(0); dma.putInt(0)
+        dma.putInt(0x1000)
+        dma.putInt(0x1010)
+        dma.putInt(0x1000)
+        dma.putInt(0)
+        dma.putInt(0)
+        dma.putInt(0)
+        dma.putInt(0)
+        dma.putInt(0)
         header[0] = dma.array()[0]
         System.arraycopy(dma.array(), 0, header, 0, 32)
         // Data at 0x1000

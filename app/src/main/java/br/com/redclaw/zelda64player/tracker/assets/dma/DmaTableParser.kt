@@ -19,17 +19,17 @@ import java.nio.channels.FileChannel
 /**
  * Parses the N64 DMA table from a normalized big-endian `.z64` ROM file.
  *
- * Streaming via [FileChannel] — never loads the full ROM into heap (Regra 9).
- * Each entry is 16 bytes (VROM start/end, ROM start/end, all BE u32).
- * The table is terminated by a 16-byte zero entry.
+ * Streaming via [FileChannel] — never loads the full ROM into heap (Regra 9). Each entry is 16
+ * bytes (VROM start/end, ROM start/end, all BE u32). The table is terminated by a 16-byte zero
+ * entry.
  */
 class DmaTableParser(
-    private val romFile: File,
-    private val tableOffset: Long,
+        private val romFile: File,
+        private val tableOffset: Long,
 ) {
     /**
-     * Parse up to [maxEntries] DMA entries starting at [tableOffset].
-     * Stops early on the zero terminator.
+     * Parse up to [maxEntries] DMA entries starting at [tableOffset]. Stops early on the zero
+     * terminator.
      */
     fun parseEntries(maxEntries: Int = 2000): List<DmaEntry> {
         val entries = mutableListOf<DmaEntry>()
@@ -53,9 +53,9 @@ class DmaTableParser(
     }
 
     /**
-     * Read raw bytes for a single [entry] from ROM.
-     * Returns the compressed bytes if [DmaEntry.isCompressed], otherwise the raw bytes.
-     * Caller is responsible for Yaz0 decompression when needed.
+     * Read raw bytes for a single [entry] from ROM. Returns the compressed bytes if
+     * [DmaEntry.isCompressed], otherwise the raw bytes. Caller is responsible for Yaz0
+     * decompression when needed.
      */
     fun readEntryBytes(entry: DmaEntry): ByteArray {
         val offset = entry.romStart.toLong() and 0xFFFFFFFFL

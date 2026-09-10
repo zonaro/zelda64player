@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Focused state mirrors the Switch focus border so the selection outline
+         follows the cell silhouette exactly (same radius as shape_card). -->
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/color_surface_container" />
+            <stroke
+                android:width="3dp"
+                android:color="?attr/colorPrimary" />
+            <corners android:radius="@dimen/switch_card_corner_radius" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/color_surface_container" />
+            <corners android:radius="@dimen/switch_card_corner_radius" />
+        </shape>
+    </item>
+</selector>

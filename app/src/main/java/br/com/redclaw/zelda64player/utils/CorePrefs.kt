@@ -3,14 +3,19 @@ package br.com.redclaw.zelda64player.utils
 import android.content.Context
 
 /**
- * Shared read/write access to the selected LibRetro core index.
+ * Centralized SharedPreferences access.
  *
- * Used by both [LibraryActivity] (settings core dialog) and [GameActivityViewModel] (to pick the
- * core .so at launch) so the choice lives in exactly one place.
+ * The emulator core is now fixed to mupen64plus_next (GLES3) — no core selection UI or preference
+ * exists anymore.
  */
 object CorePrefs {
         private const val PREFS_NAME = "ludere_prefs"
-        private const val KEY = "selected_core_index"
+
+        /** Fixed Libretro core library (mupen64plus_next GLES3). */
+        const val MUPEN_LIB = "libcore_mupen_gles3.so"
+
+        /** Returns the fixed core library name. Kept for call-site compatibility. */
+        fun getSelectedCoreLib(@Suppress("UNUSED_PARAMETER") context: Context): String = MUPEN_LIB
 
         // RetroAchievements preference keys.
         private const val PREF_RA_ENABLED = "pref_ra_enabled"
@@ -56,24 +61,6 @@ object CorePrefs {
         private const val PREF_BUTTON_STICK_ENABLED = "button_stick_enabled"
         private const val PREF_OVERLAY_SCALE = "overlay_scale"
         private const val PREF_RIGHT_TAP_ACTION = "right_tap_action"
-
-        val options = arrayOf("Mupen64Plus Next (GLES3)", "Parallel N64")
-        val libNames = arrayOf("libcore_mupen_gles3.so", "libcore_parallel.so")
-
-        fun getSelectedCoreIndex(context: Context): Int =
-                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getInt(KEY, 0)
-
-        fun getSelectedCoreLib(context: Context): String {
-                val index = getSelectedCoreIndex(context)
-                return libNames.getOrElse(index) { libNames[0] }
-        }
-
-        fun setSelectedCoreIndex(context: Context, index: Int) {
-                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                        .edit()
-                        .putInt(KEY, index)
-                        .apply()
-        }
 
         // ---- RetroAchievements ----
 
@@ -137,6 +124,21 @@ object CorePrefs {
                 context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                         .edit()
                         .putBoolean(PREF_RA_PROGRESS_INDICATORS, enabled)
+                        .apply()
+        }
+
+        // Achievements list view mode: false = list, true = grid (badge thumbnails).
+        private const val PREF_RA_VIEW_MODE = "pref_ra_view_mode"
+
+        /** Whether the achievements screens should open in grid (badge) mode. Default list. */
+        fun getRaAchievementsGrid(context: Context): Boolean =
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                        .getBoolean(PREF_RA_VIEW_MODE, false)
+
+        fun setRaAchievementsGrid(context: Context, grid: Boolean) {
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                        .edit()
+                        .putBoolean(PREF_RA_VIEW_MODE, grid)
                         .apply()
         }
 

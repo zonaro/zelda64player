@@ -9,7 +9,9 @@ import org.junit.Test
 
 class Yaz0DecompressorTest {
 
-    /** Build a minimal Yaz0 block: header + body that decompresses to [payload] via literals only. */
+    /**
+     * Build a minimal Yaz0 block: header + body that decompresses to [payload] via literals only.
+     */
     private fun yaz0LiteralOnly(payload: ByteArray): ByteArray {
         val header = ByteBuffer.allocate(16).order(ByteOrder.BIG_ENDIAN)
         header.put("Yaz0".toByteArray(Charsets.US_ASCII))

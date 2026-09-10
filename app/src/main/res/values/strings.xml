@@ -121,7 +121,6 @@
     <string name="detail_base_match">Você possui uma ROM base compatível.</string>
     <string name="detail_base_no_match">Nenhuma ROM base compatível importada.</string>
     <string name="detail_tags">Tags: %1$s</string>
-    <string name="detail_cores">Cores compatíveis: %1$s</string>
     <string name="detail_download">Baixar</string>
     <string name="detail_update">Atualizar</string>
     <string name="detail_installing">Instalando… %1$d%%</string>
@@ -247,6 +246,8 @@
     <string name="settings_ra_api_key_saved">Chave salva!</string>
     <string name="settings_ra_api_key_error_missing">Digite a chave antes de salvar.</string>
     <string name="settings_ra_status_logged_in_no_key">Conectado. Adicione a chave da Web API acima para ver o perfil.</string>
+    <string name="settings_ra_credentials_title">Credenciais RetroAchievements</string>
+    <string name="settings_ra_credentials_desc">Esta tela é protegida contra captura de tela. Sua senha é usada apenas uma vez; guardamos somente o token, de forma criptografada.</string>
 
     <!-- Achievements screen -->
     <string name="achievements_title">Conquistas</string>
@@ -270,6 +271,11 @@
     <string name="ra_sort_rarity_common">Raridade (mais comum primeiro)</string>
     <string name="ra_missable">Perdível</string>
     <string name="ra_rarity">%1$.1f%% dos jogadores</string>
+    <string name="ra_view_list">Lista</string>
+    <string name="ra_view_grid">Grade</string>
+    <string name="ra_view_mode">Modo de visualização</string>
+    <string name="ra_view_mode_dialog_title">Visualização</string>
+    <string name="ra_grid_cell_desc">Conquista: %1$s · %2$d pts</string>
 
     <!-- RetroAchievements player profile -->
     <string name="ra_profile_title">Perfil RetroAchievements</string>
@@ -346,16 +352,22 @@
     <string name="ra_toast_disabled">RetroAchievements desativado. Ative nas configurações.</string>
     <string name="ra_toast_not_logged_in">Entre com sua conta RetroAchievements nas configurações para acompanhar conquistas.</string>
     <string name="ra_toast_progress">RetroAchievements: %1$d de %2$d conquistas desbloqueadas</string>
+    <string name="ra_toast_progress_mode">RetroAchievements: %1$d de %2$d conquistas desbloqueadas · %3$s</string>
     <string name="ra_toast_untracked">Este jogo não tem conquistas no RetroAchievements.</string>
     <string name="ra_toast_connect_failed">Não foi possível conectar ao RetroAchievements.</string>
+    <string name="ra_mode_hardcore">Hardcore</string>
+    <string name="ra_mode_casual">Casual</string>
+    <string name="ra_hardcore_state_blocked">Estados salvos bloqueados no modo Hardcore.</string>
+    <string name="ra_hardcore_pause_disabled">Pausa bloqueada no Hardcore — mudando para Casual.</string>
+    <string name="ra_hardcore_macro_blocked">Ocarina automática bloqueada no modo Hardcore.</string>
+    <string name="ra_award_sync_failed">Falha ao sincronizar conquista.</string>
+    <string name="ra_award_sync_rejected">Conquista rejeitada pelo servidor.</string>
+    <string name="toast_state_load_failed">Falha ao carregar estado.</string>
+    <string name="toast_state_save_failed">Falha ao salvar estado.</string>
+    <string name="toast_fast_forward_blocked_ra">Avanço rápido bloqueado no modo Hardcore do RetroAchievements.</string>
 
     <!-- Settings: about / licenses -->
     <string name="settings_about_licenses">Este app usa rcheevos (MIT) para a integração RetroAchievements, xdelta3 (Apache-2.0) para decodificação de patches VCDIFF, além de LibretroDroid e RadialGamePad (GPL-3.0). Licenças completas no repositório do projeto.</string>
-
-    <!-- Settings: emulator core -->
-    <string name="settings_core_title">Core emulador</string>
-    <string name="settings_core_current">Atual: %1$s</string>
-    <string name="settings_core_change">Trocar core</string>
 
     <!-- Settings: about -->
     <string name="settings_about_title">Sobre</string>
