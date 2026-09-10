@@ -204,14 +204,12 @@ class TrackerDialogFragment : DialogFragment() {
             view?.post { selectTab(selected) }
         }
         // Kick off ROM asset extraction early (before ItemsTab is created) so
-        // the cache is ready when the grid builds. Use view.post to ensure
-        // the view is attached and lifecycle is STARTED.
-        view?.post {
-            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-                viewModel.ensureAssetsExtracted()
-                if (isAdded && childFragmentManager.findFragmentByTag("tab_0") is ItemsTab) {
-                    selectTab(0)
-                }
+        // the cache is ready when the grid builds. Use lifecycleScope (not
+        // viewLifecycleOwner — DialogFragment with onCreateDialog has no view).
+        lifecycleScope.launchWhenStarted {
+            viewModel.ensureAssetsExtracted()
+            if (isAdded && childFragmentManager.findFragmentByTag("tab_0") is ItemsTab) {
+                selectTab(0)
             }
         }
     }
