@@ -42,105 +42,131 @@ class RomAssetExtractor(
         private val cache: TrackerAssetCache = TrackerAssetCache(context),
 ) {
 
-    suspend fun extractAll(baseRomFile: File, game: TrackerGame): Result<ExtractReport> =
-            withContext(Dispatchers.IO) {
-                runCatching {
-                    require(baseRomFile.exists()) {
-                        "Base ROM not found: ${baseRomFile.absolutePath}"
-                    }
+        suspend fun extractAll(baseRomFile: File, game: TrackerGame): Result<ExtractReport> =
+                withContext(Dispatchers.IO) {
+                        runCatching {
+                                require(baseRomFile.exists()) {
+                                        "Base ROM not found: ${baseRomFile.absolutePath}"
+                                }
 
-                    val crc32 = ChecksumCalculator.crc32(baseRomFile)
-                    val mappings =
-                            when (game) {
-                                TrackerGame.OOT -> OotIconMap.entries
-                                TrackerGame.MM -> MmIconMap.entries
-                            }
-
-                    if (cache.hasValidCache(crc32, mappings.size)) {
-                        return@runCatching ExtractReport(cached = true, extracted = mappings.size)
-                    }
-
-                    val header = RomHeader.fromNormalizedZ64(baseRomFile)
-                    val dmaOffset =
-                            DmaTableOffsets.forRom(header.gameCode, header.versionByte)
-                                    ?: return@runCatching ExtractReport(
-                                            extracted = 0,
-                                            failed = mappings.size,
-                                            errors =
-                                                    listOf(
-                                                            "ROM ${header.gameCode} v${header.versionByte} not supported for extraction"
-                                                    ),
-                                    )
-
-                    val parser = DmaTableParser(baseRomFile, dmaOffset)
-                    val entries = parser.parseEntries()
-
-                    // Cache decompressed archives by DMA index to avoid re-reading
-                    val archiveCache = mutableMapOf<Int, ByteArray>()
-                    fun getArchive(dmaIndex: Int): ByteArray =
-                            archiveCache.getOrPut(dmaIndex) {
-                                val entry =
-                                        entries.getOrNull(dmaIndex)
-                                                ?: error(
-                                                        "DMA entry $dmaIndex not found (table size ${entries.size})"
-                                                )
-                                require(entry.exists) { "DMA entry $dmaIndex does not exist" }
-                                val raw = parser.readEntryBytes(entry)
-                                if (entry.isCompressed) Yaz0Decompressor.decompress(raw) else raw
-                            }
-
-                    var extracted = 0
-                    var failed = 0
-                    val errors = mutableListOf<String>()
-
-                    for (mapping in mappings) {
-                        try {
-                            val archiveBytes = getArchive(mapping.dmaFileIndex)
-                            val pixels =
-                                    when (mapping.format) {
-                                        br.com.redclaw.zelda64player.tracker.assets.graphics
-                                                .N64TextureFormat.RGBA32 ->
-                                                TextureDecoder.decodeRGBA32(
-                                                        archiveBytes,
-                                                        mapping.offset,
-                                                        mapping.width,
-                                                        mapping.height
-                                                )
-                                        br.com.redclaw.zelda64player.tracker.assets.graphics
-                                                .N64TextureFormat.CI8 -> {
-                                            val tlutOff =
-                                                    mapping.tlutOffset
-                                                            ?: error(
-                                                                    "CI8 mapping ${mapping.itemId} missing tlutOffset"
-                                                            )
-                                            TextureDecoder.decodeCI8(
-                                                    archiveBytes,
-                                                    mapping.offset,
-                                                    mapping.width,
-                                                    mapping.height,
-                                                    archiveBytes,
-                                                    tlutOff
-                                            )
+                                val crc32 = ChecksumCalculator.crc32(baseRomFile)
+                                val mappings =
+                                        when (game) {
+                                                TrackerGame.OOT -> OotIconMap.entries
+                                                TrackerGame.MM -> MmIconMap.entries
                                         }
-                                        else ->
-                                                error(
-                                                        "Unsupported format ${mapping.format} for ${mapping.itemId}"
+
+                                if (cache.hasValidCache(crc32, mappings.size)) {
+                                        return@runCatching ExtractReport(
+                                                cached = true,
+                                                extracted = mappings.size
+                                        )
+                                }
+
+                                val header = RomHeader.fromNormalizedZ64(baseRomFile)
+                                android.util.Log.d(
+                                        "TrackerAssets",
+                                        "ROM header: gameCode=${header.gameCode} version=${header.versionByte} title=${header.title}"
+                                )
+                                val dmaOffset =
+                                        DmaTableOffsets.forRom(header.gameCode, header.versionByte)
+                                                ?: return@runCatching ExtractReport(
+                                                        extracted = 0,
+                                                        failed = mappings.size,
+                                                        errors =
+                                                                listOf(
+                                                                        "ROM ${header.gameCode} v${header.versionByte} not supported for extraction"
+                                                                ),
                                                 )
-                                    }
-                            val outFile = cache.fileFor(mapping.itemId, crc32)
-                            TextureDecoder.saveAsPng(pixels, mapping.width, mapping.height, outFile)
-                            extracted++
-                        } catch (e: Exception) {
-                            failed++
-                            errors.add("${mapping.itemId}: ${e.message}")
+                                android.util.Log.d(
+                                        "TrackerAssets",
+                                        "DMA offset: 0x${dmaOffset.toString(16)} for ${header.gameCode}"
+                                )
+
+                                val parser = DmaTableParser(baseRomFile, dmaOffset)
+                                val entries = parser.parseEntries()
+
+                                // Cache decompressed archives by DMA index to avoid re-reading
+                                val archiveCache = mutableMapOf<Int, ByteArray>()
+                                fun getArchive(dmaIndex: Int): ByteArray =
+                                        archiveCache.getOrPut(dmaIndex) {
+                                                val entry =
+                                                        entries.getOrNull(dmaIndex)
+                                                                ?: error(
+                                                                        "DMA entry $dmaIndex not found (table size ${entries.size})"
+                                                                )
+                                                require(entry.exists) {
+                                                        "DMA entry $dmaIndex does not exist"
+                                                }
+                                                val raw = parser.readEntryBytes(entry)
+                                                if (entry.isCompressed)
+                                                        Yaz0Decompressor.decompress(raw)
+                                                else raw
+                                        }
+
+                                var extracted = 0
+                                var failed = 0
+                                val errors = mutableListOf<String>()
+
+                                for (mapping in mappings) {
+                                        try {
+                                                val archiveBytes = getArchive(mapping.dmaFileIndex)
+                                                val pixels =
+                                                        when (mapping.format) {
+                                                                br.com.redclaw.zelda64player.tracker
+                                                                        .assets.graphics
+                                                                        .N64TextureFormat.RGBA32 ->
+                                                                        TextureDecoder.decodeRGBA32(
+                                                                                archiveBytes,
+                                                                                mapping.offset,
+                                                                                mapping.width,
+                                                                                mapping.height
+                                                                        )
+                                                                br.com.redclaw.zelda64player.tracker
+                                                                        .assets.graphics
+                                                                        .N64TextureFormat.CI8 -> {
+                                                                        val tlutOff =
+                                                                                mapping.tlutOffset
+                                                                                        ?: error(
+                                                                                                "CI8 mapping ${mapping.itemId} missing tlutOffset"
+                                                                                        )
+                                                                        TextureDecoder.decodeCI8(
+                                                                                archiveBytes,
+                                                                                mapping.offset,
+                                                                                mapping.width,
+                                                                                mapping.height,
+                                                                                archiveBytes,
+                                                                                tlutOff
+                                                                        )
+                                                                }
+                                                                else ->
+                                                                        error(
+                                                                                "Unsupported format ${mapping.format} for ${mapping.itemId}"
+                                                                        )
+                                                        }
+                                                val outFile = cache.fileFor(mapping.itemId, crc32)
+                                                TextureDecoder.saveAsPng(
+                                                        pixels,
+                                                        mapping.width,
+                                                        mapping.height,
+                                                        outFile
+                                                )
+                                                extracted++
+                                        } catch (e: Exception) {
+                                                failed++
+                                                errors.add("${mapping.itemId}: ${e.message}")
+                                        }
+                                }
+
+                                if (extracted > 0) {
+                                        cache.writeMeta(crc32, game.name, mappings.size)
+                                }
+
+                                ExtractReport(
+                                        extracted = extracted,
+                                        failed = failed,
+                                        errors = errors
+                                )
                         }
-                    }
-
-                    if (extracted > 0) {
-                        cache.writeMeta(crc32, game.name, mappings.size)
-                    }
-
-                    ExtractReport(extracted = extracted, failed = failed, errors = errors)
                 }
-            }
 }

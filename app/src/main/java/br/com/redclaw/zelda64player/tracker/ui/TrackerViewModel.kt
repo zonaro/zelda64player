@@ -55,31 +55,66 @@ class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: Stri
 
     private fun resolveAssetCrc(): String? {
         val roms = AppRepositories.baseRomRepository(appContext).getAll()
+        android.util.Log.d(
+                "TrackerAssets",
+                "resolveAssetCrc game=$game roms=${roms.map { "${it.gameCode}:${it.crc32.take(8)}" }}"
+        )
         // Prefer a ROM matching the current game (OoT vs MM via gameCode)
         val gameCodes =
                 when (game) {
                     TrackerGame.OOT -> setOf("CZLE", "CZLP")
                     TrackerGame.MM -> setOf("NZSE", "NZSP")
                 }
-        return roms.firstOrNull { it.gameCode in gameCodes }?.crc32 ?: roms.firstOrNull()?.crc32
+        val result =
+                roms.firstOrNull { it.gameCode in gameCodes }?.crc32 ?: roms.firstOrNull()?.crc32
+        android.util.Log.d("TrackerAssets", "resolveAssetCrc result=$result")
+        return result
     }
 
     /**
      * Ensure icons for [game] are extracted from the base ROM if needed. Call from UI (IO-safe).
      */
     suspend fun ensureAssetsExtracted() {
-        val crc = _assetCrc.value ?: return
+        val crc = _assetCrc.value
+        android.util.Log.d(
+                "TrackerAssets",
+                "ensureAssetsExtracted game=$game crc=$crc expected=${items.size}"
+        )
+        if (crc == null) {
+            android.util.Log.w("TrackerAssets", "No CRC for $game — no base ROM imported?")
+            return
+        }
         val expectedCount = items.size
-        if (assetCache.hasValidCache(crc, expectedCount)) return
+        if (assetCache.hasValidCache(crc, expectedCount)) {
+            android.util.Log.d("TrackerAssets", "Cache valid for $crc, skipping extraction")
+            return
+        }
         val romFile =
                 AppRepositories.baseRomRepository(appContext)
                         .getAll()
                         .firstOrNull { it.crc32.equals(crc, ignoreCase = true) }
                         ?.let { File(it.path) }
-                        ?: return
+                        ?: run {
+                            android.util.Log.w("TrackerAssets", "ROM file not found for CRC $crc")
+                            return
+                        }
+        android.util.Log.d(
+                "TrackerAssets",
+                "Extracting ${items.size} icons from ${romFile.name} for $game"
+        )
         _isExtracting.value = true
         try {
-            assetExtractor.extractAll(romFile, game)
+            val result = assetExtractor.extractAll(romFile, game)
+            android.util.Log.d("TrackerAssets", "Extraction result: $result")
+            if (result.isFailure) {
+                android.util.Log.e("TrackerAssets", "Extraction failed", result.exceptionOrNull())
+            } else {
+                val report = result.getOrNull()
+                android.util.Log.d(
+                        "TrackerAssets",
+                        "Extracted=${report?.extracted} failed=${report?.failed} errors=${report?.errors}"
+                )
+            }
         } finally {
             _isExtracting.value = false
         }

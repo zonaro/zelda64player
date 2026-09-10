@@ -140,22 +140,26 @@ class GamepadTesterView @JvmOverloads constructor(
         val x = inset
         val y = inset
 
-        drawControl(canvas, RectF(x + w * .06f, y, x + w * .23f, y + h * .13f), label(R.string.tester_lb), KeyEvent.KEYCODE_BUTTON_L1)
-        drawControl(canvas, RectF(x + w * .25f, y, x + w * .42f, y + h * .13f), label(R.string.tester_lt), KeyEvent.KEYCODE_BUTTON_L2)
-        drawControl(canvas, RectF(x + w * .58f, y, x + w * .75f, y + h * .13f), label(R.string.tester_rt), KeyEvent.KEYCODE_BUTTON_R2)
-        drawControl(canvas, RectF(x + w * .77f, y, x + w * .94f, y + h * .13f), label(R.string.tester_rb), KeyEvent.KEYCODE_BUTTON_R1)
+        // Ombros maximizados — pills grandes, sem encostar no SELECT
+        drawControl(canvas, RectF(x + w * .02f, y + h * .01f, x + w * .20f, y + h * .24f), label(R.string.tester_lb), KeyEvent.KEYCODE_BUTTON_L1)
+        drawControl(canvas, RectF(x + w * .22f, y + h * .01f, x + w * .40f, y + h * .24f), label(R.string.tester_lt), KeyEvent.KEYCODE_BUTTON_L2)
+        drawControl(canvas, RectF(x + w * .60f, y + h * .01f, x + w * .78f, y + h * .24f), label(R.string.tester_rt), KeyEvent.KEYCODE_BUTTON_R2)
+        drawControl(canvas, RectF(x + w * .80f, y + h * .01f, x + w * .98f, y + h * .24f), label(R.string.tester_rb), KeyEvent.KEYCODE_BUTTON_R1)
 
-        drawDpad(canvas, x + w * .16f, y + h * .49f, min(w, h) * .095f, physical = true)
-        drawStick(canvas, x + w * .37f, y + h * .62f, min(w, h) * .115f, leftX, leftY, label(R.string.tester_l3), KeyEvent.KEYCODE_BUTTON_THUMBL)
-        drawControl(canvas, RectF(x + w * .46f, y + h * .42f, x + w * .54f, y + h * .52f), label(R.string.tester_select), KeyEvent.KEYCODE_BUTTON_SELECT)
-        drawControl(canvas, RectF(x + w * .56f, y + h * .42f, x + w * .64f, y + h * .52f), label(R.string.tester_start), KeyEvent.KEYCODE_BUTTON_START)
-        drawStick(canvas, x + w * .65f, y + h * .62f, min(w, h) * .115f, rightX, rightY, label(R.string.tester_r3), KeyEvent.KEYCODE_BUTTON_THUMBR)
+        // SELECT/START logo abaixo dos ombros, com folga
+        drawControl(canvas, RectF(x + w * .43f, y + h * .28f, x + w * .52f, y + h * .42f), label(R.string.tester_select), KeyEvent.KEYCODE_BUTTON_SELECT)
+        drawControl(canvas, RectF(x + w * .56f, y + h * .28f, x + w * .65f, y + h * .42f), label(R.string.tester_start), KeyEvent.KEYCODE_BUTTON_START)
 
-        val faceRadius = min(w, h) * .065f
-        drawControl(canvas, circle(x + w * .84f, y + h * .48f, faceRadius), label(R.string.tester_y), KeyEvent.KEYCODE_BUTTON_Y)
-        drawControl(canvas, circle(x + w * .78f, y + h * .59f, faceRadius), label(R.string.tester_x), KeyEvent.KEYCODE_BUTTON_X)
-        drawControl(canvas, circle(x + w * .90f, y + h * .59f, faceRadius), label(R.string.tester_b), KeyEvent.KEYCODE_BUTTON_B)
-        drawControl(canvas, circle(x + w * .84f, y + h * .70f, faceRadius), label(R.string.tester_a), KeyEvent.KEYCODE_BUTTON_A)
+        // D-pad e analógicos maximizados — sem sobrepor SELECT nem entre si
+        drawDpad(canvas, x + w * .18f, y + h * .60f, min(w, h) * .145f, physical = true)
+        drawStick(canvas, x + w * .39f, y + h * .74f, min(w, h) * .18f, leftX, leftY, label(R.string.tester_l3), KeyEvent.KEYCODE_BUTTON_THUMBL)
+        drawStick(canvas, x + w * .63f, y + h * .74f, min(w, h) * .18f, rightX, rightY, label(R.string.tester_r3), KeyEvent.KEYCODE_BUTTON_THUMBR)
+
+        val faceRadius = min(w, h) * .105f
+        drawControl(canvas, circle(x + w * .86f, y + h * .42f, faceRadius), label(R.string.tester_y), KeyEvent.KEYCODE_BUTTON_Y)
+        drawControl(canvas, circle(x + w * .80f, y + h * .58f, faceRadius), label(R.string.tester_x), KeyEvent.KEYCODE_BUTTON_X)
+        drawControl(canvas, circle(x + w * .92f, y + h * .58f, faceRadius), label(R.string.tester_b), KeyEvent.KEYCODE_BUTTON_B)
+        drawControl(canvas, circle(x + w * .86f, y + h * .74f, faceRadius), label(R.string.tester_a), KeyEvent.KEYCODE_BUTTON_A)
     }
 
     private fun drawN64Layout(canvas: Canvas, inset: Float) {
@@ -165,21 +169,21 @@ class GamepadTesterView @JvmOverloads constructor(
         val y = inset
         val n64 = ::isN64Pressed
 
-        drawN64Control(canvas, RectF(x + w * .04f, y, x + w * .22f, y + h * .13f), label(R.string.tester_n64_l), N64ControllerMapping.Control.L, n64)
-        drawN64Control(canvas, RectF(x + w * .78f, y, x + w * .96f, y + h * .13f), label(R.string.tester_n64_r), N64ControllerMapping.Control.R, n64)
-        drawN64Control(canvas, RectF(x + w * .06f, y + h * .19f, x + w * .18f, y + h * .33f), label(R.string.tester_n64_z), N64ControllerMapping.Control.Z, n64)
+        drawN64Control(canvas, RectF(x + w * .02f, y + h * .01f, x + w * .20f, y + h * .24f), label(R.string.tester_n64_l), N64ControllerMapping.Control.L, n64)
+        drawN64Control(canvas, RectF(x + w * .80f, y + h * .01f, x + w * .98f, y + h * .24f), label(R.string.tester_n64_r), N64ControllerMapping.Control.R, n64)
+        drawN64Control(canvas, RectF(x + w * .05f, y + h * .28f, x + w * .18f, y + h * .46f), label(R.string.tester_n64_z), N64ControllerMapping.Control.Z, n64)
 
-        drawDpad(canvas, x + w * .27f, y + h * .51f, min(w, h) * .085f, physical = false)
-        drawStick(canvas, x + w * .47f, y + h * .56f, min(w, h) * .13f, leftX, leftY, label(R.string.tester_n64_stick), null)
-        drawN64Control(canvas, RectF(x + w * .46f, y + h * .80f, x + w * .56f, y + h * .92f), label(R.string.tester_n64_start), N64ControllerMapping.Control.START, n64)
+        drawDpad(canvas, x + w * .28f, y + h * .62f, min(w, h) * .135f, physical = false)
+        drawStick(canvas, x + w * .48f, y + h * .68f, min(w, h) * .19f, leftX, leftY, label(R.string.tester_n64_stick), null)
+        drawN64Control(canvas, RectF(x + w * .46f, y + h * .88f, x + w * .56f, y + h * .99f), label(R.string.tester_n64_start), N64ControllerMapping.Control.START, n64)
 
-        val cRadius = min(w, h) * .05f
-        drawN64Control(canvas, circle(x + w * .69f, y + h * .39f, cRadius), label(R.string.tester_n64_c_up), N64ControllerMapping.Control.C_UP, n64)
-        drawN64Control(canvas, circle(x + w * .63f, y + h * .51f, cRadius), label(R.string.tester_n64_c_left), N64ControllerMapping.Control.C_LEFT, n64)
-        drawN64Control(canvas, circle(x + w * .75f, y + h * .51f, cRadius), label(R.string.tester_n64_c_right), N64ControllerMapping.Control.C_RIGHT, n64)
-        drawN64Control(canvas, circle(x + w * .69f, y + h * .63f, cRadius), label(R.string.tester_n64_c_down), N64ControllerMapping.Control.C_DOWN, n64)
-        drawN64Control(canvas, circle(x + w * .86f, y + h * .51f, cRadius * 1.15f), label(R.string.tester_n64_b), N64ControllerMapping.Control.B, n64)
-        drawN64Control(canvas, circle(x + w * .91f, y + h * .68f, cRadius * 1.15f), label(R.string.tester_n64_a), N64ControllerMapping.Control.A, n64)
+        val cRadius = min(w, h) * .088f
+        drawN64Control(canvas, circle(x + w * .70f, y + h * .40f, cRadius), label(R.string.tester_n64_c_up), N64ControllerMapping.Control.C_UP, n64)
+        drawN64Control(canvas, circle(x + w * .64f, y + h * .54f, cRadius), label(R.string.tester_n64_c_left), N64ControllerMapping.Control.C_LEFT, n64)
+        drawN64Control(canvas, circle(x + w * .76f, y + h * .54f, cRadius), label(R.string.tester_n64_c_right), N64ControllerMapping.Control.C_RIGHT, n64)
+        drawN64Control(canvas, circle(x + w * .70f, y + h * .68f, cRadius), label(R.string.tester_n64_c_down), N64ControllerMapping.Control.C_DOWN, n64)
+        drawN64Control(canvas, circle(x + w * .88f, y + h * .52f, cRadius * 1.25f), label(R.string.tester_n64_b), N64ControllerMapping.Control.B, n64)
+        drawN64Control(canvas, circle(x + w * .93f, y + h * .72f, cRadius * 1.25f), label(R.string.tester_n64_a), N64ControllerMapping.Control.A, n64)
     }
 
     private fun drawDpad(canvas: Canvas, cx: Float, cy: Float, radius: Float, physical: Boolean) {

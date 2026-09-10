@@ -133,11 +133,14 @@ class ItemIconView(context: Context) : FrameLayout(context) {
             count: Int,
             assetCrc: String? = null
     ) {
-        // Resolve asset key for cyclic items (e.g. ocarina count 2 → ocarina_2, strength 2 → strength_2)
+        // Resolve asset key for cyclic items (e.g. ocarina count 2 → ocarina_2, strength 2 →
+        // strength_2)
         val assetKey = resolveAssetKey(item, count)
         val assetFile: File? =
                 assetCrc?.let { crc ->
-                    File(context.filesDir, "tracker_assets/$crc/$assetKey.png").takeIf { it.exists() }
+                    File(context.filesDir, "tracker_assets/$crc/$assetKey.png").takeIf {
+                        it.exists()
+                    }
                 }
         // Cyclic items show the variant icon/label for the current count.
         val effectiveIcon =
@@ -220,11 +223,12 @@ class ItemIconView(context: Context) : FrameLayout(context) {
         if (!item.isCyclic || count <= 0) return item.assetKey
         return when (item.id) {
             "ocarina" -> if (count >= 2) "ocarina_2" else "ocarina"
-            "strength" -> when (count) {
-                2 -> "strength_2"
-                3 -> "strength_3"
-                else -> "strength"
-            }
+            "strength" ->
+                    when (count) {
+                        2 -> "strength_2"
+                        3 -> "strength_3"
+                        else -> "strength"
+                    }
             "scale" -> if (count >= 2) "scale_2" else "scale"
             "magic" -> if (count >= 2) "magic_2" else "magic"
             else -> item.assetKey

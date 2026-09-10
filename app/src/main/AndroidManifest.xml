@@ -38,7 +38,7 @@
             android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".views.GamepadTesterActivity"
-            android:exported="false"
+            android:exported="true"
             android:screenOrientation="sensorLandscape"
             android:parentActivityName=".views.LibraryActivity" />
         <activity

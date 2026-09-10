@@ -39,12 +39,6 @@ class GamepadTesterActivity : AppCompatActivity(), InputManager.InputDeviceListe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         inputManager = getSystemService(Context.INPUT_SERVICE) as InputManager
-        val device = findConnectedController()
-        if (device == null) {
-            Toast.makeText(this, R.string.gamepad_tester_connect_controller, Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
 
         binding = ActivityGamepadTesterBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -53,7 +47,11 @@ class GamepadTesterActivity : AppCompatActivity(), InputManager.InputDeviceListe
         binding.testerPhysical.setOnClickListener { selectMode(GamepadTesterView.Mode.PHYSICAL) }
         binding.testerN64.setOnClickListener { selectMode(GamepadTesterView.Mode.N64) }
         selectMode(GamepadTesterView.Mode.PHYSICAL)
+        val device = findConnectedController()
         updateInputDevice(device)
+        if (device == null) {
+            Toast.makeText(this, R.string.gamepad_tester_connect_controller, Toast.LENGTH_SHORT).show()
+        }
 
         window.decorView.setOnApplyWindowInsetsListener { _, insets ->
             window.decorView.post { SwitchImmersive.enterFullscreen(this) }
@@ -68,14 +66,7 @@ class GamepadTesterActivity : AppCompatActivity(), InputManager.InputDeviceListe
 
     override fun onResume() {
         super.onResume()
-        // onCreate can finish early when launched through a stale deep link
-        // without a controller. In that path there is no bound content and the
-        // launch toast is the only message the user should receive.
         if (!::binding.isInitialized) return
-        if (!hasCurrentController()) {
-            finishForDisconnect()
-            return
-        }
         binding.testerSurface.refreshProfile()
     }
 

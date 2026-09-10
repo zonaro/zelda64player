@@ -35,6 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import br.com.redclaw.zelda64player.R
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.tracker.data.TrackerExporter
@@ -201,6 +202,17 @@ class TrackerDialogFragment : DialogFragment() {
         // Posting to the view and using an async commit avoids the race.
         if (childFragmentManager.findFragmentByTag("tab_$selected") == null) {
             view?.post { selectTab(selected) }
+        }
+        // Kick off ROM asset extraction early (before ItemsTab is created) so
+        // the cache is ready when the grid builds. Use view.post to ensure
+        // the view is attached and lifecycle is STARTED.
+        view?.post {
+            viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                viewModel.ensureAssetsExtracted()
+                if (isAdded && childFragmentManager.findFragmentByTag("tab_0") is ItemsTab) {
+                    selectTab(0)
+                }
+            }
         }
     }
 
