@@ -16,12 +16,13 @@ import br.com.redclaw.zelda64player.tracker.assets.graphics.N64TextureFormat
  * Maps OoT tracker item ids to their location inside `icon_item_static` (DMA 8).
  *
  * Each icon is 32x32 RGBA32 = 4096 bytes (0x1000). Offsets from zeldaret/oot
- * `assets/xml/textures/icon_item_static.xml` (Segment 8, Format rgba32).
- * Medallions live in `icon_item_dungeon_static` — not mapped here, will use fallback.
+ * `assets/xml/textures/icon_item_static.xml` (Segment 8, Format rgba32). Medallions live in
+ * `icon_item_dungeon_static` — not mapped here, will use fallback.
  */
 object OotIconMap {
 
     private const val ICON = DmaTableOffsets.OOT_ICON_FILE_INDEX
+    private const val QUEST = DmaTableOffsets.OOT_QUEST_ICON_FILE_INDEX
 
     val entries: List<IconMapping> =
             listOf(
@@ -33,8 +34,14 @@ object OotIconMap {
                     IconMapping("din_fire", ICON, 0x5000, format = N64TextureFormat.RGBA32),
                     IconMapping("slingshot", ICON, 0x6000, format = N64TextureFormat.RGBA32),
                     IconMapping("ocarina", ICON, 0x7000, format = N64TextureFormat.RGBA32),
+                    IconMapping("ocarina_2", ICON, 0x8000, format = N64TextureFormat.RGBA32),
                     IconMapping("bombchu", ICON, 0x9000, format = N64TextureFormat.RGBA32),
-                    IconMapping("hookshot_longshot", ICON, 0xA000, format = N64TextureFormat.RGBA32),
+                    IconMapping(
+                            "hookshot_longshot",
+                            ICON,
+                            0xA000,
+                            format = N64TextureFormat.RGBA32
+                    ),
                     IconMapping("ice_arrows", ICON, 0xC000, format = N64TextureFormat.RGBA32),
                     IconMapping("farore_wind", ICON, 0xD000, format = N64TextureFormat.RGBA32),
                     IconMapping("boomerang", ICON, 0xE000, format = N64TextureFormat.RGBA32),
@@ -51,14 +58,78 @@ object OotIconMap {
                     IconMapping("iron_boots", ICON, 0x45000, format = N64TextureFormat.RGBA32),
                     IconMapping("hover_boots", ICON, 0x46000, format = N64TextureFormat.RGBA32),
                     IconMapping("strength", ICON, 0x50000, format = N64TextureFormat.RGBA32),
-                    IconMapping("magic", ICON, 0x50000, format = N64TextureFormat.RGBA32),
+                    IconMapping("strength_2", ICON, 0x51000, format = N64TextureFormat.RGBA32),
+                    IconMapping("strength_3", ICON, 0x52000, format = N64TextureFormat.RGBA32),
+                    IconMapping(
+                            "magic",
+                            QUEST,
+                            0xA200,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
+                    IconMapping(
+                            "magic_2",
+                            QUEST,
+                            0xAB00,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
                     IconMapping("scale", ICON, 0x53000, format = N64TextureFormat.RGBA32),
+                    IconMapping("scale_2", ICON, 0x54000, format = N64TextureFormat.RGBA32),
                     IconMapping("kokiri_tunic", ICON, 0x41000, format = N64TextureFormat.RGBA32),
                     IconMapping("goron_tunic", ICON, 0x42000, format = N64TextureFormat.RGBA32),
                     IconMapping("zora_tunic", ICON, 0x43000, format = N64TextureFormat.RGBA32),
                     IconMapping("rupees", ICON, 0x56000, format = N64TextureFormat.RGBA32),
-                    // Medallions are in icon_item_dungeon_static — fallback for now
-                    // forest/fire/water/spirit/shadow/light medallions not in icon_item_static
+                    IconMapping(
+                            "forest_medallion",
+                            QUEST,
+                            0x0000,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
+                    IconMapping(
+                            "fire_medallion",
+                            QUEST,
+                            0x0900,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
+                    IconMapping(
+                            "water_medallion",
+                            QUEST,
+                            0x1200,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
+                    IconMapping(
+                            "spirit_medallion",
+                            QUEST,
+                            0x1B00,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
+                    IconMapping(
+                            "shadow_medallion",
+                            QUEST,
+                            0x2400,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
+                    IconMapping(
+                            "light_medallion",
+                            QUEST,
+                            0x2D00,
+                            width = 24,
+                            height = 24,
+                            format = N64TextureFormat.RGBA32
+                    ),
                     IconMapping("keaton_mask", ICON, 0x24000, format = N64TextureFormat.RGBA32),
                     IconMapping("skull_mask", ICON, 0x25000, format = N64TextureFormat.RGBA32),
                     IconMapping("spooky_mask", ICON, 0x26000, format = N64TextureFormat.RGBA32),

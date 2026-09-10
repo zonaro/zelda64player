@@ -74,36 +74,19 @@ class RomAssetExtractor(
 
                     val parser = DmaTableParser(baseRomFile, dmaOffset)
                     val entries = parser.parseEntries()
-                    val iconIndex =
-                            when (game) {
-                                TrackerGame.OOT -> DmaTableOffsets.OOT_ICON_FILE_INDEX
-                                TrackerGame.MM -> DmaTableOffsets.MM_ICON_FILE_INDEX
-                            }
-                    val iconEntry =
-                            entries.getOrNull(iconIndex)
-                                    ?: return@runCatching ExtractReport(
-                                            extracted = 0,
-                                            failed = mappings.size,
-                                            errors =
-                                                    listOf(
-                                                            "DMA entry $iconIndex not found (table size ${entries.size})"
-                                                    ),
-                                    )
 
-                    if (!iconEntry.exists) {
-                        return@runCatching ExtractReport(
-                                extracted = 0,
-                                failed = mappings.size,
-                                errors = listOf("DMA entry $iconIndex does not exist"),
-                        )
-                    }
-
-                    val rawBytes = parser.readEntryBytes(iconEntry)
-                    val archiveBytes =
-                            if (iconEntry.isCompressed) {
-                                Yaz0Decompressor.decompress(rawBytes)
-                            } else {
-                                rawBytes
+                    // Cache decompressed archives by DMA index to avoid re-reading
+                    val archiveCache = mutableMapOf<Int, ByteArray>()
+                    fun getArchive(dmaIndex: Int): ByteArray =
+                            archiveCache.getOrPut(dmaIndex) {
+                                val entry =
+                                        entries.getOrNull(dmaIndex)
+                                                ?: error(
+                                                        "DMA entry $dmaIndex not found (table size ${entries.size})"
+                                                )
+                                require(entry.exists) { "DMA entry $dmaIndex does not exist" }
+                                val raw = parser.readEntryBytes(entry)
+                                if (entry.isCompressed) Yaz0Decompressor.decompress(raw) else raw
                             }
 
                     var extracted = 0
@@ -112,19 +95,12 @@ class RomAssetExtractor(
 
                     for (mapping in mappings) {
                         try {
+                            val archiveBytes = getArchive(mapping.dmaFileIndex)
                             val pixels =
                                     when (mapping.format) {
                                         br.com.redclaw.zelda64player.tracker.assets.graphics
                                                 .N64TextureFormat.RGBA32 ->
                                                 TextureDecoder.decodeRGBA32(
-                                                        archiveBytes,
-                                                        mapping.offset,
-                                                        mapping.width,
-                                                        mapping.height
-                                                )
-                                        br.com.redclaw.zelda64player.tracker.assets.graphics
-                                                .N64TextureFormat.RGBA16 ->
-                                                TextureDecoder.decodeRGBA16(
                                                         archiveBytes,
                                                         mapping.offset,
                                                         mapping.width,

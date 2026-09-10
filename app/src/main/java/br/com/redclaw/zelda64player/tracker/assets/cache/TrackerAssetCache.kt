@@ -23,7 +23,8 @@ import org.json.JSONObject
 class TrackerAssetCache(private val context: Context) {
 
     companion object {
-        const val CACHE_VERSION = 2 // bump to invalidate old RGBA16/stride 0x800 cache
+        const val CACHE_VERSION =
+                3 // bump to invalidate old cache (magia/medalhões/ocarina/scale/strength)
     }
 
     private fun dirFor(crc32: String): File =

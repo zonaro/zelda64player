@@ -133,14 +133,13 @@ class ItemIconView(context: Context) : FrameLayout(context) {
             count: Int,
             assetCrc: String? = null
     ) {
-        // Try ROM-extracted PNG first (Coil File), fall back to embedded drawable.
+        // Resolve asset key for cyclic items (e.g. ocarina count 2 → ocarina_2, strength 2 → strength_2)
+        val assetKey = resolveAssetKey(item, count)
         val assetFile: File? =
                 assetCrc?.let { crc ->
-                    File(context.filesDir, "tracker_assets/$crc/${item.assetKey}.png").takeIf {
-                        it.exists()
-                    }
+                    File(context.filesDir, "tracker_assets/$crc/$assetKey.png").takeIf { it.exists() }
                 }
-        // Cyclic items (hookshot, ocarina) show the variant icon/label for the current count.
+        // Cyclic items show the variant icon/label for the current count.
         val effectiveIcon =
                 if (item.isCyclic && count in 1..item.cycleIcons.size) item.cycleIcons[count - 1]
                 else item.iconRes
@@ -216,4 +215,19 @@ class ItemIconView(context: Context) : FrameLayout(context) {
                 shape = GradientDrawable.OVAL
                 setColor(AccentManager.getAccentColor(context))
             }
+
+    private fun resolveAssetKey(item: TrackerItem, count: Int): String {
+        if (!item.isCyclic || count <= 0) return item.assetKey
+        return when (item.id) {
+            "ocarina" -> if (count >= 2) "ocarina_2" else "ocarina"
+            "strength" -> when (count) {
+                2 -> "strength_2"
+                3 -> "strength_3"
+                else -> "strength"
+            }
+            "scale" -> if (count >= 2) "scale_2" else "scale"
+            "magic" -> if (count >= 2) "magic_2" else "magic"
+            else -> item.assetKey
+        }
+    }
 }
