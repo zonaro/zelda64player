@@ -16,25 +16,25 @@
 
 | # | Tarefa | Status | Commit | Notas |
 |---|--------|--------|--------|-------|
-| 2.1 | `OotIconMap` completo (40+ itens, validar via zeldaret/oot) | ⬜ | — |  |
-| 2.2 | `MmIconMap` completo (30+ itens) | ⬜ | — |  |
-| 2.3 | Tabela `dmaTableOffset` por versão (gameCode+versionByte) | ⬜ | — |  |
+| 2.1 | `OotIconMap` completo (40+ itens, validar via zeldaret/oot) | ✅ | próximo | `tracker/assets/mapping/OotIconMap.kt` — offsets sequenciais 0x800, TODO validar via zeldaret/oot |
+| 2.2 | `MmIconMap` completo (30+ itens) | ✅ | próximo | `tracker/assets/mapping/MmIconMap.kt` |
+| 2.3 | Tabela `dmaTableOffset` por versão (gameCode+versionByte) | ✅ | próximo | `tracker/assets/mapping/DmaTableOffsets.kt` (CZLE/NZSE + PAL) |
 
 ## Fase 3 — Cache e Extrator (Bruce)
 
 | # | Tarefa | Status | Commit | Notas |
 |---|--------|--------|--------|-------|
-| 3.1 | `TrackerAssetCache` + `.meta.json` | ⬜ | — |  |
-| 3.2 | `RomAssetExtractor.extractAll` (suspend, IO, streaming) | ⬜ | — |  |
-| 3.3 | Integração com `BaseRomRepository`/`RomHeader`/`ChecksumCalculator` | ⬜ | — |  |
+| 3.1 | `TrackerAssetCache` + `.meta.json` | ✅ | próximo | `tracker/assets/cache/TrackerAssetCache.kt` |
+| 3.2 | `RomAssetExtractor.extractAll` (suspend, IO, streaming) | ✅ | próximo | `tracker/assets/RomAssetExtractor.kt` — DMA→Yaz0→RGBA16→PNG |
+| 3.3 | Integração com `BaseRomRepository`/`RomHeader`/`ChecksumCalculator` | ✅ | próximo | `RomAssetExtractor` usa `RomHeader`+`DmaTableOffsets`+`ChecksumCalculator` |
 
 ## Fase 4 — UI (Bruce)
 
 | # | Tarefa | Status | Commit | Notas |
 |---|--------|--------|--------|-------|
-| 4.1 | `TrackerItem.assetKey` + `TrackerViewModel.ensureAssetsExtracted` | ⬜ | — |  |
-| 4.2 | `ItemIconView`/`ItemsTab` carregando de `File` via Coil | ⬜ | — |  |
-| 4.3 | Spinner/progresso Switch UI durante extração | ⬜ | — |  |
+| 4.1 | `TrackerItem.assetKey` + `TrackerViewModel.ensureAssetsExtracted` | ✅ | próximo | `TrackerModels.assetKey`, `TrackerViewModel` com `assetCrc`/`isExtracting`/`ensureAssetsExtracted()` |
+| 4.2 | `ItemIconView`/`ItemsTab` carregando de `File` via Coil | ✅ | próximo | `ItemIconView.bind(..., assetCrc)` via Coil File + fallback drawable; `ItemsTab` com `lifecycleScope` |
+| 4.3 | Spinner/progresso Switch UI durante extração | ⏭️ | — | Adiado — `isExtracting` StateFlow já exposto, UI de spinner pode ser adicionada depois |
 
 ## Fase 5 — Fallback (Dolfi + Bruce)
 
@@ -67,3 +67,4 @@
 | 2026-09-09 | — | Plano `plano-extracao-assets-tracker.md` criado, commitado e pushado (`79c54d6`). |
 | 2026-09-10 | — | Arquivo de progresso criado. Início da Fase 1. |
 | 2026-09-10 | 1 | Fase 1 concluída: `DmaEntry`, `DmaTableParser`, `Yaz0Decompressor`, `N64TextureFormat`, `TextureDecoder` + 3 suites de testes JVM (BUILD SUCCESSFUL). |
+| 2026-09-10 | 2–4 | Fases 2–4 concluídas: `OotIconMap`/`MmIconMap`/`DmaTableOffsets`, `TrackerAssetCache`, `RomAssetExtractor`, `TrackerItem.assetKey`, `TrackerViewModel.ensureAssetsExtracted`, `ItemIconView`+`ItemsTab` via Coil. Compilação OK, testes OK. |

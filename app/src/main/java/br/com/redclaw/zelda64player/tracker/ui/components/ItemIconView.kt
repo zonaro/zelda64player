@@ -26,8 +26,11 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import br.com.redclaw.zelda64player.R
+import br.com.redclaw.zelda64player.tracker.assets.cache.TrackerAssetCache
 import br.com.redclaw.zelda64player.tracker.model.TrackerItem
 import br.com.redclaw.zelda64player.ui.switchui.AccentManager
+import coil.load
+import java.io.File
 
 /**
  * Square, Switch-style card representing one inventory item. Tap toggles the obtained state (and
@@ -124,7 +127,11 @@ class ItemIconView(context: Context) : FrameLayout(context) {
         (checkView.layoutParams as LayoutParams).gravity = Gravity.TOP or Gravity.START
     }
 
-    fun bind(item: TrackerItem, displayName: String, obtained: Boolean, count: Int) {
+    fun bind(item: TrackerItem, displayName: String, obtained: Boolean, count: Int, assetCrc: String? = null) {
+        // Try ROM-extracted PNG first (Coil File), fall back to embedded drawable.
+        val assetFile: File? = assetCrc?.let { crc ->
+            File(context.filesDir, "tracker_assets/$crc/${item.assetKey}.png").takeIf { it.exists() }
+        }
         // Cyclic items (hookshot, ocarina) show the variant icon/label for the current count.
         val effectiveIcon =
                 if (item.isCyclic && count in 1..item.cycleIcons.size) item.cycleIcons[count - 1]
@@ -133,7 +140,13 @@ class ItemIconView(context: Context) : FrameLayout(context) {
                 if (item.isCyclic && count in 1..item.cycleLabels.size)
                         context.getString(item.cycleLabels[count - 1])
                 else displayName
-        if (effectiveIcon != 0) {
+        if (assetFile != null) {
+            iconView.load(assetFile) {
+                placeholder(effectiveIcon.takeIf { it != 0 } ?: R.drawable.placeholder_cover)
+                error(effectiveIcon.takeIf { it != 0 } ?: R.drawable.placeholder_cover)
+            }
+            iconView.visibility = VISIBLE
+        } else if (effectiveIcon != 0) {
             iconView.setImageResource(effectiveIcon)
             iconView.visibility = VISIBLE
         } else {

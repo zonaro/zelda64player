@@ -26,11 +26,13 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import br.com.redclaw.zelda64player.Zelda64PlayerApp
 import br.com.redclaw.zelda64player.tracker.model.TrackerItem
 import br.com.redclaw.zelda64player.tracker.ui.TrackerDialogFragment
 import br.com.redclaw.zelda64player.tracker.ui.TrackerViewModel
 import br.com.redclaw.zelda64player.tracker.ui.components.ItemIconView
+import kotlinx.coroutines.launch
 
 /** Manual inventory grid. Tap an item to cycle obtained count (0..maxCount). */
 class ItemsTab : Fragment() {
@@ -64,6 +66,11 @@ class ItemsTab : Fragment() {
         }
         viewModel = parent.viewModel
         buildGrid()
+        // Trigger on-demand extraction from base ROM (if needed) and rebuild when done
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.ensureAssetsExtracted()
+            if (isAdded) buildGrid()
+        }
     }
 
     private fun buildGrid() {
@@ -91,7 +98,8 @@ class ItemsTab : Fragment() {
                     item,
                     getString(item.nameRes),
                     viewModel.isItemObtained(item.id),
-                    viewModel.getItemCount(item.id)
+                    viewModel.getItemCount(item.id),
+                    viewModel.assetCrc.value
             )
             cell.layoutParams =
                     LinearLayout.LayoutParams(
@@ -118,7 +126,8 @@ class ItemsTab : Fragment() {
                 item,
                 getString(item.nameRes),
                 viewModel.isItemObtained(item.id),
-                viewModel.getItemCount(item.id)
+                viewModel.getItemCount(item.id),
+                viewModel.assetCrc.value
         )
     }
 }

@@ -19,6 +19,9 @@
 package br.com.redclaw.zelda64player.tracker.ui
 
 import android.content.Context
+import br.com.redclaw.zelda64player.data.local.AppRepositories
+import br.com.redclaw.zelda64player.tracker.assets.RomAssetExtractor
+import br.com.redclaw.zelda64player.tracker.assets.cache.TrackerAssetCache
 import br.com.redclaw.zelda64player.tracker.data.OotItemDatabase
 import br.com.redclaw.zelda64player.tracker.data.TrackerRepository
 import br.com.redclaw.zelda64player.tracker.logic.HintInterpreter
@@ -28,6 +31,9 @@ import br.com.redclaw.zelda64player.tracker.model.TrackerItem
 import br.com.redclaw.zelda64player.tracker.model.TrackerLocation
 import br.com.redclaw.zelda64player.tracker.model.TrackerSong
 import br.com.redclaw.zelda64player.tracker.model.TrackerState
+import java.io.File
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Plain (non-Android-ViewModel) state holder shared by the tracker dialog and its tab fragments.
@@ -36,7 +42,43 @@ import br.com.redclaw.zelda64player.tracker.model.TrackerState
  */
 class TrackerViewModel(context: Context, val game: TrackerGame, val hackId: String? = null) {
 
-    private val repository = TrackerRepository(context.applicationContext)
+    private val appContext = context.applicationContext
+    private val repository = TrackerRepository(appContext)
+    private val assetCache = TrackerAssetCache(appContext)
+    private val assetExtractor = RomAssetExtractor(appContext, assetCache)
+
+    // Asset extraction state (observed by UI for spinner/progress)
+    private val _isExtracting = MutableStateFlow(false)
+    val isExtracting: StateFlow<Boolean> = _isExtracting
+    private val _assetCrc = MutableStateFlow<String?>(resolveAssetCrc())
+    val assetCrc: StateFlow<String?> = _assetCrc
+
+    private fun resolveAssetCrc(): String? {
+        val roms = AppRepositories.baseRomRepository(appContext).getAll()
+        // Prefer a ROM matching the current game (OoT vs MM via gameCode)
+        val gameCodes = when (game) {
+            TrackerGame.OOT -> setOf("CZLE", "CZLP")
+            TrackerGame.MM -> setOf("NZSE", "NZSP")
+        }
+        return roms.firstOrNull { it.gameCode in gameCodes }?.crc32
+            ?: roms.firstOrNull()?.crc32
+    }
+
+    /** Ensure icons for [game] are extracted from the base ROM if needed. Call from UI (IO-safe). */
+    suspend fun ensureAssetsExtracted() {
+        val crc = _assetCrc.value ?: return
+        val expectedCount = items.size
+        if (assetCache.hasValidCache(crc, expectedCount)) return
+        val romFile = AppRepositories.baseRomRepository(appContext).getAll()
+            .firstOrNull { it.crc32.equals(crc, ignoreCase = true) }
+            ?.let { File(it.path) } ?: return
+        _isExtracting.value = true
+        try {
+            assetExtractor.extractAll(romFile, game)
+        } finally {
+            _isExtracting.value = false
+        }
+    }
     val state: TrackerState =
             repository.load(game, hackId).also {
                 if (it.hints.isEmpty()) it.hints.addAll(HintInterpreter.defaultHints())
